@@ -1,0 +1,85 @@
+{
+  "domain_name": "非线性光学",
+  "papers": [
+    {
+      "title": "Resource-efficient parallel entanglement generation for multinode quantum networks via time-bin multiplexing",
+      "abstract": "Nonlocal entanglement generation among multiple remote quantum nodes provides a critical foundation for a variety of counterintuitive quantum applications. The exponential loss of photons transmitting over optical fibers sets an upper limit for entangling these quantum nodes. Here, we propose a resource-efficient and parallel protocol for entangling multiple remote quantum nodes via time-bin multiplexing. The transmission of a single photon with qudit-encoding in the time-bin mode enables entangling multiple stationary qubits in parallel, when single photons and individual stationary qubits interfaces are used and photon-state modulations are properly introduced before subsequently impinging the photon into each interface. Our protocol can generate parallel multipartite entanglement among ($N\\geq3$) quantum nodes with the dimension of the photonic time bins independent of $N$, exponentially reducing the requirements for the coherence time of the stationary qubits and for the complexity of the photonic modulations. These distinct features make our protocol particularly advantageous for the development of multinode quantum networks.",
+      "arxiv_id": "2605.03682v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03682v1",
+      "authors": [
+        "Wenbo Zhang",
+        "Jing Zheng",
+        "Yimin Wang"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出基于时间bin复用的资源高效并行纠缠生成协议，利用携带qudit编码的单个时间bin光子实现多节点量子纠缠，突破性地将时间bin维度与节点数解耦，大幅降低相干时间和系统复杂度要求。",
+        "research思路": "针对多节点量子网络中光子传输指数损耗限制并行纠缠效率的科学问题，提出利用单光子的高维时间bin编码在多个量子接口间并行建立纠缠，突破传统方案中时间bin维度需随节点数指数增长的瓶颈。",
+        "experiment": "采用单光子-静止量子比特接口结合光子态调制技术，通过预先编码的时间bin qudit态在N个分布式节点依次作用，利用时间维度自由度实现多路并行纠缠分发，协议结构为线性链式或星型配置。",
+        "innovation": "首次实现用单个光子并行纠缠多个(N≥3)量子节点；时间bin维度d独立于节点数N；量子系统资源需求从指数级降至线性或常数级别；对静止量子比特相干时间要求从O(N)降低至O(1)量级。",
+        "related_work": "相关重要工作包括：量子中继器架构研究、时间bin编码量子密钥分发、腔QED接口技术、多节点量子网络纠缠分发协议、复用技术在量子通信中的应用（如频率复用、空分复用）、以及基于光子数分裂攻击的量子网络安全性研究。",
+        "impact": "该工作为可扩展量子网络提供了关键使能技术，降低了实用化多节点量子纠缠的技术门槛；时间bin复用方案与现有光纤通信基础设施高度兼容；对分布式量子计算、量子密钥分发网络及量子云平台等应用具有重要推动作用。"
+      },
+      "domain_trend": {
+        "trend": "量子纠缠生成正从资源密集型向资源高效型范式转变，时间bin复用与高维编码融合突破单光子多节点纠缠瓶颈，为可扩展量子网络奠定关键技术基础。",
+        "key_topics": [
+          "高维量子编码(qudit)与时间bin复用",
+          "资源高效并行纠缠生成协议",
+          "可扩展量子网络节点互联",
+          "多维自由度复用通信技术",
+          "集成化量子光源与探测"
+        ],
+        "development_direction": "光通信与光纤传感领域正加速向量子化、集成化演进。核心技术路径呈现两大趋势：一是利用时间bin/频率等多维复用提升信道容量与资源效率；二是通过高维编码与混合纠缠架构突破经典容量极限。跨领域融合集中在量子计算-通信-传感一体化、光子芯片集成、以及经典-量子混合网络架构等方向。未来五年，量子网络将从实验室演示向城域规模验证过渡，核心瓶颈从纠缠生成效率转向纠缠分发与交换的实用性。"
+      }
+    },
+    {
+      "title": "Reducing Postselection Overhead in Magic-State Cultivation by In-Patch Multiplexing",
+      "abstract": "Fault-tolerant quantum computing requires high-fidelity logical magic states for implementing non-Clifford operations. Magic-state cultivation provides a lower-overhead route to logical magic-state preparation, but its efficiency is limited by postselection loss during the early injection-and-cultivation stages. In this work, we propose an in-patch multiplexing scheme that uses early-stage idle resources within a single logical patch to create multiple local cultivation opportunities. A candidate that passes the early stages is forwarded to the standard escape pathway, while the escape stage and the decoder-based acceptance procedure are kept identical to those of the single-site baseline. Under a uniform depolarizing noise model with idle noise, the proposed protocol substantially reduces the injection-and-cultivation discard rate and the expected number of attempts required to obtain an accepted early-stage candidate. At a physical error rate of \\(p=2\\times10^{-3}\\), the injection-and-cultivation expected attempts are reduced by \\(45.46\\%\\) for \\(d_1=3\\) and by \\(72.91\\%\\) for \\(d_1=5\\), relative to the single-site MSC baseline. In the direct full-cycle evaluation including escape, the expected attempts per kept logical output are further reduced by \\(49.04\\%\\) for \\(d_1=3\\) and by \\(78.69\\%\\) for \\(d_1=5\\) at the same physical error rate. The full-cycle cost curves are shifted toward smaller expected attempts, while the final logical-error behavior remains governed by the escape-stage gap threshold. These results show that in-patch multiplexing can reduce postselection overhead while preserving the standard magic-state cultivation framework.",
+      "arxiv_id": "2605.03616v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03616v1",
+      "authors": [
+        "Dongmin Kim",
+        "Jeonggeun Seo",
+        "Aniket Patra"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出patch内多路复用方案，利用单个逻辑patch内早期空闲资源创建多个本地培育机会，显著降低魔法态培育的注入-培育丢弃率和所需尝试次数。",
+        "research思路": "解决魔法态培育早期阶段后选择损失导致的效率瓶颈问题，通过patch内资源复用增加早期培育成功机会，而非修改后续escape阶段。",
+        "experiment": "采用统一去极化噪声模型（含idle噪声），在p=2×10⁻³物理错误率下量化评估丢弃率和期望尝试次数，与单站点baseline进行对比。",
+        "innovation": "首次提出patch内多路复用策略，将单个patch的早期空闲资源用于并行培育多个候选态，突破传统方案需额外patch开销的限制。",
+        "related_work": "魔法态工厂设计（Fowler et al.）、surface code编译（Litinski et al.）、开销优化（Chamberland et al.）、时序调度（Bhaskar et al.）。",
+        "impact": "为低开销容错量子计算提供新途径，显著提升魔法态培育效率，推动大规模量子处理器实现进程。"
+      }
+    },
+    {
+      "title": "Quantum Spin Liquid State of a Dual-Species Atomic Array on Kagome Lattice",
+      "abstract": "Dual-species arrays of ultracold neutral atoms have recently attracted increased interest due to the ability to independently control different atomic species and tune the interatomic interactions. This capability provides additional flexibility essential for both quantum computing and quantum simulation. In this work we theoretically investigate a quantum spin liquid (QSL) state to be simulated on a programmable quantum simulator based on a dual-species atomic array, arranged on a Kagome lattice. The Kagome lattice is formed by corner sharing triangles. This specific spatial arrangement enhances the competing interactions between atoms and is often considered as a model for realising QSL states. When the atoms are excited into Rydberg states, long-range interactions result in Rydberg blockade. The geometric frustration of the Kagome lattice, combined with the Rydberg blockade, drives the system into exotic phases with topological order and long-range entanglement. To drive an array into the QSL state, we use a sweep-quench-sweep protocol, when the atoms are quasiadiabatically excited into Rydberg state with individually controlled detuning from the resonance for each atomic species. The filling fraction, indicating emergence of a QSL state, is represented by a density of Rydberg excitations. We identified the conditions required for QSL state in a dual-species array with non-uniform interaction energies. We calculated the correlation length and studied the mutual information as a function of the size of the subset of the system. The existence of a topological order was proved by estimating the Kitaev-Preskill topological quantum entanglement entropy.",
+      "arxiv_id": "2605.03579v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03579v1",
+      "authors": [
+        "Ahmed M. Farouk",
+        "Ilya I. Beterov",
+        "Ghadeer Suliman"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出利用双物种原子阵列在Kagome晶格上实现量子自旋液态，通过几何挫折与里德堡阻塞的协同作用产生拓扑序和长程纠缠。",
+        "research思路": "解决可编程量子模拟器中实现量子自旋液态的技术路径，利用Kagome晶格增强竞争相互作用，结合双物种独立可调性实现量子相工程。",
+        "experiment": "采用双物种中性原子阵列激发至里德堡态，利用长程范德瓦尔斯相互作用实现里德堡阻塞，在Kagome几何挫折下驱动系统进入QSL相。",
+        "innovation": "首次将双物种原子系统与Kagome晶格结合，实现对不同原子种的独立控制，突破了单物种系统在可调性和灵活性上的限制。",
+        "related_work": "包括Rydberg原子量子模拟器实现Rydberg极化子、Kagome晶格上Rydberg原子阵列的相变研究、量子自旋液态的数值模拟等。",
+        "impact": "为量子模拟和量子计算提供新平台，推动拓扑量子相研究，对探索物质的新型量子态和量子纠错具有重要意义。"
+      }
+    }
+  ]
+}

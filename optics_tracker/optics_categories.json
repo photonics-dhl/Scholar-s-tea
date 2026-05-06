@@ -1,0 +1,108 @@
+{
+  "categories": {
+    "ultrafast_optics": {
+      "name": "超快光学",
+      "name_en": "Ultrafast Optics",
+      "icon": "⚡",
+      "keywords": ["ultrafast", "sub-cycle", "femtosecond", "attosecond", "pulse shaping", "pump-probe", "high-harmonic generation", "HHG", "mode-locked laser", "frequency comb"],
+      "exclude": ["ultrafast imaging"],
+      "priority": 1
+    },
+    "metamaterial_optics": {
+      "name": "超材料与纳米光学",
+      "name_en": "Metamaterial & Nanophotonics",
+      "icon": "🧱",
+      "keywords": ["metamaterial", "metasurface", "plasmonic", "negative refraction", "superlens", "cloaking", "nanophotonics", "nanoparticle", "nano-optics"],
+      "exclude": [],
+      "priority": 2
+    },
+    "nearfield_optics": {
+      "name": "近场光学",
+      "name_en": "Near-field Optics",
+      "icon": "🔎",
+      "keywords": [
+        "near field", "near-field", "NSOM", "SNOM", "s-SNOM",
+        "evanescent wave", "scanning probe microscopy", "apertureless",
+        "scanning near-field", "near-field scanning",
+        "super-resolution microscopy", "deep subwavelength",
+        "STED", "PALM", "STORM", "single molecule imaging",
+        "surface plasmon", "sub-diffraction", "subwavelength",
+        "nano-optics", "nano imaging", "tip-enhanced", "TERS",
+        "photon scanning tunneling", "PSTM", "interferometric",
+        "scattering-type", "nano-spectroscopy", "near-infrared",
+        "aperture SNOM", "field enhancement", "hot carrier",
+        "optical antenna", "nanofocusing", "surface phonon polariton",
+        "near field optical", "optical near field", "scattering near field",
+        "aperture near-field", "near-field microscopy", "nano-photonic",
+        "photon scanning tunneling microscopy", "frustrated total internal reflection",
+        "surface enhanced Raman", "SERS", "gap plasmon", "nanoparticle dimer",
+        "near-field coupling", "optical super-resolution"
+      ],
+      "exclude": [
+        "quantum information", "quantum computing", "quantum error correction",
+        "quantum memory", "quantum key", "quantum cryptography",
+        "quantum communication", "quantum network", "quantum repeater",
+        "quantum information processing", "quantum dot", "quantum well",
+        "quantum cascade laser", "quantum optics experiments"
+      ],
+      "priority": 3
+    },
+    "laser_processing": {
+      "name": "激光加工与制造",
+      "name_en": "Laser Processing & Manufacturing",
+      "icon": "🔥",
+      "keywords": [
+        "laser processing", "laser machining", "laser microfabrication",
+        "laser ablation", "femtosecond machining", "micro-nano manufacturing",
+        "laser manufacturing", "laser surface texturing", "laser direct writing",
+        "laser patterning", "laser induced breakdown", "laser shock peening",
+        "laser drilling", "laser cutting", "laser welding", "laser melting",
+        "laser cladding", "laser deposition", "laser synthesis",
+        "laser fabrication", "lasernano", "laser-matter interaction",
+        "laser material processing", "ultrafast laser machining",
+        "laser forward transfer", "laser back ablation"
+      ],
+      "exclude": ["laser cooling", "laser spectroscopy", "laser physics"],
+      "priority": 4
+    },
+    "nonlinear_optics": {
+      "name": "非线性光学",
+      "name_en": "Nonlinear Optics",
+      "icon": "🌊",
+      "keywords": ["nonlinear optics", "SHG", "OPO", "four-wave mixing", "Raman", "CARS", "Kerr effect", "second-harmonic"],
+      "exclude": [],
+      "priority": 5
+    },
+    "nanophotonics": {
+      "name": "硅基光子学与量子光学",
+      "name_en": "Silicon Photonics & Quantum Optics",
+      "icon": "💎",
+      "keywords": ["silicon photonics", "photonic integrated", "quantum optics", "quantum computing", "single photon", "photonic crystal", " waveguide"],
+      "exclude": [],
+      "priority": 6
+    },
+    "biophotonics": {
+      "name": "生物与医学光子学",
+      "name_en": "Biomedical Photonics",
+      "icon": "🏥",
+      "keywords": ["biophotonics", "biomedical imaging", "biosensing", "phototherapy", "bioimaging", "optical coherence tomography", "fluorescence imaging"],
+      "exclude": [],
+      "priority": 7
+    },
+    "quantum_optics": {
+      "name": "光通信与光纤传感",
+      "name_en": "Optical Communication & Fiber Sensing",
+      "icon": "📡",
+      "keywords": ["optical communication", "fiber optic sensing", "fibersensor", "optical fiber", "wavelength division multiplexing", "dense WDM", "BOTDR", "BOTDA"],
+      "exclude": [],
+      "priority": 8
+    }
+  },
+  "quality_filters": {
+    "min_citation_count": 3,
+    "min_if": 3.0
+  },
+  "feishu": {
+    "target_group": "oc_6172e7ce838d85f4928d6ee707203b60"
+  }
+}

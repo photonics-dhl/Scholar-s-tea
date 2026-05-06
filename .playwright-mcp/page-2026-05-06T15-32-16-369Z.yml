@@ -1,0 +1,36 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Scholar's Tea" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e10]: Scholar's Tea
+        - navigation [ref=e11]:
+          - link "学科" [ref=e12] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e13]
+            - text: 学科
+          - link "课题组" [ref=e16] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e17]
+            - text: 课题组
+          - link "思想工坊" [ref=e22] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e23]
+            - text: 思想工坊
+          - link "茶话会" [ref=e25] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e26]
+            - text: 茶话会
+          - link "TOP10" [ref=e28] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e29]
+            - text: TOP10
+        - button "登录" [ref=e36] [cursor=pointer]:
+          - link "登录" [ref=e37]:
+            - /url: /signin
+    - main [ref=e38]
+    - contentinfo [ref=e47]:
+      - paragraph [ref=e49]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - alert [ref=e50]

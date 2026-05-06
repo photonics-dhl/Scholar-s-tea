@@ -79,104 +79,129 @@ export default function GroupsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">课题组</h1>
-          <p className="mt-1 text-muted-foreground">
-            发现并加入优秀的研究团队 · 共 {total} 个课题组
-          </p>
-        </div>
-        <Link href="/groups/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            创建课题组
-          </Button>
-        </Link>
-      </div>
-
-      {/* Search & Filters */}
-      <div className="mb-6 flex items-center gap-4">
-        <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="搜索课题组..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Button type="submit" variant="secondary">
-            搜索
-          </Button>
-        </form>
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Groups Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse rounded-lg border bg-card p-4">
-              <div className="h-24 bg-muted" />
-              <div className="mt-4 h-4 w-2/3 bg-muted" />
-              <div className="mt-2 h-3 w-1/2 bg-muted" />
-              <div className="mt-4 h-3 w-full bg-muted" />
-              <div className="mt-2 h-3 w-3/4 bg-muted" />
+    <div>
+      {/* Scholarly Page Header */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-journal-primary/[0.08] via-journal-primary/[0.02] to-transparent border-b border-journal-border/30">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-journal-gold/10 via-transparent to-transparent" />
+        <div className="relative container mx-auto px-4 py-12 md:py-16">
+          <div className="flex items-end justify-between">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-8 w-1 rounded-full bg-journal-gold" />
+                <span className="text-sm font-medium text-journal-primary tracking-wide uppercase">Research Groups</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-foreground">
+                课题组
+              </h1>
+              <p className="mt-4 text-lg text-muted-foreground font-source-serif leading-relaxed">
+                发现并加入优秀的研究团队
+                <span className="mx-2 text-journal-gold">·</span>
+                共 <span className="font-semibold text-foreground">{total}</span> 个课题组
+              </p>
             </div>
-          ))}
+            <Link href="/groups/new" className="hidden sm:block">
+              <Button variant="journal" size="lg">
+                <Plus className="mr-2 h-4 w-4" />
+                创建课题组
+              </Button>
+            </Link>
+          </div>
         </div>
-      ) : groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-muted-foreground">暂无课题组</p>
-          <Link href="/groups/new" className="mt-4">
-            <Button>创建第一个课题组</Button>
+      </section>
+
+      <div className="container mx-auto py-10">
+        {/* Search & Filters */}
+        <div className="mb-8 flex items-center gap-4">
+          <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="搜索课题组..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 focus-visible:ring-journal-primary/30 focus-visible:border-journal-primary/50"
+              />
+            </div>
+            <Button type="submit" variant="journal-outline">
+              搜索
+            </Button>
+          </form>
+          <Button variant="outline" size="icon" className="border-journal-border/50 hover:border-journal-gold/50">
+            <Filter className="h-4 w-4" />
+          </Button>
+          <Link href="/groups/new" className="sm:hidden">
+            <Button size="icon">
+              <Plus className="h-4 w-4" />
+            </Button>
           </Link>
         </div>
-      ) : (
-        <>
+
+        {/* Groups Grid */}
+        {loading ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {groups.map((group) => (
-              <GroupCard key={group.id} group={group} />
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="animate-pulse rounded-xl border bg-card p-4">
+                <div className="h-24 bg-muted rounded-lg" />
+                <div className="mt-4 h-4 w-2/3 bg-muted rounded" />
+                <div className="mt-2 h-3 w-1/2 bg-muted rounded" />
+                <div className="mt-4 h-3 w-full bg-muted rounded" />
+                <div className="mt-2 h-3 w-3/4 bg-muted rounded" />
+              </div>
             ))}
           </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const newPage = page - 1;
-                  setPage(newPage);
-                  fetchGroups(search, newPage);
-                }}
-                disabled={page === 1}
-              >
-                上一页
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                第 {page} / {totalPages} 页
-              </span>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const newPage = page + 1;
-                  setPage(newPage);
-                  fetchGroups(search, newPage);
-                }}
-                disabled={page === totalPages}
-              >
-                下一页
-              </Button>
+        ) : groups.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="h-16 w-16 rounded-2xl bg-journal-primary/10 flex items-center justify-center mb-4">
+              <Search className="h-8 w-8 text-journal-primary/50" />
             </div>
-          )}
-        </>
-      )}
+            <p className="text-muted-foreground font-source-serif text-lg">暂无课题组</p>
+            <Link href="/groups/new" className="mt-4">
+              <Button variant="journal">创建第一个课题组</Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {groups.map((group) => (
+                <GroupCard key={group.id} group={group} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-10 flex items-center justify-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newPage = page - 1;
+                    setPage(newPage);
+                    fetchGroups(search, newPage);
+                  }}
+                  disabled={page === 1}
+                  className="border-journal-border/50"
+                >
+                  上一页
+                </Button>
+                <span className="text-sm text-muted-foreground px-3">
+                  第 <span className="font-medium text-foreground">{page}</span> / {totalPages} 页
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newPage = page + 1;
+                    setPage(newPage);
+                    fetchGroups(search, newPage);
+                  }}
+                  disabled={page === totalPages}
+                  className="border-journal-border/50"
+                >
+                  下一页
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

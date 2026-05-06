@@ -1,0 +1,178 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e8]
+        - text: 高校学术交流社区
+      - heading "学者茶话会 Scholar's Tea" [level=1] [ref=e10]:
+        - text: 学者茶话会
+        - generic [ref=e11]: Scholar's Tea
+      - paragraph [ref=e12]: 连接优秀研究者，分享学术见解，发现前沿研究。加入我们，开启您的学术交流之旅。
+      - generic [ref=e13]:
+        - button "探索学科" [ref=e14] [cursor=pointer]:
+          - link "探索学科" [ref=e15]:
+            - /url: /disciplines
+            - img [ref=e16]
+            - text: 探索学科
+        - button "浏览课题组" [ref=e19] [cursor=pointer]:
+          - link "浏览课题组" [ref=e20]:
+            - /url: /groups
+            - img [ref=e21]
+            - text: 浏览课题组
+    - generic [ref=e27]:
+      - generic [ref=e29]:
+        - generic [ref=e30]: "4"
+        - generic [ref=e31]: 课题组
+      - generic [ref=e33]:
+        - generic [ref=e34]: "0"
+        - generic [ref=e35]: 发表论文
+      - generic [ref=e37]:
+        - generic [ref=e38]: "4"
+        - generic [ref=e39]: 讨论帖子
+      - generic [ref=e41]:
+        - generic [ref=e42]: "0"
+        - generic [ref=e43]: 注册用户
+    - generic [ref=e44]:
+      - heading "快速入口" [level=2] [ref=e45]:
+        - img [ref=e46]
+        - text: 快速入口
+      - generic [ref=e49]:
+        - link "学科社区 探索不同学科领域，与学者们交流思想 进入" [ref=e50] [cursor=pointer]:
+          - /url: /disciplines
+          - generic [ref=e52]:
+            - img [ref=e54]
+            - heading "学科社区" [level=3] [ref=e57]
+            - paragraph [ref=e58]: 探索不同学科领域，与学者们交流思想
+            - generic [ref=e59]:
+              - text: 进入
+              - img [ref=e60]
+        - link "课题组 发现并加入优秀的研究团队 进入" [ref=e62] [cursor=pointer]:
+          - /url: /groups
+          - generic [ref=e64]:
+            - img [ref=e66]
+            - heading "课题组" [level=3] [ref=e71]
+            - paragraph [ref=e72]: 发现并加入优秀的研究团队
+            - generic [ref=e73]:
+              - text: 进入
+              - img [ref=e74]
+        - link "茶话会 加入实时聊天室，与研究者交流 进入" [ref=e76] [cursor=pointer]:
+          - /url: /tea-party
+          - generic [ref=e78]:
+            - img [ref=e80]
+            - heading "茶话会" [level=3] [ref=e82]
+            - paragraph [ref=e83]: 加入实时聊天室，与研究者交流
+            - generic [ref=e84]:
+              - text: 进入
+              - img [ref=e85]
+        - link "思想工坊 与 AI 助手讨论学术问题 进入" [ref=e87] [cursor=pointer]:
+          - /url: /workshop
+          - generic [ref=e89]:
+            - img [ref=e91]
+            - heading "思想工坊" [level=3] [ref=e93]
+            - paragraph [ref=e94]: 与 AI 助手讨论学术问题
+            - generic [ref=e95]:
+              - text: 进入
+              - img [ref=e96]
+    - generic [ref=e98]:
+      - generic [ref=e99]:
+        - heading "优秀课题组" [level=2] [ref=e100]:
+          - img [ref=e101]
+          - text: 优秀课题组
+        - button "查看全部" [ref=e106] [cursor=pointer]:
+          - link "查看全部" [ref=e107]:
+            - /url: /groups
+            - text: 查看全部
+            - img [ref=e108]
+      - generic [ref=e110]:
+        - link "应用数学研究所 北京大学 北京大学应用数学研究所，研究数值计算、优化理论等。 0 成员" [ref=e111] [cursor=pointer]:
+          - /url: /groups/applied-math-pku
+          - generic [ref=e113]:
+            - img [ref=e115]
+            - heading "应用数学研究所" [level=3] [ref=e120]
+            - paragraph [ref=e121]: 北京大学
+            - paragraph [ref=e122]: 北京大学应用数学研究所，研究数值计算、优化理论等。
+            - generic [ref=e124]:
+              - img [ref=e125]
+              - text: 0 成员
+        - link "自然语言处理实验室 清华大学 清华大学NLP实验室，研究大语言模型、机器翻译、文本生成等。 1 成员" [ref=e130] [cursor=pointer]:
+          - /url: /groups/nlp-lab-tsinghua
+          - generic [ref=e132]:
+            - img [ref=e134]
+            - heading "自然语言处理实验室" [level=3] [ref=e139]
+            - paragraph [ref=e140]: 清华大学
+            - paragraph [ref=e141]: 清华大学NLP实验室，研究大语言模型、机器翻译、文本生成等。
+            - generic [ref=e143]:
+              - img [ref=e144]
+              - text: 1 成员
+        - link "量子计算研究中心 浙江大学 探索量子计算理论与应用，开展量子算法、量子模拟等前沿研究。 1 成员" [ref=e149] [cursor=pointer]:
+          - /url: /groups/quantum-computing-zju
+          - generic [ref=e151]:
+            - img [ref=e153]
+            - heading "量子计算研究中心" [level=3] [ref=e158]
+            - paragraph [ref=e159]: 浙江大学
+            - paragraph [ref=e160]: 探索量子计算理论与应用，开展量子算法、量子模拟等前沿研究。
+            - generic [ref=e162]:
+              - img [ref=e163]
+              - text: 1 成员
+        - link "人工智能实验室 浙江大学 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。 3 成员" [ref=e168] [cursor=pointer]:
+          - /url: /groups/ai-lab-zju
+          - generic [ref=e170]:
+            - img [ref=e172]
+            - heading "人工智能实验室" [level=3] [ref=e177]
+            - paragraph [ref=e178]: 浙江大学
+            - paragraph [ref=e179]: 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。
+            - generic [ref=e181]:
+              - img [ref=e182]
+              - text: 3 成员
+    - generic [ref=e187]:
+      - generic [ref=e188]:
+        - heading "热门学科" [level=2] [ref=e189]:
+          - img [ref=e190]
+          - text: 热门学科
+        - button "查看全部" [ref=e193] [cursor=pointer]:
+          - link "查看全部" [ref=e194]:
+            - /url: /disciplines
+            - text: 查看全部
+            - img [ref=e195]
+      - generic [ref=e197]:
+        - link "数学 1 课题组" [ref=e198] [cursor=pointer]:
+          - /url: /disciplines/mathematics
+          - generic [ref=e200]:
+            - heading "数学" [level=3] [ref=e201]
+            - paragraph [ref=e202]: 1 课题组
+        - link "物理学 1 课题组" [ref=e203] [cursor=pointer]:
+          - /url: /disciplines/physics
+          - generic [ref=e205]:
+            - heading "物理学" [level=3] [ref=e206]
+            - paragraph [ref=e207]: 1 课题组
+        - link "计算机科学 2 课题组" [ref=e208] [cursor=pointer]:
+          - /url: /disciplines/computer-science
+          - generic [ref=e210]:
+            - heading "计算机科学" [level=3] [ref=e211]
+            - paragraph [ref=e212]: 2 课题组
+    - generic [ref=e216]:
+      - img [ref=e218]
+      - generic [ref=e224]:
+        - heading "TOP10 问题" [level=3] [ref=e225]
+        - paragraph [ref=e226]: 每月最受欢迎的研究讨论，看看社区最热门的话题
+      - button "查看排行" [ref=e227] [cursor=pointer]:
+        - link "查看排行" [ref=e228]:
+          - /url: /top-questions
+          - text: 查看排行
+          - img [ref=e229]
+    - contentinfo [ref=e231]:
+      - generic [ref=e233]:
+        - generic [ref=e234]:
+          - img [ref=e235]
+          - generic [ref=e238]: Scholar's Tea 学者茶话会
+        - paragraph [ref=e239]: 高校学术交流社区 · 连接学者，创造价值
+        - generic [ref=e240]:
+          - link "学科" [ref=e241] [cursor=pointer]:
+            - /url: /disciplines
+          - link "课题组" [ref=e242] [cursor=pointer]:
+            - /url: /groups
+          - link "TOP10" [ref=e243] [cursor=pointer]:
+            - /url: /top-questions
+          - link "茶话会" [ref=e244] [cursor=pointer]:
+            - /url: /tea-party
+  - alert [ref=e245]

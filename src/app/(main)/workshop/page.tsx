@@ -5,7 +5,6 @@ import { Send, Sparkles, Loader2, User, Bot, BookOpen, Lightbulb } from 'lucide-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 interface Message {
   id: string;
@@ -96,7 +95,7 @@ export default function WorkshopPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Sparkles className="h-7 w-7 text-primary" />
+          <Sparkles className="h-7 w-7 text-tea-primary" />
           思想工坊
         </h1>
         <p className="mt-1 text-muted-foreground">
@@ -105,14 +104,20 @@ export default function WorkshopPage() {
       </div>
 
       {/* Chat Area */}
-      <Card className="flex-1 flex flex-col overflow-hidden">
+      <Card className="flex-1 flex flex-col overflow-hidden border-tea-primary/10">
         <CardContent className="flex-1 flex flex-col p-0">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 gap-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-dot-pattern">
             {messages.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Sparkles className="size-8 text-primary" />
+                <div className="relative size-16 rounded-2xl bg-gradient-to-br from-tea-primary/20 to-tea-accent/20 flex items-center justify-center mb-4">
+                  <Sparkles className="size-8 text-tea-primary" />
+                  <div className="absolute -top-1 -right-1">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tea-accent opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-tea-accent" />
+                    </span>
+                  </div>
                 </div>
                 <h2 className="text-xl font-semibold mb-2">欢迎来到思想工坊</h2>
                 <p className="text-muted-foreground max-w-md mb-6">
@@ -120,15 +125,15 @@ export default function WorkshopPage() {
                 </p>
 
                 {/* Suggestions */}
-                <div className="grid gap-2 w-full max-w-lg">
+                <div className="grid gap-2.5 w-full max-w-lg">
                   {SUGGESTED_PROMPTS.map((prompt, i) => (
                     <Button
                       key={i}
                       variant="outline"
-                      className="justify-start h-auto py-3 px-4 text-left"
+                      className="justify-start h-auto py-3 px-4 text-left border-tea-primary/20 hover:border-tea-primary/50 hover:bg-tea-primary/5 transition-all duration-200"
                       onClick={() => handleSuggestion(prompt.action)}
                     >
-                      <prompt.icon className="h-4 w-4 mr-3 flex-shrink-0 text-primary" />
+                      <prompt.icon className="h-4 w-4 mr-3 flex-shrink-0 text-tea-primary" />
                       <span className="text-sm">{prompt.text}</span>
                     </Button>
                   ))}
@@ -136,38 +141,35 @@ export default function WorkshopPage() {
               </div>
             )}
 
-            {messages.map((message) => (
+            {messages.map((message, i) => (
               <div
                 key={message.id}
-                className={`flex gap-3 ${
-                  message.role === 'user' ? 'flex-row-reverse' : ''
-                }`}
+                className={`flex gap-3 animate-fade-in-up ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 {/* Avatar */}
-                <div className={`flex-shrink-0 size-8 rounded-full flex items-center justify-center ${
+                <div className={`flex-shrink-0 size-9 rounded-full flex items-center justify-center shadow-sm ${
                   message.role === 'user'
-                    ? 'bg-primary/10'
-                    : 'bg-muted'
+                    ? 'bg-gradient-to-br from-tea-primary to-tea-mint text-tea-primary-foreground'
+                    : 'bg-gradient-to-br from-convo-blue to-convo-blue/80 text-convo-blue-foreground'
                 }`}>
                   {message.role === 'user' ? (
-                    <User className="h-4 w-4 text-primary" />
+                    <User className="h-4 w-4" />
                   ) : (
-                    <Bot className="h-4 w-4 text-muted-foreground" />
+                    <Bot className="h-4 w-4" />
                   )}
                 </div>
 
                 {/* Content */}
-                <div className={`flex-1 max-w-[80%] ${
-                  message.role === 'user' ? 'text-right' : ''
-                }`}>
-                  <div className={`rounded-lg px-4 py-3 inline-block text-left ${
+                <div className={`flex-1 max-w-[80%] ${message.role === 'user' ? 'text-right' : ''}`}>
+                  <div className={`rounded-2xl px-4 py-3 inline-block text-left shadow-sm transition-shadow duration-200 hover:shadow-md ${
                     message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-convo-blue text-convo-blue-foreground'
+                      ? 'bg-gradient-to-br from-tea-primary to-tea-mint text-tea-primary-foreground rounded-tr-md'
+                      : 'bg-gradient-to-br from-convo-blue to-convo-blue/80 text-convo-blue-foreground rounded-tl-md'
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1 px-1">
+                  <p className="text-xs text-muted-foreground mt-1.5 px-1">
                     {message.timestamp.toLocaleTimeString('zh-CN', {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -179,15 +181,20 @@ export default function WorkshopPage() {
 
             {/* Loading indicator */}
             {loading && (
-              <div className="flex gap-3">
-                <div className="size-8 rounded-full bg-muted flex items-center justify-center">
-                  <Bot className="size-4 text-muted-foreground" />
+              <div className="flex gap-3 animate-fade-in-up">
+                <div className="size-9 rounded-full bg-gradient-to-br from-convo-blue to-convo-blue/80 flex items-center justify-center">
+                  <Bot className="size-4 text-convo-blue-foreground" />
                 </div>
                 <div className="flex-1">
-                  <div className="bg-muted rounded-lg px-4 py-3 inline-block">
+                  <div className="bg-convo-blue/10 rounded-2xl rounded-tl-md px-4 py-3 inline-block border border-convo-blue/20">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      AI 思考中...
+                      <Loader2 className="h-3 w-3 animate-spin text-convo-blue" />
+                      <span>AI 思考中</span>
+                      <span className="flex gap-0.5">
+                        <span className="w-1 h-1 rounded-full bg-convo-blue animate-typing-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1 h-1 rounded-full bg-convo-blue animate-typing-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1 h-1 rounded-full bg-convo-blue animate-typing-bounce" style={{ animationDelay: '300ms' }} />
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -196,12 +203,12 @@ export default function WorkshopPage() {
 
             {/* Error */}
             {error && (
-              <div className="flex gap-3">
-                <div className="size-8 rounded-full bg-muted flex items-center justify-center">
-                  <Bot className="size-4 text-muted-foreground" />
+              <div className="flex gap-3 animate-fade-in-up">
+                <div className="size-9 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <Bot className="size-4 text-destructive" />
                 </div>
                 <div className="flex-1">
-                  <div className="bg-destructive/10 text-destructive rounded-lg px-4 py-3 inline-block">
+                  <div className="bg-destructive/10 text-destructive rounded-2xl rounded-tl-md px-4 py-3 inline-block border border-destructive/20">
                     <p className="text-sm">{error}</p>
                   </div>
                 </div>
@@ -212,7 +219,7 @@ export default function WorkshopPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t p-4">
+          <div className="border-t border-tea-primary/10 p-4 bg-background">
             <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
                 ref={inputRef}
@@ -220,9 +227,14 @@ export default function WorkshopPage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="输入你的问题..."
                 disabled={loading}
-                className="flex-1"
+                className="flex-1 focus-visible:ring-tea-primary/30 focus-visible:border-tea-primary/50"
               />
-              <Button type="submit" size="icon" disabled={!input.trim() || loading}>
+              <Button
+                type="submit"
+                size="icon"
+                disabled={!input.trim() || loading}
+                className="bg-tea-primary hover:bg-tea-primary/90 text-tea-primary-foreground transition-all duration-200"
+              >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (

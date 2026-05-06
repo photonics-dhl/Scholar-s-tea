@@ -1,0 +1,74 @@
+{
+  "domain_name": "近场光学",
+  "papers": [
+    {
+      "title": "Optimized Nanogap Thermophotovoltaic Devices for Waste Heat Recovery",
+      "abstract": "Nanogap thermophotovoltaic (TPV) devices can deliver high power densities even with the medium-temperature heat sources. As such, these devices are very promising for recovering industrial waste heat. So far, the demonstrated nanogap TPVs have shown performances far below optimal. The objective of this study is to identify the optimal designs for nanogap TPV devices targeted for industrial waste heat recovery. Optimal configurations for maximal power density, maximal efficiency, and a trade-off between the two are determined as a function of the size of the vacuum gap between the emitter and the photovoltaic (PV) cell. The effects of adding a metallic cover to the PV cell, as well as introducing an air gap between the PV cell and the reflector, are also studied through this optimization framework. Results show that the optimal device configuration is highly sensitive to the vacuum gap size. A metallic cover enhances power density for gaps below 125nm due to surface plasmon-polariton coupling, but significantly reduces efficiency due to its parasitic absorption. To realize the benefits of air gaps, ultrathin PV cells requiring mechanical support by a substrate are needed. The presence of the substrate, however, diminishes the benefits of the air gap rendering them ineffective. ITO and InAs are found as optimal materials for the emitter and PV cell, respectively, owing to tunable plasma frequency of ITO and low bandgap of InAs.",
+      "arxiv_id": "2605.03988v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03988v1",
+      "authors": [
+        "Mehran Habibzadeh",
+        "Sheila Edalatpour"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "系统确定了nanogap TPV器件的最优设计参数组合，实现工业余热回收场景下功率密度与转换效率的协同优化。",
+        "research思路": "针对现有nanogap TPV性能远低于理论极限的问题，建立多参数优化框架，量化分析真空间隙尺寸、金属覆盖层和空气隙对器件性能的影响规律。",
+        "experiment": "采用理论建模与数值优化方法，系统扫描真空间隙尺寸参数范围（从纳米到微米尺度），结合电磁波传输和热力学模型评估功率密度与效率指标。",
+        "innovation": "首次建立nanogap TPV多参数（间隙/覆盖层/空气隙）协同优化模型，揭示125nm间隙阈值下金属覆盖层通过表面等离激元增强功率密度的物理机制。",
+        "related_work": "与瑞士ETHZurich的窄间隙TPV研究、MIT的纳米尺度热辐射调控工作、以及斯坦福大学的光-物质耦合增强太阳能电池研究形成互补。",
+        "impact": "为工业余热回收用TPV器件的工程化设计提供了理论依据，推动纳米尺度热光电转换技术的实用化进程，具有显著的节能减碳应用前景。"
+      },
+      "domain_trend": {
+        "trend": "近场光学正突破传统边界，量子纠缠与纳米尺度能量转换成为核心驱动力，推动工业余热回收与量子计算实用化的跨域融合"
+      }
+    },
+    {
+      "title": "Entangling gates for the SU(N) anyons",
+      "abstract": "The model of a topological quantum computer is a promising one due to its natural resistance to noise and other errors. Operations in such a computer are implemented by braiding the trajectories of anyons. While it is easy to understand how to build one-qubit operations, two-qubit operations are more difficult. In arXiv:2412.20931 we suggested an approach to build such operations for a topological quantum computer based on SU(2) Chern-Simons theory with arbitrary level using cabling of knots. In this paper we discuss how this approach should be generalized to the SU(N) case, what the differences are, and which new problems arise.",
+      "arxiv_id": "2605.04016v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.04016v1",
+      "authors": [
+        "Sergey Mironov",
+        "Andrey Morozov"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出基于SU(N) Chern-Simons理论的缆化绳结方法实现拓扑量子纠缠门，推广了SU(2)方案并解决多分量任意子两比特门难题。",
+        "research思路": "针对拓扑量子计算中通用纠缠门难以构造的问题，借鉴绳结代数与拓扑不变量，将SU(2)缆化技术扩展至高对称性SU(N)任意子系统。",
+        "experiment": "采用数学缆化（cabling）技术对纽结进行复合，结合量子群表示与融合空间分析，通过拓扑量子场论计算编织矩阵元。",
+        "innovation": "首次将缆化绳结方法应用于SU(N)任意子，构建了除编织操作外的显式纠缠门方案，并指出了融合空间维数增长的计算挑战。",
+        "related_work": "包括Kitaev的拓扑量子计算模型、Freedman等人的拓扑量子门理论，以及同作者前序工作arXiv:2412.20931（SU(2)情形），以及Cui等人关于SU(N)任意子的研究。",
+        "impact": "为基于高对称性任意子的量子计算机提供关键门操作路径，推动拓扑量子计算实用化，并深化拓扑量子场论与量子信息的交叉研究。"
+      }
+    },
+    {
+      "title": "Factoring $2048$ bit RSA integers with a half-million-qubit modular atomic processor",
+      "abstract": "Shor's algorithm is one of the most promising applications of quantum computers. However, since $\\sim 10^6$ physical qubits are believed to be required for established approaches, the algorithm will need to be distributed across many modules. In this paper, we provide a distributed compilation of Shor's algorithm on a modular atomic processor. We present an end-to-end compilation and optimization strategy that focuses on the interplay between the inter-module communication and the intra-module clock rate. With a half-million-qubit modular atomic processor with a communication rate of $10^5$ Bell pairs per second and a measurement time of 1 ms in a CPU-inspired architecture, we demonstrate that 2048-bit RSA integers can be factored in only 16\\% more time than a single-module architecture. Our work presents the first end-to-end analysis and simulation of large-scale integer factorization on modular atomic hardware and it provides a blueprint for the future design of other large-scale modular algorithms.",
+      "arxiv_id": "2605.03951v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03951v1",
+      "authors": [
+        "Tian Xue",
+        "Jacob P. Covey"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "该论文首次在模块化原子量子处理器上实现端到端分布式Shor算法编译，利用50万量子比特系统成功分解2048位RSA整数，分解时间仅比单模块架构增加16%。",
+        "research思路": "针对Shor算法需要约百万量子比特而无法在单模块实现的问题，研究采用模块化分布式架构，通过优化模块间通信速率与模块内时钟速率的平衡，实现大规模量子计算任务的有效分解。",
+        "experiment": "采用CPU启发式架构设计半百万量子比特模块化原子处理器，设定模块间通信速率为10^5 Bell对/秒、单次测量时间1ms，并进行端到端编译优化和性能模拟验证。",
+        "innovation": "首次提供模块化原子硬件上大规模整数分解的端到端分析与模拟；提出模块间通信与模块内时钟速率协同优化策略；实现2048位RSA分解仅增加16%时间开销的突破性效率。",
+        "related_work": "相关工作包括Shor算法的原始提出、量子纠错码研究、分布式量子计算架构、离子阱/超导量子比特模块化方案，以及先前认为需要~10^6物理比特的估算研究。",
+        "impact": "该工作为百万量子比特级量子计算机提供了可行的模块化实现蓝图，指明了原子量子处理器在大规模密码学应用中的潜力，对未来量子计算硬件设计和分布式算法编译具有重要指导意义。"
+      }
+    }
+  ]
+}

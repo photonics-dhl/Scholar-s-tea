@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, Settings, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ChatRoom } from '@/components/features/tea-party/ChatRoom';
-import { OnlineUsers } from '@/components/features/tea-party/OnlineUsers';
 import { MessageList } from '@/components/features/tea-party/MessageList';
 import { MessageInput } from '@/components/features/tea-party/MessageInput';
+import { OnlineUsers } from '@/components/features/tea-party/OnlineUsers';
 import { useTeaPartySocket } from '@/hooks/useTeaPartySocket';
 import { useTeaPartyMessages } from '@/hooks/useTeaPartyMessages';
 
@@ -167,7 +166,7 @@ export default function TeaPartyRoomPage() {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
         <div className="text-center">
-          <div className="size-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="size-8 border-4 border-tea-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">加载中...</p>
         </div>
       </div>
@@ -186,19 +185,25 @@ export default function TeaPartyRoomPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-120px)]">
+    <div className="flex h-[calc(100vh-120px)] -mx-4 -mt-4">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.push('/tea-party')}>
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-tea-primary/[0.03] to-transparent">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => router.push('/tea-party')} className="hover:bg-tea-primary/10">
               <ArrowLeft className="size-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold">{room.name}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-semibold">{room.name}</h1>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tea-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-tea-primary" />
+                </span>
+              </div>
               {room.description && (
-                <p className="text-sm text-muted-foreground">{room.description}</p>
+                <p className="text-xs text-muted-foreground">{room.description}</p>
               )}
             </div>
           </div>
@@ -207,26 +212,31 @@ export default function TeaPartyRoomPage() {
               variant="ghost"
               size="sm"
               onClick={() => setShowUsers(!showUsers)}
+              className="hover:bg-tea-primary/10"
             >
-              <Users className="size-4 mr-2" />
-              {room.participantCount}
+              <Users className="size-4 mr-1.5 text-tea-primary" />
+              <span className="text-tea-primary font-medium">{room.participantCount}</span>
             </Button>
           </div>
         </div>
 
         {/* Messages */}
-        <MessageList
-          messages={messages}
-          typingUsers={typingUsers}
-          roomId={roomId}
-        />
+        <div className="flex-1 overflow-y-auto bg-dot-pattern">
+          <MessageList
+            messages={messages}
+            typingUsers={typingUsers}
+            roomId={roomId}
+          />
+        </div>
 
         {/* Input */}
-        <MessageInput
-          onSend={handleSendMessage}
-          onTyping={handleTyping}
-          disabled={!isConnected}
-        />
+        <div className="border-t border-tea-primary/10 p-3 bg-background">
+          <MessageInput
+            onSend={handleSendMessage}
+            onTyping={handleTyping}
+            disabled={!isConnected}
+          />
+        </div>
       </div>
 
       {/* Online Users Sidebar */}

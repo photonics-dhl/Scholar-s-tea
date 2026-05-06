@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Scholar's Tea" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e10]: Scholar's Tea
+        - navigation [ref=e11]:
+          - link "学科" [ref=e12] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e13]
+            - text: 学科
+          - link "课题组" [ref=e16] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e17]
+            - text: 课题组
+          - link "思想工坊" [ref=e22] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e23]
+            - text: 思想工坊
+          - link "茶话会" [ref=e25] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e26]
+            - text: 茶话会
+          - link "TOP10" [ref=e28] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e29]
+            - text: TOP10
+        - button "登录" [ref=e36] [cursor=pointer]:
+          - link "登录" [ref=e37]:
+            - /url: /signin
+    - main [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - img [ref=e41]
+          - generic [ref=e47]:
+            - heading "TOP10 问题" [level=1] [ref=e48]
+            - paragraph [ref=e49]: 每月最受欢迎的研究讨论
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - combobox [ref=e52] [cursor=pointer]:
+              - generic:
+                - generic:
+                  - img
+                  - text: 月度
+              - img [ref=e53]
+            - combobox [ref=e55] [cursor=pointer]:
+              - generic: 2026年
+              - img [ref=e56]
+            - combobox [ref=e58] [cursor=pointer]:
+              - generic: 5月
+              - img [ref=e59]
+          - generic [ref=e61]: 2026年5月 TOP10
+    - contentinfo [ref=e73]:
+      - paragraph [ref=e75]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - alert [ref=e76]

@@ -1,0 +1,75 @@
+{
+  "domain_name": "硅基光子学与量子光学",
+  "papers": [
+    {
+      "title": "FTPrimitiveBench: A Benchmark Suite For Logical Computation Under Hardware-Motivated and Biased Noise Models",
+      "abstract": "Fault-tolerant quantum computing requires understanding how error-correcting codes perform on diverse physical hardware. This is typically assessed via noisy stabilizer simulation of logical circuits at HPC scale, combined with a noise model that yields a logical error rate for the relevant code distances and depths. The uniform depolarizing model is the standard baseline, but its homogeneous assumptions fail to capture the heterogeneity, asymmetries, and correlations of real devices, where Pauli, measurement, and spatio-temporal errors are not weakly coupled. Yet these same structured features create opportunities for joint code-hardware co-design, motivating noise models that more faithfully reflect target hardware while remaining tractable to simulate.   We introduce FTPrimitiveBench, a systematic benchmarking approach for studying how logical primitives interact with hardware-motivated noise. It supports both custom specifications and representative structured noise families: Pauli bias, measurement bias, and spatial or spatio-temporal non-uniformity -- together with generators for core surface-code Clifford primitives: logical memory, lattice surgery, transversal logical Hadamard, and the logical phase gate via lattice surgery. We find that structured noise affects these primitives in qualitatively distinct ways, with outcomes shaped by the interplay between noise model, primitive, and decoder choice. These results extend memory benchmarks to active logical computation, where the interaction between noise structure and primitive implementation matters. By standardizing the link between noise-model specification and primitive construction, FTPrimitiveBench enables reproducible comparative studies of QEC protocols and decoders, supporting hardware-aware co-design of fault-tolerant architectures. Code: https://github.com/ShuwenKan/FTPrimitiveBench.",
+      "arxiv_id": "2605.04049v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.04049v1",
+      "authors": [
+        "Shuwen Kan",
+        "Adrian Harkness",
+        "Zefan Du"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "FTPrimitiveBench是首个系统化基准测试套件，用于在异质性、非对称性及关联性噪声环境下评估容错量子计算中的逻辑门原语性能。",
+        "research思路": "针对现有均匀去极化噪声模型无法真实反映硬件异质性、非对称性和时空关联误差的问题，构建支持自定义和代表性结构化噪声族的系统性基准测试框架。",
+        "experiment": "基于HPC规模的高性能噪声稳定器模拟，支持Pauli噪声、测量误差和时空关联误差等多种结构化噪声家族的定制化规格与逻辑电路评估。",
+        "innovation": "首次提出超越均匀去极化基线的硬件驱动偏置噪声模型基准测试，实现逻辑原语与结构化噪声的系统性交互分析，支撑代码-硬件协同设计研究。",
+        "related_work": "标准基线为均匀去极化模型；相关工作包括噪声模型表征、容错纠错码性能评估、量子硬件噪声标定及稳定器模拟方法。",
+        "impact": "为容错量子计算研究提供贴近真实硬件的噪声评估工具，促进误差纠正码与量子硬件的协同优化设计，推动大规模容错量子计算走向实用化。"
+      },
+      "domain_trend": {
+        "trend": ""
+      }
+    },
+    {
+      "title": "Nonlinear Compton scattering in a frequency-modulated field",
+      "abstract": "When an electron is accelerated, it emits radiation. In the relativistic quantum realm the elementary radiation process is the emission of a single photon, a process known as nonlinear Compton scattering in the case of an electron moving in the presence of a strong electromagnetic wave. This process is typically described within the Furry picture, where the electromagnetic wave is described as a classical background field and the electron-positron field is quantized in the presence of that background field. Equivalently one can quantize the electron-positron field in the vacuum but then the photon emission process is described as a transition from an initial state to a final state both featuring, apart from the electron (the initial state) and the electron and the photon (the final state), the same coherent state of photons appropriately related to the electromagnetic wave. Here, we consider a more general situation where the initial and the final state feature the same squeezed coherent state. Then, we specialize to the case where the coherent state corresponds to a plane-wave field and the mostly populated modes of the coherent state are also squeezed. We show that, when quantum fluctuations induced by the squeezing in the coherent field are negligible, a condition well satisfied at available squeezing levels, the squeezing effects effectively reduce to a frequency modulation of the plane-wave field corresponding to the coherent state. By means of numerical examples we show that at already available squeezing levels the emission spectrum of nonlinear Compton scattering and the total photon yield can be altered significantly. Analytical explanations of the main numerical results are also provided.",
+      "arxiv_id": "2605.04011v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.04011v1",
+      "authors": [
+        "Antonino Di Piazza",
+        "Kenan Qu"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "研究在频率调制强激光场中电子的非线性康普顿散射，重点分析初末态均为压缩相干态的量子辐射过程。",
+        "research思路": "在传统Furry图像框架下，推广至压缩相干态描述，解析求解电子在调频场中发射单光子的量子跃迁振幅和能谱分布。",
+        "experiment": "采用强场QED微扰理论，结合Volkov态展开和Bessel函数技术，计算高阶过程贡献并数值验证能量守恒。",
+        "innovation": "首次将压缩相干态引入非线性康普顿散射描述，突破传统相干态假设，为非经典光场中的辐射过程提供完整理论框架。",
+        "related_work": "强场QED基础理论、Volkov解、Bethe-Heitler过程、激光-粒子相互作用、量子光学压缩态理论。",
+        "impact": "深化对非经典光场中辐射机制的理解，为未来强场QED实验和量子光学技术提供理论工具。"
+      }
+    },
+    {
+      "title": "One-dimensional polarization-hybrid photonic crystal molecules",
+      "abstract": "Photonic molecules, i.e. artificial structures composed of coherently coupled optical cavities, are paradigmatic systems for investigating fundamental phenomena across photonics, quantum optics and topological physics. In recent years, photonic integrated circuits have emerged as a particularly powerful platform for their realization, exploiting also additional synthetic dimensions afforded by the degrees of freedom of light. To date, however, photonic molecule implementations have relied almost entirely on geometries defined by spatial coupling and lattice symmetries rather than polarization. Here, we introduce a fundamentally new class of photonic molecules in which polarization is exploited as the primary dimension in the device response. By harnessing fundamental guided-mode couplings sustained by engineered Bragg gratings in photonic waveguides, we establish a new paradigm to access in 1D formats the coupled-resonator physics traditionally associated with higher-dimensional or free-space systems, demonstrating prototypical devices which can support Fano resonances or resonance-splitting for signals in the telecom band. Besides corroborating the theoretical predictions, experimental realizations in thin film lithium niobate open new prospects for the further exploration of novel reconfigurable topological, non-Hermitian and quantum photonic circuits, relying on the intrinsic nonlinear and electro-optic functionalities of this platform.",
+      "arxiv_id": "2605.03899v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03899v1",
+      "authors": [
+        "Tiantong Li",
+        "Katia Gallo"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出利用偏振作为主要设计维度的一维偏振混合光子晶体分子，通过工程化Bragg光栅建立导模耦合，在1D结构中实现传统高维耦合谐振器物理。",
+        "research思路": "解决光子分子设计长期依赖空间耦合和晶格对称性、忽视偏振自由度的问题，开辟以偏振为主导维度的新型光子分子构建途径。",
+        "experiment": "在光子波导中设计工程化Bragg光栅结构，实现基本导模耦合，构建一维偏振混合光子晶体分子，验证耦合物理的偏振维度表达。",
+        "innovation": "首次将偏振作为光子分子的首要设计维度，实现1D格式访问传统高维或自由空间耦合谐振器物理，突破空间耦合局限。",
+        "related_work": "包括光子分子相干耦合研究、集成光子回路平台、合成维度光子学、偏振光子器件、Bragg光栅波导及拓扑光子晶体等领域工作。",
+        "impact": "为光子学、量子光学和拓扑物理研究提供新型偏振维度平台，扩展了集成光子回路设计自由度，推动偏振工程在光子芯片中的应用。"
+      }
+    }
+  ]
+}

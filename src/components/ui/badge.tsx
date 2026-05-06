@@ -11,6 +11,13 @@ const badgeVariants = cva(
         secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         outline: 'text-foreground',
+        // Scholar's Tea rank badges
+        'rank-gold': 'border-transparent bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-700 border-yellow-400/50',
+        'rank-silver': 'border-transparent bg-gradient-to-r from-slate-300/30 to-slate-400/30 text-slate-700 border-slate-400/50',
+        'rank-bronze': 'border-transparent bg-gradient-to-r from-orange-400/20 to-amber-700/20 text-amber-800 border-orange-400/50',
+        // Scholar's Tea zone badges
+        journal: 'border-transparent bg-journal-primary/10 text-journal-primary border-journal-primary/30',
+        tea: 'border-transparent bg-tea-primary/10 text-tea-primary border-tea-primary/30',
       },
     },
     defaultVariants: {

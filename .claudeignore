@@ -1,0 +1,96 @@
+# Dependencies - too large to include
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Git data
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment files (security)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Uploads
+uploads/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Coverage
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large media
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mov
+*.avi
+
+# Compressed
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Package files
+*.tgz
+*.whl
+
+# Lock files (not needed for context)
+bun.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated code / type definitions
+*.generated.ts
+*.generated.js
+src/generated/
+prisma/generated/
+
+# Storybook / docs build
+storybook-static/
+
+# Test outputs
+test-results/
+playwright-report/
+*.test.ts.snap
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+tmp/
+
+# PDF and large docs
+*.pdf
+
+# Claude worktrees
+.claude/worktrees/
+
+# Turbo/cache
+.turbo/
+.cache/

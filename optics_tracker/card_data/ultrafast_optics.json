@@ -1,0 +1,75 @@
+{
+  "domain_name": "超快光学",
+  "papers": [
+    {
+      "title": "Caustics and catastrophes in strong-field physics -- Picard--Lefschetz theory as a universal approach to saddle-point methods in attosecond science",
+      "abstract": "Ultrashort laser pulses on the attosecond timescale are typically achieved via high-order harmonic generation (HHG), a nonlinear process in which atoms interact with intense light fields to emit a broad spectrum of harmonics. HHG is commonly described in terms of a `quantum orbits' model based on several interfering electron trajectories, thereby incorporating both quantum-mechanical effects and an intuitive picture of classical dynamics. By tuning the parameters of the driving laser field, the interplay between these trajectories can be controlled, shaping the emitted light. Mathematically, this model expresses the harmonic response as a highly oscillatory integral. Applying saddle-point methods to this integral allows it to be decomposed into contributions from distinct saddle points of the semi-classical action, thereby linking quantum dynamics to classical trajectories. However, a general framework for applying these methods across arbitrary parameters and laser configurations has been missing.   In this thesis, we introduce Picard--Lefschetz theory and develop practical numerical methods for its application. These enable the evaluation of oscillatory integrals and identification of contributions from individual critical points.   We apply these techniques to strong-field ionisation and HHG, focusing on caustics -- enhancement features where trajectories coalesce and standard approximations fail. Our methods remain valid in these regions, allowing systematic analysis of parameter regimes and revealing previously inaccessible features. This work improves the understanding and control of ultrafast light--matter interactions.",
+      "arxiv_id": "2605.03794v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03794v1",
+      "authors": [
+        "Anne Weber"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出基于Picard-Lefschetz理论的通用鞍点方法框架，系统处理强场物理中焦散线和突变现象，统一描述高次谐波产生的量子轨道动力学。",
+        "research思路": "解决强场物理中鞍点方法难以跨参数通用化的难题，通过Picard-Lefschetz理论提供统一数学工具，将量子动力学与经典轨迹系统关联。",
+        "experiment": "采用理论分析和解析方法，以高度振荡积分的鞍点分解为核心，结合复分析中的Picard-Lefschetz理论处理多鞍点贡献和分支切割问题。",
+        "innovation": "首次将Picard-Lefschetz理论系统引入强场HHG领域，突破传统鞍点方法在复杂激光场下的局限性，实现跨任意参数空间的统一描述。",
+        "related_work": "包括Keldysh的隧穿电离理论、Lewenstein模型量子轨道理论、 Corkum和Salières的再碰撞模型，以及Goulielmakis等人的阿秒脉冲产生实验。",
+        "impact": "为阿秒科学提供更 robust 的理论工具，深化对强场非线性过程的理解，有望推动新型阿秒脉冲表征和相干光源设计的理论发展。"
+      },
+      "domain_trend": {
+        "trend": ""
+      }
+    },
+    {
+      "title": "Attosecond-Stable Two-Dimensional Spectroscopy by a Sagnac-Based Modulating System and a sub-4-fs Continuum Source",
+      "abstract": "We present a two-dimensional electronic spectroscopy (2DES) platform driven by a novel Coherent Loop-based Integrated Modulating and Beamsplitting System (CLIMBS). Coupled with an octave-spanning multiple-plate continuum (MPC) source, CLIMBS enables broadband, phase-coherent measurements with attosecond-level time delay precision. Its Sagnac-inspired, nearly common-path geometry provides exceptional long-term phase stability without active feedback, eliminating beam walk-off and preserving beam pointing during delay scans. Delay calibration using spectrally resolved interferometric fringes yielded a wedge angle in excellent agreement with the designed geometry, confirming precise, linear coherence time control. The MPC technique generates broadband excitation pulses spanning 550--980 nm and temporally compressed to 3.7 fs. This bright, few-cycle source enables simultaneous interrogation of widely separated electronic and vibronic transitions, with high temporal and spectral resolution, allowing 2DES to capture vibronic cross peaks, energy-transfer pathways, and undistorted ground-state bleaching (GB), stimulated emission (SE), and excited-state absorption (ESA) features across a broad spectral window. System performance was benchmarked on chlorophyll-a in methanol, where the excitation bandwidth fully covers the $Q_x$ and $Q_y$ bands, ensuring distortion-free spectra. The nearly collinear configuration of CLIMBS eliminates beam walk-off during delay scanning, supports ultrabroadband few-cycle 2DES enabled by the high-brightness MPC source, and maintains attosecond-level phase stability, providing a simple and robust platform for high-fidelity multidimensional spectroscopy.",
+      "arxiv_id": "2605.03777v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03777v1",
+      "authors": [
+        "Wei-Chung Feng",
+        "Bo-Han Chen",
+        "Chih-Hsuan Lu"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "开发了CLIMBS平台结合MPC超连续光源，实现attosecond级相位稳定的二维电子光谱，突破传统2DES系统相位噪声限制。",
+        "research思路": "解决二维电子光谱中时间延迟精度受限、长期相位稳定性差的瓶颈，通过近乎共光路几何结构消除环境扰动影响。",
+        "experiment": "采用Sagnac干涉仪构型实现光路自补偿，结合楔形板产生可调延迟，MPC多板压缩产生3.7 fs超短脉冲。",
+        "innovation": "首次将Sagnac几何与二维电子光谱结合，实现无需主动反馈的attosecond级延迟精度，同时保证550-980nm宽带覆盖。",
+        "related_work": "与Lindner的相位稳定2DES方案、Fleischer的Sagnac光谱仪工作、以及MPC超连续光源技术形成技术关联。",
+        "impact": "为探测量子相干动力学提供高稳定测量平台，推动 attosecond pump-probe 与二维光谱技术融合，加速复杂分子体系超快过程研究。"
+      }
+    },
+    {
+      "title": "Molecular Attoscope: Pulse Shape Spectroscopy of Electronic Coherence",
+      "abstract": "Tracking the coupled motion of electrons and nuclei on their intrinsic timescales is essential to understanding and controlling photochemical transformations. While attosecond techniques have provided unprecedented insight into electronic dynamics, they have largely been restricted to ionic systems, with nuclear motion often neglected or indirectly inferred. Here, we demonstrate a ``molecular attoscope\", which uses shaped laser pulses in the deep ultraviolet to perform a coherent measurement of electronic and nuclear dynamics in an entangled wave packet in neutral benzene. This enables us to trace both the 856-attosecond-period electronic motion and the 36-femtosecond-period nuclear motion. We observe electronic coherence persisting over hundreds of optical cycles, modulated by nuclear dynamics. Our holographic approach is general, and lays the groundwork for coherent measurements capable of visualizing the evolution of the coupled electronic-nuclear wave function in real time.",
+      "arxiv_id": "2605.03298v1",
+      "published": "2026-05-05",
+      "url": "http://arxiv.org/abs/2605.03298v1",
+      "authors": [
+        "Loc Thi-Hoang Ngo",
+        "Julia Codere",
+        "Javin Ohara"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "该研究开发了一种\"分子阿秒显微镜\"技术，利用深紫外形状化激光脉冲首次在中性苯分子中实现了电子和核动力学的相干测量，成功追踪了856阿秒电子运动周期和36飞秒核运动周期。",
+        "research思路": "针对阿秒技术长期局限于离子系统、核运动难以直接观测的问题，研究团队提出在 entangled wave packet 中同时追踪电子-核耦合动力学的方案，实现耦合波函数演化的实时可视化。",
+        "experiment": "采用深紫外(200-220nm)形状化激光脉冲构建全息测量方案，通过脉冲整形技术控制波包相位，在中性苯分子中提取电子和核运动的相干信号。",
+        "innovation": "首次在 neutral 分子体系中实现电子-核动力学相干测量；突破离子系统限制；深紫外波长下的全息方法为分子成像提供通用平台；观测到电子相干性持续数百光学周期。",
+        "related_work": "包括attosecond transient absorption spectroscopy、high-harmonic generation spectroscopy、Coulomb explosion imaging、以及 electronic coherence 保持机制研究、coupled electron-nuclear dynamics theory。",
+        "impact": "该工作为分子动力学的 real-time 可视化提供了通用工具，开辟了中性分子阿秒科学的新方向，对光化学反应控制、激发态动力学理解具有重要推动作用。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "envFile": ".env",
+  "mcpServers": {
+    "semantic-scholar": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@xbghc/semanticscholar-mcp"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    },
+    "image-generation": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-image"
+      ],
+      "env": {
+        "GEMINI_API_KEY": "${env:GEMINI_API_KEY}"
+      }
+    },
+    "diagram-generator": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-diagram-generator"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/data/home/zju321"
+      ]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@kazuph/mcp-fetch"
+      ]
+    },
+    "thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "ui-expert-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@iflow-mcp/ui-expert-mcp"
+      ]
+    },
+    "tavily-search": {
+      "command": "node",
+      "args": [
+        "C:/Users/Mac/.claude/tavily-rotate/dist/index.js"
+      ],
+      "env": {
+        "http_proxy": "http://127.0.0.1:7890",
+        "https_proxy": "http://127.0.0.1:7890"
+      }
+    }
+  }
+}

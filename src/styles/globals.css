@@ -246,3 +246,36 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* ===== 页面过渡动画 ===== */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 0.35s ease-out forwards;
+}
+
+/* ===== 区域上下文工具类 ===== */
+.zone-scholarly {
+  --zone-primary: var(--journal-primary);
+  --zone-accent: var(--journal-gold);
+}
+
+.zone-social {
+  --zone-primary: var(--tea-primary);
+  --zone-accent: var(--tea-accent);
+}
+
+/* ===== 点阵背景图案（交流区） ===== */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, var(--journal-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -16,27 +17,67 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const navItems = [
-  { href: '/disciplines', label: '学科', icon: GraduationCap },
-  { href: '/groups', label: '课题组', icon: Users },
-  { href: '/workshop', label: '思想工坊', icon: Sparkles },
-  { href: '/tea-party', label: '茶话会', icon: MessageCircle },
-  { href: '/top-questions', label: 'TOP10', icon: Trophy },
+  { href: '/disciplines', label: '学科', icon: GraduationCap, zone: 'scholarly' as const },
+  { href: '/groups', label: '课题组', icon: Users, zone: 'scholarly' as const },
+  { href: '/workshop', label: '思想工坊', icon: Sparkles, zone: 'social' as const },
+  { href: '/tea-party', label: '茶话会', icon: MessageCircle, zone: 'social' as const },
+  { href: '/top-questions', label: 'TOP10', icon: Trophy, zone: 'scholarly' as const },
 ];
+
+function getZone(pathname: string): 'scholarly' | 'social' | 'neutral' {
+  if (pathname.startsWith('/disciplines') || pathname.startsWith('/groups') || pathname.startsWith('/top-questions')) {
+    return 'scholarly';
+  }
+  if (pathname.startsWith('/tea-party') || pathname.startsWith('/workshop')) {
+    return 'social';
+  }
+  return 'neutral';
+}
 
 export function MainNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const currentZone = getZone(pathname);
+
+  const zoneStyles = {
+    scholarly: {
+      logoIcon: 'text-journal-primary',
+      logoBg: 'bg-journal-primary/10',
+      logoBgHover: 'group-hover:bg-journal-primary/20',
+      activeBg: 'bg-journal-primary/10',
+      activeText: 'text-journal-primary',
+      indicator: 'bg-journal-gold',
+    },
+    social: {
+      logoIcon: 'text-tea-primary',
+      logoBg: 'bg-tea-primary/10',
+      logoBgHover: 'group-hover:bg-tea-primary/20',
+      activeBg: 'bg-tea-primary/10',
+      activeText: 'text-tea-primary',
+      indicator: 'bg-tea-accent',
+    },
+    neutral: {
+      logoIcon: 'text-primary',
+      logoBg: 'bg-primary/10',
+      logoBgHover: 'group-hover:bg-primary/20',
+      activeBg: 'bg-primary/10',
+      activeText: 'text-primary',
+      indicator: 'bg-primary',
+    },
+  };
+
+  const z = zoneStyles[currentZone];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-            <GraduationCap className="h-5 w-5 text-primary" />
+          <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg transition-colors', z.logoBg, z.logoBgHover)}>
+            <GraduationCap className={cn('h-5 w-5', z.logoIcon)} />
           </div>
-          <span className="hidden font-semibold sm:inline-block">
+          <span className="hidden font-semibold sm:inline-block font-serif">
             Scholar&apos;s Tea
           </span>
         </Link>
@@ -46,18 +87,24 @@ export function MainNav() {
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
+            const itemZone = item.zone;
+            const itemStyles = itemZone === 'scholarly' ? zoneStyles.scholarly : zoneStyles.social;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={cn(
+                  'relative flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
                   isActive
-                    ? 'bg-primary/10 text-primary'
+                    ? cn(itemStyles.activeBg, itemStyles.activeText, 'font-semibold')
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`}
+                )}
               >
                 <Icon className="h-4 w-4" />
                 {item.label}
+                {isActive && (
+                  <span className={cn('absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full animate-fade-in-up', itemStyles.indicator)} />
+                )}
               </Link>
             );
           })}
@@ -132,16 +179,19 @@ export function MainNav() {
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               const Icon = item.icon;
+              const itemZone = item.zone;
+              const itemStyles = itemZone === 'scholarly' ? zoneStyles.scholarly : zoneStyles.social;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors',
                     isActive
-                      ? 'bg-primary/10 text-primary'
+                      ? cn(itemStyles.activeBg, itemStyles.activeText)
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`}
+                  )}
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}

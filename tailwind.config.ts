@@ -100,6 +100,7 @@ const config: Config = {
         'float': 'float 3s ease-in-out infinite',
         'like-bounce': 'likeBounce 0.4s ease-out forwards',
         'hermes-float': 'hermesFloat 3s ease-in-out infinite',
+        'hermes-breathe': 'hermesBreathe 2.5s ease-in-out infinite',
         'hermes-bounce': 'hermesBounce 0.6s ease-out',
         'hermes-bounce-leaf': 'hermesBounceLeaf 0.6s ease-out',
         'hermes-wiggle': 'hermesWiggle 1s ease-in-out infinite',
@@ -107,6 +108,11 @@ const config: Config = {
         'hermes-twinkle': 'hermesTwinkle 1.2s ease-in-out infinite',
         'hermes-dance': 'hermesDance 1.8s ease-in-out',
         'hermes-wave-left': 'hermesWaveLeft 1.2s ease-in-out',
+        'hermes-shake': 'hermesShake 0.4s ease-in-out infinite',
+        'hermes-dizzy': 'hermesDizzy 1.5s ease-in-out infinite',
+        'hermes-spin-slow': 'hermesSpinSlow 2s linear infinite',
+        'hermes-float-heart': 'hermesFloatHeart 1.8s ease-in-out infinite',
+        'hermes-dizzy-star': 'hermesDizzyStar 1s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -204,6 +210,33 @@ const config: Config = {
           '60%': { transform: 'rotate(5deg)' },
           '75%': { transform: 'rotate(-15deg)' },
           '90%': { transform: 'rotate(0deg)' },
+        },
+        hermesBreathe: {
+          '0%, 100%': { transform: 'scale(1) translateY(0)' },
+          '50%': { transform: 'scale(1.02) translateY(-2px)' },
+        },
+        hermesShake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-2px)' },
+          '75%': { transform: 'translateX(2px)' },
+        },
+        hermesDizzy: {
+          '0%, 100%': { transform: 'rotate(0deg) translateX(0)' },
+          '25%': { transform: 'rotate(-5deg) translateX(-3px)' },
+          '50%': { transform: 'rotate(3deg) translateX(2px)' },
+          '75%': { transform: 'rotate(-4deg) translateX(-2px)' },
+        },
+        hermesSpinSlow: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        hermesFloatHeart: {
+          '0%, 100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '50%': { opacity: '0.7', transform: 'translateY(-6px) scale(1.15)' },
+        },
+        hermesDizzyStar: {
+          '0%, 100%': { opacity: '1', transform: 'rotate(0deg) scale(1)' },
+          '50%': { opacity: '0.5', transform: 'rotate(180deg) scale(0.8)' },
         },
       },
       transitionTimingFunction: {

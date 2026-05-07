@@ -1,0 +1,185 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e24] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e25]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e55]: Research Groups
+            - heading "课题组" [level=1] [ref=e56]
+            - paragraph [ref=e57]: 发现并加入优秀的研究团队·共 4 个课题组
+          - link "创建课题组" [ref=e58] [cursor=pointer]:
+            - /url: /groups/new
+            - button "创建课题组" [ref=e59]:
+              - img [ref=e60]
+              - text: 创建课题组
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - img [ref=e65]
+                - textbox "搜索课题组..." [ref=e68]
+              - button "搜索" [ref=e69] [cursor=pointer]
+            - button [ref=e70] [cursor=pointer]:
+              - img [ref=e71]
+          - generic [ref=e140]:
+            - link "应用数学研究所 北京大学 北京大学应用数学研究所，研究数值计算、优化理论等。 0 0 0 0" [ref=e141] [cursor=pointer]:
+              - /url: /groups/applied-math-pku
+              - generic [ref=e142]:
+                - img [ref=e147]
+                - generic [ref=e151]:
+                  - generic [ref=e152]:
+                    - heading "应用数学研究所" [level=3] [ref=e153]
+                    - paragraph [ref=e154]:
+                      - generic [ref=e155]: 北京大学
+                  - paragraph [ref=e156]: 北京大学应用数学研究所，研究数值计算、优化理论等。
+                  - generic [ref=e157]:
+                    - generic [ref=e158]:
+                      - img [ref=e159]
+                      - generic [ref=e164]: "0"
+                    - generic [ref=e165]:
+                      - img [ref=e166]
+                      - generic [ref=e169]: "0"
+                    - generic [ref=e170]:
+                      - img [ref=e171]
+                      - generic [ref=e174]: "0"
+                    - generic [ref=e175]:
+                      - img [ref=e176]
+                      - generic [ref=e179]: "0"
+            - link "自然语言处理实验室 清华大学 清华大学NLP实验室，研究大语言模型、机器翻译、文本生成等。 1 1 0 0" [ref=e180] [cursor=pointer]:
+              - /url: /groups/nlp-lab-tsinghua
+              - generic [ref=e181]:
+                - img [ref=e186]
+                - generic [ref=e190]:
+                  - generic [ref=e191]:
+                    - heading "自然语言处理实验室" [level=3] [ref=e192]
+                    - paragraph [ref=e193]:
+                      - generic [ref=e194]: 清华大学
+                  - paragraph [ref=e195]: 清华大学NLP实验室，研究大语言模型、机器翻译、文本生成等。
+                  - generic [ref=e196]:
+                    - generic [ref=e197]:
+                      - img [ref=e198]
+                      - generic [ref=e203]: "1"
+                    - generic [ref=e204]:
+                      - img [ref=e205]
+                      - generic [ref=e208]: "1"
+                    - generic [ref=e209]:
+                      - img [ref=e210]
+                      - generic [ref=e213]: "0"
+                    - generic [ref=e214]:
+                      - img [ref=e215]
+                      - generic [ref=e218]: "0"
+            - link "量子计算研究中心 浙江大学 探索量子计算理论与应用，开展量子算法、量子模拟等前沿研究。 1 1 1 0" [ref=e219] [cursor=pointer]:
+              - /url: /groups/quantum-computing-zju
+              - generic [ref=e220]:
+                - img [ref=e225]
+                - generic [ref=e229]:
+                  - generic [ref=e230]:
+                    - heading "量子计算研究中心" [level=3] [ref=e231]
+                    - paragraph [ref=e232]:
+                      - generic [ref=e233]: 浙江大学
+                  - paragraph [ref=e234]: 探索量子计算理论与应用，开展量子算法、量子模拟等前沿研究。
+                  - generic [ref=e235]:
+                    - generic [ref=e236]:
+                      - img [ref=e237]
+                      - generic [ref=e242]: "1"
+                    - generic [ref=e243]:
+                      - img [ref=e244]
+                      - generic [ref=e247]: "1"
+                    - generic [ref=e248]:
+                      - img [ref=e249]
+                      - generic [ref=e252]: "1"
+                    - generic [ref=e253]:
+                      - img [ref=e254]
+                      - generic [ref=e257]: "0"
+            - link "人工智能实验室 浙江大学 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。 3 1 1 1" [ref=e258] [cursor=pointer]:
+              - /url: /groups/ai-lab-zju
+              - generic [ref=e259]:
+                - img [ref=e264]
+                - generic [ref=e268]:
+                  - generic [ref=e269]:
+                    - heading "人工智能实验室" [level=3] [ref=e270]
+                    - paragraph [ref=e271]:
+                      - generic [ref=e272]: 浙江大学
+                  - paragraph [ref=e273]: 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。
+                  - generic [ref=e274]:
+                    - generic [ref=e275]:
+                      - img [ref=e276]
+                      - generic [ref=e281]: "3"
+                    - generic [ref=e282]:
+                      - img [ref=e283]
+                      - generic [ref=e286]: "1"
+                    - generic [ref=e287]:
+                      - img [ref=e288]
+                      - generic [ref=e291]: "1"
+                    - generic [ref=e292]:
+                      - img [ref=e293]
+                      - generic [ref=e296]: "1"
+    - contentinfo [ref=e110]:
+      - paragraph [ref=e112]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+    - generic [ref=e113]:
+      - button "拖拽":
+        - generic:
+          - img
+          - generic: 拖拽
+        - generic:
+          - generic "点击我呀~（右键也有惊喜）":
+            - img
+    - generic [ref=e297]:
+      - generic [ref=e298]:
+        - generic [ref=e299]:
+          - generic "点击我呀~（右键也有惊喜）" [ref=e300] [cursor=pointer]:
+            - img [ref=e301]
+          - generic [ref=e320]:
+            - heading "Hermes" [level=3] [ref=e321]:
+              - text: Hermes
+              - img [ref=e322]
+            - paragraph [ref=e324]: 你的常驻 AI 助手
+        - generic [ref=e325]:
+          - button "清空对话" [ref=e326] [cursor=pointer]:
+            - img [ref=e327]
+          - button "最小化" [active] [ref=e330] [cursor=pointer]:
+            - img [ref=e331]
+      - generic [ref=e337]:
+        - generic "点击我呀~（右键也有惊喜）" [ref=e339] [cursor=pointer]:
+          - img [ref=e340]
+          - generic: 点击聊天~
+        - paragraph [ref=e372]: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+      - generic [ref=e363]:
+        - textbox "问点什么..." [ref=e364]
+        - button [disabled]:
+          - img
+  - alert [ref=e139]

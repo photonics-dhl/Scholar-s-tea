@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils/cn';
 import { useSession } from 'next-auth/react';
 import { useHermesChat } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
-import { HermesAvatar } from './HermesAvatar';
+import { HermesAvatar, type HermesMood } from './HermesAvatar';
 
 const HIDDEN_PATHS = ['/admin'];
 const AVATAR_SIZE = 72;
@@ -259,7 +259,7 @@ export function FloatingChat() {
     }
   };
 
-  const hermesMood = isLoading ? 'thinking' : 'idle';
+  const hermesMood: HermesMood = isLoading ? 'thinking' : 'idle';
 
   const panelPos = useMemo(() => {
     if (!mounted) return { left: 0, top: 0, originX: 'center' as const, originY: 'center' as const };
@@ -326,6 +326,7 @@ export function FloatingChat() {
               mood={hermesMood}
               className="relative z-10 drop-shadow-lg hover:drop-shadow-xl transition-shadow"
               interactive={false}
+              isDragging={isDragging}
             />
           </div>
 

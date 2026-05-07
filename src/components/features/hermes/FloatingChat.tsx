@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal } from 'lucide-react';
+import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal, Shield, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
+import { useSession } from 'next-auth/react';
 import { useHermesChat } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar } from './HermesAvatar';
@@ -119,11 +120,14 @@ function getPanelPosition(avatarX: number, avatarY: number) {
 
 export function FloatingChat() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'ADMIN';
+
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, isLoading, sendMessage, clearMessages } = useHermesChat();
+  const { messages, isLoading, mode, setMode, sendMessage, clearMessages } = useHermesChat();
 
   // ===== 拖拽状态 =====
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -361,20 +365,29 @@ export function FloatingChat() {
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-tea-primary to-tea-mint text-white flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <HermesAvatar size={36} mood={hermesMood} interactive={false} />
-            <div>
-              <h3 className="text-sm font-semibold flex items-center gap-1">
-                Hermes
-                <Sparkles className="w-3 h-3 text-yellow-200" />
-              </h3>
-              <p className="text-[10px] text-white/80">
-                {isLoading ? '正在思考中...' : '你的常驻 AI 助手'}
-              </p>
+        <div className="flex flex-col flex-shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-tea-primary to-tea-mint text-white">
+            <div className="flex items-center gap-2.5">
+              <HermesAvatar size={36} mood={hermesMood} interactive={false} />
+              <div>
+                <h3 className="text-sm font-semibold flex items-center gap-1">
+                  Hermes
+                  {mode === 'community_manager' ? (
+                    <Shield className="w-3 h-3 text-yellow-200" />
+                  ) : (
+                    <Sparkles className="w-3 h-3 text-yellow-200" />
+                  )}
+                </h3>
+                <p className="text-[10px] text-white/80">
+                  {isLoading
+                    ? '正在思考中...'
+                    : mode === 'community_manager'
+                      ? '社区运营助手'
+                      : '你的常驻 AI 助手'}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="icon"
@@ -394,6 +407,37 @@ export function FloatingChat() {
               <Minimize2 className="h-3.5 w-3.5" />
             </Button>
           </div>
+          </div>
+
+          {/* Mode Switcher — ADMIN only */}
+          {isAdmin && (
+            <div className="flex bg-tea-primary/10 border-b border-tea-primary/10">
+              <button
+                onClick={() => setMode('kawaii')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium transition-colors',
+                  mode === 'kawaii'
+                    ? 'bg-white text-tea-primary border-b-2 border-tea-primary'
+                    : 'text-tea-primary/60 hover:text-tea-primary hover:bg-white/50'
+                )}
+              >
+                <MessageCircle className="w-3 h-3" />
+                日常助手
+              </button>
+              <button
+                onClick={() => setMode('community_manager')}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium transition-colors',
+                  mode === 'community_manager'
+                    ? 'bg-white text-tea-primary border-b-2 border-tea-primary'
+                    : 'text-tea-primary/60 hover:text-tea-primary hover:bg-white/50'
+                )}
+              >
+                <Shield className="w-3 h-3" />
+                社区管家
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Messages */}

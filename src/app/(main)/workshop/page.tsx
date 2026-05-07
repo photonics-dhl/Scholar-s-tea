@@ -59,6 +59,7 @@ export default function WorkshopPage() {
       grant: 'grant',
       survey: 'survey',
       research: 'suggest',
+      community_manager: undefined,
     }
 
     sendMessage(content, {

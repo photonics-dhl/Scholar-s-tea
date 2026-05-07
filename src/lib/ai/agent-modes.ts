@@ -10,6 +10,7 @@ import {
   Landmark,
   BookOpen,
   Lightbulb,
+  Shield,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -19,6 +20,7 @@ export type AgentMode =
   | 'grant'
   | 'survey'
   | 'research'
+  | 'community_manager'
 
 export interface AgentModeConfig {
   id: AgentMode
@@ -301,6 +303,63 @@ export const agentModes: Record<AgentMode, AgentModeConfig> = {
         icon: BookOpen,
         label: '切入建议',
         text: '我的背景是计算机视觉和深度学习，对生物医学图像分析感兴趣，请给我 3-5 个具体的研究切入点建议。',
+      },
+    ],
+  },
+
+  community_manager: {
+    id: 'community_manager',
+    label: '社区管家',
+    description: '社区运营数据分析、内容质量评估、管理决策辅助',
+    icon: Shield,
+    color: 'text-tea-primary',
+    bgColor: 'bg-tea-primary/10',
+    borderColor: 'border-tea-primary/20',
+    systemPrompt: `你是 Scholar's Tea 学者茶话会的「社区运营专家」—— Hermes 的社区管家模式。
+
+你的核心职责：
+- 分析社区健康度指标（用户增长、内容产出、互动质量）
+- 评估帖子/评论的内容质量和讨论热度
+- 识别潜在的运营问题（低质量内容、活跃度下降、话题分布不均）
+- 提供可操作的运营建议（活动策划、内容引导、用户激励）
+- 协助管理员处理待审核内容（引用验证、课题组认证）
+
+分析框架：
+1. 数据洞察：基于社区统计数据，发现趋势和异常
+2. 内容评估：从学术价值、讨论深度、互动质量三个维度评估内容
+3. 运营建议：针对具体问题给出具体、可执行的改进方案
+4. 风险预警：提前发现可能影响社区氛围的问题
+
+回答原则：
+- 用数据和事实支撑观点，避免主观臆断
+- 建议要具体可操作，不要空泛
+- 对敏感问题保持客观中立
+- 使用中文回答，必要时可引用英文术语`,
+    welcome: {
+      title: '社区运营助手',
+      subtitle: '帮你分析社区数据、评估内容质量、辅助管理决策',
+      features: [
+        '查询社区统计数据和增长趋势',
+        '分析热门话题和内容质量分布',
+        '评估待审核内容和用户行为',
+        '提供运营策略和活动策划建议',
+      ],
+    },
+    quickPrompts: [
+      {
+        icon: Shield,
+        label: '社区概览',
+        text: '请分析一下社区最近一周的运营状况，包括用户增长、内容产出、互动质量等关键指标。',
+      },
+      {
+        icon: Lightbulb,
+        label: '热门话题',
+        text: '最近社区有哪些热门讨论话题？哪些方向的讨论最受欢迎？',
+      },
+      {
+        icon: Brain,
+        label: '运营建议',
+        text: '基于当前社区数据，请给出 3-5 条提升社区活跃度和内容质量的具体建议。',
       },
     ],
   },

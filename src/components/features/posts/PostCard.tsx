@@ -53,8 +53,9 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
   return (
     <div
       className={cn(
-        'group flex gap-0 rounded-xl border bg-card overflow-hidden transition-all duration-200',
-        'hover:shadow-md hover:border-tea-primary/25',
+        'group flex gap-0 rounded-xl border bg-card overflow-hidden transition-all duration-300',
+        'hover:shadow-lg hover:border-tea-primary/30 hover:-translate-y-0.5',
+        'animate-fade-in-up',
         isHot && 'border-l-4 border-l-tea-accent',
         className
       )}

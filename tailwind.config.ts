@@ -90,10 +90,15 @@ const config: Config = {
       animation: {
         shimmer: 'shimmer 1.5s infinite linear',
         'fade-in-up': 'fadeInUp 0.4s ease-out forwards',
+        'fade-in': 'fadeIn 0.3s ease-out forwards',
         'bounce-in': 'bounceIn 0.5s ease-out forwards',
         typing: 'typingBounce 1.2s infinite ease-in-out',
         'slide-in-right': 'slideInRight 0.3s ease-out forwards',
+        'slide-in-left': 'slideInLeft 0.3s ease-out forwards',
+        'scale-in': 'scaleIn 0.25s ease-out forwards',
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'like-bounce': 'likeBounce 0.4s ease-out forwards',
       },
       keyframes: {
         shimmer: {
@@ -101,8 +106,12 @@ const config: Config = {
           '100%': { backgroundPosition: '200% 0' },
         },
         fadeInUp: {
-          from: { opacity: '0', transform: 'translateY(12px)' },
+          from: { opacity: '0', transform: 'translateY(16px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
         },
         bounceIn: {
           '0%': { transform: 'scale(0.3)', opacity: '0' },
@@ -117,6 +126,25 @@ const config: Config = {
         slideInRight: {
           from: { opacity: '0', transform: 'translateX(20px)' },
           to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideInLeft: {
+          from: { opacity: '0', transform: 'translateX(-20px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
+        likeBounce: {
+          '0%': { transform: 'scale(1)' },
+          '25%': { transform: 'scale(1.3)' },
+          '50%': { transform: 'scale(0.95)' },
+          '75%': { transform: 'scale(1.1)' },
+          '100%': { transform: 'scale(1)' },
         },
       },
       transitionTimingFunction: {

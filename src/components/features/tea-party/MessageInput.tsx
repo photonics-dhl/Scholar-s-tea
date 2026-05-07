@@ -190,7 +190,7 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
         </div>
 
         {/* Image Upload */}
-        <label className="cursor-pointer">
+        <label className="cursor-pointer relative h-8 w-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <input
             type="file"
             accept="image/*"
@@ -198,36 +198,18 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
             onChange={handleImageSelect}
             disabled={disabled || uploading}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-400 hover:text-gray-600"
-            disabled={disabled || uploading}
-            asChild
-          >
-            <span><Image className="h-5 w-5" /></span>
-          </Button>
+          <Image className="h-5 w-5" />
         </label>
 
         {/* File Upload */}
-        <label className="cursor-pointer">
+        <label className="cursor-pointer relative h-8 w-8 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
           <input
             type="file"
             className="hidden"
             onChange={handleFileSelect}
             disabled={disabled || uploading}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-400 hover:text-gray-600"
-            disabled={disabled || uploading}
-            asChild
-          >
-            <span><Paperclip className="h-5 w-5" /></span>
-          </Button>
+          <Paperclip className="h-5 w-5" />
         </label>
 
         {uploading && (
@@ -268,9 +250,9 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
           onClick={handleSend}
           disabled={!content.trim() || disabled || uploading}
           variant="tea"
-          className="size-10 flex-shrink-0 transition-transform active:scale-95 rounded-full"
+          className="size-10 flex-shrink-0 rounded-full transition-all duration-200 hover:scale-105 active:scale-90 hover:shadow-md"
         >
-          <Send className="size-4" />
+          <Send className="size-4 transition-transform duration-200 group-active:translate-x-0.5" />
         </Button>
       </div>
       <p className="text-[11px] text-muted-foreground px-3 pb-2 font-sans">

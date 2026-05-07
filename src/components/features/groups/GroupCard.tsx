@@ -31,7 +31,8 @@ export function GroupCard({ group, className, animationDelay = 0 }: GroupCardPro
     <Link href={`/groups/${group.slug}`} className="group">
       <div
         className={cn(
-          'relative flex flex-col overflow-hidden rounded-lg border border-journal-border bg-card shadow-sm transition-all duration-200 hover:border-journal-gold hover:shadow-md hover:-translate-y-0.5',
+          'relative flex flex-col overflow-hidden rounded-lg border border-journal-border bg-card shadow-sm transition-all duration-300 hover:border-journal-gold hover:shadow-lg hover:-translate-y-1',
+          'animate-fade-in-up',
           className
         )}
         style={{ animationDelay: `${animationDelay}ms` }}

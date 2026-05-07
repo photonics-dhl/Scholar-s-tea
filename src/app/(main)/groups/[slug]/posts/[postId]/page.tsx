@@ -7,24 +7,21 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
-  MessageSquare,
   Eye,
   Pin,
   Lock,
   Share2,
   Flag,
   Clock,
-  Send,
-  CornerDownRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
 import { cn } from '@/lib/utils/cn';
+import { CommentSection } from '@/components/features/posts/CommentSection';
 
 interface Author {
   id: string;
@@ -84,9 +81,7 @@ export default function GroupPostDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentContent, setCommentContent] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
+
   const [voting, setVoting] = useState(false);
   const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
 
@@ -157,51 +152,38 @@ export default function GroupPostDetailPage() {
     }
   };
 
-  const handleSubmitComment = async () => {
-    if (!commentContent.trim()) return;
-    try {
-      const res = await fetch('/api/v1/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, content: commentContent }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setComments([...comments, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }]);
-        setCommentContent('');
-        if (post) {
-          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
-        }
+  const handleSubmitComment = async (content: string) => {
+    const res = await fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, content }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setComments([...comments, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }]);
+      if (post) {
+        setPost({ ...post, _count: { comments: post._count.comments + 1 } });
       }
-    } catch (err) {
-      console.error('Comment failed:', err);
     }
   };
 
-  const handleReply = async (parentId: string) => {
-    if (!replyContent.trim()) return;
-    try {
-      const res = await fetch('/api/v1/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, content: replyContent, parentId }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setComments(comments.map((c) => {
-          if (c.id === parentId) {
-            return { ...c, children: [...c.children, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }] };
-          }
-          return c;
-        }));
-        setReplyContent('');
-        setReplyingTo(null);
-        if (post) {
-          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
+  const handleSubmitReply = async (parentId: string, content: string) => {
+    const res = await fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, content, parentId }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setComments(comments.map((c) => {
+        if (c.id === parentId) {
+          return { ...c, children: [...c.children, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }] };
         }
+        return c;
+      }));
+      if (post) {
+        setPost({ ...post, _count: { comments: post._count.comments + 1 } });
       }
-    } catch (err) {
-      console.error('Reply failed:', err);
     }
   };
 
@@ -357,128 +339,16 @@ export default function GroupPostDetailPage() {
       </article>
 
       {/* Comments Section */}
-      <section className="rounded-xl border bg-card shadow-sm">
-        <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-muted-foreground" />
-            {post._count.comments} 条评论
-          </h2>
-        </div>
-
-        {/* Comment Form */}
-        {!post.isLocked && (
-          <div className="px-6 py-4 border-b bg-muted/10">
-            <Textarea
-              placeholder="写下你的评论..."
-              value={commentContent}
-              onChange={(e) => setCommentContent(e.target.value)}
-              className="mb-3 min-h-[80px] resize-y"
-            />
-            <div className="flex justify-end">
-              <Button
-                onClick={handleSubmitComment}
-                disabled={!commentContent.trim()}
-                size="sm"
-                className="gap-1.5"
-              >
-                <Send className="h-3.5 w-3.5" />
-                发布评论
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Comments List */}
-        <div className="divide-y divide-border/50">
-          {comments.map((comment) => (
-            <div key={comment.id} className="px-6 py-4">
-              {/* 一级评论 */}
-              <div className="flex gap-3">
-                <Avatar className="h-8 w-8 mt-0.5">
-                  <AvatarFallback className="text-xs bg-muted text-muted-foreground">
-                    {comment.author.name?.slice(0, 2) || '匿'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium">{comment.author.name || '匿名用户'}</span>
-                    <span className="text-xs text-muted-foreground">{formatRelative(comment.createdAt)}</span>
-                    {comment.score > 0 && (
-                      <Badge variant="outline" className="text-[10px] h-4 px-1 border-orange-200 text-orange-600">
-                        <ArrowUp className="h-2.5 w-2.5 mr-0.5" />
-                        {comment.score}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-foreground leading-relaxed mb-2">{comment.content}</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs text-muted-foreground hover:text-tea-primary"
-                      onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                    >
-                      <CornerDownRight className="h-3 w-3 mr-1" />
-                      {replyingTo === comment.id ? '取消回复' : '回复'}
-                    </Button>
-                  </div>
-
-                  {/* Reply Form */}
-                  {replyingTo === comment.id && (
-                    <div className="mt-3 flex gap-2">
-                      <Textarea
-                        placeholder={`回复 @${comment.author.name || '匿名'}...`}
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        className="flex-1 min-h-[60px] text-sm"
-                        rows={2}
-                      />
-                      <div className="flex flex-col gap-1.5">
-                        <Button size="sm" onClick={() => handleReply(comment.id)} className="gap-1">
-                          <Send className="h-3 w-3" /> 发布
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setReplyingTo(null)}>
-                          取消
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 子评论 */}
-                  {comment.children.length > 0 && (
-                    <div className="mt-3 space-y-3 pl-3 border-l-2 border-border/40">
-                      {comment.children.map((child) => (
-                        <div key={child.id} className="flex gap-2.5">
-                          <Avatar className="h-6 w-6 mt-0.5">
-                            <AvatarFallback className="text-[10px] bg-muted text-muted-foreground">
-                              {child.author.name?.slice(0, 2) || '匿'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className="text-sm font-medium">{child.author.name || '匿名用户'}</span>
-                              <span className="text-xs text-muted-foreground">{formatRelative(child.createdAt)}</span>
-                            </div>
-                            <p className="text-sm text-foreground leading-relaxed">{child.content}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {comments.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm">暂无评论，来说点什么吧</p>
-          </div>
-        )}
-      </section>
+      <div className="rounded-xl border bg-card shadow-sm p-6">
+        <CommentSection
+          comments={comments}
+          postAuthorId={post.author.id}
+          commentCount={post._count.comments}
+          isLocked={post.isLocked}
+          onSubmitComment={handleSubmitComment}
+          onSubmitReply={handleSubmitReply}
+        />
+      </div>
     </div>
   );
 }

@@ -7,7 +7,6 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
-  MessageSquare,
   Eye,
   Pin,
   Lock,
@@ -17,8 +16,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
+import { CommentSection } from '@/components/features/posts/CommentSection';
 
 interface Author {
   id: string;
@@ -96,9 +95,6 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentContent, setCommentContent] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
   const [voting, setVoting] = useState(false);
 
   useEffect(() => {
@@ -171,58 +167,41 @@ export default function PostDetailPage() {
     }
   };
 
-  const handleSubmitComment = async () => {
-    if (!commentContent.trim()) return;
-
-    try {
-      const res = await fetch('/api/v1/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, content: commentContent }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setComments([...comments, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }]);
-        setCommentContent('');
-        if (post) {
-          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
-        }
+  const handleSubmitComment = async (content: string) => {
+    const res = await fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, content }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setComments([...comments, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }]);
+      if (post) {
+        setPost({ ...post, _count: { comments: post._count.comments + 1 } });
       }
-    } catch (err) {
-      console.error('Comment failed:', err);
     }
   };
 
-  const handleReply = async (parentId: string) => {
-    if (!replyContent.trim()) return;
-
-    try {
-      const res = await fetch('/api/v1/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, content: replyContent, parentId }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setComments(comments.map(c => {
-          if (c.id === parentId) {
-            return {
-              ...c,
-              children: [...c.children, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }],
-            };
-          }
-          return c;
-        }));
-        setReplyContent('');
-        setReplyingTo(null);
-        if (post) {
-          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
+  const handleSubmitReply = async (parentId: string, content: string) => {
+    const res = await fetch('/api/v1/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, content, parentId }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setComments(comments.map(c => {
+        if (c.id === parentId) {
+          return {
+            ...c,
+            children: [...c.children, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }],
+          };
         }
+        return c;
+      }));
+      if (post) {
+        setPost({ ...post, _count: { comments: post._count.comments + 1 } });
       }
-    } catch (err) {
-      console.error('Reply failed:', err);
     }
   };
 
@@ -334,123 +313,14 @@ export default function PostDetailPage() {
       </article>
 
       {/* Comments Section */}
-      <section className="border-t pt-8">
-        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-          <MessageSquare className="h-5 w-5" />
-          {post._count.comments} 条评论
-        </h2>
-
-        {/* Comment Form */}
-        {!post.isLocked && (
-          <div className="mb-8">
-            <Textarea
-              placeholder="写下你的评论..."
-              value={commentContent}
-              onChange={(e) => setCommentContent(e.target.value)}
-              className="mb-3"
-            />
-            <div className="flex justify-end">
-              <Button onClick={handleSubmitComment} disabled={!commentContent.trim()}>
-                发布评论
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Comments List */}
-        <div className="space-y-6">
-          {comments.map((comment) => (
-            <div key={comment.id} className="space-y-4">
-              {/* Main Comment */}
-              <div className="flex gap-4">
-                <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
-                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-300 hover:text-gray-400">
-                    <ArrowUp className="h-3 w-3" />
-                  </Button>
-                  <span className="text-xs text-muted-foreground/60">{comment.score}</span>
-                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-300 hover:text-gray-400">
-                    <ArrowDown className="h-3 w-3" />
-                  </Button>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium">{comment.author.name || '匿名用户'}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(comment.createdAt)}
-                    </span>
-                  </div>
-                  <p className="text-sm mb-2">{comment.content}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                  >
-                    回复
-                  </Button>
-
-                  {/* Reply Form */}
-                  {replyingTo === comment.id && (
-                    <div className="mt-3 flex gap-2">
-                      <Textarea
-                        placeholder={`回复 @${comment.author.name || '匿名'}...`}
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        className="flex-1"
-                        rows={2}
-                      />
-                      <div className="flex flex-col gap-1">
-                        <Button size="sm" onClick={() => handleReply(comment.id)}>
-                          发布
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setReplyingTo(null)}>
-                          取消
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Children Comments */}
-                  {comment.children.length > 0 && (
-                    <div className="mt-4 ml-4 pl-4 border-l space-y-4">
-                      {comment.children.map((child) => (
-                        <div key={child.id} className="flex gap-3">
-                          <div className="flex flex-col items-center gap-0.5 min-w-[24px]">
-                            <Button variant="ghost" size="icon" className="h-4 w-4 text-gray-300 hover:text-gray-400">
-                              <ArrowUp className="h-3 w-3" />
-                            </Button>
-                            <span className="text-[10px] text-muted-foreground/60">{child.score}</span>
-                            <Button variant="ghost" size="icon" className="h-4 w-4 text-gray-300 hover:text-gray-400">
-                              <ArrowDown className="h-3 w-3" />
-                            </Button>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-sm">
-                                {child.author.name || '匿名用户'}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {formatDate(child.createdAt)}
-                              </span>
-                            </div>
-                            <p className="text-sm">{child.content}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {comments.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>暂无评论，来说点什么吧</p>
-          </div>
-        )}
-      </section>
+      <CommentSection
+        comments={comments}
+        postAuthorId={post.author.id}
+        commentCount={post._count.comments}
+        isLocked={post.isLocked}
+        onSubmitComment={handleSubmitComment}
+        onSubmitReply={handleSubmitReply}
+      />
     </div>
   );
 }

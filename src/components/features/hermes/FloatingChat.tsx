@@ -36,35 +36,36 @@ export function FloatingChat() {
   return (
     <>
       {/* Floating Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className={cn(
-            'fixed bottom-6 right-6 z-50',
-            'w-14 h-14 rounded-full shadow-lg',
-            'bg-gradient-to-br from-tea-primary to-tea-mint',
-            'text-white flex items-center justify-center',
-            'hover:shadow-xl hover:scale-105 transition-all duration-300',
-            'animate-fade-in-up'
-          )}
-          title="AI 助手 Hermes"
-        >
-          <Bot className="w-7 h-7" />
-        </button>
-      )}
+      <button
+        onClick={() => setIsOpen(true)}
+        className={cn(
+          'fixed bottom-6 right-6 z-50',
+          'w-14 h-14 rounded-full shadow-lg',
+          'bg-gradient-to-br from-tea-primary to-tea-mint',
+          'text-white flex items-center justify-center',
+          'hover:shadow-xl hover:scale-110 transition-all duration-300',
+          'animate-fade-in-up',
+          isOpen && 'scale-0 opacity-0 pointer-events-none'
+        )}
+        title="AI 助手 Hermes"
+      >
+        <Bot className="w-7 h-7" />
+      </button>
 
       {/* Chat Panel */}
-      {isOpen && (
-        <div
-          className={cn(
-            'fixed bottom-6 right-6 z-50',
-            'w-[380px] max-w-[calc(100vw-48px)]',
-            'h-[520px] max-h-[calc(100vh-100px)]',
-            'bg-white rounded-2xl shadow-2xl border border-gray-200/80',
-            'flex flex-col overflow-hidden',
-            'animate-fade-in-up'
-          )}
-        >
+      <div
+        className={cn(
+          'fixed bottom-6 right-6 z-50',
+          'w-[380px] max-w-[calc(100vw-48px)]',
+          'h-[520px] max-h-[calc(100vh-100px)]',
+          'bg-white rounded-2xl shadow-2xl border border-gray-200/80',
+          'flex flex-col overflow-hidden',
+          'transition-all duration-300 ease-out origin-bottom-right',
+          isOpen
+            ? 'scale-100 opacity-100 translate-y-0'
+            : 'scale-75 opacity-0 translate-y-4 pointer-events-none'
+        )}
+      >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-tea-primary to-tea-mint text-white flex-shrink-0">
             <div className="flex items-center gap-2.5">
@@ -193,7 +194,6 @@ export function FloatingChat() {
             </div>
           </div>
         </div>
-      )}
     </>
   );
 }

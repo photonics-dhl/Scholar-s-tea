@@ -10,7 +10,7 @@ import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar } from './HermesAvatar';
 
 const HIDDEN_PATHS = ['/admin'];
-const AVATAR_SIZE = 72; // 包含 padding/blur 的总占用
+const AVATAR_SIZE = 72;
 const PANEL_W = 400;
 const PANEL_H = 560;
 const MARGIN = 12;
@@ -40,7 +40,7 @@ function clamp(val: number, min: number, max: number) {
 function getDefaultPosition() {
   if (typeof window === 'undefined') return { x: 0, y: 0 };
   return {
-    x: window.innerWidth - 24 - AVATAR_SIZE,
+    x: window.innerWidth - MARGIN - AVATAR_SIZE,
     y: Math.round(window.innerHeight / 2 - AVATAR_SIZE / 2),
   };
 }
@@ -48,37 +48,73 @@ function getDefaultPosition() {
 function clampPosition(x: number, y: number) {
   if (typeof window === 'undefined') return { x, y };
   return {
-    x: clamp(x, MARGIN, window.innerWidth - AVATAR_SIZE - MARGIN),
-    y: clamp(y, MARGIN, window.innerHeight - AVATAR_SIZE - MARGIN),
+    x: clamp(x, MARGIN, Math.max(MARGIN, window.innerWidth - AVATAR_SIZE - MARGIN)),
+    y: clamp(y, MARGIN, Math.max(MARGIN, window.innerHeight - AVATAR_SIZE - MARGIN)),
   };
 }
 
-/** 计算面板位置，确保不被截断 */
+/** 智能计算面板位置 — 始终紧贴 avatar 的最近可用空间 */
 function getPanelPosition(avatarX: number, avatarY: number) {
-  if (typeof window === 'undefined') return { left: 0, top: 0 };
+  if (typeof window === 'undefined')
+    return { left: 0, top: 0, originX: 'center' as const, originY: 'center' as const };
 
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  // 默认：面板在头像左上方（右下角对齐头像左上角，留一点间距）
-  let left = avatarX - PANEL_W - MARGIN;
-  let top = avatarY - PANEL_H - MARGIN;
+  // 动态计算有效面板尺寸（视口过小时自适应）
+  const effW = Math.min(PANEL_W, vw - 2 * MARGIN);
+  const effH = Math.min(PANEL_H, vh - 2 * MARGIN);
 
-  // 左侧空间不够 → 放到头像右侧
-  if (left < MARGIN) {
+  // 计算四个方向可用空间
+  const spaceRight = vw - avatarX - AVATAR_SIZE - MARGIN;
+  const spaceLeft = avatarX - MARGIN;
+  const spaceBelow = vh - avatarY - AVATAR_SIZE - MARGIN;
+  const spaceAbove = avatarY - MARGIN;
+
+  let left: number;
+  let top: number;
+  let originX: 'left' | 'right' | 'center';
+  let originY: 'top' | 'bottom' | 'center';
+
+  // ========== 水平方向 ==========
+  // 策略：优先放在空间更大的一侧；如果都够放，优先右侧（阅读习惯）
+  if (spaceRight >= effW && spaceRight >= spaceLeft) {
     left = avatarX + AVATAR_SIZE + MARGIN;
+    originX = 'left';
+  } else if (spaceLeft >= effW) {
+    left = avatarX - effW - MARGIN;
+    originX = 'right';
+  } else if (spaceRight >= spaceLeft) {
+    // 空间都不够，但右侧稍大 → 贴右边缘
+    left = Math.max(MARGIN, vw - effW - MARGIN);
+    originX = 'right';
+  } else {
+    // 左侧稍大 → 贴左边缘
+    left = MARGIN;
+    originX = 'left';
   }
 
-  // 上方空间不够 → 放到头像下方
-  if (top < MARGIN) {
-    top = avatarY + AVATAR_SIZE + MARGIN;
+  // ========== 垂直方向 ==========
+  // 策略：优先让面板顶部与 avatar 顶部对齐；如果下方放不下，再向上调整
+  if (spaceBelow >= effH) {
+    // 下方空间足够，面板顶部对齐 avatar 顶部
+    top = avatarY;
+    originY = 'top';
+  } else if (spaceAbove >= effH) {
+    // 上方空间足够，面板底部对齐 avatar 底部
+    top = avatarY + AVATAR_SIZE - effH;
+    originY = 'bottom';
+  } else {
+    // 上下都不够，居中于 avatar 垂直方向，再 clamp
+    top = avatarY + Math.round(AVATAR_SIZE / 2) - Math.round(effH / 2);
+    originY = 'center';
   }
 
-  // 最终边界限制
-  left = clamp(left, MARGIN, vw - PANEL_W - MARGIN);
-  top = clamp(top, MARGIN, vh - PANEL_H - MARGIN);
+  // 最终 clamp，确保不超出视口
+  top = clamp(top, MARGIN, Math.max(MARGIN, vh - effH - MARGIN));
+  left = clamp(left, MARGIN, Math.max(MARGIN, vw - effW - MARGIN));
 
-  return { left, top };
+  return { left, top, originX, originY };
 }
 
 export function FloatingChat() {
@@ -91,21 +127,36 @@ export function FloatingChat() {
 
   // ===== 拖拽状态 =====
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const posRef = useRef(pos);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef<{ sx: number; sy: number; ix: number; iy: number } | null>(null);
+  const dragTargetRef = useRef<HTMLElement | null>(null);
+
+  // 同步 ref 避免闭包问题
+  useEffect(() => {
+    posRef.current = pos;
+  }, [pos]);
 
   // 初始化位置（避免 SSR 问题）
   useEffect(() => {
     const saved = getSavedPosition();
     if (saved) {
-      setPos(clampPosition(saved.x, saved.y));
+      const clamped = clampPosition(saved.x, saved.y);
+      setPos(clamped);
+      posRef.current = clamped;
     } else {
-      setPos(getDefaultPosition());
+      const def = getDefaultPosition();
+      setPos(def);
+      posRef.current = def;
     }
     setMounted(true);
 
     const onResize = () => {
-      setPos((prev) => clampPosition(prev.x, prev.y));
+      setPos((prev) => {
+        const next = clampPosition(prev.x, prev.y);
+        posRef.current = next;
+        return next;
+      });
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -115,43 +166,74 @@ export function FloatingChat() {
     if (isOpen) return;
 
     const target = e.currentTarget as HTMLElement;
+    dragTargetRef.current = target;
     target.setPointerCapture(e.pointerId);
 
     dragStartRef.current = {
       sx: e.clientX,
       sy: e.clientY,
-      ix: pos.x,
-      iy: pos.y,
+      ix: posRef.current.x,
+      iy: posRef.current.y,
     };
     setIsDragging(true);
 
-    // 防止拖拽时选中文本
     e.preventDefault();
-  }, [isOpen, pos]);
+  }, [isOpen]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging || !dragStartRef.current) return;
 
     const dx = e.clientX - dragStartRef.current.sx;
     const dy = e.clientY - dragStartRef.current.sy;
-    setPos(clampPosition(dragStartRef.current.ix + dx, dragStartRef.current.iy + dy));
+    const next = clampPosition(dragStartRef.current.ix + dx, dragStartRef.current.iy + dy);
+    setPos(next);
+    posRef.current = next;
   }, [isDragging]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     setIsDragging(false);
 
+    // 释放 pointer capture
+    if (dragTargetRef.current) {
+      try {
+        dragTargetRef.current.releasePointerCapture(e.pointerId);
+      } catch { /* 可能已自动释放 */ }
+      dragTargetRef.current = null;
+    }
+
     const dx = e.clientX - (dragStartRef.current?.sx ?? 0);
     const dy = e.clientY - (dragStartRef.current?.sy ?? 0);
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     dragStartRef.current = null;
-    savePosition(pos.x, pos.y);
+    savePosition(posRef.current.x, posRef.current.y);
 
     if (distance < 5) {
       setIsOpen(true);
     }
-  }, [isDragging, pos]);
+  }, [isDragging]);
+
+  const handlePointerCancel = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    if (dragTargetRef.current) {
+      try {
+        dragTargetRef.current.releasePointerCapture(e.pointerId);
+      } catch { /* ignore */ }
+      dragTargetRef.current = null;
+    }
+
+    dragStartRef.current = null;
+    // 取消拖拽时不保存位置，回退到上一次保存的位置
+    const saved = getSavedPosition();
+    if (saved) {
+      const clamped = clampPosition(saved.x, saved.y);
+      setPos(clamped);
+      posRef.current = clamped;
+    }
+  }, [isDragging]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -176,7 +258,7 @@ export function FloatingChat() {
   const hermesMood = isLoading ? 'thinking' : 'idle';
 
   const panelPos = useMemo(() => {
-    if (!mounted) return { left: 0, top: 0 };
+    if (!mounted) return { left: 0, top: 0, originX: 'center' as const, originY: 'center' as const };
     return getPanelPosition(pos.x, pos.y);
   }, [pos, mounted]);
 
@@ -194,11 +276,12 @@ export function FloatingChat() {
           height: AVATAR_SIZE,
           opacity: mounted ? 1 : 0,
           transition: 'opacity 0.3s ease',
+          touchAction: 'none',
         }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
       >
         <div
           className={cn(
@@ -266,7 +349,7 @@ export function FloatingChat() {
           'h-[560px] max-h-[calc(100vh-24px)]',
           'bg-white rounded-2xl shadow-2xl border border-gray-200/80',
           'flex flex-col overflow-hidden',
-          'transition-all duration-300 ease-out',
+          'transition-[transform,opacity] duration-300 ease-out',
           isOpen
             ? 'scale-100 opacity-100'
             : 'scale-75 opacity-0 pointer-events-none'
@@ -274,7 +357,7 @@ export function FloatingChat() {
         style={{
           left: panelPos.left,
           top: panelPos.top,
-          transformOrigin: `${pos.x < panelPos.left ? 'left' : 'right'} ${pos.y < panelPos.top ? 'top' : 'bottom'}`,
+          transformOrigin: `${panelPos.originX} ${panelPos.originY}`,
         }}
       >
         {/* Header */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,87 +9,149 @@ import { useHermesChat } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar } from './HermesAvatar';
 
-// 不需要显示 Hermes 助手的页面路径（支持前缀匹配）
 const HIDDEN_PATHS = ['/admin'];
+const AVATAR_SIZE = 72; // 包含 padding/blur 的总占用
+const PANEL_W = 400;
+const PANEL_H = 560;
+const MARGIN = 12;
 
 function shouldShowHermes(pathname: string): boolean {
   return !HIDDEN_PATHS.some((p) => pathname.startsWith(p));
 }
 
-/** 读取保存的位置 */
 function getSavedPosition(): { x: number; y: number } | null {
   try {
-    const raw = localStorage.getItem('hermes-position');
+    const raw = localStorage.getItem('hermes-pos-v2');
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
   return null;
 }
 
-/** 保存位置 */
 function savePosition(x: number, y: number) {
   try {
-    localStorage.setItem('hermes-position', JSON.stringify({ x, y }));
+    localStorage.setItem('hermes-pos-v2', JSON.stringify({ x, y }));
   } catch { /* ignore */ }
+}
+
+function clamp(val: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, val));
+}
+
+function getDefaultPosition() {
+  if (typeof window === 'undefined') return { x: 0, y: 0 };
+  return {
+    x: window.innerWidth - 24 - AVATAR_SIZE,
+    y: Math.round(window.innerHeight / 2 - AVATAR_SIZE / 2),
+  };
+}
+
+function clampPosition(x: number, y: number) {
+  if (typeof window === 'undefined') return { x, y };
+  return {
+    x: clamp(x, MARGIN, window.innerWidth - AVATAR_SIZE - MARGIN),
+    y: clamp(y, MARGIN, window.innerHeight - AVATAR_SIZE - MARGIN),
+  };
+}
+
+/** 计算面板位置，确保不被截断 */
+function getPanelPosition(avatarX: number, avatarY: number) {
+  if (typeof window === 'undefined') return { left: 0, top: 0 };
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // 默认：面板在头像左上方（右下角对齐头像左上角，留一点间距）
+  let left = avatarX - PANEL_W - MARGIN;
+  let top = avatarY - PANEL_H - MARGIN;
+
+  // 左侧空间不够 → 放到头像右侧
+  if (left < MARGIN) {
+    left = avatarX + AVATAR_SIZE + MARGIN;
+  }
+
+  // 上方空间不够 → 放到头像下方
+  if (top < MARGIN) {
+    top = avatarY + AVATAR_SIZE + MARGIN;
+  }
+
+  // 最终边界限制
+  left = clamp(left, MARGIN, vw - PANEL_W - MARGIN);
+  top = clamp(top, MARGIN, vh - PANEL_H - MARGIN);
+
+  return { left, top };
 }
 
 export function FloatingChat() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { messages, isLoading, sendMessage, clearMessages } = useHermesChat();
 
   // ===== 拖拽状态 =====
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState<{ x: number; y: number }>(() => {
-    const saved = getSavedPosition();
-    // 默认位置：右侧偏中间（更显眼）
-    return saved ?? { x: 0, y: -120 };
-  });
+  const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  const dragStartRef = useRef<{ sx: number; sy: number; ix: number; iy: number } | null>(null);
+
+  // 初始化位置（避免 SSR 问题）
+  useEffect(() => {
+    const saved = getSavedPosition();
+    if (saved) {
+      setPos(clampPosition(saved.x, saved.y));
+    } else {
+      setPos(getDefaultPosition());
+    }
+    setMounted(true);
+
+    const onResize = () => {
+      setPos((prev) => clampPosition(prev.x, prev.y));
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    // 如果聊天面板打开，不拖拽
     if (isOpen) return;
 
-    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    const target = e.currentTarget as HTMLElement;
+    target.setPointerCapture(e.pointerId);
+
     dragStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      ox: offset.x,
-      oy: offset.y,
+      sx: e.clientX,
+      sy: e.clientY,
+      ix: pos.x,
+      iy: pos.y,
     };
     setIsDragging(true);
-  }, [offset, isOpen]);
+
+    // 防止拖拽时选中文本
+    e.preventDefault();
+  }, [isOpen, pos]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging || !dragStartRef.current) return;
-    const dx = e.clientX - dragStartRef.current.x;
-    const dy = e.clientY - dragStartRef.current.y;
-    const newOffset = {
-      x: dragStartRef.current.ox + dx,
-      y: dragStartRef.current.oy + dy,
-    };
-    setOffset(newOffset);
+
+    const dx = e.clientX - dragStartRef.current.sx;
+    const dy = e.clientY - dragStartRef.current.sy;
+    setPos(clampPosition(dragStartRef.current.ix + dx, dragStartRef.current.iy + dy));
   }, [isDragging]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     setIsDragging(false);
 
-    // 判定是点击还是拖拽：移动距离 < 5px 视为点击
-    const dx = e.clientX - (dragStartRef.current?.x ?? 0);
-    const dy = e.clientY - (dragStartRef.current?.y ?? 0);
+    const dx = e.clientX - (dragStartRef.current?.sx ?? 0);
+    const dy = e.clientY - (dragStartRef.current?.sy ?? 0);
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     dragStartRef.current = null;
-    savePosition(offset.x, offset.y);
+    savePosition(pos.x, pos.y);
 
     if (distance < 5) {
       setIsOpen(true);
     }
-  }, [isDragging, offset]);
+  }, [isDragging, pos]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -111,105 +173,114 @@ export function FloatingChat() {
     }
   };
 
-  // 判断当前 mood
   const hermesMood = isLoading ? 'thinking' : 'idle';
 
-  // 不在白名单页面则不渲染
+  const panelPos = useMemo(() => {
+    if (!mounted) return { left: 0, top: 0 };
+    return getPanelPosition(pos.x, pos.y);
+  }, [pos, mounted]);
+
   if (!pathname || !shouldShowHermes(pathname)) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed z-50"
-      style={{
-        right: 24,
-        bottom: '50%',
-        transform: `translate(${offset.x}px, ${offset.y}px)`,
-      }}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-    >
-      {/* Floating Button with cute avatar */}
-      <button
-        className={cn(
-          'group relative flex items-center justify-center',
-          'transition-all duration-300',
-          isOpen && 'scale-0 opacity-0 pointer-events-none',
-          isDragging && 'cursor-grabbing',
-          !isDragging && 'cursor-grab'
-        )}
-        title="AI 助手 Hermes（按住拖拽）"
+    <>
+      {/* Avatar */}
+      <div
+        className="fixed z-50"
+        style={{
+          left: pos.x,
+          top: pos.y,
+          width: AVATAR_SIZE,
+          height: AVATAR_SIZE,
+          opacity: mounted ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+        }}
         onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
       >
-        {/* 背景光环 */}
         <div
-          className="absolute inset-0 rounded-full bg-tea-primary/20 animate-ping"
-          style={{ animationDuration: '3s' }}
-        />
-        <div className="absolute inset-[-6px] rounded-full bg-gradient-to-br from-tea-primary/30 to-tea-mint/30 blur-sm" />
-
-        {/* 拖拽提示条 */}
-        <div
-          data-drag-handle
           className={cn(
-            'absolute -top-3 left-1/2 -translate-x-1/2',
-            'flex items-center gap-0.5 px-2 py-0.5 rounded-full',
-            'bg-tea-primary/90 text-white text-[10px] shadow-sm',
-            'opacity-0 group-hover:opacity-100 transition-opacity',
-            'cursor-grab active:cursor-grabbing'
+            'group relative flex items-center justify-center w-full h-full',
+            'transition-all duration-300',
+            isOpen && 'scale-0 opacity-0 pointer-events-none',
+            isDragging && 'cursor-grabbing',
+            !isDragging && 'cursor-grab'
           )}
+          title="AI 助手 Hermes（按住拖拽）"
+          role="button"
+          tabIndex={0}
         >
-          <GripHorizontal className="w-3 h-3" />
-          <span>拖拽</span>
-        </div>
-
-        <div data-avatar>
-          <HermesAvatar
-            size={64}
-            mood={hermesMood}
-            className="relative z-10 drop-shadow-lg hover:drop-shadow-xl transition-shadow"
+          {/* 背景光环 */}
+          <div
+            className="absolute inset-0 rounded-full bg-tea-primary/20 animate-ping"
+            style={{ animationDuration: '3s' }}
           />
-        </div>
+          <div className="absolute inset-[-6px] rounded-full bg-gradient-to-br from-tea-primary/30 to-tea-mint/30 blur-sm" />
 
-        {/* 未读提示小红点 */}
-        {!isOpen && messages.length <= 1 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full border-2 border-white animate-pulse" />
-        )}
-
-        {/* 常驻提示文字 */}
-        {!isOpen && (
-          <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap">
-            <span className="text-[10px] bg-white/90 text-tea-primary px-2 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium">
-              点我聊天~
-            </span>
+          {/* 拖拽提示条 */}
+          <div
+            className={cn(
+              'absolute -top-3 left-1/2 -translate-x-1/2',
+              'flex items-center gap-0.5 px-2 py-0.5 rounded-full',
+              'bg-tea-primary/90 text-white text-[10px] shadow-sm',
+              'opacity-0 group-hover:opacity-100 transition-opacity',
+              'cursor-grab active:cursor-grabbing pointer-events-none'
+            )}
+          >
+            <GripHorizontal className="w-3 h-3" />
+            <span>拖拽</span>
           </div>
-        )}
-      </button>
 
-      {/* Chat Panel */}
+          <div>
+            <HermesAvatar
+              size={64}
+              mood={hermesMood}
+              className="relative z-10 drop-shadow-lg hover:drop-shadow-xl transition-shadow"
+              interactive={false}
+            />
+          </div>
+
+          {/* 未读提示小红点 */}
+          {!isOpen && messages.length <= 1 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full border-2 border-white animate-pulse" />
+          )}
+
+          {/* 常驻提示文字 */}
+          {!isOpen && (
+            <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
+              <span className="text-[10px] bg-white/90 text-tea-primary px-2 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium">
+                点我聊天~
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Chat Panel - completely separate from avatar to avoid event interference */}
       <div
         className={cn(
           'fixed z-50',
-          'w-[400px] max-w-[calc(100vw-48px)]',
-          'h-[560px] max-h-[calc(100vh-100px)]',
+          'w-[400px] max-w-[calc(100vw-24px)]',
+          'h-[560px] max-h-[calc(100vh-24px)]',
           'bg-white rounded-2xl shadow-2xl border border-gray-200/80',
           'flex flex-col overflow-hidden',
-          'transition-all duration-300 ease-out origin-bottom-right',
+          'transition-all duration-300 ease-out',
           isOpen
-            ? 'scale-100 opacity-100 translate-y-0'
-            : 'scale-75 opacity-0 translate-y-4 pointer-events-none'
+            ? 'scale-100 opacity-100'
+            : 'scale-75 opacity-0 pointer-events-none'
         )}
         style={{
-          right: 24,
-          bottom: '50%',
-          transform: `translate(${offset.x}px, ${offset.y + 40}px)`,
+          left: panelPos.left,
+          top: panelPos.top,
+          transformOrigin: `${pos.x < panelPos.left ? 'left' : 'right'} ${pos.y < panelPos.top ? 'top' : 'bottom'}`,
         }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-tea-primary to-tea-mint text-white flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <HermesAvatar size={36} mood={hermesMood} />
+            <HermesAvatar size={36} mood={hermesMood} interactive={false} />
             <div>
               <h3 className="text-sm font-semibold flex items-center gap-1">
                 Hermes
@@ -255,7 +326,7 @@ export function FloatingChat() {
               {/* Avatar */}
               {message.role === 'assistant' ? (
                 <div className="flex-shrink-0">
-                  <HermesAvatar size={28} />
+                  <HermesAvatar size={28} interactive={false} />
                 </div>
               ) : (
                 <div className="flex-shrink-0 w-7 h-7 rounded-full bg-tea-primary/10 text-tea-primary flex items-center justify-center">
@@ -281,11 +352,11 @@ export function FloatingChat() {
             </div>
           ))}
 
-          {/* Loading indicator with cute animation */}
+          {/* Loading indicator */}
           {isLoading && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-2.5">
               <div className="flex-shrink-0">
-                <HermesAvatar size={28} mood="thinking" />
+                <HermesAvatar size={28} mood="thinking" interactive={false} />
               </div>
               <div className="bg-white border border-gray-200/80 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
                 <div className="flex gap-1 items-center">
@@ -342,6 +413,6 @@ export function FloatingChat() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

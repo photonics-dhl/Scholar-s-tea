@@ -89,7 +89,7 @@ function parseMarkdown(text: string): string {
   )
   // 包裹连续的 li 为 ul
   html = html.replace(
-    /(<li class="markdown-li">.*?<\/li>)(\n<li class="markdown-li">.*?<\/li>)*/gs,
+    /(<li class="markdown-li">[\s\S]*?<\/li>)(\n<li class="markdown-li">[\s\S]*?<\/li>)*/g,
     (match) => `<ul class="markdown-ul">${match}</ul>`
   )
 

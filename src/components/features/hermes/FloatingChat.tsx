@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X, Send, Minimize2, Trash2, User, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
@@ -8,7 +9,15 @@ import { useHermesChat } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar } from './HermesAvatar';
 
+// 不需要显示 Hermes 助手的页面路径（支持前缀匹配）
+const HIDDEN_PATHS = ['/admin'];
+
+function shouldShowHermes(pathname: string): boolean {
+  return !HIDDEN_PATHS.some((p) => pathname.startsWith(p));
+}
+
 export function FloatingChat() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +45,9 @@ export function FloatingChat() {
 
   // 判断当前 mood
   const hermesMood = isLoading ? 'thinking' : 'idle';
+
+  // 不在白名单页面则不渲染
+  if (!pathname || !shouldShowHermes(pathname)) return null;
 
   return (
     <>

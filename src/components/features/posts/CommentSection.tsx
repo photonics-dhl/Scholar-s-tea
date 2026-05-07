@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   MessageSquare,
   Heart,
+  ThumbsDown,
   CornerDownRight,
   Send,
   X,
@@ -74,15 +75,25 @@ function ReplyCard({
   parentAuthorName: string
 }) {
   const [liked, setLiked] = useState(false)
+  const [disliked, setDisliked] = useState(false)
   const [likeCount, setLikeCount] = useState(comment.score > 0 ? comment.score : 0)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [isLikeAnimating, setIsLikeAnimating] = useState(false)
   const isAuthor = comment.author.id === postAuthorId
 
   const handleLike = () => {
-    setIsAnimating(true)
+    setIsLikeAnimating(true)
+    if (disliked) setDisliked(false)
     setLiked(!liked)
     setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
-    setTimeout(() => setIsAnimating(false), 400)
+    setTimeout(() => setIsLikeAnimating(false), 400)
+  }
+
+  const handleDislike = () => {
+    if (liked) {
+      setLiked(false)
+      setLikeCount((prev) => (prev > 0 ? prev - 1 : 0))
+    }
+    setDisliked(!disliked)
   }
 
   return (
@@ -123,8 +134,9 @@ function ReplyCard({
           {/* Content */}
           <p className="text-sm text-foreground leading-relaxed">{comment.content}</p>
 
-          {/* Actions */}
+          {/* Actions — 小红书风格 */}
           <div className="flex items-center gap-3 mt-1.5">
+            {/* 点赞 */}
             <button
               onClick={handleLike}
               className={cn(
@@ -134,12 +146,28 @@ function ReplyCard({
             >
               <Heart
                 className={cn(
-                  'h-3 w-3 transition-all duration-200',
+                  'h-3.5 w-3.5 transition-all duration-200',
                   liked && 'fill-current',
-                  isAnimating && 'animate-like-bounce'
+                  isLikeAnimating && 'animate-like-bounce'
                 )}
               />
               <span>{likeCount > 0 ? likeCount : '赞'}</span>
+            </button>
+            {/* 踩 */}
+            <button
+              onClick={handleDislike}
+              className={cn(
+                'flex items-center gap-1 text-xs transition-colors duration-200',
+                disliked ? 'text-gray-700' : 'text-muted-foreground hover:text-gray-600'
+              )}
+            >
+              <ThumbsDown
+                className={cn(
+                  'h-3.5 w-3.5 transition-all duration-200',
+                  disliked && 'fill-current'
+                )}
+              />
+              <span>{disliked ? '已踩' : '踩'}</span>
             </button>
             <button
               onClick={() => onReply(comment.id, comment.author.name || '匿名用户')}
@@ -165,8 +193,9 @@ function CommentCard({
   onReply: (commentId: string, authorName: string) => void
 }) {
   const [liked, setLiked] = useState(false)
+  const [disliked, setDisliked] = useState(false)
   const [likeCount, setLikeCount] = useState(comment.score > 0 ? comment.score : 0)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [isLikeAnimating, setIsLikeAnimating] = useState(false)
   const [showAllReplies, setShowAllReplies] = useState(true)
   const isAuthor = comment.author.id === postAuthorId
   const isHot = comment.score >= 5
@@ -174,10 +203,19 @@ function CommentCard({
   const replyCount = comment.children.length
 
   const handleLike = () => {
-    setIsAnimating(true)
+    setIsLikeAnimating(true)
+    if (disliked) setDisliked(false)
     setLiked(!liked)
     setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
-    setTimeout(() => setIsAnimating(false), 400)
+    setTimeout(() => setIsLikeAnimating(false), 400)
+  }
+
+  const handleDislike = () => {
+    if (liked) {
+      setLiked(false)
+      setLikeCount((prev) => (prev > 0 ? prev - 1 : 0))
+    }
+    setDisliked(!disliked)
   }
 
   return (
@@ -221,14 +259,15 @@ function CommentCard({
           <p className="text-[15px] text-foreground leading-relaxed">{comment.content}</p>
         </div>
 
-        {/* Actions Bar - 底部操作栏 */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-border/30 bg-muted/20">
-          <div className="flex items-center gap-4">
+        {/* Actions Bar - 小红书风格底部操作栏 */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/30 bg-muted/20">
+          {/* 左侧：回复 + 展开 */}
+          <div className="flex items-center gap-3">
             <button
               onClick={() => onReply(comment.id, comment.author.name || '匿名用户')}
               className="flex items-center gap-1 text-xs text-muted-foreground hover:text-tea-primary transition-colors"
             >
-              <CornerDownRight className="h-3 w-3" />
+              <CornerDownRight className="h-3.5 w-3.5" />
               回复
             </button>
             {hasReplies && (
@@ -249,25 +288,45 @@ function CommentCard({
             )}
           </div>
 
-          {/* 右侧点赞 */}
-          <button
-            onClick={handleLike}
-            className={cn(
-              'flex items-center gap-1.5 text-sm px-3 py-1 rounded-full transition-all duration-200',
-              liked
-                ? 'bg-red-50 text-red-500'
-                : 'text-muted-foreground hover:bg-gray-100 hover:text-red-400'
-            )}
-          >
-            <Heart
+          {/* 右侧：点赞 + 踩 — 小红书风格 pill */}
+          <div className="flex items-center gap-1 bg-gray-100/80 rounded-full px-1 py-0.5">
+            <button
+              onClick={handleLike}
               className={cn(
-                'h-4 w-4 transition-all duration-200',
-                liked && 'fill-current',
-                isAnimating && 'animate-like-bounce'
+                'flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-all duration-200',
+                liked
+                  ? 'bg-red-50 text-red-500'
+                  : 'text-muted-foreground hover:text-red-400 hover:bg-gray-200/50'
               )}
-            />
-            <span className="tabular-nums">{likeCount > 0 ? likeCount : '点赞'}</span>
-          </button>
+            >
+              <Heart
+                className={cn(
+                  'h-4 w-4 transition-all duration-200',
+                  liked && 'fill-current',
+                  isLikeAnimating && 'animate-like-bounce'
+                )}
+              />
+              <span className="tabular-nums min-w-[1ch]">{likeCount > 0 ? likeCount : '点赞'}</span>
+            </button>
+            <div className="w-px h-4 bg-gray-300/60" />
+            <button
+              onClick={handleDislike}
+              className={cn(
+                'flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-all duration-200',
+                disliked
+                  ? 'bg-gray-200 text-gray-700'
+                  : 'text-muted-foreground hover:text-gray-600 hover:bg-gray-200/50'
+              )}
+            >
+              <ThumbsDown
+                className={cn(
+                  'h-4 w-4 transition-all duration-200',
+                  disliked && 'fill-current'
+                )}
+              />
+              <span>{disliked ? '已踩' : '踩'}</span>
+            </button>
+          </div>
         </div>
       </div>
 

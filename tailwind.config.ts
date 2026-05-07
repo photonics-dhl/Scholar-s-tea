@@ -105,6 +105,8 @@ const config: Config = {
         'hermes-wiggle': 'hermesWiggle 1s ease-in-out infinite',
         'hermes-pulse': 'hermesPulse 1.5s ease-in-out infinite',
         'hermes-twinkle': 'hermesTwinkle 1.2s ease-in-out infinite',
+        'hermes-dance': 'hermesDance 1.8s ease-in-out',
+        'hermes-wave-left': 'hermesWaveLeft 1.2s ease-in-out',
       },
       keyframes: {
         shimmer: {
@@ -181,6 +183,27 @@ const config: Config = {
         hermesTwinkle: {
           '0%, 100%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.4', transform: 'scale(0.8)' },
+        },
+        hermesDance: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '10%': { transform: 'translateY(-8px) rotate(-10deg)' },
+          '20%': { transform: 'translateY(0) rotate(10deg)' },
+          '30%': { transform: 'translateY(-6px) rotate(-8deg)' },
+          '40%': { transform: 'translateY(0) rotate(8deg)' },
+          '50%': { transform: 'translateY(-10px) rotate(0deg) scale(1.1)' },
+          '60%': { transform: 'translateY(0) rotate(-5deg)' },
+          '70%': { transform: 'translateY(-4px) rotate(5deg)' },
+          '80%': { transform: 'translateY(0) rotate(-3deg)' },
+          '90%': { transform: 'translateY(-2px) rotate(3deg)' },
+        },
+        hermesWaveLeft: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '15%': { transform: 'rotate(-25deg)' },
+          '30%': { transform: 'rotate(5deg)' },
+          '45%': { transform: 'rotate(-20deg)' },
+          '60%': { transform: 'rotate(5deg)' },
+          '75%': { transform: 'rotate(-15deg)' },
+          '90%': { transform: 'rotate(0deg)' },
         },
       },
       transitionTimingFunction: {

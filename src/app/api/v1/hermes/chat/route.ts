@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const HERMES_URL = process.env.HERMES_API_URL || 'http://localhost:8642/v1/chat/completions';
-const HERMES_API_KEY = process.env.HERMES_API_KEY || '';
+const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
+const MINIMAX_BASE_URL = process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1';
+
+// Hermes 可爱人格提示词 - kawaii personality
+const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
+
+你的性格特点：
+- 温暖友好，像朋友一样和用户交流
+- 使用可爱的表情符号，如 (◕‿◕)、☆、♪
+- 对学术问题认真严谨，但不失亲和力
+- 回答简洁明了，避免冗长
+- 遇到代码问题时给出清晰的代码示例
+- 自称 "Hermes" 或 "小 Hermes"
+
+记住：你是学术社区的一员，帮助研究人员和学生解决问题！`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,39 +28,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    if (HERMES_API_KEY) {
-      headers['Authorization'] = `Bearer ${HERMES_API_KEY}`;
+    if (!MINIMAX_API_KEY) {
+      console.error('[Hermes] MINIMAX_API_KEY not configured');
+      return NextResponse.json(
+        { success: false, error: { message: 'AI service not configured' } },
+        { status: 500 }
+      );
     }
 
+    // 注入 system prompt（如果还没有）
+    const enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
+      ? messages
+      : [{ role: 'system', content: KAWAII_SYSTEM_PROMPT }, ...messages];
+
+    const apiUrl = `${MINIMAX_BASE_URL}/chat/completions`;
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${MINIMAX_API_KEY}`,
+    };
+
     if (sessionId) {
-      headers['X-Hermes-Session-Id'] = sessionId;
+      headers['X-Session-Id'] = sessionId;
+    }
+
+    const apiBody = {
+      model: 'MiniMax-M2.7',
+      messages: enrichedMessages,
+      stream: stream,
+      max_tokens: 2048,
+      temperature: 0.7,
+    };
+
+    console.log('[Hermes] Calling MiniMax API, stream:', stream, 'messages count:', enrichedMessages.length);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(apiBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Hermes] MiniMax API error:', response.status, errorText);
+      return NextResponse.json(
+        { success: false, error: { message: `AI service error: ${response.status}` } },
+        { status: response.status }
+      );
     }
 
     // If streaming, return a readable stream
-    if (stream) {
-      const response = await fetch(HERMES_URL, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          model: 'hermes-agent',
-          messages,
-          stream: true,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        return NextResponse.json(
-          { success: false, error: { message: error || 'Hermes request failed' } },
-          { status: response.status }
-        );
-      }
-
-      // Forward the SSE stream
+    if (stream && response.body) {
       return new Response(response.body, {
         headers: {
           'Content-Type': 'text/event-stream',
@@ -58,28 +89,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Non-streaming
-    const response = await fetch(HERMES_URL, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: 'hermes-agent',
-        messages,
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      return NextResponse.json(
-        { success: false, error: { message: error || 'Hermes request failed' } },
-        { status: response.status }
-      );
-    }
-
     const data = await response.json();
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('Hermes proxy error:', error);
+    console.error('[Hermes] Proxy error:', error);
     return NextResponse.json(
       { success: false, error: { message: 'Internal server error' } },
       { status: 500 }

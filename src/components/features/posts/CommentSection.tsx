@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import {
   MessageSquare,
@@ -8,6 +8,10 @@ import {
   CornerDownRight,
   Send,
   X,
+  Pin,
+  Flame,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -57,22 +61,22 @@ function formatRelativeTime(dateString: string): string {
   return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 }
 
-function CommentItem({
+/* ===================== 单条回复卡片 ===================== */
+function ReplyCard({
   comment,
   postAuthorId,
   onReply,
-  depth = 0,
+  parentAuthorName,
 }: {
   comment: Comment
   postAuthorId?: string
   onReply: (commentId: string, authorName: string) => void
-  depth?: number
+  parentAuthorName: string
 }) {
   const [liked, setLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(comment.score > 0 ? comment.score : 0)
-  const isAuthor = comment.author.id === postAuthorId
-
   const [isAnimating, setIsAnimating] = useState(false)
+  const isAuthor = comment.author.id === postAuthorId
 
   const handleLike = () => {
     setIsAnimating(true)
@@ -82,75 +86,144 @@ function CommentItem({
   }
 
   return (
-    <div
-      className={cn(
-        'group animate-fade-in-up',
-        depth > 0 && 'ml-12'
-      )}
-      style={{ animationDelay: `${depth * 50}ms` }}
-    >
-      <div className="flex gap-3 py-4">
-        {/* Avatar */}
-        <Avatar className={cn('flex-shrink-0', depth > 0 ? 'h-7 w-7' : 'h-9 w-9')}>
-          <AvatarFallback
-            className={cn(
-              'bg-gradient-to-br from-tea-primary/20 to-tea-mint/20 text-tea-primary font-medium',
-              depth > 0 ? 'text-[10px]' : 'text-xs'
-            )}
-          >
+    <div className="flex gap-2.5 group/reply animate-fade-in-up">
+      {/* 左侧时间线 */}
+      <div className="flex flex-col items-center flex-shrink-0">
+        <Avatar className="h-7 w-7">
+          <AvatarFallback className="text-[10px] bg-gradient-to-br from-tea-primary/15 to-tea-mint/15 text-tea-primary font-medium">
             {comment.author.name?.slice(0, 2) || '匿'}
           </AvatarFallback>
         </Avatar>
+        <div className="w-px flex-1 bg-gradient-to-b from-tea-primary/10 to-transparent min-h-[8px]" />
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
+      {/* 内容卡片 */}
+      <div className="flex-1 min-w-0 pb-2">
+        <div className="rounded-lg bg-muted/40 px-3 py-2.5 transition-colors hover:bg-muted/60">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-1">
-            <span className={cn('font-medium', depth > 0 ? 'text-sm' : 'text-sm')}>
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            <span className="text-sm font-semibold text-foreground">
               {comment.author.name || '匿名用户'}
             </span>
             {isAuthor && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-tea-primary/10 text-tea-primary font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-tea-primary/10 text-tea-primary font-medium">
                 作者
               </span>
             )}
-            {comment.isPinned && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-journal-gold/10 text-journal-gold font-medium">
-                置顶
-              </span>
-            )}
-          </div>
-
-          {/* Content */}
-          <p className={cn('text-foreground leading-relaxed', depth > 0 ? 'text-sm' : 'text-[15px]')}>
-            {comment.content}
-          </p>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4 mt-2">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground ml-auto">
               {formatRelativeTime(comment.createdAt)}
             </span>
+          </div>
 
+          {/* 引用回复 */}
+          <p className="text-[13px] text-muted-foreground mb-1">
+            回复 <span className="text-tea-primary font-medium">@{parentAuthorName}</span>
+          </p>
+
+          {/* Content */}
+          <p className="text-sm text-foreground leading-relaxed">{comment.content}</p>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 mt-1.5">
             <button
               onClick={handleLike}
               className={cn(
                 'flex items-center gap-1 text-xs transition-colors duration-200',
-                liked
-                  ? 'text-red-500'
-                  : 'text-muted-foreground hover:text-red-400'
+                liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-400'
               )}
             >
               <Heart
                 className={cn(
-                  'h-3.5 w-3.5 transition-all duration-200',
+                  'h-3 w-3 transition-all duration-200',
                   liked && 'fill-current',
                   isAnimating && 'animate-like-bounce'
                 )}
               />
-              <span>{likeCount > 0 ? likeCount : '点赞'}</span>
+              <span>{likeCount > 0 ? likeCount : '赞'}</span>
             </button>
+            <button
+              onClick={() => onReply(comment.id, comment.author.name || '匿名用户')}
+              className="text-xs text-muted-foreground hover:text-tea-primary transition-colors"
+            >
+              回复
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
+/* ===================== 单条评论卡片 ===================== */
+function CommentCard({
+  comment,
+  postAuthorId,
+  onReply,
+}: {
+  comment: Comment
+  postAuthorId?: string
+  onReply: (commentId: string, authorName: string) => void
+}) {
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(comment.score > 0 ? comment.score : 0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [showAllReplies, setShowAllReplies] = useState(true)
+  const isAuthor = comment.author.id === postAuthorId
+  const isHot = comment.score >= 5
+  const hasReplies = comment.children.length > 0
+  const replyCount = comment.children.length
+
+  const handleLike = () => {
+    setIsAnimating(true)
+    setLiked(!liked)
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1))
+    setTimeout(() => setIsAnimating(false), 400)
+  }
+
+  return (
+    <div className="animate-fade-in-up">
+      {/* 主评论卡片 */}
+      <div className="rounded-xl border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+        {/* Header Bar - GitHub Issues 风格 */}
+        <div className="flex items-center gap-2.5 px-4 py-2.5 bg-muted/30 border-b border-border/30">
+          <Avatar className="h-7 w-7">
+            <AvatarFallback className="text-[10px] bg-gradient-to-br from-tea-primary/20 to-tea-mint/20 text-tea-primary font-medium">
+              {comment.author.name?.slice(0, 2) || '匿'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+            <span className="text-sm font-semibold text-foreground truncate">
+              {comment.author.name || '匿名用户'}
+            </span>
+            {isAuthor && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-tea-primary/10 text-tea-primary font-medium shrink-0">
+                作者
+              </span>
+            )}
+            {comment.isPinned && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-journal-gold/10 text-journal-gold font-medium shrink-0 flex items-center gap-0.5">
+                <Pin className="h-2.5 w-2.5" /> 置顶
+              </span>
+            )}
+            {isHot && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-50 text-orange-500 font-medium shrink-0 flex items-center gap-0.5">
+                <Flame className="h-2.5 w-2.5" /> 热评
+              </span>
+            )}
+          </div>
+          <span className="text-[11px] text-muted-foreground shrink-0">
+            {formatRelativeTime(comment.createdAt)}
+          </span>
+        </div>
+
+        {/* Content */}
+        <div className="px-4 py-3">
+          <p className="text-[15px] text-foreground leading-relaxed">{comment.content}</p>
+        </div>
+
+        {/* Actions Bar - 底部操作栏 */}
+        <div className="flex items-center justify-between px-4 py-2 border-t border-border/30 bg-muted/20">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => onReply(comment.id, comment.author.name || '匿名用户')}
               className="flex items-center gap-1 text-xs text-muted-foreground hover:text-tea-primary transition-colors"
@@ -158,28 +231,65 @@ function CommentItem({
               <CornerDownRight className="h-3 w-3" />
               回复
             </button>
+            {hasReplies && (
+              <button
+                onClick={() => setShowAllReplies(!showAllReplies)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-tea-primary transition-colors"
+              >
+                {showAllReplies ? (
+                  <>
+                    <ChevronUp className="h-3 w-3" /> 收起 {replyCount} 条回复
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3" /> 展开 {replyCount} 条回复
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
-          {/* Children */}
-          {comment.children.length > 0 && (
-            <div className="mt-2 space-y-0">
-              {comment.children.map((child) => (
-                <CommentItem
-                  key={child.id}
-                  comment={child}
-                  postAuthorId={postAuthorId}
-                  onReply={onReply}
-                  depth={depth + 1}
-                />
-              ))}
-            </div>
-          )}
+          {/* 右侧点赞 */}
+          <button
+            onClick={handleLike}
+            className={cn(
+              'flex items-center gap-1.5 text-sm px-3 py-1 rounded-full transition-all duration-200',
+              liked
+                ? 'bg-red-50 text-red-500'
+                : 'text-muted-foreground hover:bg-gray-100 hover:text-red-400'
+            )}
+          >
+            <Heart
+              className={cn(
+                'h-4 w-4 transition-all duration-200',
+                liked && 'fill-current',
+                isAnimating && 'animate-like-bounce'
+              )}
+            />
+            <span className="tabular-nums">{likeCount > 0 ? likeCount : '点赞'}</span>
+          </button>
         </div>
       </div>
+
+      {/* 回复列表 - 小红书楼中楼风格 */}
+      {hasReplies && showAllReplies && (
+        <div className="mt-2 ml-4 pl-4 border-l-2 border-tea-primary/10 space-y-1">
+          {comment.children.map((child) => (
+            <ReplyCard
+              key={child.id}
+              comment={child}
+              postAuthorId={postAuthorId}
+              onReply={onReply}
+              parentAuthorName={comment.author.name || '匿名用户'}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
+/* ===================== 主评论区组件 ===================== */
 export function CommentSection({
   comments,
   postAuthorId,
@@ -193,6 +303,7 @@ export function CommentSection({
   const [replyToName, setReplyToName] = useState('')
   const [replyContent, setReplyContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const replyInputRef = useRef<HTMLTextAreaElement>(null)
 
   const handleSubmitComment = async () => {
     if (!commentContent.trim() || isSubmitting) return
@@ -221,21 +332,44 @@ export function CommentSection({
     setReplyingTo(commentId)
     setReplyToName(authorName)
     setReplyContent('')
+    // 聚焦到回复输入框
+    setTimeout(() => replyInputRef.current?.focus(), 100)
   }
 
+  const cancelReply = () => {
+    setReplyingTo(null)
+    setReplyToName('')
+    setReplyContent('')
+  }
+
+  // 排序：置顶 > 热评 > 时间
+  const sortedComments = [...comments].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1
+    if (!a.isPinned && b.isPinned) return 1
+    if (a.score !== b.score) return b.score - a.score
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
+
   return (
-    <section className="animate-fade-in-up">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        <MessageSquare className="h-5 w-5 text-muted-foreground" />
-        <h2 className="text-lg font-semibold">
-          {commentCount} 条评论
-        </h2>
+    <section className="space-y-4">
+      {/* 评论区头部 */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-tea-primary" />
+          <h2 className="text-lg font-semibold">
+            评论 <span className="text-muted-foreground text-sm font-normal">({commentCount})</span>
+          </h2>
+        </div>
+        {comments.length > 0 && (
+          <span className="text-xs text-muted-foreground">
+            按热度排序
+          </span>
+        )}
       </div>
 
-      {/* Comment Form */}
+      {/* 主评论输入框 - 小红书风格 */}
       {!isLocked && (
-        <div className="mb-8 animate-fade-in-up">
+        <div className="rounded-xl border border-border/50 bg-card shadow-sm p-4 animate-fade-in-up">
           <div className="flex gap-3">
             <Avatar className="h-9 w-9 flex-shrink-0">
               <AvatarFallback className="text-xs bg-gradient-to-br from-tea-primary/20 to-tea-mint/20 text-tea-primary">
@@ -247,14 +381,14 @@ export function CommentSection({
                 placeholder="写下你的评论..."
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
-                className="min-h-[80px] resize-y bg-muted/30 border-transparent focus:bg-background focus:border-input transition-colors"
+                className="min-h-[80px] resize-none bg-muted/20 border-transparent focus:bg-background focus:border-input transition-colors rounded-lg"
               />
               <div className="flex justify-end mt-2">
                 <Button
                   onClick={handleSubmitComment}
                   disabled={!commentContent.trim() || isSubmitting}
                   size="sm"
-                  className="gap-1.5 rounded-full px-5"
+                  className="gap-1.5 rounded-full px-5 bg-tea-primary hover:bg-tea-primary/90"
                 >
                   <Send className="h-3.5 w-3.5" />
                   发布
@@ -265,28 +399,30 @@ export function CommentSection({
         </div>
       )}
 
-      {/* Reply Form (floating) */}
+      {/* 回复浮层 - 固定在评论区上方 */}
       {replyingTo && (
-        <div className="mb-6 p-4 rounded-xl bg-muted/30 border border-border/50 animate-fade-in-up">
+        <div className="rounded-xl border border-tea-primary/30 bg-tea-primary/5 p-4 animate-fade-in-up sticky top-0 z-10">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">
-              回复 <span className="font-medium text-foreground">@{replyToName}</span>
+            <span className="text-sm text-tea-primary font-medium flex items-center gap-1">
+              <CornerDownRight className="h-3.5 w-3.5" />
+              回复 <span className="font-semibold">@{replyToName}</span>
             </span>
             <Button
               variant="ghost"
               size="icon"
               className="h-6 w-6"
-              onClick={() => setReplyingTo(null)}
+              onClick={cancelReply}
             >
               <X className="h-3.5 w-3.5" />
             </Button>
           </div>
           <div className="flex gap-2">
             <Textarea
+              ref={replyInputRef}
               placeholder={`回复 @${replyToName}...`}
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
-              className="min-h-[60px] text-sm resize-y"
+              className="min-h-[60px] text-sm resize-none rounded-lg"
               rows={2}
               autoFocus
             />
@@ -295,12 +431,12 @@ export function CommentSection({
                 size="sm"
                 onClick={handleSubmitReply}
                 disabled={!replyContent.trim() || isSubmitting}
-                className="gap-1"
+                className="gap-1 bg-tea-primary hover:bg-tea-primary/90"
               >
                 <Send className="h-3 w-3" />
                 发布
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setReplyingTo(null)}>
+              <Button size="sm" variant="ghost" onClick={cancelReply}>
                 取消
               </Button>
             </div>
@@ -308,10 +444,10 @@ export function CommentSection({
         </div>
       )}
 
-      {/* Comments List */}
-      <div className="divide-y divide-border/30">
-        {comments.map((comment) => (
-          <CommentItem
+      {/* 评论列表 */}
+      <div className="space-y-4">
+        {sortedComments.map((comment) => (
+          <CommentCard
             key={comment.id}
             comment={comment}
             postAuthorId={postAuthorId}
@@ -320,10 +456,14 @@ export function CommentSection({
         ))}
       </div>
 
+      {/* 空状态 */}
       {comments.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground animate-fade-in-up">
-          <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-40" />
-          <p className="text-sm">暂无评论，来说点什么吧</p>
+        <div className="text-center py-16 text-muted-foreground animate-fade-in-up">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+            <MessageSquare className="h-8 w-8 opacity-40" />
+          </div>
+          <p className="text-sm font-medium">暂无评论</p>
+          <p className="text-xs mt-1 opacity-70">来说点什么吧，成为第一个评论的人~</p>
         </div>
       )}
     </section>

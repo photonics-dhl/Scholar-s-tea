@@ -99,6 +99,12 @@ const config: Config = {
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 3s ease-in-out infinite',
         'like-bounce': 'likeBounce 0.4s ease-out forwards',
+        'hermes-float': 'hermesFloat 3s ease-in-out infinite',
+        'hermes-bounce': 'hermesBounce 0.6s ease-out',
+        'hermes-bounce-leaf': 'hermesBounceLeaf 0.6s ease-out',
+        'hermes-wiggle': 'hermesWiggle 1s ease-in-out infinite',
+        'hermes-pulse': 'hermesPulse 1.5s ease-in-out infinite',
+        'hermes-twinkle': 'hermesTwinkle 1.2s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -145,6 +151,36 @@ const config: Config = {
           '50%': { transform: 'scale(0.95)' },
           '75%': { transform: 'scale(1.1)' },
           '100%': { transform: 'scale(1)' },
+        },
+        hermesFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        hermesBounce: {
+          '0%': { transform: 'scale(1) rotate(0deg)' },
+          '25%': { transform: 'scale(0.85) rotate(-5deg)' },
+          '50%': { transform: 'scale(1.15) rotate(3deg)' },
+          '75%': { transform: 'scale(0.95) rotate(-2deg)' },
+          '100%': { transform: 'scale(1) rotate(0deg)' },
+        },
+        hermesBounceLeaf: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-15deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-5deg)' },
+        },
+        hermesWiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-8deg)' },
+          '75%': { transform: 'rotate(8deg)' },
+        },
+        hermesPulse: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.7', transform: 'scale(1.1)' },
+        },
+        hermesTwinkle: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.4', transform: 'scale(0.8)' },
         },
       },
       transitionTimingFunction: {

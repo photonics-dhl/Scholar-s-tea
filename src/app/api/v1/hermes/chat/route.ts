@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_BASE_URL = process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1';
+const HERMES_MODEL = process.env.HERMES_MODEL || 'MiniMax-M2.7';
 
 // Hermes 可爱人格提示词 - kawaii personality
 const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     const apiBody = {
-      model: 'MiniMax-M2.7',
+      model: HERMES_MODEL,
       messages: enrichedMessages,
       stream: stream,
       max_tokens: 2048,

@@ -169,6 +169,44 @@ export async function getGroupById(id: string) {
           logo: true,
         },
       },
+      college: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      members: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          role: 'asc',
+        },
+      },
+      disciplines: {
+        include: {
+          discipline: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
           members: true,

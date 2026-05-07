@@ -52,6 +52,7 @@ interface FeedPublication {
 
 interface FeedGroup {
   id: string
+  slug: string
   name: string
   institution: string
   members: number
@@ -83,8 +84,9 @@ export default function HomePage() {
 
         // Build active groups feed
         setActiveGroups(
-          groupsData.data.map((g: { id: string; name: string; institution: { name: string }; _count: { members: number } }) => ({
+          groupsData.data.map((g: { id: string; slug: string; name: string; institution: { name: string }; _count: { members: number } }) => ({
             id: g.id,
+            slug: g.slug,
             name: g.name,
             institution: g.institution.name,
             members: g._count.members,
@@ -316,7 +318,7 @@ export default function HomePage() {
             summary: g.institution,
             time: g.time,
             stats: { label: '成员', value: g.members },
-            href: `/groups/${g.id}`,
+            href: `/groups/${g.slug || g.id}`,
           }))}
           color="border-tea-primary/20 hover:border-tea-primary/40"
           delay={300}

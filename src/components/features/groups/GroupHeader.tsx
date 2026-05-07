@@ -38,7 +38,7 @@ export function GroupHeader({
   onFollowToggle,
   className,
 }: GroupHeaderProps) {
-  const status = statusConfig[group.verificationStatus];
+  const status = statusConfig[group.verificationStatus] || statusConfig.PENDING;
   const StatusIcon = status.icon;
 
   return (
@@ -81,14 +81,14 @@ export function GroupHeader({
                 </Badge>
               </div>
               <p className="mt-1 flex items-center text-muted-foreground">
-                {group.institution.logo && (
+                {group.institution?.logo && (
                   <img
                     src={group.institution.logo}
                     alt=""
                     className="mr-1.5 h-4 w-4"
                   />
                 )}
-                {group.institution.name}
+                {group.institution?.name}
                 {group.college && ` · ${group.college.name}`}
                 {group.department && ` · ${group.department.name}`}
               </p>
@@ -113,7 +113,7 @@ export function GroupHeader({
         )}
 
         {/* Disciplines Tags */}
-        {group.disciplines.length > 0 && (
+        {group.disciplines?.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {group.disciplines.map(({ discipline }) => (
               <Badge key={discipline.id} variant="secondary">

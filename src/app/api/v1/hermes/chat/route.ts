@@ -4,6 +4,9 @@ const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_BASE_URL = process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1';
 const HERMES_MODEL = process.env.HERMES_MODEL || 'MiniMax-M2.7';
 
+// Support HTTP_PROXY/HTTPS_PROXY for server environments with proxy
+const PROXY_URL = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
+
 // Hermes 可爱人格提示词 - kawaii personality
 const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
 
@@ -63,11 +66,25 @@ export async function POST(request: NextRequest) {
 
     console.log('[Hermes] Calling MiniMax API, stream:', stream, 'messages count:', enrichedMessages.length);
 
-    const response = await fetch(apiUrl, {
+    const fetchOpts: RequestInit & { dispatcher?: unknown } = {
       method: 'POST',
       headers,
       body: JSON.stringify(apiBody),
-    });
+    };
+
+    if (PROXY_URL) {
+      try {
+        // undici is built into Node.js 18+; ProxyAgent routes through HTTP_PROXY
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { ProxyAgent } = require('undici');
+        fetchOpts.dispatcher = new ProxyAgent(PROXY_URL);
+        console.log('[Hermes] Using proxy:', PROXY_URL);
+      } catch (proxyErr) {
+        console.warn('[Hermes] Proxy setup failed:', proxyErr);
+      }
+    }
+
+    const response = await fetch(apiUrl, fetchOpts);
 
     if (!response.ok) {
       const errorText = await response.text();

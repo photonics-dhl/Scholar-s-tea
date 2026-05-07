@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
     if (PROXY_URL) {
       try {
         // undici is built into Node.js 18+; ProxyAgent routes through HTTP_PROXY
+        // @ts-ignore - undici is a Node.js built-in, types may not be resolved by tsc
         const { ProxyAgent } = await import('undici');
         fetchOpts.dispatcher = new ProxyAgent(PROXY_URL);
         console.log('[Hermes] Using proxy:', PROXY_URL);

@@ -8,7 +8,8 @@ import { cn } from '@/lib/utils/cn';
 import { useSession } from 'next-auth/react';
 import { useHermesChat } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
-import { HermesAvatar, type HermesMood } from './HermesAvatar';
+import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvatar';
+import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
 
 const HIDDEN_PATHS = ['/admin'];
 const AVATAR_SIZE = 72;
@@ -62,11 +63,9 @@ function getPanelPosition(avatarX: number, avatarY: number) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  // 动态计算有效面板尺寸（视口过小时自适应）
   const effW = Math.min(PANEL_W, vw - 2 * MARGIN);
   const effH = Math.min(PANEL_H, vh - 2 * MARGIN);
 
-  // 计算四个方向可用空间
   const spaceRight = vw - avatarX - AVATAR_SIZE - MARGIN;
   const spaceLeft = avatarX - MARGIN;
   const spaceBelow = vh - avatarY - AVATAR_SIZE - MARGIN;
@@ -77,8 +76,6 @@ function getPanelPosition(avatarX: number, avatarY: number) {
   let originX: 'left' | 'right' | 'center';
   let originY: 'top' | 'bottom' | 'center';
 
-  // ========== 水平方向 ==========
-  // 策略：优先放在空间更大的一侧；如果都够放，优先右侧（阅读习惯）
   if (spaceRight >= effW && spaceRight >= spaceLeft) {
     left = avatarX + AVATAR_SIZE + MARGIN;
     originX = 'left';
@@ -86,36 +83,72 @@ function getPanelPosition(avatarX: number, avatarY: number) {
     left = avatarX - effW - MARGIN;
     originX = 'right';
   } else if (spaceRight >= spaceLeft) {
-    // 空间都不够，但右侧稍大 → 贴右边缘
     left = Math.max(MARGIN, vw - effW - MARGIN);
     originX = 'right';
   } else {
-    // 左侧稍大 → 贴左边缘
     left = MARGIN;
     originX = 'left';
   }
 
-  // ========== 垂直方向 ==========
-  // 策略：优先让面板顶部与 avatar 顶部对齐；如果下方放不下，再向上调整
   if (spaceBelow >= effH) {
-    // 下方空间足够，面板顶部对齐 avatar 顶部
     top = avatarY;
     originY = 'top';
   } else if (spaceAbove >= effH) {
-    // 上方空间足够，面板底部对齐 avatar 底部
     top = avatarY + AVATAR_SIZE - effH;
     originY = 'bottom';
   } else {
-    // 上下都不够，居中于 avatar 垂直方向，再 clamp
     top = avatarY + Math.round(AVATAR_SIZE / 2) - Math.round(effH / 2);
     originY = 'center';
   }
 
-  // 最终 clamp，确保不超出视口
   top = clamp(top, MARGIN, Math.max(MARGIN, vh - effH - MARGIN));
   left = clamp(left, MARGIN, Math.max(MARGIN, vw - effW - MARGIN));
 
   return { left, top, originX, originY };
+}
+
+/** 安慰话语库 — 给用户带来一天的好心情 */
+const COMFORT_MESSAGES: Record<RadialAction, string[]> = {
+  encourage: [
+    '今天的你已经很棒了，剩下的交给明天~ ✨',
+    '不管遇到什么困难，记得我永远支持你！',
+    '深呼吸，一切都会好起来的 🌈',
+    '你是独一无二的，不要和别人比较~',
+    '今天的辛苦是为了明天的绽放，加油！💪',
+    '失败只是成功在调皮，再试一次吧！',
+    '你的努力我都看在眼里，真的很厉害！',
+    '别担心，有我在呢~ 🍵',
+  ],
+  rest: [
+    '累了就休息一下吧，身体最重要~ 🌙',
+    '闭上眼睛，想象一片宁静的茶园...',
+    '休息不是偷懒，是为了更好地出发~',
+    '来杯热茶，放松一下心情吧 🍵',
+    '你的大脑也需要喝杯茶歇歇脚~',
+  ],
+  dance: [
+    '啦啦啦~ 跟着音乐摇摆起来！🎵',
+    '跳舞是灵魂在微笑~',
+    '今天的心情是舞曲节奏的！',
+    '旋转跳跃我闭着眼~ ✨',
+  ],
+  greet: [
+    '嗨~ 很高兴见到你！👋',
+    '又是美好的一天呢！',
+    '见到你我就开心起来了~',
+    '来，击个掌！✋',
+  ],
+  love: [
+    '最喜欢你了！❤️',
+    '你对我真好~ 谢谢你！',
+    '有你在的世界真好~',
+    '我要给你一个大大的拥抱！🤗',
+  ],
+  random: [],
+};
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export function FloatingChat() {
@@ -136,12 +169,16 @@ export function FloatingChat() {
   const dragStartRef = useRef<{ sx: number; sy: number; ix: number; iy: number } | null>(null);
   const dragTargetRef = useRef<HTMLElement | null>(null);
 
+  // ===== 右键扇形菜单状态 =====
+  const [radialOpen, setRadialOpen] = useState(false);
+  const [avatarCommand, setAvatarCommand] = useState<AvatarCommand | undefined>(undefined);
+
   // 同步 ref 避免闭包问题
   useEffect(() => {
     posRef.current = pos;
   }, [pos]);
 
-  // 初始化位置（避免 SSR 问题）
+  // 初始化位置
   useEffect(() => {
     const saved = getSavedPosition();
     if (saved) {
@@ -198,7 +235,6 @@ export function FloatingChat() {
     if (!isDragging) return;
     setIsDragging(false);
 
-    // 释放 pointer capture
     if (dragTargetRef.current) {
       try {
         dragTargetRef.current.releasePointerCapture(e.pointerId);
@@ -230,7 +266,6 @@ export function FloatingChat() {
     }
 
     dragStartRef.current = null;
-    // 取消拖拽时不保存位置，回退到上一次保存的位置
     const saved = getSavedPosition();
     if (saved) {
       const clamped = clampPosition(saved.x, saved.y);
@@ -238,6 +273,43 @@ export function FloatingChat() {
       posRef.current = clamped;
     }
   }, [isDragging]);
+
+  // ===== 右键菜单处理 =====
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isOpen || isDragging) return;
+    setRadialOpen(true);
+  }, [isOpen, isDragging]);
+
+  const handleRadialClose = useCallback(() => {
+    setRadialOpen(false);
+  }, []);
+
+  const handleRadialSelect = useCallback((action: RadialAction) => {
+    const comfortMessages = COMFORT_MESSAGES[action];
+    const bubble = comfortMessages.length > 0 ? pickRandom(comfortMessages) : undefined;
+
+    switch (action) {
+      case 'encourage':
+        setAvatarCommand({ action: 'happy', bubble });
+        break;
+      case 'rest':
+        setAvatarCommand({ action: 'sleep', bubble });
+        break;
+      case 'dance':
+        setAvatarCommand({ action: 'dance', bubble });
+        break;
+      case 'greet':
+        setAvatarCommand({ action: 'wave', bubble });
+        break;
+      case 'love':
+        setAvatarCommand({ action: 'love', bubble });
+        break;
+      case 'random':
+        setAvatarCommand({ action: 'random' });
+        break;
+    }
+  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -286,6 +358,7 @@ export function FloatingChat() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
+        onContextMenu={handleContextMenu}
       >
         <div
           className={cn(
@@ -295,7 +368,7 @@ export function FloatingChat() {
             isDragging && 'cursor-grabbing',
             !isDragging && 'cursor-grab'
           )}
-          title="AI 助手 Hermes（按住拖拽）"
+          title="AI 助手 Hermes（按住拖拽，右键菜单）"
           role="button"
           tabIndex={0}
         >
@@ -320,6 +393,19 @@ export function FloatingChat() {
             <span>拖拽</span>
           </div>
 
+          {/* 右键提示 */}
+          <div
+            className={cn(
+              'absolute -top-3 right-0 translate-x-1/2',
+              'px-1.5 py-0.5 rounded-full',
+              'bg-amber-400/90 text-white text-[9px] shadow-sm',
+              'opacity-0 group-hover:opacity-100 transition-opacity',
+              'pointer-events-none whitespace-nowrap'
+            )}
+          >
+            右键菜单
+          </div>
+
           <div>
             <HermesAvatar
               size={64}
@@ -327,6 +413,7 @@ export function FloatingChat() {
               className="relative z-10 drop-shadow-lg hover:drop-shadow-xl transition-shadow"
               interactive={false}
               isDragging={isDragging}
+              command={avatarCommand}
             />
           </div>
 
@@ -339,14 +426,24 @@ export function FloatingChat() {
           {!isOpen && (
             <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
               <span className="text-[10px] bg-white/90 text-tea-primary px-2 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium">
-                点我聊天~
+                点我聊天~ 右键有惊喜
               </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Chat Panel - completely separate from avatar to avoid event interference */}
+      {/* 右键扇形菜单 */}
+      <HermesRadialMenu
+        open={radialOpen}
+        anchorX={pos.x}
+        anchorY={pos.y}
+        anchorSize={AVATAR_SIZE}
+        onSelect={handleRadialSelect}
+        onClose={handleRadialClose}
+      />
+
+      {/* Chat Panel */}
       <div
         className={cn(
           'fixed z-50',

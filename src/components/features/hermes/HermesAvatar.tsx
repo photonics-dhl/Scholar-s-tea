@@ -18,6 +18,12 @@ export type HermesMood =
   | 'dizzy'
   | 'bored';
 
+/** 外部命令接口 — 让父组件可以命令 Avatar 执行动作 */
+export interface AvatarCommand {
+  action: 'wave' | 'dance' | 'sleep' | 'love' | 'happy' | 'random';
+  bubble?: string;
+}
+
 interface HermesAvatarProps {
   size?: number;
   mood?: HermesMood;
@@ -25,6 +31,8 @@ interface HermesAvatarProps {
   className?: string;
   interactive?: boolean;
   isDragging?: boolean;
+  /** 外部命令 — 传入新对象即触发对应动作 */
+  command?: AvatarCommand;
 }
 
 /* ============ 气泡消息库 ============ */
@@ -81,6 +89,38 @@ const BUBBLES = {
     '我要发霉了...',
     '数羊中... 1、2、3...',
   ],
+  /** 安慰/鼓励话语 — 给用户带来好心情 */
+  comfort: {
+    encourage: [
+      '今天的你已经很棒了，剩下的交给明天~ ✨',
+      '不管遇到什么困难，记得我永远支持你！',
+      '深呼吸，一切都会好起来的 🌈',
+      '你是独一无二的，不要和别人比较~',
+      '今天的辛苦是为了明天的绽放，加油！💪',
+      '失败只是成功在调皮，再试一次吧！',
+      '你的努力我都看在眼里，真的很厉害！',
+      '别担心，有我在呢~ 🍵',
+    ],
+    rest: [
+      '累了就休息一下吧，身体最重要~ 🌙',
+      '闭上眼睛，想象一片宁静的茶园...',
+      '休息不是偷懒，是为了更好地出发~',
+      '来杯热茶，放松一下心情吧 🍵',
+      '你的大脑也需要喝杯茶歇歇脚~',
+    ],
+    dance: [
+      '啦啦啦~ 跟着音乐摇摆起来！🎵',
+      '跳舞是灵魂在微笑~',
+      '今天的心情是舞曲节奏的！',
+      '旋转跳跃我闭着眼~ ✨',
+    ],
+    greet: [
+      '嗨~ 很高兴见到你！👋',
+      '又是美好的一天呢！',
+      '见到你我就开心起来了~',
+      '来，击个掌！✋',
+    ],
+  },
 };
 
 function pickRandom<T>(arr: T[]): T {
@@ -94,6 +134,7 @@ export function HermesAvatar({
   className,
   interactive = true,
   isDragging = false,
+  command,
 }: HermesAvatarProps) {
   const [internalMood, setInternalMood] = useState<HermesMood>('idle');
   const [blinking, setBlinking] = useState(false);
@@ -112,6 +153,8 @@ export function HermesAvatar({
   const lastInteractRef = useRef<number>(Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartTimeRef = useRef<number>(0);
+  const commandTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const prevCommandRef = useRef<AvatarCommand | undefined>(undefined);
 
   const mood = controlledMood || internalMood;
 
@@ -128,10 +171,123 @@ export function HermesAvatar({
     lastInteractRef.current = Date.now();
   }, []);
 
+  /* ============ 外部命令处理 ============ */
+  useEffect(() => {
+    if (!command || command === prevCommandRef.current) return;
+    prevCommandRef.current = command;
+
+    // Clear any pending command timer
+    if (commandTimerRef.current) {
+      clearTimeout(commandTimerRef.current);
+    }
+
+    resetIdleTimer();
+
+    const execute = () => {
+      switch (command.action) {
+        case 'wave':
+          setIsWaving(true);
+          setInternalMood('waving');
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.greet), 2500);
+          commandTimerRef.current = setTimeout(() => {
+            setIsWaving(false);
+            setInternalMood('idle');
+          }, 1500);
+          break;
+
+        case 'dance':
+          setIsDancing(true);
+          setInternalMood('dancing');
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.dance), 2500);
+          commandTimerRef.current = setTimeout(() => {
+            setIsDancing(false);
+            setInternalMood('idle');
+          }, 2000);
+          break;
+
+        case 'sleep':
+          setInternalMood('sleepy');
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.rest), 3000);
+          commandTimerRef.current = setTimeout(() => {
+            setInternalMood('idle');
+          }, 2500);
+          break;
+
+        case 'love':
+          setInternalMood('love');
+          showBubble(command.bubble || pickRandom(BUBBLES.love), 2500);
+          commandTimerRef.current = setTimeout(() => {
+            setInternalMood('idle');
+          }, 2000);
+          break;
+
+        case 'happy':
+          setIsBouncing(true);
+          setInternalMood('happy');
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.encourage), 3000);
+          commandTimerRef.current = setTimeout(() => {
+            setIsBouncing(false);
+            setInternalMood('idle');
+          }, 1500);
+          break;
+
+        case 'random': {
+          const actions: (() => void)[] = [
+            () => {
+              setIsWaving(true);
+              setInternalMood('waving');
+              showBubble('猜猜我要做什么？👋', 2000);
+              commandTimerRef.current = setTimeout(() => {
+                setIsWaving(false);
+                setInternalMood('idle');
+              }, 1500);
+            },
+            () => {
+              setIsDancing(true);
+              setInternalMood('dancing');
+              showBubble('随机舞王登场！💃', 2000);
+              commandTimerRef.current = setTimeout(() => {
+                setIsDancing(false);
+                setInternalMood('idle');
+              }, 2000);
+            },
+            () => {
+              setInternalMood('love');
+              showBubble(pickRandom(BUBBLES.love), 2000);
+              commandTimerRef.current = setTimeout(() => {
+                setInternalMood('idle');
+              }, 2000);
+            },
+            () => {
+              setIsBouncing(true);
+              setInternalMood('happy');
+              showBubble(pickRandom(BUBBLES.comfort.encourage), 2500);
+              commandTimerRef.current = setTimeout(() => {
+                setIsBouncing(false);
+                setInternalMood('idle');
+              }, 1200);
+            },
+            () => {
+              setInternalMood('curious');
+              showBubble('咦？这是什么？🤔', 1500);
+              commandTimerRef.current = setTimeout(() => {
+                setInternalMood('idle');
+              }, 1500);
+            },
+          ];
+          pickRandom(actions)();
+          break;
+        }
+      }
+    };
+
+    execute();
+  }, [command, showBubble, resetIdleTimer]);
+
   /* ============ 自动眨眼 ============ */
   useEffect(() => {
     const blinkInterval = setInterval(() => {
-      if (mood === 'sleepy' || mood === 'bored') return; // 困倦时不眨眼
+      if (mood === 'sleepy' || mood === 'bored') return;
       setBlinking(true);
       setTimeout(() => setBlinking(false), 120 + Math.random() * 80);
     }, 2500 + Math.random() * 3000);
@@ -159,11 +315,9 @@ export function HermesAvatar({
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
     resetIdleTimer();
-    // 随机出现 hover 气泡
     if (Math.random() > 0.5 && !speechBubble) {
       showBubble(pickRandom(BUBBLES.hover), 2000);
     }
-    // 好奇歪头
     if (mood === 'idle') {
       setHeadTilt(Math.random() > 0.5 ? 8 : -8);
       setTimeout(() => setHeadTilt(0), 800);
@@ -184,7 +338,6 @@ export function HermesAvatar({
       showBubble(pickRandom(BUBBLES.drag), 1500);
       resetIdleTimer();
     } else {
-      // 拖拽结束，判断是否有眩晕
       const dragDuration = Date.now() - dragStartTimeRef.current;
       if (dragDuration > 800) {
         setInternalMood('dizzy');
@@ -205,38 +358,31 @@ export function HermesAvatar({
     const checkIdle = () => {
       const elapsed = Date.now() - lastInteractRef.current;
 
-      // 超过 45 秒无聊
       if (elapsed > 45000 && mood === 'idle' && !isDragging && !controlledMood) {
         const actions: (() => void)[] = [
-          // 打哈欠
           () => {
             setInternalMood('bored');
             showBubble('哈~ 欠~ 🥱', 2000);
             setTimeout(() => setInternalMood('idle'), 2000);
           },
-          // 左顾右盼
           () => {
             setHeadTilt(12);
             setTimeout(() => setHeadTilt(-12), 400);
             setTimeout(() => setHeadTilt(0), 800);
           },
-          // 自言自语
           () => {
             showBubble(pickRandom(BUBBLES.idle), 3000);
           },
-          // 想睡觉
           () => {
             setInternalMood('sleepy');
             showBubble('Zzz... 好困...', 2500);
             setTimeout(() => setInternalMood('idle'), 2500);
           },
-          // 爱心眼
           () => {
             setInternalMood('love');
             showBubble(pickRandom(BUBBLES.love), 2000);
             setTimeout(() => setInternalMood('idle'), 2000);
           },
-          // 好奇
           () => {
             setInternalMood('curious');
             showBubble('嗯？什么声音？', 1500);
@@ -347,11 +493,19 @@ export function HermesAvatar({
     }
   }, [controlledMood]);
 
+  /* ============ 清理 ============ */
+  useEffect(() => {
+    return () => {
+      if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
+      if (idleTimerRef.current) clearInterval(idleTimerRef.current);
+      if (commandTimerRef.current) clearTimeout(commandTimerRef.current);
+    };
+  }, []);
+
   /* ============ SVG 渲染辅助 ============ */
   const s = size;
   const eyeScaleY = blinking && mood !== 'sleepy' && mood !== 'bored' ? 0.1 : 1;
 
-  // 眼睛基础位置 + 跟随偏移
   const eyeBaseX = s * 0.38;
   const eyeBaseY = s * 0.5;
   const eye2BaseX = s * 0.62;
@@ -359,7 +513,6 @@ export function HermesAvatar({
   const eyeRx = s * 0.07;
   const eyeRy = s * 0.09;
 
-  // 不同 mood 的眼睛渲染
   const renderEyes = () => {
     const ex1 = eyeBaseX + eyeOffset.x;
     const ey1 = eyeBaseY + eyeOffset.y;
@@ -367,7 +520,6 @@ export function HermesAvatar({
     const ey2 = eye2BaseY + eyeOffset.y;
 
     if (mood === 'love') {
-      // 爱心眼
       return (
         <>
           <g transform={`translate(${ex1 - eyeBaseX}, ${ey1 - eyeBaseY})`}>
@@ -393,7 +545,6 @@ export function HermesAvatar({
     }
 
     if (mood === 'dizzy') {
-      // 螺旋眼
       return (
         <>
           <g transform={`translate(${ex1 - eyeBaseX}, ${ey1 - eyeBaseY})`}>
@@ -411,7 +562,6 @@ export function HermesAvatar({
     }
 
     if (mood === 'surprised') {
-      // 大眼圆
       return (
         <>
           <g transform={`translate(${ex1 - eyeBaseX}, ${ey1 - eyeBaseY}) scale(1.2)`} style={{ transformOrigin: `${eyeBaseX}px ${eyeBaseY}px` }}>
@@ -427,7 +577,6 @@ export function HermesAvatar({
     }
 
     if (mood === 'sleepy' || mood === 'bored') {
-      // 半闭眼（弧线）
       return (
         <>
           <g transform={`translate(${ex1 - eyeBaseX}, ${ey1 - eyeBaseY})`}>
@@ -441,13 +590,10 @@ export function HermesAvatar({
     }
 
     if (mood === 'angry') {
-      // 倒竖眉 + 横眼
       return (
         <>
-          {/* 眉毛 */}
           <line x1={eyeBaseX - eyeRx} y1={eyeBaseY - eyeRy - 2} x2={eyeBaseX + eyeRx} y2={eyeBaseY - eyeRy * 0.3} stroke="#1a1a2e" strokeWidth={2} strokeLinecap="round" />
           <line x1={eye2BaseX + eyeRx} y1={eyeBaseY - eyeRy - 2} x2={eye2BaseX - eyeRx} y2={eyeBaseY - eyeRy * 0.3} stroke="#1a1a2e" strokeWidth={2} strokeLinecap="round" />
-          {/* 眼睛 */}
           <g style={{ transform: `scaleY(${eyeScaleY})`, transformOrigin: `${ex1}px ${ey1}px` }}>
             <ellipse cx={ex1} cy={ey1} rx={eyeRx} ry={eyeRy} fill="#1a1a2e" />
             <circle cx={ex1 - eyeRx * 0.2} cy={ey1 - eyeRy * 0.3} r={eyeRx * 0.25} fill="white" />
@@ -461,7 +607,6 @@ export function HermesAvatar({
     }
 
     if (mood === 'shy') {
-      // 向下看
       return (
         <>
           <g style={{ transform: `scaleY(${eyeScaleY})`, transformOrigin: `${ex1}px ${ey1}px` }}>
@@ -477,7 +622,6 @@ export function HermesAvatar({
     }
 
     if (mood === 'curious') {
-      // 一只眼睁大一只眼正常 + 歪眉
       return (
         <>
           <line x1={eyeBaseX - eyeRx} y1={eyeBaseY - eyeRy} x2={eyeBaseX + eyeRx} y2={eyeBaseY - eyeRy - 3} stroke="#1a1a2e" strokeWidth={1.5} strokeLinecap="round" />
@@ -493,7 +637,6 @@ export function HermesAvatar({
       );
     }
 
-    // 默认：正常椭圆眼
     return (
       <>
         <g style={{ transform: `scaleY(${eyeScaleY})`, transformOrigin: `${ex1}px ${ey1}px` }}>
@@ -508,7 +651,6 @@ export function HermesAvatar({
     );
   };
 
-  // 嘴巴路径
   const mouthD = (() => {
     if (mood === 'happy' || mood === 'dancing' || mood === 'waving')
       return `M ${s * 0.35} ${s * 0.62} Q ${s * 0.5} ${s * 0.74} ${s * 0.65} ${s * 0.62}`;
@@ -529,7 +671,6 @@ export function HermesAvatar({
     return `M ${s * 0.38} ${s * 0.65} Q ${s * 0.5} ${s * 0.68} ${s * 0.62} ${s * 0.65}`;
   })();
 
-  // 动画类名
   const animationClass = isDancing
     ? 'animate-hermes-dance'
     : isBouncing
@@ -540,13 +681,9 @@ export function HermesAvatar({
           ? 'animate-hermes-breathe'
           : '';
 
-  // 头部倾斜（好奇、歪头时）
   const headTransform = headTilt !== 0 ? `rotate(${headTilt} ${s * 0.5} ${s * 0.55})` : undefined;
-
-  // 生气时的身体微颤
   const bodyShake = mood === 'angry' ? 'animate-hermes-shake' : '';
 
-  // 腮红颜色和透明度按 mood
   const blushOpacity = mood === 'love' || mood === 'shy' ? 0.7 : mood === 'angry' ? 0.5 : 0.4;
   const blushColor = mood === 'angry' ? '232,100,100' : '232,160,160';
 
@@ -695,7 +832,7 @@ export function HermesAvatar({
       {/* 悬浮提示（无受控 mood 且无气泡时） */}
       {!controlledMood && !speechBubble && isHovered && (
         <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] bg-tea-primary text-white px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none animate-scale-in">
-          点击聊天~
+          点击聊天~ 右键有菜单哦
         </span>
       )}
     </div>

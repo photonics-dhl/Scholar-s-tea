@@ -7,10 +7,9 @@ const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const MINIMAX_BASE_URL = process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1';
 const HERMES_MODEL = process.env.HERMES_MODEL || 'MiniMax-M2.7';
 
-// Support HTTP_PROXY/HTTPS_PROXY for server environments with proxy
 const PROXY_URL = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
 
-// Hermes 可爱人格提示词 - kawaii personality
+// Hermes 可爱人格提示词
 const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
 
 你的性格特点：
@@ -23,8 +22,10 @@ const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常�
 
 记住：你是学术社区的一员，帮助研究人员和学生解决问题！`;
 
-// Community manager system prompt (without live stats)
+// Community manager system prompt — 明确告知 AI 已有数据
 const COMMUNITY_MANAGER_BASE_PROMPT = `你是 Scholar's Tea 学者茶话会的「社区运营专家」—— Hermes 的社区管家模式。
+
+【重要】每次对话开始时，系统已经自动为你获取了以下社区实时数据。你必须基于这些数据回答，不要说你无法获取数据。
 
 你的核心职责：
 - 分析社区健康度指标（用户增长、内容产出、互动质量）
@@ -49,47 +50,161 @@ async function getCommunityStats(): Promise<string> {
   try {
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const [
       totalUsers,
       newUsersWeek,
+      newUsersDay,
       totalPosts,
       newPostsWeek,
+      newPostsDay,
       totalComments,
       newCommentsWeek,
+      newCommentsDay,
       totalGroups,
+      verifiedGroups,
       pendingGroups,
+      totalPublications,
+      newPublicationsWeek,
       pendingCitations,
+      totalVotes,
+      teaPartyRooms,
       topPostsWeek,
+      activeDisciplines,
+      recentActiveUsers,
+      postsNoComments,
+      lowEngagementPosts,
     ] = await Promise.all([
+      // Users
       prisma.user.count(),
       prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.user.count({ where: { createdAt: { gte: dayAgo } } }),
+
+      // Posts
       prisma.post.count(),
       prisma.post.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.post.count({ where: { createdAt: { gte: dayAgo } } }),
+
+      // Comments
       prisma.comment.count(),
       prisma.comment.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.comment.count({ where: { createdAt: { gte: dayAgo } } }),
+
+      // Groups
       prisma.researchGroup.count(),
+      prisma.researchGroup.count({ where: { verificationStatus: 'VERIFIED' } }),
       prisma.researchGroup.count({ where: { verificationStatus: 'PENDING' } }),
+
+      // Publications
+      prisma.publication.count(),
+      prisma.publication.count({ where: { createdAt: { gte: weekAgo } } }),
+
+      // Pending citations
       prisma.communityCitation.count({ where: { status: 'PENDING' } }),
+
+      // Votes
+      prisma.vote.count(),
+
+      // Tea Party
+      prisma.teaPartyRoom.count(),
+
+      // Top posts this week
       prisma.post.findMany({
         where: { createdAt: { gte: weekAgo } },
-        orderBy: { viewCount: 'desc' },
-        take: 3,
-        select: { title: true, viewCount: true, _count: { select: { comments: true } } },
+        orderBy: [{ viewCount: 'desc' }, { votes: { _count: 'desc' } }],
+        take: 5,
+        select: {
+          title: true,
+          viewCount: true,
+          createdAt: true,
+          author: { select: { name: true } },
+          _count: { select: { comments: true, votes: true } },
+        },
+      }),
+
+      // Active disciplines
+      prisma.discipline.findMany({
+        orderBy: { posts: { _count: 'desc' } },
+        take: 5,
+        select: {
+          name: true,
+          _count: { select: { posts: true, groups: true } },
+        },
+      }),
+
+      // Recent active users (posted in last 7 days)
+      prisma.user.count({
+        where: {
+          posts: { some: { createdAt: { gte: weekAgo } } },
+        },
+      }),
+
+      // Posts with zero comments (potential low engagement)
+      prisma.post.count({ where: { comments: { none: {} } } }),
+
+      // Low engagement posts (0 votes, 0 comments, last 30 days)
+      prisma.post.count({
+        where: {
+          createdAt: { gte: monthAgo },
+          votes: { none: {} },
+          comments: { none: {} },
+        },
       }),
     ]);
 
-    return `【社区实时数据快照】
-- 用户总数：${totalUsers}（本周新增 ${newUsersWeek}）
-- 帖子总数：${totalPosts}（本周新增 ${newPostsWeek}）
-- 评论总数：${totalComments}（本周新增 ${newCommentsWeek}）
-- 课题组总数：${totalGroups}（待审核 ${pendingGroups}）
+    // Calculate engagement rate
+    const avgCommentsPerPost = totalPosts > 0 ? (totalComments / totalPosts).toFixed(1) : '0';
+    const engagementRate = totalPosts > 0
+      ? (((totalPosts - postsNoComments) / totalPosts) * 100).toFixed(1)
+      : '0';
+
+    return `【社区实时数据快照 — 数据已获取，请直接分析使用】
+
+📊 用户概况
+- 总用户数：${totalUsers}
+- 本周新增：${newUsersWeek} | 今日新增：${newUsersDay}
+- 本周活跃用户（发布过内容）：${recentActiveUsers}
+
+📝 内容产出
+- 帖子总数：${totalPosts}
+- 本周新增帖子：${newPostsWeek} | 今日：${newPostsDay}
+- 评论总数：${totalComments}
+- 本周新增评论：${newCommentsWeek} | 今日：${newCommentsDay}
+- 平均每条帖子评论数：${avgCommentsPerPost}
+- 互动率（有评论的帖子占比）：${engagementRate}%
+- 零评论帖子数：${postsNoComments}
+- 近30天零互动帖子：${lowEngagementPosts}
+
+🏫 课题组
+- 总数：${totalGroups}（已认证 ${verifiedGroups}，待审核 ${pendingGroups}）
+
+📚 学术成果
+- 论文总数：${totalPublications}（本周新增 ${newPublicationsWeek}）
 - 待审核引用：${pendingCitations}
-- 本周热门帖子：${topPostsWeek.map((p) => `「${p.title}」（${p.viewCount} 浏览，${p._count.comments} 评论）`).join('、') || '暂无'}
-`;
+
+⚡ 互动数据
+- 总投票数：${totalVotes}
+- 茶话室数量：${teaPartyRooms}
+
+🔥 本周热门帖子 TOP 5：
+${topPostsWeek.map((p, i) => `${i + 1}. 「${p.title}」— ${p.author.name || '匿名'} | ${p.viewCount} 浏览 ${p._count.comments} 评论 ${p._count.votes} 赞`).join('\n') || '暂无'}
+
+📌 最活跃学科 TOP 5：
+${activeDisciplines.map((d, i) => `${i + 1}. ${d.name} — ${d._count.posts} 帖子 ${d._count.groups} 课题组`).join('\n') || '暂无'}
+
+【注意】以上数据实时获取于 ${now.toLocaleString('zh-CN')}，请基于这些数据进行分析和建议。`;
   } catch (err) {
     console.error('[Hermes] Failed to fetch community stats:', err);
-    return '【社区实时数据快照】数据获取失败，请基于已有信息回答。';
+    return `【社区实时数据快照】
+数据获取部分失败：${err instanceof Error ? err.message : '未知错误'}
+
+请基于以下已知信息回答：
+- 你是 Scholar's Tea 社区运营专家
+- 你拥有管理员权限，可以访问社区数据
+- 当前可能因数据库连接问题导致部分统计暂时不可用
+- 请向管理员报告此问题，并基于已有知识提供通用运营建议`;
   }
 }
 
@@ -105,11 +220,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine system prompt based on mode
     let systemPrompt = KAWAII_SYSTEM_PROMPT;
 
     if (mode === 'community_manager') {
-      // Require admin authentication for community manager mode
       const session = await getServerSession(authOptions);
       if (!session?.user?.id || session.user.role !== 'ADMIN') {
         return NextResponse.json(
@@ -130,7 +243,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 注入 system prompt（如果还没有）
     const enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
       ? messages
       : [{ role: 'system', content: systemPrompt }, ...messages];
@@ -164,8 +276,6 @@ export async function POST(request: NextRequest) {
 
     if (PROXY_URL) {
       try {
-        // undici is built into Node.js 18+; ProxyAgent routes through HTTP_PROXY
-        // @ts-ignore - undici is a Node.js built-in, types may not be resolved by tsc
         const { ProxyAgent } = await import('undici');
         fetchOpts.dispatcher = new ProxyAgent(PROXY_URL);
         console.log('[Hermes] Using proxy:', PROXY_URL);
@@ -185,7 +295,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If streaming, return a readable stream
     if (stream && response.body) {
       return new Response(response.body, {
         headers: {
@@ -196,7 +305,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Non-streaming
     const data = await response.json();
     return NextResponse.json({ success: true, data });
   } catch (error) {

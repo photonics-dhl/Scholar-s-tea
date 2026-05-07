@@ -2,73 +2,75 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "Caustics and catastrophes in strong-field physics -- Picard--Lefschetz theory as a universal approach to saddle-point methods in attosecond science",
-      "abstract": "Ultrashort laser pulses on the attosecond timescale are typically achieved via high-order harmonic generation (HHG), a nonlinear process in which atoms interact with intense light fields to emit a broad spectrum of harmonics. HHG is commonly described in terms of a `quantum orbits' model based on several interfering electron trajectories, thereby incorporating both quantum-mechanical effects and an intuitive picture of classical dynamics. By tuning the parameters of the driving laser field, the interplay between these trajectories can be controlled, shaping the emitted light. Mathematically, this model expresses the harmonic response as a highly oscillatory integral. Applying saddle-point methods to this integral allows it to be decomposed into contributions from distinct saddle points of the semi-classical action, thereby linking quantum dynamics to classical trajectories. However, a general framework for applying these methods across arbitrary parameters and laser configurations has been missing.   In this thesis, we introduce Picard--Lefschetz theory and develop practical numerical methods for its application. These enable the evaluation of oscillatory integrals and identification of contributions from individual critical points.   We apply these techniques to strong-field ionisation and HHG, focusing on caustics -- enhancement features where trajectories coalesce and standard approximations fail. Our methods remain valid in these regions, allowing systematic analysis of parameter regimes and revealing previously inaccessible features. This work improves the understanding and control of ultrafast light--matter interactions.",
-      "arxiv_id": "2605.03794v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03794v1",
+      "title": "Roadmap on Attosecond Science",
+      "abstract": "Twenty-five years have passed since the first experimental demonstration of attosecond pulses, marking the advent of our ability to resolve and control electron motion in real time. What began as a technological breakthrough - generating the shortest flashes ever produced - has evolved into a powerful approach for probing and steering electronic dynamics in atoms, molecules, and solids. This roadmap, authored by leading experts in the field, surveys the recent rapid progress in the generation and characterization of attosecond pulses, emerging attosecond measurement and control techniques, and their expanding range of applications. It reviews current and future developments in attosecond light sources, including novel laser technologies, waveform synthesizers, new schemes for high-order harmonic generation, attosecond pulse generation at free-electron lasers, and structured light. Advances in attosecond measurement methodologies are also discussed, encompassing all-attosecond pump-probe spectroscopy, attosecond four-wave mixing, attosecond microscopy, spectroscopy with light transients, and attosecond interferometry. Furthermore, the roadmap addresses applications of attosecond spectroscopy to reveal electron dynamics in molecules and condensed matter systems from both theoretical and experimental perspectives, and highlights emerging directions at the interface with quantum optics and quantum entanglement. Overall, this work aims to serve as a comprehensive resource for navigating the evolving landscape of attosecond science.",
+      "arxiv_id": "2604.15085v1",
+      "published": "2026-04-16",
+      "url": "http://arxiv.org/abs/2604.15085v1",
       "authors": [
-        "Anne Weber"
+        "Rocio Borrego Varillas",
+        "Pierre Agostini",
+        "Fernando Ardana-Lamas"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出基于Picard-Lefschetz理论的通用鞍点方法框架，系统处理强场物理中焦散线和突变现象，统一描述高次谐波产生的量子轨道动力学。",
-        "research思路": "解决强场物理中鞍点方法难以跨参数通用化的难题，通过Picard-Lefschetz理论提供统一数学工具，将量子动力学与经典轨迹系统关联。",
-        "experiment": "采用理论分析和解析方法，以高度振荡积分的鞍点分解为核心，结合复分析中的Picard-Lefschetz理论处理多鞍点贡献和分支切割问题。",
-        "innovation": "首次将Picard-Lefschetz理论系统引入强场HHG领域，突破传统鞍点方法在复杂激光场下的局限性，实现跨任意参数空间的统一描述。",
-        "related_work": "包括Keldysh的隧穿电离理论、Lewenstein模型量子轨道理论、 Corkum和Salières的再碰撞模型，以及Goulielmakis等人的阿秒脉冲产生实验。",
-        "impact": "为阿秒科学提供更 robust 的理论工具，深化对强场非线性过程的理解，有望推动新型阿秒脉冲表征和相干光源设计的理论发展。"
+        "summary": "由领域顶级专家撰写的阿秒科学综合性路线图，全面综述了25年来阿秒脉冲产生、表征技术的最新进展及在原子分子固体中的前沿应用。",
+        "research思路": "系统性梳理阿秒科学从技术突破到应用拓展的发展脉络，解决电子动力学实时探测与控制中的关键技术瓶颈，展望未来发展方向。",
+        "experiment": "综述涵盖高次谐波产生、自由电子激光阿秒脉冲生成、波形合成器、结构光泵浦探测等关键技术路线及实验方案。",
+        "innovation": "首次由多专家联合发布涵盖光源、测量到应用的完整技术路线图，纳入自由电子激光、结构光等新兴方向，突破传统单一技术综述局限。",
+        "related_work": "涉及高次谐波产生理论、泵浦探测技术、光场波形合成、自由电子激光阿秒源、固体高次谐波等领域的重要研究工作。",
+        "impact": "为阿秒科学未来10年发展提供战略指引，推动电子动力学控制从原子层面向分子和固体系统拓展，奠定超快光学与量子科技融合基础。"
       },
       "domain_trend": {
-        "trend": ""
+        "trend": "```json\n{\n  \"trend\": \"超快光学正从阿秒电子动力学"
       }
     },
     {
-      "title": "Attosecond-Stable Two-Dimensional Spectroscopy by a Sagnac-Based Modulating System and a sub-4-fs Continuum Source",
-      "abstract": "We present a two-dimensional electronic spectroscopy (2DES) platform driven by a novel Coherent Loop-based Integrated Modulating and Beamsplitting System (CLIMBS). Coupled with an octave-spanning multiple-plate continuum (MPC) source, CLIMBS enables broadband, phase-coherent measurements with attosecond-level time delay precision. Its Sagnac-inspired, nearly common-path geometry provides exceptional long-term phase stability without active feedback, eliminating beam walk-off and preserving beam pointing during delay scans. Delay calibration using spectrally resolved interferometric fringes yielded a wedge angle in excellent agreement with the designed geometry, confirming precise, linear coherence time control. The MPC technique generates broadband excitation pulses spanning 550--980 nm and temporally compressed to 3.7 fs. This bright, few-cycle source enables simultaneous interrogation of widely separated electronic and vibronic transitions, with high temporal and spectral resolution, allowing 2DES to capture vibronic cross peaks, energy-transfer pathways, and undistorted ground-state bleaching (GB), stimulated emission (SE), and excited-state absorption (ESA) features across a broad spectral window. System performance was benchmarked on chlorophyll-a in methanol, where the excitation bandwidth fully covers the $Q_x$ and $Q_y$ bands, ensuring distortion-free spectra. The nearly collinear configuration of CLIMBS eliminates beam walk-off during delay scanning, supports ultrabroadband few-cycle 2DES enabled by the high-brightness MPC source, and maintains attosecond-level phase stability, providing a simple and robust platform for high-fidelity multidimensional spectroscopy.",
-      "arxiv_id": "2605.03777v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03777v1",
+      "title": "Ultrafast all-optical quantum teleportation",
+      "abstract": "Light's intrinsic carrier frequency of hundreds of terahertz theoretically enables information processing at terahertz clock rates. In optical quantum computing, continuous-variable quantum teleportation is the fundamental building block for deterministic logic operations. This protocol transfers unknown quantum states between nodes using quantum entanglement and real-time feedforward of measurement outcomes. However, electrical feedforward bottlenecks currently restrict operational bandwidths to approximately 100 megahertz, preventing the exploitation of light's ultimate speed. Here we show 1-terahertz-bandwidth all-optical quantum teleportation, completely bypassing this electronic limitation. By transferring Bell measurement outcomes optically, we successfully teleported vacuum states across the terahertz band and real-time random coherent wavepackets with a 42-picosecond temporal width. Evaluating the intrinsic state transfer quality, we achieved teleportation fidelities of $\\mathcal{F}=0.784$ for the broadband vacuum states and $\\mathcal{F}=0.770$ for the dynamic coherent wavepackets. Both results strictly surpass the classical limit of $\\mathcal{F}=0.5$, demonstrating genuine quantum teleportation at ultrafast speeds. Our results establish that optical quantum processing speeds are constrained solely by the nonlinear medium's 1-picosecond-scale response, rather than classical electrical interfaces. This methodology provides a cornerstone for terahertz-clock quantum computers capable of overcoming Moore's law, and paves the way for a high-capacity, telecom-compatible quantum internet.",
+      "arxiv_id": "2604.14959v1",
+      "published": "2026-04-16",
+      "url": "http://arxiv.org/abs/2604.14959v1",
       "authors": [
-        "Wei-Chung Feng",
-        "Bo-Han Chen",
-        "Chih-Hsuan Lu"
+        "Takumi Suzuki",
+        "Takaya Hoshi",
+        "Akito Kawasaki"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "开发了CLIMBS平台结合MPC超连续光源，实现attosecond级相位稳定的二维电子光谱，突破传统2DES系统相位噪声限制。",
-        "research思路": "解决二维电子光谱中时间延迟精度受限、长期相位稳定性差的瓶颈，通过近乎共光路几何结构消除环境扰动影响。",
-        "experiment": "采用Sagnac干涉仪构型实现光路自补偿，结合楔形板产生可调延迟，MPC多板压缩产生3.7 fs超短脉冲。",
-        "innovation": "首次将Sagnac几何与二维电子光谱结合，实现无需主动反馈的attosecond级延迟精度，同时保证550-980nm宽带覆盖。",
-        "related_work": "与Lindner的相位稳定2DES方案、Fleischer的Sagnac光谱仪工作、以及MPC超连续光源技术形成技术关联。",
-        "impact": "为探测量子相干动力学提供高稳定测量平台，推动 attosecond pump-probe 与二维光谱技术融合，加速复杂分子体系超快过程研究。"
+        "summary": "实现了1 THz带宽的全光学量子隐形传态，完全绕过电子前馈瓶颈，以42皮秒时间分辨率成功传输真空态和随机相干波包。",
+        "research思路": "解决电子前馈将量子隐形传态带宽限制在约100 MHz的技术瓶颈，释放光学量子计算的巨大速度潜力。",
+        "experiment": "采用全光学方法传输Bell测量结果，通过THz带宽信道传输量子态，实现了42 ps时间宽度的实时相干波包传输与高保真度验证。",
+        "innovation": "首次实现完全绕过电子环节的THz带宽量子隐形传态，将操作带宽提升约10000倍，突破长期困扰该领域的速度极限。",
+        "related_work": "连续变量量子隐形传态协议、基于纠缠的量子态传输、实时前馈量子操作、MHz量级电子前馈的早期验证工作。",
+        "impact": "为实现光速级别的量子信息处理和大规模量子网络奠定基础，有望推动光学量子计算从实验室走向实用化。"
       }
     },
     {
-      "title": "Molecular Attoscope: Pulse Shape Spectroscopy of Electronic Coherence",
-      "abstract": "Tracking the coupled motion of electrons and nuclei on their intrinsic timescales is essential to understanding and controlling photochemical transformations. While attosecond techniques have provided unprecedented insight into electronic dynamics, they have largely been restricted to ionic systems, with nuclear motion often neglected or indirectly inferred. Here, we demonstrate a ``molecular attoscope\", which uses shaped laser pulses in the deep ultraviolet to perform a coherent measurement of electronic and nuclear dynamics in an entangled wave packet in neutral benzene. This enables us to trace both the 856-attosecond-period electronic motion and the 36-femtosecond-period nuclear motion. We observe electronic coherence persisting over hundreds of optical cycles, modulated by nuclear dynamics. Our holographic approach is general, and lays the groundwork for coherent measurements capable of visualizing the evolution of the coupled electronic-nuclear wave function in real time.",
-      "arxiv_id": "2605.03298v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03298v1",
+      "title": "Time Delay Distribution and Laser Stability in Arbitrary Detuning Asynchronous Optical Sampling",
+      "abstract": "Arbitrary Detuning ASynchronous OPtical Sampling (ADA-SOPS) is an emerging technique for extending standard pump--probe experiments performed with two femtosecond lasers to multitimescale experiments, which are of great interest for the study of complex systems. Although no specific requirements are needed for laser repetition rates, their ratio determines the achievable delay distribution and therefore is strongly related to the temporal resolution of the technique. We report a detailed theoretical analysis of measurement performances with respect to laser repetition rates, and we validate our model with experimental data. In the case of amplified laser systems, we demonstrate that achieved delays are inherently correlated to the time interval between amplified pulses, which affects the pulse energy and can generate artifacts. Nevertheless, a deep understanding of the origin of such artifacts allows to suggest several compensation strategies, either during data analysis or at the conception of the experimental setup. Finally we present a new algorithm integrated into the ADASOPS device: by selecting pairs of probe pulses having the same elapsed time with respect to the previous pulse, it automatically compensates any effect of energy fluctuation.",
+      "arxiv_id": "2604.14728v1",
+      "published": "2026-04-16",
+      "url": "http://arxiv.org/abs/2604.14728v1",
       "authors": [
-        "Loc Thi-Hoang Ngo",
-        "Julia Codere",
-        "Javin Ohara"
+        "Laura Antonucci",
+        "A. Bonvalet",
+        "X. Solinas"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "该研究开发了一种\"分子阿秒显微镜\"技术，利用深紫外形状化激光脉冲首次在中性苯分子中实现了电子和核动力学的相干测量，成功追踪了856阿秒电子运动周期和36飞秒核运动周期。",
-        "research思路": "针对阿秒技术长期局限于离子系统、核运动难以直接观测的问题，研究团队提出在 entangled wave packet 中同时追踪电子-核耦合动力学的方案，实现耦合波函数演化的实时可视化。",
-        "experiment": "采用深紫外(200-220nm)形状化激光脉冲构建全息测量方案，通过脉冲整形技术控制波包相位，在中性苯分子中提取电子和核运动的相干信号。",
-        "innovation": "首次在 neutral 分子体系中实现电子-核动力学相干测量；突破离子系统限制；深紫外波长下的全息方法为分子成像提供通用平台；观测到电子相干性持续数百光学周期。",
-        "related_work": "包括attosecond transient absorption spectroscopy、high-harmonic generation spectroscopy、Coulomb explosion imaging、以及 electronic coherence 保持机制研究、coupled electron-nuclear dynamics theory。",
-        "impact": "该工作为分子动力学的 real-time 可视化提供了通用工具，开辟了中性分子阿秒科学的新方向，对光化学反应控制、激发态动力学理解具有重要推动作用。"
+        "summary": "提出了ADA-SOPS技术中延迟分布与激光重复率关系的详细理论模型，验证了放大激光系统的固有相关性伪影，并给出补偿策略。",
+        "research思路": "解决多时间尺度泵浦-探测实验中延迟分布不可控和时间分辨率受限的问题，通过理论建模与实验验证建立系统设计准则。",
+        "experiment": "采用两个飞秒激光器构建ADA-SOPS系统，通过改变重复率比例和延迟参数进行系统性实验，采集验证数据对比理论预测。",
+        "innovation": "首次建立激光重复率与延迟分布的定量关系模型；揭示放大激光系统中脉冲能量与延迟的固有相关性；提出数据分析和硬件层面的多策略补偿方案。",
+        "related_work": "异步光学采样技术（ASOPS）的基础理论；泵浦-探测技术在不同时间尺度的应用发展；飞秒激光系统稳定性研究。",
+        "impact": "为复杂系统多时间尺度动力学研究提供可靠实验框架，推动ADA-SOPS技术向更广泛应用发展，对超快光学测量领域具有重要指导意义。"
       }
     }
   ]

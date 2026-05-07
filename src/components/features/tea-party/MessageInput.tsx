@@ -1,27 +1,50 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Smile, Image, Paperclip, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 
 interface MessageInputProps {
-  onSend: (content: string) => void;
+  onSend: (content: string, type?: string) => void;
   onTyping: (isTyping: boolean) => void;
   disabled?: boolean;
 }
 
+// Common emojis for quick picker
+const QUICK_EMOJIS = [
+  '😀','😂','🥰','😍','🤔','😢','😡','👍','👎','👏',
+  '🙏','🔥','❤️','💔','🎉','✨','💡','🤝','🌟','💯',
+  '😊','😅','😭','😤','🥳','🤯','😴','🤓','😎','🤗',
+];
+
 export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) {
   const [content, setContent] = useState('');
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiRef = useRef<HTMLDivElement>(null);
+
+  // Close emoji picker on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
+        setShowEmoji(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSend = useCallback(() => {
     if (!content.trim() || disabled) return;
-
-    onSend(content.trim());
+    onSend(content.trim(), 'TEXT');
     setContent('');
-
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     if (isTypingRef.current) {
       isTypingRef.current = false;
       onTyping(false);
@@ -30,12 +53,10 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-
     if (!isTypingRef.current) {
       isTypingRef.current = true;
       onTyping(true);
     }
-
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
@@ -52,6 +73,67 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
     }
   };
 
+  const insertEmoji = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newContent = content.slice(0, start) + emoji + content.slice(end);
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+    }, 0);
+  };
+
+  const handleFileUpload = async (file: File, type: 'IMAGE' | 'FILE') => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+
+      const res = await fetch('/api/v1/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success && data.data?.url) {
+        if (type === 'IMAGE') {
+          onSend(data.data.url, 'IMAGE');
+        } else {
+          const fileInfo = `${file.name}|${data.data.url}|${formatFileSize(file.size)}`;
+          onSend(fileInfo, 'FILE');
+        }
+      } else {
+        alert(data.error?.message || '上传失败');
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert('上传失败，请重试');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file, 'IMAGE');
+    }
+    e.target.value = '';
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file, 'FILE');
+    }
+    e.target.value = '';
+  };
+
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -64,21 +146,111 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
   }, [onTyping]);
 
   return (
-    <div className="border-t border-journal-border p-4 bg-paper-white">
-      <div className="flex gap-2 items-end">
+    <div className="border-t border-gray-200/80 bg-white">
+      {/* Toolbar */}
+      <div className="flex items-center gap-1 px-3 pt-2">
+        {/* Emoji Button */}
+        <div className="relative" ref={emojiRef}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'h-8 w-8 text-gray-400 hover:text-gray-600',
+              showEmoji && 'text-tea-primary bg-tea-primary/10'
+            )}
+            onClick={() => setShowEmoji(!showEmoji)}
+            disabled={disabled || uploading}
+          >
+            <Smile className="h-5 w-5" />
+          </Button>
+          
+          {/* Emoji Picker */}
+          {showEmoji && (
+            <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-xl shadow-lg p-3 w-[280px] z-50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-muted-foreground">常用表情</span>
+                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setShowEmoji(false)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-10 gap-1">
+                {QUICK_EMOJIS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    className="h-7 w-7 flex items-center justify-center text-lg hover:bg-gray-100 rounded transition-colors"
+                    onClick={() => insertEmoji(emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Image Upload */}
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+            disabled={disabled || uploading}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-400 hover:text-gray-600"
+            disabled={disabled || uploading}
+            asChild
+          >
+            <span><Image className="h-5 w-5" /></span>
+          </Button>
+        </label>
+
+        {/* File Upload */}
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            className="hidden"
+            onChange={handleFileSelect}
+            disabled={disabled || uploading}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-gray-400 hover:text-gray-600"
+            disabled={disabled || uploading}
+            asChild
+          >
+            <span><Paperclip className="h-5 w-5" /></span>
+          </Button>
+        </label>
+
+        {uploading && (
+          <span className="text-xs text-muted-foreground ml-1">上传中...</span>
+        )}
+      </div>
+
+      {/* Input Row */}
+      <div className="flex gap-2 items-end px-3 pb-3 pt-1">
         <textarea
+          ref={textareaRef}
           value={content}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={disabled ? '连接中...' : '输入消息，按 Enter 发送...'}
-          disabled={disabled}
+          disabled={disabled || uploading}
           maxLength={500}
           rows={1}
           className={cn(
-            'flex-1 resize-none rounded-lg border border-journal-border bg-tea-bg px-4 py-3 text-sm font-source-serif',
-            'focus:outline-none focus:ring-2 focus:ring-tea-primary focus:border-tea-primary',
+            'flex-1 resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm',
+            'focus:outline-none focus:ring-1 focus:ring-tea-primary focus:border-tea-primary',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            'min-h-[44px] max-h-[120px] transition-all duration-200'
+            'min-h-[40px] max-h-[120px] transition-all duration-200'
           )}
           style={{
             height: 'auto',
@@ -94,16 +266,22 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
           type="button"
           size="icon"
           onClick={handleSend}
-          disabled={!content.trim() || disabled}
+          disabled={!content.trim() || disabled || uploading}
           variant="tea"
-          className="size-11 flex-shrink-0 transition-transform active:scale-95"
+          className="size-10 flex-shrink-0 transition-transform active:scale-95 rounded-full"
         >
           <Send className="size-4" />
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground mt-1 font-sans">
+      <p className="text-[11px] text-muted-foreground px-3 pb-2 font-sans">
         {content.length}/500
       </p>
     </div>
   );
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }

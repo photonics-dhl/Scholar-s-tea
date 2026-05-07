@@ -1,0 +1,123 @@
+- generic:
+  - generic:
+    - generic:
+      - banner:
+        - generic:
+          - link:
+            - /url: /
+            - generic:
+              - img
+            - generic: Scholar's Tea
+          - navigation:
+            - link:
+              - /url: /disciplines
+              - img
+              - text: 学科
+            - link:
+              - /url: /groups
+              - img
+              - text: 课题组
+            - link:
+              - /url: /workshop
+              - img
+              - text: 思想工坊
+            - link:
+              - /url: /tea-party
+              - img
+              - text: 茶话会
+            - link:
+              - /url: /top-questions
+              - img
+              - text: TOP10
+          - button:
+            - img
+            - generic: 搜索
+            - generic: /
+          - generic:
+            - button:
+              - generic:
+                - generic: 测
+      - main:
+        - generic:
+          - generic:
+            - button:
+              - link:
+                - /url: /groups/ai-lab/posts
+                - img
+                - text: 返回列表
+          - generic:
+            - heading [level=1]: 发布新帖
+            - paragraph: 在 课题组 分享你的研究见解
+          - generic:
+            - textbox:
+              - /placeholder: 标题（最多 200 字）
+            - generic:
+              - generic: 0/200
+          - generic:
+            - generic: 正文内容
+            - generic:
+              - generic: 已选中 21 字
+              - button [expanded]:
+                - img
+                - generic: AI 优化
+          - generic:
+            - generic:
+              - generic:
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button:
+                  - img
+                - button [disabled]:
+                  - img
+              - generic:
+                - generic:
+                  - generic:
+                    - paragraph: AI的未来是什么？这是一个值得探讨的问题。
+          - generic:
+            - generic:
+              - img
+              - generic: 标签
+            - generic:
+              - textbox:
+                - /placeholder: 添加标签，按回车确认
+              - button: 添加
+          - generic:
+            - paragraph: 请遵守社区规范，发布有价值的学术内容
+            - button [disabled]:
+              - img
+              - text: 发布帖子
+      - contentinfo:
+        - generic:
+          - paragraph: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - alert
+  - menu "AI 优化" [active] [ref=e136]:
+    - menuitem "改进表达" [ref=e137] [cursor=pointer]:
+      - img [ref=e138]
+      - generic [ref=e141]: 改进表达
+    - menuitem "检查语法" [ref=e142] [cursor=pointer]:
+      - img [ref=e143]
+      - generic [ref=e146]: 检查语法
+    - menuitem "生成摘要" [ref=e147] [cursor=pointer]:
+      - img [ref=e148]
+      - generic [ref=e149]: 生成摘要
+    - menuitem "推荐标签" [ref=e150] [cursor=pointer]:
+      - img [ref=e151]
+      - generic [ref=e155]: 推荐标签

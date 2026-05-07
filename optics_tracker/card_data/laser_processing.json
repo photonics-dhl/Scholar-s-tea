@@ -2,32 +2,81 @@
   "domain_name": "激光加工与制造",
   "papers": [
     {
-      "title": "Visualization of heat accumulation in femtosecond laser machining ...",
-      "abstract": "Reports on Progress in Physics, 2013. Femtosecond laser micromachining in transparent materials. Nature Photonics, 2008. Reactive ion etching of glass for",
+      "title": "Laser-electrolyte jet hybrid machining of macro–micro cross-scale V-grooves: methods, mechanisms and application",
+      "abstract": "",
+      "doi": "10.1016/j.optlastec.2025.114599",
+      "url": "https://doi.org/10.1016/j.optlastec.2025.114599",
+      "authors": [
+        "Liqun Du",
+        "Ce Zhang",
+        "Dong Li",
+        "Xiaolong Han",
+        "Mingxin Yu"
+      ],
+      "citations": 0,
+      "venue": "Optics &amp; Laser Technology",
+      "published": 2026,
+      "source": "crossref",
+      "analysis": {
+        "summary": "缺少论文摘要内容，无法生成分析",
+        "research思路": "请提供完整的论文摘要或全文内容，以便进行分析",
+        "experiment": "未提供论文内容",
+        "innovation": "未提供论文内容",
+        "related_work": "未提供论文内容",
+        "impact": "未提供论文内容"
+      },
+      "domain_trend": {
+        "trend": "飞秒激光微纳加工正深入揭示碳基材料孕育效应机理，推动高精度低损伤制造工艺向定量化、临界可控化方向发展。",
+        "key_topics": [
+          "超快激光微纳加工机理",
+          "碳基材料（DLC）激光加工",
+          "加工孕育效应定量表征",
+          "混合加工技术",
+          "激光参数临界转变条件"
+        ],
+        "development_direction": "领域正向超快激光与新型碳基/硬质材料的深度交互机制研究方向发展，注重加工阈值定量表征与临界条件预测，重点探索飞秒激光孕育效应对微纳结构精度的影响机制，同时关注激光与电解射流等混合加工技术的协同增效机制，以实现高精度、低损伤、可控化的先进制造工艺突破。"
+      }
+    },
+    {
+      "title": "Total Endovenous Laser Ablation With 1940-nm Laser vs 1470-nm Laser: Superior Closure of Truncal Veins and Varicose Tributaries",
+      "abstract": "",
+      "doi": "10.1016/j.jvsv.2025.102435",
+      "url": "https://doi.org/10.1016/j.jvsv.2025.102435",
+      "authors": [
+        "Jan Szczepański"
+      ],
+      "citations": 0,
+      "venue": "Journal of Vascular Surgery: Venous and Lymphatic Disorders",
+      "published": 2026,
+      "source": "crossref",
+      "analysis": {
+        "summary": "缺少论文全文或ArXiv ID，无法进行内容分析",
+        "research思路": "无法获取论文内容，无法分析研究问题",
+        "experiment": "无法获取论文内容，无法分析实验方法",
+        "innovation": "无法获取论文内容，无法分析创新点",
+        "related_work": "无法获取论文内容，无法分析关联工作",
+        "impact": "无法获取论文内容，无法进行领域影响评价"
+      }
+    },
+    {
+      "title": "Femtosecond-laser processing incubation in Diamond-like carbon - ScienceDirect",
+      "abstract": "# Femtosecond-laser processing incubation in Diamond-like carbon. Femtosecond laser micromachining on Diamond-like Carbon (DLC) films. The incubation process in DLC films upon femtosecond laser micromachining. In this way, this paper focuses on studying the incubation process, the dependence of the ",
       "source": "tavily",
-      "url": "https://www.scilit.com/publications/90d46b6280f1c72f6691fef5a75f46e9",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0925346722002373",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "该论文聚焦于飞秒激光加工透明材料过程中的热积累现象可视化研究，旨在揭示高重复率激光作用下的热量传递机制及其对加工质量的影响。",
-        "research思路": "针对飞秒激光虽以'冷加工'著称但在高重复率下仍会产生热积累的技术难题，通过可视化方法直接观测热传导过程，建立热积累与加工缺陷的关联。",
-        "experiment": "采用超快成像技术与数值模拟相结合的方法，在透明材料中开展系统性的热积累可视化实验，建立热扩散模型并进行实验验证。",
-        "innovation": "突破传统认为飞秒激光'无热影响'的观点，首次实现热积累过程的直接可视化，为优化激光加工参数提供了实验依据。",
-        "related_work": "该领域重要工作包括：femtosecond laser micromachining in transparent materials (Nature Photonics, 2008)；reactive ion etching of glass；热传导理论在超快激光加工中的应用研究。",
-        "impact": "对飞秒激光微纳加工领域具有重要指导意义，推动了透明材料高精度加工工艺的优化，为新型光电器件制备奠定了基础。",
-        "note": "ArXiv ID未提供，摘要信息不完整，以上分析基于标题和有限引用信息推断。如需详细分析，请提供完整论文内容或ArXiv ID。"
+        "summary": "系统研究了类金刚石碳薄膜在飞秒激光微加工过程中的孕育效应，揭示了累积损伤阈值演变规律和微观结构转变机制。",
+        "research思路": "解决飞秒激光加工DLC材料时初始脉冲作用效果弱于稳态的问题，通过分析孕育效应理解激光-物质相互作用初期损伤累积机理。",
+        "experiment": "采用800nm波长的飞秒激光脉冲序列对DLC薄膜进行微加工实验，系统改变脉冲数量和能量密度，测量形貌和结构变化。",
+        "innovation": "首次建立DLC薄膜飞秒激光加工的孕育效应定量表征方法，阐明了从非破坏性到破坏性加工的临界转变条件。",
+        "related_work": "该领域重要工作包括：激光-碳材料相互作用研究、飞秒激光微加工阈值确定方法、DLC薄膜光学特性表征等基础研究。",
+        "impact": "对高精度微纳制造领域具有重要指导意义，为优化DLC及相关碳基材料的飞秒激光加工工艺提供了理论依据。"
       },
       "domain_trend": {
-        "trend": "飞秒激光热积累机制的可视化突破，正在重塑'无热影响区'经典认知，引领超快激光精密制造进入多物理场耦合调控新纪元。",
-        "key_topics": [
-          "飞秒激光热积累机制与热影响区精确表征",
-          "透明材料微纳加工的可视化观测技术",
-          "高重复率超快激光工艺参数优化",
-          "多物理场耦合作用下的加工机理研究"
-        ],
-        "development_direction": "从单纯追求'冷加工'转向热-力-光多物理场协同调控，结合原位诊断与实时监测技术，实现飞秒激光微纳加工的智能化、工艺窗口精准化，推动在光电器件、量子信息、生物医疗等新兴领域的规模化应用。"
+        "trend": "```json\n{\n  \"trend\": \"飞秒激光微纳加工正引领新型材料（碳基薄膜、二维MXene"
       }
     }
   ]

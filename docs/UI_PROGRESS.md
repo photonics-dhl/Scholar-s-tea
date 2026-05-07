@@ -1,6 +1,6 @@
 # Scholar's Tea - UI 优化进度报告
 
-> 更新时间: 2026-04-29
+> 更新时间: 2026-05-06
 
 ## 当前状态总览
 
@@ -10,10 +10,11 @@
 - **server remote**: ❌ 已删除 (指向已清理的僵尸路径)
 
 ### 服务器状态
-- **服务器**: `10.72.212.33` ✅ 运行中
+- **服务器**: `10.72.212.33` ⚠️ 需要重新构建部署
 - **正确路径**: `/data/home/zju321/321/DHL/Scholar's_Tea/` ✅
-- **运行端口**: `3002` ✅
+- **运行端口**: `3002` ⚠️ 当前不可访问
 - **Z: 挂载**: `Z:/321/DHL/Scholar's_Tea/` = 服务器同路径 ✅
+- **GitHub**: `develop` 分支已推送 (commit `0e71fb3`)
 
 ---
 
@@ -178,30 +179,38 @@ Other:
    - `/groups` 列表页
    - `/groups/[slug]` 详情页
 
-5. **Tea Party 房间列表**
-   - `/tea-party` 页面优化
+### ✅ Phase 6: 双轨视觉重设计 (2026-05-06)
 
-### P2: 中优先级
+**设计策略**: "双轨人格" — 学术区肃重 / 交流区活泼
+
+| 任务 | 状态 | 文件 |
+|------|------|------|
+| 导航区域感知 | ✅ | `MainNav.tsx` - scholarly 用 journal-gold, social 用 tea-accent |
+| 页面过渡动画 | ✅ | `template.tsx` + `globals.css` animate-page-enter |
+| 学科页面头部 | ✅ | 全宽 journal-primary 渐变 + 金色细线 + 衬线标题 |
+| 课题组列表头部 | ✅ | 同上 + journal 按钮 variant |
+| TOP10 排名徽章 | ✅ | 金/银/铜渐变徽章 + 学术头部 |
+| 茶话会 RoomCard | ✅ | 热度渐变条 + 圆角 2xl + 在线绿点脉冲 |
+| 茶话会聊天室 | ✅ | 点阵背景 + tea-primary 头部 + 渐变气泡 |
+| 工坊 AI 对话 | ✅ | convo-blue 渐变气泡 + 打字动画 + 活泼欢迎界面 |
+| Badge rank 变体 | ✅ | rank-gold/silver/bronze + journal/tea |
+| GroupCard 微调 | ✅ | 顶部金色细线 + 衬线描述文字 |
+
+### P2: 中优先级 (剩余)
 
 6. **字体系统完善**
-   - 引入 Crimson Pro (标题)
-   - 引入 Source Serif 4 (正文)
-   - 引入 JetBrains Mono (代码)
+   - layout.tsx 已引入 Google Fonts (link 方式) → 可优化为 next/font/google
 
-7. **通用组件完善**
-   - Badge 组件增强
-   - Input/Textarea 组件
-
-8. **响应式优化**
+7. **响应式优化**
    - 移动端适配
    - 平板适配
 
-### P3: 低优先级
+8. **评论/帖子交互优化**
 
-9. **TOP10 页面优化**
-10. **Footer 优化**
-11. **全局过渡动画**
-12. **滚动条美化**
+### P3: 低优先级 (剩余)
+
+9. **Footer 增强**
+10. **首页微调**
 
 ---
 

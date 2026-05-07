@@ -38,10 +38,11 @@ interface ChatRoomProps {
   onlineUsers: OnlineUser[];
   typingUsers: TypingUser[];
   isConnected: boolean;
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, type?: string) => void;
   onTyping: (isTyping: boolean) => void;
   showUsers: boolean;
   onCloseUsers: () => void;
+  currentUserId?: string;
 }
 
 export function ChatRoom({
@@ -54,12 +55,13 @@ export function ChatRoom({
   onTyping,
   showUsers,
   onCloseUsers,
+  currentUserId,
 }: ChatRoomProps) {
   return (
     <div className="flex flex-1">
       {/* Main Chat */}
       <div className="flex-1 flex flex-col">
-        <MessageList messages={messages} typingUsers={typingUsers} roomId={roomId} />
+        <MessageList messages={messages} typingUsers={typingUsers} roomId={roomId} currentUserId={currentUserId} />
         <MessageInput
           onSend={onSendMessage}
           onTyping={onTyping}

@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e83]
+  - generic [ref=e313]:
+    - generic [ref=e314]:
+      - heading "欢迎回来" [level=1] [ref=e315]
+      - paragraph [ref=e316]: 登录到 Scholar's Tea，与学者们交流思想
+    - generic [ref=e317]:
+      - generic [ref=e318]:
+        - heading "登录" [level=3] [ref=e319]
+        - paragraph [ref=e320]: 选择登录方式开始探索
+      - generic [ref=e321]:
+        - button "使用 GitHub 继续" [ref=e323] [cursor=pointer]:
+          - img [ref=e324]
+          - generic [ref=e327]: 使用 GitHub 继续
+        - generic [ref=e331]: 或使用邮箱登录
+        - generic [ref=e332]:
+          - generic [ref=e333]:
+            - text: 邮箱
+            - generic [ref=e334]:
+              - img [ref=e335]
+              - textbox "邮箱" [ref=e338]:
+                - /placeholder: your@email.com
+          - generic [ref=e339]:
+            - generic [ref=e340]:
+              - generic [ref=e341]: 密码
+              - link "忘记密码？" [ref=e342] [cursor=pointer]:
+                - /url: /forgot-password
+            - generic [ref=e343]:
+              - img [ref=e344]
+              - textbox "密码" [ref=e347]
+          - button "登录" [ref=e348] [cursor=pointer]
+    - paragraph [ref=e349]:
+      - text: 还没有账号？
+      - link "创建一个" [ref=e350] [cursor=pointer]:
+        - /url: /signup

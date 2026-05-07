@@ -1,4 +1,5 @@
 import { MainNav } from '@/components/layout/MainNav';
+import { FloatingChat } from '@/components/features/hermes/FloatingChat';
 
 export default function MainLayout({
   children,
@@ -14,6 +15,7 @@ export default function MainLayout({
           <p>Scholar&apos;s Tea 学者茶话会 · 高校学术交流社区</p>
         </div>
       </footer>
+      <FloatingChat />
     </div>
   );
 }

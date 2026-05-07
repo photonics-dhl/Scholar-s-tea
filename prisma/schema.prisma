@@ -151,6 +151,7 @@ model ResearchGroup {
   publications    Publication[]
   news           News[]
   patents        Patent[]
+  posts          Post[]
   followers      User[]       @relation("UserFollows")
   disciplines    GroupDiscipline[]
   scoreHistory   ScoreHistory[]
@@ -231,6 +232,7 @@ model Post {
   content     String    @db.Text
   authorId    String
   disciplineId String?
+  groupId     String?
   isPinned    Boolean   @default(false)
   isLocked    Boolean   @default(false)
   viewCount   Int       @default(0)
@@ -240,6 +242,7 @@ model Post {
 
   author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   discipline Discipline? @relation(fields: [disciplineId], references: [id], onDelete: SetNull)
+  group      ResearchGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
 
   comments Comment[]
   votes    Vote[]

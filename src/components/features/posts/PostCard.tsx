@@ -59,12 +59,12 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
         className
       )}
     >
-      {/* 左侧投票区 */}
-      <div className="flex flex-col items-center gap-0.5 px-3 py-4 bg-muted/30 min-w-[60px]">
+      {/* 左侧投票区 - 弱化设计 */}
+      <div className="flex flex-col items-center gap-0 px-2 py-3 min-w-[44px]">
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-md hover:bg-tea-primary/10 hover:text-tea-primary"
+          className="h-6 w-6 rounded hover:bg-transparent hover:text-tea-primary/70 text-gray-300"
           disabled={voting}
           onClick={(e) => {
             e.preventDefault()
@@ -72,16 +72,11 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
             onVote?.(post.id, 1)
           }}
         >
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp className="h-3.5 w-3.5" />
         </Button>
         <span
           className={cn(
-            'text-sm font-bold tabular-nums leading-tight',
-            post.score > 0
-              ? 'text-tea-primary'
-              : post.score < 0
-                ? 'text-destructive'
-                : 'text-muted-foreground'
+            'text-xs font-medium tabular-nums leading-tight text-muted-foreground/70',
           )}
         >
           {post.score}
@@ -89,7 +84,7 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 rounded-md hover:bg-destructive/10 hover:text-destructive rotate-180"
+          className="h-6 w-6 rounded hover:bg-transparent hover:text-destructive/60 text-gray-300 rotate-180"
           disabled={voting}
           onClick={(e) => {
             e.preventDefault()
@@ -97,7 +92,7 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
             onVote?.(post.id, -1)
           }}
         >
-          <ArrowUp className="h-4 w-4" />
+          <ArrowUp className="h-3.5 w-3.5" />
         </Button>
       </div>
 

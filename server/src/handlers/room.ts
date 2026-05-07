@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { randomUUID } from 'crypto';
 
 type QueryFunction = (text: string, params?: any[]) => Promise<any>;
 
@@ -27,12 +28,15 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
           return;
         }
 
-        // Add participant if not exists
+        // Add participant if not exists (PG 9.2 compatible)
         await query(
-          `INSERT INTO "TeaPartyRoomParticipant" ("roomId", "userId", "joinedAt")
-           VALUES ($1, $2, NOW())
-           ON CONFLICT ("roomId", "userId") DO UPDATE SET "joinedAt" = NOW()`,
-          [roomId, socket.data.user.id]
+          `INSERT INTO "TeaPartyRoomParticipant" ("id", "roomId", "userId", "joinedAt")
+           SELECT $1, $2, $3, NOW()
+           WHERE NOT EXISTS (
+             SELECT 1 FROM "TeaPartyRoomParticipant"
+             WHERE "roomId" = $2 AND "userId" = $3
+           )`,
+          [randomUUID(), roomId, socket.data.user.id]
         );
 
         // Join socket room
@@ -75,10 +79,10 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
 
         // Create system message
         const systemMsgResult = await query(
-          `INSERT INTO "Message" ("roomId", "userId", "content", "type", "createdAt")
-           VALUES ($1, $2, $3, $4, NOW())
+          `INSERT INTO "Message" ("id", "roomId", "userId", "content", "type", "createdAt")
+           VALUES ($1, $2, $3, $4, $5, NOW())
            RETURNING *`,
-          [roomId, socket.data.user.id, `${socket.data.user.name || '用户'} 加入了房间`, 'SYSTEM']
+          [randomUUID(), roomId, socket.data.user.id, `${socket.data.user.name || '用户'} 加入了房间`, 'SYSTEM']
         );
 
         // Broadcast system message
@@ -117,10 +121,10 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
 
         // Create system message
         const systemMsgResult = await query(
-          `INSERT INTO "Message" ("roomId", "userId", "content", "type", "createdAt")
-           VALUES ($1, $2, $3, $4, NOW())
+          `INSERT INTO "Message" ("id", "roomId", "userId", "content", "type", "createdAt")
+           VALUES ($1, $2, $3, $4, $5, NOW())
            RETURNING *`,
-          [roomId, socket.data.user.id, `${socket.data.user.name || '用户'} 离开了房间`, 'SYSTEM']
+          [randomUUID(), roomId, socket.data.user.id, `${socket.data.user.name || '用户'} 离开了房间`, 'SYSTEM']
         );
 
         // Broadcast system message

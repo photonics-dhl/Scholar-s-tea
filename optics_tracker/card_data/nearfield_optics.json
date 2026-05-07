@@ -2,72 +2,82 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Optimized Nanogap Thermophotovoltaic Devices for Waste Heat Recovery",
-      "abstract": "Nanogap thermophotovoltaic (TPV) devices can deliver high power densities even with the medium-temperature heat sources. As such, these devices are very promising for recovering industrial waste heat. So far, the demonstrated nanogap TPVs have shown performances far below optimal. The objective of this study is to identify the optimal designs for nanogap TPV devices targeted for industrial waste heat recovery. Optimal configurations for maximal power density, maximal efficiency, and a trade-off between the two are determined as a function of the size of the vacuum gap between the emitter and the photovoltaic (PV) cell. The effects of adding a metallic cover to the PV cell, as well as introducing an air gap between the PV cell and the reflector, are also studied through this optimization framework. Results show that the optimal device configuration is highly sensitive to the vacuum gap size. A metallic cover enhances power density for gaps below 125nm due to surface plasmon-polariton coupling, but significantly reduces efficiency due to its parasitic absorption. To realize the benefits of air gaps, ultrathin PV cells requiring mechanical support by a substrate are needed. The presence of the substrate, however, diminishes the benefits of the air gap rendering them ineffective. ITO and InAs are found as optimal materials for the emitter and PV cell, respectively, owing to tunable plasma frequency of ITO and low bandgap of InAs.",
-      "arxiv_id": "2605.03988v1",
+      "title": "Quantum Hierarchical Reinforcement Learning via Variational Quantum Circuits",
+      "abstract": "Reinforcement learning is one of the most challenging learning paradigms where efficacy and efficiency gains are extremely valuable. Hierarchical reinforcement learning is a variant that leverages temporal abstraction to structure decision-making. While parametrized quantum computations have shown success in non-hierarchical reinforcement learning, whether these advantages adapt to hierarchical decision-making remains a critical open question. In this work, we develop a hybrid hierarchical agent based on the option-critic architecture. This hybrid agent substitutes classical components with variational quantum circuits for feature extractors, option-value functions, termination functions, and intra-option policies. Evaluated on standard benchmarking environments, results show that a hybrid agent utilizing a quantum feature extractor can outperform classical baselines while saving up to 66\\% trainable parameters. We also identify an architectural bottleneck that quantum option-value estimation severely degrades performance. Further ablation studies reveal how architectural choices of the quantum circuits affect performance. Our work establishes design principles for parameter-efficient hybrid hierarchical agents.",
+      "arxiv_id": "2605.03434v1",
       "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03988v1",
+      "url": "http://arxiv.org/abs/2605.03434v1",
       "authors": [
-        "Mehran Habibzadeh",
-        "Sheila Edalatpour"
+        "Yu-Ting Lee",
+        "Samuel Yen-Chi Chen",
+        "Fu-Chieh Chang"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "系统确定了nanogap TPV器件的最优设计参数组合，实现工业余热回收场景下功率密度与转换效率的协同优化。",
-        "research思路": "针对现有nanogap TPV性能远低于理论极限的问题，建立多参数优化框架，量化分析真空间隙尺寸、金属覆盖层和空气隙对器件性能的影响规律。",
-        "experiment": "采用理论建模与数值优化方法，系统扫描真空间隙尺寸参数范围（从纳米到微米尺度），结合电磁波传输和热力学模型评估功率密度与效率指标。",
-        "innovation": "首次建立nanogap TPV多参数（间隙/覆盖层/空气隙）协同优化模型，揭示125nm间隙阈值下金属覆盖层通过表面等离激元增强功率密度的物理机制。",
-        "related_work": "与瑞士ETHZurich的窄间隙TPV研究、MIT的纳米尺度热辐射调控工作、以及斯坦福大学的光-物质耦合增强太阳能电池研究形成互补。",
-        "impact": "为工业余热回收用TPV器件的工程化设计提供了理论依据，推动纳米尺度热光电转换技术的实用化进程，具有显著的节能减碳应用前景。"
+        "summary": "提出基于option-critic架构的量子分层强化学习智能体，用变分量子电路替代关键组件，实现超越经典基线性能并节省66%可训练参数。",
+        "research思路": "探索参数化量子计算在分层强化学习中的适用性，将量子优势从非分层RL扩展到利用时间抽象的分层决策范式。",
+        "experiment": "在标准基准环境评估混合智能体，对比量子特征提取器与经典基线的性能、参数量和训练效率。",
+        "innovation": "首次将变分量子电路应用于分层RL的全部核心组件（特征提取、选项值、终止函数、策略），实现参数效率显著提升。",
+        "related_work": "参数化量子RL、option-critic架构、分层强化学习中的时间抽象、量子机器学习中的变分电路。",
+        "impact": "验证了量子计算对分层决策问题的潜力，为量子增强的分层RL开辟新方向，同时识别出量子选项值估计的架构瓶颈。",
+        "reviewer_note": "原文摘要存在截断，末尾'that quantum option-value est'显示关键结论未完整呈现，建议核实完整论文以确认具体发现。"
       },
       "domain_trend": {
-        "trend": "近场光学正突破传统边界，量子纠缠与纳米尺度能量转换成为核心驱动力，推动工业余热回收与量子计算实用化的跨域融合"
+        "trend": "该论文实际属于量子机器学习领域，与近场光学领域不符，无法提供近场光学领域的有效分析。",
+        "key_topics": [
+          "变分量子电路",
+          "分层强化学习",
+          "量子增强决策",
+          "量子-经典混合架构"
+        ],
+        "development_direction": "该研究属于量子计算与强化学习的交叉领域，验证了变分量子电路在分层决策问题中的潜力，开辟了量子增强分层RL的新方向，但与近场光学领域无直接关联。建议提供符合近场光学领域的论文以进行准确分析。"
       }
     },
     {
-      "title": "Entangling gates for the SU(N) anyons",
-      "abstract": "The model of a topological quantum computer is a promising one due to its natural resistance to noise and other errors. Operations in such a computer are implemented by braiding the trajectories of anyons. While it is easy to understand how to build one-qubit operations, two-qubit operations are more difficult. In arXiv:2412.20931 we suggested an approach to build such operations for a topological quantum computer based on SU(2) Chern-Simons theory with arbitrary level using cabling of knots. In this paper we discuss how this approach should be generalized to the SU(N) case, what the differences are, and which new problems arise.",
-      "arxiv_id": "2605.04016v1",
+      "title": "Microscopic theory of a radiation-balanced solar laser",
+      "abstract": "We develop a microscopic open-quantum-system theory for a radiation-balanced solar laser (RBSL) based on ytterbium-doped yttrium aluminum garnet (Yb:YAG), in which optical gain, thermal redistribution among sublevels of the electronic ground and excited manifolds, and lattice-temperature dynamics are treated within a unified framework. Starting from a Lindblad master equation for a multilevel gain medium coupled to a cavity mode, we include incoherent solar pumping, spontaneous emission, cavity loss, and phonon-assisted intra-manifold relaxation obeying detailed balance. In the regime of fast thermalization within each electronic manifold, a compact temperature-dependent two-level model is derived, in which the gain, inversion, and lasing threshold are controlled by Boltzmann occupation factors and partition functions of the electronic sublevels. This microscopic reduction is then coupled self-consistently to a thermal balance equation accounting for anti-Stokes fluorescence cooling, quantum-defect heating, parasitic absorption, and heat exchange with the environment. The theory predicts several operating regimes, including pure cooling, lasing with net cooling, and lasing with net heating, as well as dynamical effects such as delayed lasing onset induced by self-cooling into threshold. In contrast to earlier radiation-balanced laser (RBL) models based mainly on macroscopic rate equations and thermodynamic balance arguments, the present approach provides a microscopic description of the feedback between quantum optical dynamics and temperature redistribution. It therefore offers a physically transparent framework for analyzing RBSLs and for identifying design strategies that exploit level structure, thermalization, and photonic-environment engineering to stabilize laser operation while minimizing internal heat load.",
+      "arxiv_id": "2605.03296v1",
       "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.04016v1",
+      "url": "http://arxiv.org/abs/2605.03296v1",
       "authors": [
-        "Sergey Mironov",
-        "Andrey Morozov"
+        "Ahmed Jaber",
+        "Michael Küblböck",
+        "Jean-Michel Ménard"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出基于SU(N) Chern-Simons理论的缆化绳结方法实现拓扑量子纠缠门，推广了SU(2)方案并解决多分量任意子两比特门难题。",
-        "research思路": "针对拓扑量子计算中通用纠缠门难以构造的问题，借鉴绳结代数与拓扑不变量，将SU(2)缆化技术扩展至高对称性SU(N)任意子系统。",
-        "experiment": "采用数学缆化（cabling）技术对纽结进行复合，结合量子群表示与融合空间分析，通过拓扑量子场论计算编织矩阵元。",
-        "innovation": "首次将缆化绳结方法应用于SU(N)任意子，构建了除编织操作外的显式纠缠门方案，并指出了融合空间维数增长的计算挑战。",
-        "related_work": "包括Kitaev的拓扑量子计算模型、Freedman等人的拓扑量子门理论，以及同作者前序工作arXiv:2412.20931（SU(2)情形），以及Cui等人关于SU(N)任意子的研究。",
-        "impact": "为基于高对称性任意子的量子计算机提供关键门操作路径，推动拓扑量子计算实用化，并深化拓扑量子场论与量子信息的交叉研究。"
+        "summary": "开发了Yb:YAG辐射平衡太阳能激光器的微观开放量子系统理论，将光学增益、热弛豫与晶格温度动力学在统一Lindblad框架下处理，推导出温度依赖的两能级模型并自洽耦合热平衡方程。",
+        "research思路": "解决太阳能激光器中光-物质相互作用与热管理耦合的核心问题，将传统激光物理中分离处理的增益介质能级结构、声子弛豫和晶格加热在量子统计框架下统一描述，实现无热负荷激光运转的理论预测。",
+        "experiment": "基于Lindblad主方程建立多能级增益介质耦合腔模的理论模型；引入非相干太阳泵浦、自发辐射、腔损耗和满足详细平衡的声子辅助流形内弛豫；在快速热化极限下约化为温度依赖的两能级模型并耦合热平衡方程。",
+        "innovation": "首次将微观量子理论应用于辐射平衡激光器，建立增益/反转/阈值与电子子能级玻尔兹曼占据因子和配分函数的显式关系；实现增益动力学与反斯托克斯荧光冷却的自洽耦合；为辐射平衡激光器提供了普适的理论预测工具。",
+        "related_work": "辐射平衡激光概念（Bog模等）、Yb:YAG太阳能泵浦激光（枋口组等）、激光热效应理论、荧光冷却理论（Epstein组）、固体激光器速率方程模型。",
+        "impact": "为辐射平衡太阳能激光器的设计和优化提供了严谨的微观理论基础，架起了宏观激光工程与量子统计力学的桥梁，对高功率太阳泵浦激光、太空中激光应用等领域具有重要指导意义。"
       }
     },
     {
-      "title": "Factoring $2048$ bit RSA integers with a half-million-qubit modular atomic processor",
-      "abstract": "Shor's algorithm is one of the most promising applications of quantum computers. However, since $\\sim 10^6$ physical qubits are believed to be required for established approaches, the algorithm will need to be distributed across many modules. In this paper, we provide a distributed compilation of Shor's algorithm on a modular atomic processor. We present an end-to-end compilation and optimization strategy that focuses on the interplay between the inter-module communication and the intra-module clock rate. With a half-million-qubit modular atomic processor with a communication rate of $10^5$ Bell pairs per second and a measurement time of 1 ms in a CPU-inspired architecture, we demonstrate that 2048-bit RSA integers can be factored in only 16\\% more time than a single-module architecture. Our work presents the first end-to-end analysis and simulation of large-scale integer factorization on modular atomic hardware and it provides a blueprint for the future design of other large-scale modular algorithms.",
-      "arxiv_id": "2605.03951v1",
+      "title": "OptiLookUp: An Optical ROM-Based Loop up Table Engine for Photonic Accelerators",
+      "abstract": "Read-only memory (ROM) provides deterministic access to predefined data mappings. Extending ROM concepts to the optical domain enables high-bandwidth, low-latency, and parallel memory access, but realizing compact and reconfigurable optical ROM remains challenging due to loss, wavelength control, and integration constraints. This work presents a high-speed, reconfigurable photonic ROM architecture implemented using integrated microring resonators (MRRs). The ROM encodes predefined input-output mappings directly in the spectral response of the photonic devices, enabling deterministic lookup-based operation without dynamic computation during readout. To improve scalability and reduce cumulative insertion loss, the architecture employs compact banked sub-arrays that are selectively addressed through an optical decoding mechanism. Reconfigurability is achieved using transistor-based optical selectors, allowing different ROM banks to be activated without physical light rerouting or interferometric structures. The proposed photonic ROM is designed and evaluated using device-level simulations based on the GlobalFoundries 45SPCLO silicon photonics platform. Simulation results demonstrate reliable operation at data rates up to 12.5 GHz, with stable light-to-current transfer characteristics obtained through integrated photodiode readout. The optical ROM can be used to implement nonlinear activation functions utilised in photonic accelerator architectures, including sigmoid, tanh, ReLU, and exponential mappings.",
+      "arxiv_id": "2605.03241v1",
       "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03951v1",
+      "url": "http://arxiv.org/abs/2605.03241v1",
       "authors": [
-        "Tian Xue",
-        "Jacob P. Covey"
+        "Ankur Singh",
+        "Akhilesh Jaiswal"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "该论文首次在模块化原子量子处理器上实现端到端分布式Shor算法编译，利用50万量子比特系统成功分解2048位RSA整数，分解时间仅比单模块架构增加16%。",
-        "research思路": "针对Shor算法需要约百万量子比特而无法在单模块实现的问题，研究采用模块化分布式架构，通过优化模块间通信速率与模块内时钟速率的平衡，实现大规模量子计算任务的有效分解。",
-        "experiment": "采用CPU启发式架构设计半百万量子比特模块化原子处理器，设定模块间通信速率为10^5 Bell对/秒、单次测量时间1ms，并进行端到端编译优化和性能模拟验证。",
-        "innovation": "首次提供模块化原子硬件上大规模整数分解的端到端分析与模拟；提出模块间通信与模块内时钟速率协同优化策略；实现2048位RSA分解仅增加16%时间开销的突破性效率。",
-        "related_work": "相关工作包括Shor算法的原始提出、量子纠错码研究、分布式量子计算架构、离子阱/超导量子比特模块化方案，以及先前认为需要~10^6物理比特的估算研究。",
-        "impact": "该工作为百万量子比特级量子计算机提供了可行的模块化实现蓝图，指明了原子量子处理器在大规模密码学应用中的潜力，对未来量子计算硬件设计和分布式算法编译具有重要指导意义。"
+        "summary": "提出基于微环谐振器的光学ROM架构，通过光谱编码实现高速确定性查找，利用banked子阵列和晶体管选择器突破光学存储的紧凑性与可重构性瓶颈。",
+        "research思路": "解决光学域ROM面临的高损耗、波长控制复杂、集成困难等问题，探索在光子芯片上实现紧凑、可重构且低插入损耗的只读存储器。",
+        "experiment": "采用集成微环谐振器(MRRs)阵列构建ROM核心，通过光学解码实现banked子阵列选择性寻址，使用晶体管基光学选择器控制 bank's激活。",
+        "innovation": "首次将ROM查找表概念完整迁移至光子域；实现读取时无需动态计算的确定性操作；兼顾可重构性与低损耗的可扩展架构设计。",
+        "related_work": "光子矩阵计算、光学神经网络、片上光互连、微波光子存储、集成光子器件的波长多路复用技术。",
+        "impact": "为光子加速器提供高效的查找表引擎支撑，推动光子计算从矩阵运算向更复杂的数据映射扩展，对AI推理和高性能计算具有重要应用价值。"
       }
     }
   ]

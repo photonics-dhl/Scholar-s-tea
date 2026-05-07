@@ -293,25 +293,24 @@ export default function GroupPostDetailPage() {
 
         {/* Vote & Content */}
         <div className="flex gap-0">
-          {/* 左侧投票区 */}
-          <div className="flex flex-col items-center gap-1 px-4 py-6 bg-muted/20 min-w-[72px]">
+          {/* 左侧投票区 - 弱化设计 */}
+          <div className="flex flex-col items-center gap-0.5 px-3 py-5 min-w-[52px]">
             <Button
               variant="ghost"
               size="icon"
               className={cn(
-                'h-9 w-9 rounded-lg transition-all',
+                'h-7 w-7 rounded-md transition-colors',
                 userVote === 1
-                  ? 'bg-orange-100 text-orange-600 hover:bg-orange-200 hover:text-orange-700'
-                  : 'hover:bg-tea-primary/10 hover:text-tea-primary'
+                  ? 'text-tea-primary'
+                  : 'text-gray-300 hover:text-gray-400'
               )}
               onClick={() => handleVote(1)}
               disabled={voting}
             >
-              <ArrowUp className="h-5 w-5" />
+              <ArrowUp className="h-4 w-4" />
             </Button>
             <span className={cn(
-              'text-lg font-bold tabular-nums',
-              userVote === 1 ? 'text-orange-600' : userVote === -1 ? 'text-blue-600' : 'text-foreground'
+              'text-sm font-medium tabular-nums text-muted-foreground/70',
             )}>
               {post.score}
             </span>
@@ -319,20 +318,20 @@ export default function GroupPostDetailPage() {
               variant="ghost"
               size="icon"
               className={cn(
-                'h-9 w-9 rounded-lg transition-all',
+                'h-7 w-7 rounded-md transition-colors',
                 userVote === -1
-                  ? 'bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-700'
-                  : 'hover:bg-destructive/10 hover:text-destructive'
+                  ? 'text-blue-400'
+                  : 'text-gray-300 hover:text-gray-400'
               )}
               onClick={() => handleVote(-1)}
               disabled={voting}
             >
-              <ArrowDown className="h-5 w-5" />
+              <ArrowDown className="h-4 w-4" />
             </Button>
           </div>
 
           {/* 右侧内容区 */}
-          <div className="flex-1 p-6 pl-4">
+          <div className="flex-1 p-6 pl-3">
             <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-a:text-tea-primary prose-a:no-underline hover:prose-a:underline">
               <div
                 className="prose-content"

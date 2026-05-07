@@ -1,0 +1,39 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e83]
+  - generic [ref=e270]:
+    - generic [ref=e271]:
+      - heading "加入我们" [level=1] [ref=e272]
+      - paragraph [ref=e273]: 创建账号，开启学术交流之旅
+    - generic [ref=e274]:
+      - generic [ref=e275]:
+        - heading "注册" [level=3] [ref=e276]
+        - paragraph [ref=e277]: 填写信息创建您的账号
+      - generic [ref=e278]:
+        - button "使用 GitHub 注册" [ref=e280] [cursor=pointer]:
+          - img [ref=e281]
+          - generic [ref=e284]: 使用 GitHub 注册
+        - generic [ref=e288]: 或使用邮箱注册
+        - generic [ref=e289]:
+          - generic [ref=e290]:
+            - text: 昵称
+            - generic [ref=e291]:
+              - img [ref=e292]
+              - textbox "昵称" [ref=e295]:
+                - /placeholder: 您的昵称
+          - generic [ref=e296]:
+            - text: 邮箱
+            - generic [ref=e297]:
+              - img [ref=e298]
+              - textbox "邮箱" [ref=e301]:
+                - /placeholder: your@email.com
+          - generic [ref=e302]:
+            - text: 密码
+            - generic [ref=e303]:
+              - img [ref=e304]
+              - textbox "密码" [ref=e307]:
+                - /placeholder: 设置密码
+          - button "创建账号" [ref=e308] [cursor=pointer]
+    - paragraph [ref=e309]:
+      - text: 已有账号？
+      - link "登录" [ref=e310] [cursor=pointer]:
+        - /url: /signin

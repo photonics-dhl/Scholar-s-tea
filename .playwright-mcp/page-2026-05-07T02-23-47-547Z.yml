@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e83]
+  - generic [ref=e152]:
+    - banner [ref=e153]:
+      - generic [ref=e154]:
+        - link "Scholar's Tea" [ref=e155] [cursor=pointer]:
+          - /url: /
+          - img [ref=e157]
+          - generic [ref=e160]: Scholar's Tea
+        - navigation [ref=e161]:
+          - link "学科" [ref=e162] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e163]
+            - text: 学科
+          - link "课题组" [ref=e166] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e167]
+            - text: 课题组
+          - link "思想工坊" [ref=e172] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e173]
+            - text: 思想工坊
+          - link "茶话会" [ref=e175] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e176]
+            - text: 茶话会
+          - link "TOP10" [ref=e179] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e180]
+            - text: TOP10
+        - button "搜索 /" [ref=e186] [cursor=pointer]:
+          - img [ref=e187]
+          - generic [ref=e190]: 搜索
+          - generic [ref=e191]: /
+        - button "登录" [ref=e193] [cursor=pointer]:
+          - link "登录" [ref=e194]:
+            - /url: /signin
+    - main [ref=e195]:
+      - generic [ref=e197]:
+        - generic [ref=e198]:
+          - generic [ref=e199]:
+            - button [ref=e200] [cursor=pointer]:
+              - img [ref=e201]
+            - generic [ref=e203]:
+              - heading "Claude测试房间" [level=1] [ref=e205]
+              - paragraph [ref=e209]: Claude AI 可测试的聊天室
+          - button "0" [ref=e211] [cursor=pointer]:
+            - img [ref=e212]
+            - generic [ref=e217]: "0"
+        - generic [ref=e221]:
+          - generic [ref=e222]:
+            - textbox "连接中..." [disabled] [ref=e223]
+            - button [disabled]:
+              - img
+          - paragraph [ref=e224]: 0/500
+    - contentinfo [ref=e225]:
+      - paragraph [ref=e227]: Scholar's Tea 学者茶话会 · 高校学术交流社区

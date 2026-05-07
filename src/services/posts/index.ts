@@ -40,6 +40,7 @@ export interface CreatePostInput {
   title: string;
   content: string;
   disciplineId?: string;
+  groupId?: string;
   tags?: string[];
 }
 
@@ -58,16 +59,18 @@ export type SortOrder = 'latest' | 'hot' | 'pinned';
 
 export async function getPosts(params: {
   disciplineId?: string;
+  groupId?: string;
   authorId?: string;
   page?: number;
   pageSize?: number;
   sort?: SortOrder;
   search?: string;
 }) {
-  const { disciplineId, authorId, page = 1, pageSize = 20, sort = 'latest', search } = params;
+  const { disciplineId, groupId, authorId, page = 1, pageSize = 20, sort = 'latest', search } = params;
 
   const where: Prisma.PostWhereInput = {
     ...(disciplineId && { disciplineId }),
+    ...(groupId && { groupId }),
     ...(authorId && { authorId }),
     ...(search && {
       OR: [
@@ -261,7 +264,7 @@ export async function getPostsByDisciplineSlug(slug: string, params: {
 // ============================================
 
 export async function createPost(authorId: string, data: CreatePostInput) {
-  const { title, content, disciplineId, tags } = data;
+  const { title, content, disciplineId, groupId, tags } = data;
 
   return prisma.post.create({
     data: {
@@ -269,6 +272,7 @@ export async function createPost(authorId: string, data: CreatePostInput) {
       content,
       authorId,
       disciplineId,
+      groupId,
       tags: tags && tags.length > 0 ? {
         create: tags.map((name) => ({
           tag: {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ArrowLeft, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MessageList } from '@/components/features/tea-party/MessageList';
@@ -61,6 +62,9 @@ export default function TeaPartyRoomPage() {
   const params = useParams();
   const router = useRouter();
   const roomId = params.roomId as string;
+
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
 
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
@@ -149,9 +153,9 @@ export default function TeaPartyRoomPage() {
     };
   }, [socket, addMessage]);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = (content: string, type?: string) => {
     if (!content.trim()) return;
-    sendMessage(content);
+    sendMessage(content, type || 'TEXT');
   };
 
   const handleTyping = (isTyping: boolean) => {
@@ -222,6 +226,7 @@ export default function TeaPartyRoomPage() {
             messages={messages}
             typingUsers={typingUsers}
             roomId={roomId}
+            currentUserId={currentUserId}
           />
         </div>
 

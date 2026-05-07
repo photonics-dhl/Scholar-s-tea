@@ -94,6 +94,7 @@ export interface GroupWithRelations {
     publications: number;
     news: number;
     patents: number;
+    posts: number;
   };
   members: GroupMemberWithUser[];
   disciplines: {

@@ -29,9 +29,10 @@ interface MessageListProps {
   messages: Message[];
   typingUsers: TypingUser[];
   roomId: string;
+  currentUserId?: string;
 }
 
-export function MessageList({ messages, typingUsers, roomId }: MessageListProps) {
+export function MessageList({ messages, typingUsers, roomId, currentUserId }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
 
@@ -53,11 +54,32 @@ export function MessageList({ messages, typingUsers, roomId }: MessageListProps)
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="flex-1 overflow-y-auto px-4 py-4 gap-4"
+      className="flex-1 overflow-y-auto px-4 py-4 space-y-1"
     >
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
-      ))}
+      {messages.map((message, index) => {
+        const isOwn = message.userId === currentUserId;
+        // Check if previous message is from the same user (for grouping)
+        const prevMessage = index > 0 ? messages[index - 1] : null;
+        const isGrouped = prevMessage !== null 
+          && prevMessage.userId === message.userId 
+          && prevMessage.type !== 'SYSTEM'
+          && message.type !== 'SYSTEM';
+        // Check if next message is from the same user
+        const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+        const isLastInGroup = nextMessage === null 
+          || nextMessage.userId !== message.userId 
+          || nextMessage.type === 'SYSTEM';
+
+        return (
+          <MessageItem 
+            key={message.id} 
+            message={message} 
+            isOwn={isOwn}
+            isGrouped={isGrouped}
+            isLastInGroup={isLastInGroup}
+          />
+        );
+      })}
 
       {typingUsers.length > 0 && (
         <TypingIndicator users={typingUsers} />

@@ -1,6 +1,23 @@
 import { prisma } from '@/lib/db/prisma';
 import type { Prisma } from '@prisma/client';
 
+// Proxy support for server-side fetch
+let _fetch: typeof fetch = fetch;
+let _agent: any = undefined;
+if (typeof window === 'undefined') {
+  const proxyUrl = process.env.http_proxy || process.env.https_proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+  if (proxyUrl) {
+    try {
+      const nodeFetch = require('node-fetch');
+      const { HttpsProxyAgent } = require('https-proxy-agent');
+      _fetch = nodeFetch.default || nodeFetch;
+      _agent = new HttpsProxyAgent(proxyUrl);
+    } catch {
+      // Fallback to native fetch
+    }
+  }
+}
+
 interface EmbeddingResult {
   embedding: number[];
   error?: string;
@@ -19,15 +36,15 @@ interface SearchResult {
 const EMBEDDING_MODEL = 'text-embedding-3-small';
 
 export async function generateEmbedding(text: string): Promise<EmbeddingResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
+  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
 
   if (!apiKey) {
     return { embedding: [], error: 'API key not configured' };
   }
 
   try {
-    const response = await fetch(`${baseUrl}/embeddings`, {
+    const response = await _fetch(`${baseUrl}/embeddings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +54,8 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
         model: EMBEDDING_MODEL,
         input: text.slice(0, 8000),
       }),
-    });
+      agent: _agent,
+    } as any);
 
     if (!response.ok) {
       const errorText = await response.text();

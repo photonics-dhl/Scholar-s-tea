@@ -2,65 +2,82 @@
   "domain_name": "超材料与纳米光学",
   "papers": [
     {
-      "title": "Neural-network reconstruction of THz transmission spectra using electrically tunable AlGaN/GaN plasmonic-crystal analyzer",
-      "abstract": "We demonstrate machine learning (ML) based reconstruction of terahertz transmission spectra using an electrically tunable grating-gate AlGaN/GaN plasmonic-crystal analyzer. The analyzer encodes the transmission spectrum into a voltage-dependent intensity, which is then inverted by an ML algorithm. A feedforward neural network trained on a synthetic dataset is validated experimentally on four samples in standard Fourier Transform Infrared (FTIR) mode and in direct (fixed-mirror) acquisition mode. The network achieves a mean square error (MSE) of the reconstruction of 0.015 in FTIR mode and 0.038 in direct mode, correctly identifying six out of seven ground-truth resonances in each mode. Against a first-difference Tikhonov regularization baseline, the mean reconstruction error is reduced 3.6 times in FTIR mode and 1.55 times in direct mode, with fewer spurious peaks and lower peak-position errors. Voltage-tunable plasmonic filtering combined with neural-network inversion establishes an interferometer-free architecture for THz spectral reconstruction.",
-      "arxiv_id": "2605.03778v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03778v1",
+      "title": "Flat optics for analog computing: from fundamental mechanisms to advanced meta-processors",
+      "abstract": "As the explosive growth of visual data increasingly strains the latency and energy limits of conventional electronic computing, optical analog computing has re-emerged as a disruptive paradigm for zero-power, speed-of-light information processing. Propelled by the unprecedented wave-manipulation capabilities of optical metasurfaces, this field is undergoing a rapid transition from macroscopic physical optics to ultra-compact, on-chip meta-processors. This Review examines the fundamental mechanisms of metasurface-empowered optical computing spanning Fourier-domain, nonlocal spatial-domain, and interferometric architectures that perform mathematical operations, with a particular focus on spatial differentiation and edge detection as representative computing tasks. By emphasizing recent breakthroughs, we highlight the evolution of meta-processors from static, linear regimes to dynamically reconfigurable, nonlinear, and quantum-assisted multidimensional platforms. We also envision how the synergy of AI-driven inverse design and the integration of analog meta-front-ends with optical neural networks will synergistically revolutionize next-generation intelligent machine vision.",
+      "arxiv_id": "2604.16849v1",
+      "published": "2026-04-18",
+      "url": "http://arxiv.org/abs/2604.16849v1",
       "authors": [
-        "A. Witkowska",
-        "M. Dub",
-        "P. Sai"
+        "Tingting Liu",
+        "Jumin Qiu",
+        "Xintong Shi"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "利用电调谐AlGaN/GaN等离子体晶体结合前馈神经网络，实现太赫兹透射光谱的快速重建，在FTIR和直接模式下均获得低MSE和准确的共振峰识别。",
-        "research思路": "将复杂太赫兹光谱信息压缩编码为电压依赖的光强响应，通过训练神经网络逆向求解这一映射关系，实现从单探测器电压信号重建完整光谱。",
-        "experiment": "采用光栅门AlGaN/GaN HEMT结构实现电调谐等离子体滤波；合成数据集训练前馈网络；分别在FTIR干涉仪模式和固定镜直接采集模式进行实验验证。",
-        "innovation": "首次将神经网络与电调谐等离子体晶体结合进行光谱重建；双模式验证证明了方法的通用性；相比Tikhonov正则化baseline，误差降低1.55-3.6倍，伪峰显著减少。",
-        "related_work": "包括太赫兹等离子体光子学器件、等离子体波红外探测器、机器学习光谱分析、以及压缩感知光谱仪等研究。",
-        "impact": "为紧凑型、低成本太赫兹光谱检测提供了新范式，推动了智能光谱仪和片上光谱分析的发展，具有重要的应用前景。"
+        "summary": "综述超表面赋能的光学模拟计算机制与进展，从傅里叶域、微分运算到动态可重构元处理器，展望低功耗高速光学计算新范式。",
+        "research思路": "针对视觉数据处理中电子计算的延迟与能耗瓶颈，探索基于超表面的光学模拟计算实现数学运算，重点突破空间微分与边缘检测。",
+        "experiment": "采用超表面波前工程实现傅里叶变换与空间微分，涵盖干涉仪架构与非局部响应机制，演示从静态线性到动态可重构系统的演进。",
+        "innovation": "首次系统综述超表面光学计算从基础机制到多维平台的完整发展路径，实现从宏观光学向芯片级元处理器的技术跨越。",
+        "related_work": "涵盖基于傅里叶光学的传统模拟计算、超表面波前调控、非线性光学处理及量子光学计算等领域的代表性工作。",
+        "impact": "为下一代零功耗、低延迟计算提供技术路线图，推动光学计算从实验室演示向实际应用转化，对AI视觉处理意义重大。"
       },
       "domain_trend": {
-        "trend": "超材料与纳米光学领域正经历从理论验证向智能实用化的范式转变，AI赋能光谱重建、轨道角动量结构光非线性调控与超表面商业化三大方向齐头并进，预示着集成化、智能化光子芯片的崛起。"
+        "trend": "超表面驱动的多功能光学系统正从实验室走向实际应用，融合光学计算、AI感知与生物传感，朝着芯片级低功耗智能光学处理器方向发展。",
+        "key_topics": [
+          "超表面光学计算与模拟信号处理",
+          "等离子体纳米结构增强机理与应用",
+          "光学传感与环境纳米塑料检测",
+          "可重构多功能集成光子器件",
+          "AI视觉处理的光学加速"
+        ],
+        "development_direction": "该领域正朝着三大方向演进：(1)超表面赋能的光学模拟计算向低功耗、高并行、动态可重构方向发展，为AI视觉处理提供物理层加速；(2)等离子体纳米天线通过几何工程调控光-物质相互作用，实现高灵敏传感与高效光源；(3)环境/生物检测向快速、原位、低成本技术演进，SSBD等新技术将推动纳米塑料等新兴污染物检测。未来趋势是多功能集成——在同一芯片上融合计算、感知、调控功能，实现智能光学系统的片上化。"
       }
     },
     {
-      "title": "[PDF] Nonlinear optics with structured light",
-      "abstract": "Keywords: wave mixing; parametric conversion; high harmonic generation; structured light; photonic crystals; holography; nonlinear optics; second harmonic generation; metasurfaces Buono WT, Forbes A. Structure Behaviour observed Relations Laguerre-Gaussian OAM operations36,47,51 Radial selection rul",
-      "source": "tavily",
-      "url": "https://www.oejournal.org/oea/en/article/pdf/preview/10.29026/oea.2022.210174.pdf",
-      "authors": [],
+      "title": "Toroidal Plasmonic Nanodimers for Enhanced Near-Infrared Emission in Heterostructured InP Quantum Dots",
+      "abstract": "Near-infrared (NIR) emitters operating in the 650-900 nm range are highly attractive for imaging and sensing in turbid media; however, cadmium-free InP-based quantum dots (QDs) often suffer from limited brightness due to nonradiative pathways and inefficient photon outcoupling. In particular, heterostructured InP QDs can exhibit band alignments that induce partial spatial separation of charge carriers, leading to reduced electron-hole wavefunction overlap. This modifies intrinsic recombination dynamics and enhances the sensitivity of their emission to the surrounding photonic environment. Here, we investigate silver toroidal plasmonic nanoantenna dimers (Ag TPNDs) through finite-difference-time-domain (FDTD) simulations as a geometry-tunable platform for enhancing NIR emission of heterostructured InP-based QDs. The coupled toroidal geometry supports strongly confined bonding modes that generate intense nanogap hotspots, while its resonance can be systematically tuned through the toroid aspect ratio. By spectrally aligning the antenna response with QD emission bands (675-845 nm), we achieve large Purcell enhancements together with high quantum efficiencies, demonstrating efficient conversion of enhanced decay rates into radiative emission. We further show that nanometer-scale variations in emitter-antenna separation strongly modulate the radiative rates and spectral response. These results establish toroidal plasmonic nanodimers as a topology-driven platform for controlling emission in NIR quantum emitters and for advancing NIR nanophotonic applications.",
+      "arxiv_id": "2604.14992v1",
+      "published": "2026-04-16",
+      "url": "http://arxiv.org/abs/2604.14992v1",
+      "authors": [
+        "Arda Gulucu",
+        "Emre Ozan Polat"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "系统综述了结构光场（如轨道角动量光束）在二阶、高阶非线性光学过程中的调控机制与物理规律。",
-        "research思路": "探索具有空间相位结构的结构光如何突破传统选择定则限制，实现新型波混频、参数转换和谐波产生过程。",
-        "experiment": "采用超表面、光子晶体等微纳结构实现结构光场产生与非线性过程耦合，结合全息术与OAM模式选择技术。",
-        "innovation": "将轨道角动量(OAM)自由度引入非线性光学，建立结构光的径向与角向选择定则，突破标量光学极限。",
-        "related_work": "Zhong-Ning Chen超表面非线性光学、Willatts结构光波混频研究、 Forbes团队OAM光束产生与操控系列工作。",
-        "impact": "为光通信、光信息处理提供新范式，推动微纳光子器件与量子光源研发，对结构光物理与应用光学有重要指导价值。"
+        "summary": "通过FDTD模拟研究银环形等离子体纳米天线二聚体，利用其强约束键合模式和纳米间隙热点，显著增强异质结构InP量子点的近红外发射。",
+        "research思路": "针对不含镉InP量子点因载流子空间分离和非辐射复合导致的亮度受限问题，利用等离子体纳米天线调控其周围光子环境，从而优化辐射复合动力学。",
+        "experiment": "采用有限差分时域(FDTD)仿真方法，构建可调几何参数的银环形纳米天线二聚体模型，系统模拟其共振特性与量子点发射的耦合效果。",
+        "innovation": "引入环形几何结构产生强约束键合模式，首次系统研究TPNDs几何参数与共振波长的构效关系，实现对近红外区域的精确调谐。",
+        "related_work": "量子点等离子体增强领域、等离子体纳米天线设计、InP基近红外发光材料、以及异质结构量子点的载流子动力学调控研究。",
+        "impact": "为开发高效无镉近红外光源提供了新思路，推动等离子体纳米天线在生物成像和传感领域的应用，尤其对650-900nm波段器件设计具有重要指导意义。"
       }
     },
     {
-      "title": "Metasurfaces go mainstream | Nature Photonics",
-      "abstract": "December 22, 2022 - Researchers often define metamaterials as manmade composite or structured media that exhibit properties that are not naturally available, such as negative refraction . However, ‘unnatural’ properties are not a requirement for a media to be",
-      "source": "tavily",
-      "url": "https://www.nature.com/articles/s41566-022-01137-1",
-      "authors": [],
+      "title": "Ultrasensitive Nanoplastics Detection Leveraging Shrinking Surface Plasmonic Bubble",
+      "abstract": "Nanoplastics pose serious environmental and health risks due to their widespread presence in aquatic systems. Detecting trace amounts of nanoplastics is a challenging task, which currently requires sophisticated equipment and tedious sample preparation (e.g., ultrafiltration). In this work, we demonstrate an ultra-sensitive Shrinking Surface Bubble Deposition (SSBD) technique for nanoplastics detection. SSBD leverages plasmonic photothermal effects to generate a surface bubble and the resulting Marangoni flow to concentrate sparsely suspended nanoplastics onto the bubble surface. The collected nanoplastic particles are subsequently deposited on the substrate after the bubble shrinks and vanishes. To quantify the detection limit of SSBD for nanoplastics in water, core-shell gold plasmonic nanoparticles are mixed with the aqueous sample to enable photothermal bubble generation, while also supporting surface-enhanced Raman spectroscopy (SERS) for signal enhancement. Results show that the limits of detection are 10 ng/mL, 10-1 ng/mL and 10-3 ng/mL for polystyrene (PS) particles with diameters of 500 nm, 200 nm and 30 nm, respectively. We further used SSBD to detect plastics particles in real drinking water (e.g., bottled and fountain water) and found polyamides (PA) and polypropylene (PP) micro/nanoplastics, demonstrating the potential of the SSBD-SERS technique as a versatile and sensitive platform for detecting trace-level nanoplastic contamination and assessing human exposure risk.",
+      "arxiv_id": "2604.10871v1",
+      "published": "2026-04-13",
+      "url": "http://arxiv.org/abs/2604.10871v1",
+      "authors": [
+        "Yang Liu",
+        "Renzheng Zhang",
+        "Amartya Mandal"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "该文综述了超表面(metasurfaces)技术从实验室研究向实际应用与商业化转化的里程碑式进展,探讨其成为光学主流技术的演进历程。",
-        "research思路": "系统性回顾超表面领域的核心技术突破——从超颖材料到平面超表面的范式转变,分析介观尺度光场调控的物理机制及器件化进程。",
-        "experiment": "作为综述性论文,主要综合分析多项实验工作:包括基于几何相位的超表面设计、介质纳米天线阵列制备、多功能集成器件演示等关键技术。",
-        "innovation": "相较于早期三维块状超颖材料,该文强调平面化、低损粍、易集成的超表面方案,突破传统光学元件体积限制,实现轻薄化光电器件。",
-        "related_work": "重要关联工作包括:Yankov等(III-V族半导体超表面)、Hsiao等(钙钛矿超表面)、Arbabi等(MEMS可调超表面)、Capasso组的广义Snell定律工作。",
-        "impact": "该综述标志着超表面从物理概念验证进入工程应用阶段,为AR/VR、传感成像、量子光源等应用领域提供重要参考,推动光子学产业革新。"
+        "summary": "开发了SSBD技术，利用等离子体光热效应产生表面气泡和Marangoni流动实现纳米塑料的快速富集与SERS检测，无需复杂设备即可实现超灵敏检测。",
+        "research思路": "解决水体中痕量纳米塑料难以检测的问题，突破传统方法需要超滤等繁琐样品准备的局限，实现对稀疏悬浮纳米塑料的原位富集与高灵敏检测。",
+        "experiment": "采用核壳结构金等离子体纳米粒子混合样品溶液，通过激光照射产生光热气泡，Marangoni流动将纳米塑料输运至气泡表面，气泡收缩后颗粒沉积于基底进行SERS分析。",
+        "innovation": "创新性结合气泡生成与SERS增强双功能，利用Marangoni流动实现选择性富集，气泡收缩过程自然完成样品沉积，避免了传统过滤和浓缩步骤。",
+        "related_work": "纳米塑料检测领域涉及超滤分离、荧光标记、质谱分析等技术；SERS检测方面有各种纳米结构基底研究；光热气泡操控粒子方面有微流控和液滴蒸发相关工作。",
+        "impact": "为环境水中纳米塑料的原位快速检测提供了新思路，降低了对精密仪器和复杂操作的依赖，有望推动纳米塑料环境监测技术的实用化发展。"
       }
     }
   ]

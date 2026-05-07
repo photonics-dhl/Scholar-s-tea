@@ -2,82 +2,52 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "Resource-efficient parallel entanglement generation for multinode quantum networks via time-bin multiplexing",
-      "abstract": "Nonlocal entanglement generation among multiple remote quantum nodes provides a critical foundation for a variety of counterintuitive quantum applications. The exponential loss of photons transmitting over optical fibers sets an upper limit for entangling these quantum nodes. Here, we propose a resource-efficient and parallel protocol for entangling multiple remote quantum nodes via time-bin multiplexing. The transmission of a single photon with qudit-encoding in the time-bin mode enables entangling multiple stationary qubits in parallel, when single photons and individual stationary qubits interfaces are used and photon-state modulations are properly introduced before subsequently impinging the photon into each interface. Our protocol can generate parallel multipartite entanglement among ($N\\geq3$) quantum nodes with the dimension of the photonic time bins independent of $N$, exponentially reducing the requirements for the coherence time of the stationary qubits and for the complexity of the photonic modulations. These distinct features make our protocol particularly advantageous for the development of multinode quantum networks.",
-      "arxiv_id": "2605.03682v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03682v1",
+      "title": "Flexible misaligned fiber-optic sensor for respiration and heart rate monitoring",
+      "abstract": "",
+      "doi": "10.1016/j.yofte.2026.104579",
+      "url": "https://doi.org/10.1016/j.yofte.2026.104579",
       "authors": [
-        "Wenbo Zhang",
-        "Jing Zheng",
-        "Yimin Wang"
+        "Mei Yang",
+        "Yinggang Liu",
+        "Zhihao Wei",
+        "Min Shao"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Optical Fiber Technology",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "提出基于时间bin复用的资源高效并行纠缠生成协议，利用携带qudit编码的单个时间bin光子实现多节点量子纠缠，突破性地将时间bin维度与节点数解耦，大幅降低相干时间和系统复杂度要求。",
-        "research思路": "针对多节点量子网络中光子传输指数损耗限制并行纠缠效率的科学问题，提出利用单光子的高维时间bin编码在多个量子接口间并行建立纠缠，突破传统方案中时间bin维度需随节点数指数增长的瓶颈。",
-        "experiment": "采用单光子-静止量子比特接口结合光子态调制技术，通过预先编码的时间bin qudit态在N个分布式节点依次作用，利用时间维度自由度实现多路并行纠缠分发，协议结构为线性链式或星型配置。",
-        "innovation": "首次实现用单个光子并行纠缠多个(N≥3)量子节点；时间bin维度d独立于节点数N；量子系统资源需求从指数级降至线性或常数级别；对静止量子比特相干时间要求从O(N)降低至O(1)量级。",
-        "related_work": "相关重要工作包括：量子中继器架构研究、时间bin编码量子密钥分发、腔QED接口技术、多节点量子网络纠缠分发协议、复用技术在量子通信中的应用（如频率复用、空分复用）、以及基于光子数分裂攻击的量子网络安全性研究。",
-        "impact": "该工作为可扩展量子网络提供了关键使能技术，降低了实用化多节点量子纠缠的技术门槛；时间bin复用方案与现有光纤通信基础设施高度兼容；对分布式量子计算、量子密钥分发网络及量子云平台等应用具有重要推动作用。"
+        "summary": "请提供论文摘要或完整内容，以便进行准确的结构化分析。",
+        "research思路": "（需获取论文信息后再填写）",
+        "experiment": "（需获取论文信息后再填写）",
+        "innovation": "（需获取论文信息后再填写）",
+        "related_work": "（需获取论文信息后再填写）",
+        "impact": "（需获取论文信息后再填写）"
       },
       "domain_trend": {
-        "trend": "量子纠缠生成正从资源密集型向资源高效型范式转变，时间bin复用与高维编码融合突破单光子多节点纠缠瓶颈，为可扩展量子网络奠定关键技术基础。",
-        "key_topics": [
-          "高维量子编码(qudit)与时间bin复用",
-          "资源高效并行纠缠生成协议",
-          "可扩展量子网络节点互联",
-          "多维自由度复用通信技术",
-          "集成化量子光源与探测"
-        ],
-        "development_direction": "光通信与光纤传感领域正加速向量子化、集成化演进。核心技术路径呈现两大趋势：一是利用时间bin/频率等多维复用提升信道容量与资源效率；二是通过高维编码与混合纠缠架构突破经典容量极限。跨领域融合集中在量子计算-通信-传感一体化、光子芯片集成、以及经典-量子混合网络架构等方向。未来五年，量子网络将从实验室演示向城域规模验证过渡，核心瓶颈从纠缠生成效率转向纠缠分发与交换的实用性。"
+        "trend": "光纤传感向柔性可穿戴与多物理量融合演进，光通信聚焦大气湍流闪烁抑制与偏振态调控，理论框架趋于统一多阶统计描述。"
       }
     },
     {
-      "title": "Fundamental Limits of Eavesdropper Detection and Localization in Optical Fiber via Stimulated Brillouin Scattering",
-      "abstract": "Recent work investigated the use of Stimulated Brillouin Scattering (SBS) to measure changes in fiber parameters, thereby enhancing the security of a Quantum Key Distribution (QKD) system. In this work, we focus solely on the impact of quantum technology on the task of intrusion-detection. We derive an effective input-output model for the SBS interaction, and utilize it to compare three detection methods: First, the established state of the art. Second, a photon-counting based method which will likely be available in the near future and, finally, the ultimate quantum limit. We illustrate the potential benefit from modern quantum technology within two different mathematical frameworks: First by using the quantum error exponent of asymmetric hypothesis testing, and second in the context of parameter-estimation and quantum metrology.",
-      "arxiv_id": "2604.16961v2",
-      "published": "2026-04-18",
-      "url": "http://arxiv.org/abs/2604.16961v2",
+      "title": "Spatio-Temporal Scintillation Mitigation via Polarizations Coupled Higher-Order Correlation",
+      "abstract": "We present a unified theoretical framework linking second and fourth order statistical correlations of stochastic electromagnetic beams to the scintillation index observed after propagation through Kolmogorov atmospheric turbulence. We derive the beam coherence polarization matrix and its propagation law in a random medium. An algebraic connection is established between the second order polarization matrix J, its fourth order Gram counterpart obtained from the square of J, the classical degree of polarization P, the fourth order degree of polarization, and the scintillation index of the beam intensity. A key result is a closed form purity relation connecting the trace of the squared polarization matrix to the square of its trace, which shows that unpolarized natural beams exhibit a large scintillation index. The analysis demonstrates that scintillation can be reduced by polarizing the beam using suitable polarizer sets. This reduction occurs independently of the atmospheric turbulence strength parameter. Experimental results further show that simultaneous control of coherence and polarization, achievable using a pseudo random phase plate, provides a practical approach for minimizing scintillation in free space optical communication links.",
+      "arxiv_id": "2603.07058v1",
+      "published": "2026-03-07",
+      "url": "http://arxiv.org/abs/2603.07058v1",
       "authors": [
-        "Kiran Adhikari",
-        "Janis Nötzel"
+        "Shouvik Sadhukhan",
+        "C. S. Narayanamurthy"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "推导了受激布里渊散射的量子输入-输出模型，从量子信息理论角度系统分析了光纤窃听检测的三种检测方案的理论极限。",
-        "research思路": "聚焦量子技术如何突破传统光纤入侵检测的灵敏度极限，通过建立SBS量子模型，运用假设检验和量子计量学框架量化分析检测与定位性能。",
-        "experiment": "采用理论建模方法，建立SBS相互作用的有效量子模型；运用量子错误指数进行非对称假设检验，并结合量子Cramer-Rao界进行参数估计性能分析。",
-        "innovation": "首次将完整量子信息理论框架应用于SBS光纤传感的窃听检测；系统比较了经典光子计数方案与终极量子极限的差距，为未来量子增强传感提供了理论依据。",
-        "related_work": "包括QKD系统的实际安全分析、基于SBS的光纤传感技术、量子假设检验理论、量子计量学中的参数估计界，以及量子密钥分发的实际安全性评估等相关研究。",
-        "impact": "为量子增强型光纤安全系统提供了严格的理论基准，明确了从当前技术到量子极限的提升路径，对未来高性能光纤安防系统的设计具有重要指导意义。"
-      }
-    },
-    {
-      "title": "Robust and Active Visible-Light Integrated Photonics on Thin-Film Lithium Tantalate for Underwater Optical Wireless Communications",
-      "abstract": "Visible-light integrated photonics enables compact platforms for sensing, precision metrology, and free-space data links at visible wavelengths. However, many applications remain limited by the lack of high-speed and robust modulators in the blue-green band. Here we report, both operating at 532 nm, thin-film lithium tantalate waveguides of propagation losses of dB/cm scale and modulators with a flat frequency response to ~50 GHz. The modulator remains stable when delivering 5 dBm modulated optical power, which cannot be achieved by thin-film lithium niobate based counterparts under similar conditions and structures. We validate system-level underwater wireless optical communications (UWOCs) by transmitting 112 Gb/s signals over a 3-m underwater link. This represents the first integrated external modulator-based UWOC system, overcoming the bandwidth-power-chirp trade-offs of traditional directly modulated laser based systems. We further demonstrate dual-drive modulators for optical single-sideband and electro-optic frequency-comb generations in the green-wavelength band. These results provide a foundation for complex, robust, and active visible-light photonic integrated circuits for underwater optical applications.",
-      "arxiv_id": "2603.14346v1",
-      "published": "2026-03-15",
-      "url": "http://arxiv.org/abs/2603.14346v1",
-      "authors": [
-        "Changjian Guo",
-        "Xingjie Li",
-        "Xiaofeng Wu"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "首次实现基于薄膜钽酸锂集成调制器的蓝绿光水下无线光通信系统，在532 nm波长实现112 Gb/s、3米传输距离，突破传统直接调制激光的带宽-功率-啁啾权衡限制。",
-        "research思路": "针对蓝绿光波段缺乏高速、鲁棒调制器的技术瓶颈，提出采用薄膜钽酸锂材料平台，利用其在可见光波段的优异电光性能和热稳定性，构建集成光子调制器实现UWOC系统级验证。",
-        "experiment": "制备低损耗（dB/cm级）薄膜钽酸锂波导，设计带宽达50 GHz的Mach-Zehnder调制器，在5 dBm光功率下保持稳定工作；搭建112 Gb/s OOK调制的水下链路测试系统，验证系统级通信性能。",
-        "innovation": "首次将集成外部调制器应用于UWOC系统；实现532 nm波段5 dBm高功率下稳定工作（传统薄膜铌酸锂无法达到）；调制器频响平坦至~50 GHz，克服直接调制激光的啁啾限制。",
-        "related_work": "UWOC领域主要采用直接调制激光方案（受限于带宽-功率权衡）；薄膜铌酸锂在1550 nm波段的集成光子学进展迅速，但在可见光波段的性能受限于材料特性和功率处理能力。",
-        "impact": "该工作为蓝绿光高速水下通信提供了新的集成光子技术路线，薄膜钽酸锂平台在可见光波段的优异性能为未来高阶调制格式、更长距离UWOC系统的实现奠定基础，有望推动水下传感器网络和水下航行器通信的发展。"
+        "summary": "建立了随机电磁光束二阶极化矩阵与四阶闪烁指数的统一理论框架，揭示极化度与闪烁效应的数学关联，证明通过人工极化可有效抑制大气湍流引起的强度闪烁。",
+        "research思路": "针对自由空间光通信中大气湍流导致的闪烁效应问题，从电磁光束的二阶和四阶统计相关性的数学联系出发，建立极化状态与闪烁指数的理论桥梁。",
+        "experiment": "采用Kolmogorov湍流模型进行理论推导，建立光束相干极化矩阵的传播定律，构造Gram矩阵建立纯度关系表达式，理论验证不同极化状态下的闪烁指数变化规律。",
+        "innovation": "首次建立二阶极化矩阵J与其四阶Gram矩阵的代数联系，推导出纯度关系tr(J²)/(tr J)²，发现非极化自然光束具有大闪烁指数，为闪烁抑制提供新理论路径。",
+        "related_work": "与Wolf的相干性矩阵理论、曼纳克概率密度模型、量子光学高阶相关研究相关，涉及自由空间光通信中的闪烁抑制技术、偏振复用通信系统等研究方向。",
+        "impact": "为大气湍流中光束闪烁抑制提供了理论工具，对自由空间光通信、激光雷达等应用有重要意义，推动了光学相干性理论与统计光学交叉领域的发展。"
       }
     }
   ]

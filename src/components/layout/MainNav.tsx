@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
+import { GlobalSearch } from '@/components/features/search/GlobalSearch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -38,7 +39,24 @@ export function MainNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const currentZone = getZone(pathname);
+
+  // Global search shortcut: /
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const target = e.target as HTMLElement
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+          return
+        }
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const zoneStyles = {
     scholarly: {
@@ -109,6 +127,20 @@ export function MainNav() {
             );
           })}
         </nav>
+
+        {/* Search Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="hidden md:flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          onClick={() => setSearchOpen(true)}
+        >
+          <Search className="h-4 w-4" />
+          <span className="text-sm">搜索</span>
+          <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
+            /
+          </kbd>
+        </Button>
 
         {/* User Menu */}
         <div className="flex items-center gap-2">
@@ -201,6 +233,8 @@ export function MainNav() {
           </nav>
         </div>
       )}
+
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }

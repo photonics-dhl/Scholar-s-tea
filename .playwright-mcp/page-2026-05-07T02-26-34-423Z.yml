@@ -1,0 +1,102 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e23] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e24]
+            - text: 思想工坊
+          - link "茶话会" [ref=e26] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e27]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "测" [ref=e84] [cursor=pointer]:
+          - generic [ref=e86]: 测
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - img [ref=e54]
+              - generic [ref=e56]: Live Chat
+            - heading "茶话会" [level=1] [ref=e57]
+            - paragraph [ref=e58]: 加入实时聊天室，与研究者交流思想·共 3 个房间
+          - button "创建房间" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - text: 创建房间
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - searchbox "搜索房间..." [ref=e67]
+            - button "搜索" [ref=e68] [cursor=pointer]
+          - generic [ref=e69]:
+            - img [ref=e70]
+            - generic [ref=e72]: 共 3 个房间
+          - generic [ref=e87]:
+            - 'link "Claude测试房间 主持人: Hongliang Dang Claude AI 可测试的聊天室 0 / 50 0" [ref=e88] [cursor=pointer]':
+              - /url: /tea-party/cmohc960p0005755efk83pfsm
+              - generic [ref=e91]:
+                - generic [ref=e93]:
+                  - heading "Claude测试房间" [level=3] [ref=e95]
+                  - paragraph [ref=e96]: "主持人: Hongliang Dang"
+                - paragraph [ref=e97]: Claude AI 可测试的聊天室
+                - generic [ref=e98]:
+                  - generic [ref=e99]:
+                    - img [ref=e100]
+                    - generic [ref=e105]: 0 / 50
+                  - generic [ref=e106]:
+                    - img [ref=e107]
+                    - generic [ref=e109]: "0"
+            - 'link "量子计算讨论组 主持人: 张教授 量子计算前沿进展讨论 0 / 30 0" [ref=e110] [cursor=pointer]':
+              - /url: /tea-party/cmogy6j5v001mf4r14icgi8ip
+              - generic [ref=e113]:
+                - generic [ref=e115]:
+                  - heading "量子计算讨论组" [level=3] [ref=e117]
+                  - paragraph [ref=e118]: "主持人: 张教授"
+                - paragraph [ref=e119]: 量子计算前沿进展讨论
+                - generic [ref=e120]:
+                  - generic [ref=e121]:
+                    - img [ref=e122]
+                    - generic [ref=e127]: 0 / 30
+                  - generic [ref=e128]:
+                    - img [ref=e129]
+                    - generic [ref=e131]: "0"
+            - 'link "AI研究交流室 主持人: 张教授 人工智能研究者交流群 0 / 50 3" [ref=e132] [cursor=pointer]':
+              - /url: /tea-party/cmogy6j44001kf4r1exaakjre
+              - generic [ref=e135]:
+                - generic [ref=e137]:
+                  - heading "AI研究交流室" [level=3] [ref=e139]
+                  - paragraph [ref=e140]: "主持人: 张教授"
+                - paragraph [ref=e141]: 人工智能研究者交流群
+                - generic [ref=e142]:
+                  - generic [ref=e143]:
+                    - img [ref=e144]
+                    - generic [ref=e149]: 0 / 50
+                  - generic [ref=e150]:
+                    - img [ref=e151]
+                    - generic [ref=e153]: "3"
+    - contentinfo [ref=e80]:
+      - paragraph [ref=e82]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - alert [ref=e83]

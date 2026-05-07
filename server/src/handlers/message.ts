@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { randomUUID } from 'crypto';
 
 type QueryFunction = (text: string, params?: any[]) => Promise<any>;
 
@@ -20,10 +21,10 @@ export function registerMessageHandlers(io: Server, query: QueryFunction) {
 
         // Create message
         const messageResult = await query(
-          `INSERT INTO "Message" ("roomId", "userId", "content", "type", "createdAt")
-           VALUES ($1, $2, $3, $4, NOW())
+          `INSERT INTO "Message" ("id", "roomId", "userId", "content", "type", "createdAt")
+           VALUES ($1, $2, $3, $4, $5, NOW())
            RETURNING *`,
-          [roomId, socket.data.user.id, content, type]
+          [randomUUID(), roomId, socket.data.user.id, content, type]
         );
 
         const message = messageResult.rows[0];

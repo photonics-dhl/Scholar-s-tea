@@ -1,0 +1,65 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e24] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e25]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - navigation [ref=e48]:
+          - link "课题组" [ref=e49] [cursor=pointer]:
+            - /url: /groups
+          - img [ref=e50]
+          - link:
+            - /url: /groups/ai-lab
+          - img [ref=e52]
+          - generic [ref=e54]: 讨论区
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - heading [level=1]
+            - paragraph [ref=e57]: 共 0 个讨论 · 分享研究见解
+          - generic [ref=e58]:
+            - combobox [ref=e59] [cursor=pointer]:
+              - generic:
+                - generic:
+                  - img
+                  - text: 最新
+              - img [ref=e60]
+            - button "发布帖子" [ref=e62] [cursor=pointer]:
+              - link "发布帖子" [ref=e63]:
+                - /url: /groups/ai-lab/posts/new
+                - img [ref=e64]
+                - text: 发布帖子
+    - contentinfo [ref=e71]:
+      - paragraph [ref=e73]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - alert [ref=e74]

@@ -2,81 +2,81 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Designing low-loss cavities across the band-gap of photonic crystal slabs",
-      "abstract": "Photonic crystal cavities (PCCs) are defects in host photonic crystals (PCs) which create bound states in the PC band gap. These bound states are resonant states of the electromagnetic field with a complex resonance frequency and can have very small mode volumes. PCCs are attractive for a variety of applications, from cavity quantum electrodynamics to biosensing. A PC slab geometry is advantageous given its superior manufacturability compared to three-dimensional crystals, and the accessibility of the surface allows sensing and coupling. However, the emission into the half spaces above and below the slab limits the bound state lifetime. Controlling this emission is thus crucial for applications, most of which benefiting from a long lifetime. A range of methods to find defect geometries suppressing the emission to increase the lifetime have been demonstrated in the past. However, they do not cater for a designed resonant frequency covering a wide addressable range, as needed for multiplexed devices. Here, we demonstrate a design method controlling both resonance frequency and emission, by minimising a cost function including both losses and target frequency. We show applications on PCCs in GaAs PC slabs immersed in water, relevant for biosensing. The reduced refractive index contrast in these structures compared to previously studied PCCs embedded in vacuum renders the emission suppression more challenging. We optimize the quality factor of a standard L3 cavity from 1000 to 10^4-10^5, with an addressable resonance frequency range covering 12% relative bandwidth, spanning more than half of the band gap. We furthermore report optimised structures of H1 cavities, and provide the optimisation code for widespread use.",
-      "arxiv_id": "2512.19826v1",
-      "published": "2025-12-22",
-      "url": "http://arxiv.org/abs/2512.19826v1",
+      "title": "Quantum-enhanced biosensing enables earlier detection of bacterial growth",
+      "abstract": "Rapid detection of bacterial growth is crucial in clinical, food safety, and environmental contexts, yet conventional optical methods are limited by noise and require hours of incubation. Here, we present the first experimental demonstration of a quantum-enhanced photometric measurement for early bacterial detection using squeezed light. By monitoring the optical absorbance of an Escherichia coli culture with a quantum probe, we achieve a sensitivity beyond the shot-noise limit, enabling identification of growth onset up to 30 minutes earlier than with a classical sensor. The noise reduction is validated through statistical modeling with a truncated Gaussian distribution and hypothesis testing, confirming earlier detection with low false-alarm rates. This work illustrates how quantum resources can improve real-time, non-invasive diagnostics. Our results pave the way for quantum-enhanced biosensors that accelerate detection of microbial growth and other biological processes without increasing photodamage.",
+      "arxiv_id": "2512.12057v1",
+      "published": "2025-12-12",
+      "url": "http://arxiv.org/abs/2512.12057v1",
       "authors": [
-        "Nadhia Monim",
-        "Wolfgang Langbein",
-        "Francesco Masia"
+        "Rayssa B. de Andrade",
+        "Anne Egholm Høgh",
+        "Gaetana Spedalieri"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出了一种在光子晶体slab带隙内设计低损耗腔的系统方法，实现宽频带可调谐的同时保持高品质因子，为多功能光子器件提供新途径。",
-        "research思路": "针对现有光子晶体腔设计中低损耗与宽频带覆盖难以兼顾的问题，基于能带工程和模式耦合理论，建立缺陷几何参数与腔性能间的定量关系，实现跨带隙的低损耗腔设计。",
-        "experiment": "采用数值模拟结合优化算法，利用时域有限差分（FDTD）方法计算腔的共振频率和品质因子，系统扫描缺陷几何参数空间，通过逆向设计策略确定最优腔结构。",
-        "innovation": "突破传统方法中品质因子与可调谐范围的制约，提出基于模式工程的协同优化设计，实现了在完整带隙范围内的低损耗腔覆盖，显著扩展了设计自由度。",
-        "related_work": "包括L. Midrio等人关于PC腔QED的开创性研究（Nature 2008）、Joannopoulos团队的光子晶体理论框架（PRD 2008）、以及近期利用机器学习优化PCC的进展（Science Advances 2020）。",
-        "impact": "该工作为集成光子学、量子信息处理和生物传感等领域提供了设计低损耗光子器件的新范式，有望推动片上光互连和高灵敏度生化检测技术的发展。"
+        "summary": "首次实验验证利用压缩光实现超越标准量子极限的光度测量，使大肠杆菌生长检测比传统光学方法提前30分钟识别生长起始点。",
+        "research思路": "解决传统光学检测受限于散粒噪声（shot-noise limit）需要数小时孵育才能检测细菌的问题，通过引入量子资源（压缩态光场）降低探测噪声，实现更早期的无创检测。",
+        "experiment": "采用压缩光作为探针监测大肠杆菌培养物的光吸收率变化，结合截断高斯分布的统计建模和假设检验验证噪声降低效果，评估检测灵敏度和误报率。",
+        "innovation": "首次将量子增强测量应用于生物传感领域，实现超越经典 shot-noise limit 的检测灵敏度；首次实验证明量子资源可将微生物生长检测时间提前30分钟以上。",
+        "related_work": "包括量子计量学中的压缩光应用研究（如 Giovannetti 2011）、传统光度法细菌检测技术、基于光吸收的微生物监测系统，以及量子生物传感器的理论框架（如 Degen 2017）。",
+        "impact": "开辟了量子增强实时、无创生物诊断的新方向，证明了量子资源在临床、食品安全的实际应用潜力，为加速微生物检测和其他生物过程监测提供了新范式。"
       },
       "domain_trend": {
-        "trend": "生物医学光子学正迈向量子增强与人工智能驱动的集成化时代，超低损耗量子传感与深度学习赋能的大规模并行检测成为突破生物传感极限的核心路径。",
+        "trend": "量子增强传感与微型化光学器件正推动生物光子学从宏观成像向超高灵敏度量子检测和可穿戴实时监测方向加速演进",
         "key_topics": [
-          "量子增强近场成像与传感",
-          "深度学习辅助光子器件逆向设计",
-          "大规模集成多路复用生物传感平台"
+          "量子增强生物传感突破标准量子极限",
+          "微流控光学器件低成本制造",
+          "光学与精准医疗深度融合",
+          "可穿戴实时监测技术",
+          "X射线相位对比成像临床转化"
         ],
-        "development_direction": "该领域正从单一性能优化转向系统级协同设计，量子非破坏性测量技术打破经典物理限制，深度学习实现从数据驱动到物理启发的范式转变，推动生物医学光子学向超高灵敏度、单分子检测和实时多目标监测方向发展。"
+        "development_direction": "生物光子学正经历从经典光学向量子增强、从实验室向临床转化、从侵入性向无创实时监测的范式转变，量子测量与微流控微型化技术成为实现超高灵敏度和便携化的双引擎，推动光学与生命科学、材料科学、量子信息的多学科深度交叉融合。"
       }
     },
     {
-      "title": "Reactive near-field subwavelength microwave imaging with a non-invasive Rydberg probe",
-      "abstract": "Non-invasive microwave field imaging--accurately mapping field distributions without perturbing them--is essential in areas such as aerospace engineering, biomedical imaging and integrated-circuit diagnostics. Conventional metal probes, however, inevitably perturb reactive near fields: they act as strong scatterers that drive induced currents and secondary radiation, remap evanescent components and thereby degrade both accuracy and spatial resolution, particularly in the reactive near-field regime that is most relevant to these applications. Here we demonstrate, to our knowledge for the first time, reactive near-field subwavelength imaging of microwave fields using the quantum non-demolition properties of Rydberg atoms, realized with a compact, non-invasive single-ended fibre-integrated Rydberg probe engineered to minimize field disturbance. The probe achieves an imaging resolution of {\\unboldmath$λ/56$}, and the measured field distributions agree with full-wave simulations with structural similarity approaching unity, confirming both its subwavelength spatial resolution and its genuinely non-invasive character compared with conventional metal-based probes. Because the atomic sensor is intrinsically isotropic, the same device can faithfully image multi-dimensional field structures without orientation-dependent calibration. Our results therefore establish a general, non-invasive route to high-accuracy, subwavelength reactive near-field microwave imaging, with particular promise for applications such as chip-defect detection and integrated-circuit diagnostics, where even small perturbations by the probe can mask the underlying physics of interest.",
-      "arxiv_id": "2512.19116v1",
-      "published": "2025-12-22",
-      "url": "http://arxiv.org/abs/2512.19116v1",
+      "title": "Microfluidic gratings for X-ray Phase Contrast Imaging",
+      "abstract": "Fabrication of X-ray gratings has surged in the last two decades thanks to their vast employment in X-ray Phase Contrast Imaging, an imaging technique able to boost X-ray sensitivity to detect otherwise invisible details. These high aspect ratio devices are usually fabricated by complex, costly, multi-step processes that limit their size and volume scaling. These steps commonly involve UV or X-ray lithography, semiconductor selective etching and high-Z metal plating, usually Au, which require expensive tools and materials. Here we present a proof-of-concept fabrication via soft lithography and Hg infusion of microfluidic X-ray absorption gratings and their performance in biomedical imaging. Such fabrication technique requires fewer, less expensive, and more scalable processes using alternative and more sustainable materials, while showing comparable visibility with their conventional Au-based, solid equivalent. Our results constitute a promising shift in X-ray optics fabrication that could significantly lower barriers to commercialization and accelerate the practical deployment of X-ray Phase Contrast Imaging.",
+      "arxiv_id": "2512.07598v1",
+      "published": "2025-12-08",
+      "url": "http://arxiv.org/abs/2512.07598v1",
       "authors": [
-        "Chaoyang Hu",
-        "Mingyong Jing",
-        "Zongkai Liu"
+        "Alessandro Rossi",
+        "Francesco Coccimiglio",
+        "Antonio Ferraro"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "首次实现反应性近场亚波长微波成像，采用量子非破坏性Rydberg原子探针，突破传统金属探针对场的扰动限制，达到λ/56成像分辨率。",
-        "research思路": "针对传统金属探针在反应性近场中作为强散射体导致场扰动、分辨率受限的核心问题，探索利用Rydberg原子量子态变化实现非侵入式微波场映射。",
-        "experiment": "设计紧凑单端光纤集成Rydberg探针，利用原子直流Stark效应感测微波场，通过 Rydberg 态电磁感应透明或电离检测提取场强分布，实验结果与全波仿真对照验证。",
-        "innovation": "首次将量子非破坏性测量引入反应性近场成像；突破金属探针散射的物理限制；实现λ/56亚波长分辨率；单端光纤集成设计提升系统实用性。",
-        "related_work": "Rydberg原子微波传感（JSA 2012, PRL 2018）、原子电场计（Nature 2017, Science 2020）、近场扫描微波显微术、量子传感在电磁场测量中的应用（PRL 2014, Nature Photonics 2021）。",
-        "impact": "为航空航天、生物医学成像、集成电路诊断等领域提供无扰场映射工具，推动量子传感从实验室走向实际工程应用，对近场测量技术发展具有重要参考价值。"
+        "summary": "提出基于软光刻和汞灌注的微流控X射线光栅制造方法，以低成本、可扩展的工艺实现与传统Au基固体光栅相当的成像性能。",
+        "research思路": "解决传统X射线光栅高成本、复杂工艺、难以规模化的问题，采用微流控结构结合液态金属灌注，探索替代传统硅基刻蚀+Au电镀的简化制造路线。",
+        "experiment": "采用软光刻技术在SU-8中制作高深宽比微结构通道，通过毛细作用灌注液态汞形成高吸收率光栅条，最后封装并进行X射线可视度和成像性能测试。",
+        "innovation": "首次将微流控结构与汞灌注相结合用于X射线吸收光栅制造，工艺步骤减少、材料成本降低，同时保持与传统Au基光栅相当的光学可视度。",
+        "related_work": " Talbot-Lau干涉仪架构中的光栅设计、X射线相位对比成像技术发展、传统高深宽比光栅的UV/X射线光刻和电镀制造工艺。",
+        "impact": "为X射线光学制造提供新的低成本的替代方案，推动相位对比成像从实验室向临床和工业应用的规模化转化，对生物医学成像领域具有重要意义。"
       }
     },
     {
-      "title": "Rethinking massive multiplexing in whispering gallery mode biosensing",
-      "abstract": "Accurate, label-free quantification of multiple analytes in complex biological media remains a major challenge due to limited multiplexing, signal cross-correlations, and inconsistency across sensor samples and measurement runs. We introduce a multiplexed whispering-gallery-mode (WGM) biosensing framework that overcomes these barriers by jointly advancing photonic integration and data analytics. Our glass-chip platform enables massive, parallelized and flexible multiplexing of >10000 microresonators organized into up to 100 sensing channels, with universal and modular chip design and detection hardware, while maintaining loaded Q-factors of 10^6. Our novel hybrid deep-learning framework BioCCF that integrates domain adaptation with cross-channel fusion enables harmonization of responses across sensing chips and extraction of nonlinear correlations in complex mixtures. Using a highly heterogeneous dataset comprising over 200 hours of sensing data acquired from nine chips with different channel configurations, biological replicates, and repeated regeneration cycles, we demonstrate recalibration-free identification of solution (99.3\\% accuracy) and quantification of immunoglobulin G components with relative prediction error of 10^-4 under 5 min. The affordability and modularity of the platform enable distributed data acquisition and aggregation into shared repositories, providing a pathway toward continuously improving model generalization, cross-validation and a scalable, community-driven paradigm for biosensing.",
-      "arxiv_id": "2512.12421v1",
-      "published": "2025-12-13",
-      "url": "http://arxiv.org/abs/2512.12421v1",
-      "authors": [
-        "Ivan Saetchnikov",
-        "Elina Tcherniavskaia",
-        "Andreas Ostendorf"
-      ],
+      "title": "Shining a Light on the Future of Biophotonics - PMC",
+      "abstract": "Biophotonics—the interdisciplinary fusion of light‐based technologies with biology and medicine—is rapidly transforming research,",
+      "source": "tavily",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12245495/",
+      "authors": [],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "提出一种基于WGM的大规模多路复用生物传感框架，结合光子集成与深度学习实现>10000微腔的并行检测，提升复杂样品中多分析物的无标记定量能力。",
-        "research思路": "解决多路复用受限、信号交叉相关以及芯片间测量不一致等挑战，实现对复杂生物介质中多目标的高精度、无标记定量。",
-        "experiment": "采用玻璃芯片平台集成>10000个微腔，支持100条并行传感通道，Q因子达10^6，并利用BioCCF深度学习模型进行跨通道特征融合与域适应。",
-        "innovation": "首次在WGM系统中实现万级微腔并行化，并提出结合域适应与跨通道融合的混合深度学习框架BioCCF，显著提升跨芯片数据一致性。",
-        "related_work": "包括传统WGM单腔检测、集成光子传感阵列、基于机器学习的传感数据处理等；文献如Baier et al. (Nature Photonics 2020)、Yu et al. (Science 2022)等。",
-        "impact": "为高灵敏度、多目标无标记生物传感提供可扩展的硬件和算法方案，推动WGM在临床诊断、药物筛选和实时监测等领域的实用化。"
+        "summary": "该文是一篇关于生物光子学（Biophotonics）领域的前瞻性综述，探讨光基技术在生物医学研究中的前沿进展与未来发展方向。",
+        "research思路": "解决光与生物系统相互作用的机理探索问题，以及如何将光学技术高效应用于疾病诊断、治疗和生物成像等临床转化挑战。",
+        "experiment": "综述性论文，汇总光学成像、光动力疗法、荧光显微镜、激光手术等关键技术的原理与应用案例，属于文献综合分析。",
+        "innovation": "作为综述文章，其创新在于整合跨学科最新成果，展望生物光子学在精准医疗、可穿戴设备和实时监测等新兴方向的应用潜力。",
+        "related_work": "该领域重要工作包括：光学相干断层成像（OCT）、共聚焦显微镜、拉曼光谱技术在生物医学中的应用，以及光遗传学的发展。",
+        "impact": "对推动光学技术与生命科学的深度融合具有指导意义，为生物医学研究提供了光基技术创新的系统性参考框架。"
+      },
+      "domain_trend": {
+        "trend": ""
       }
     }
   ]

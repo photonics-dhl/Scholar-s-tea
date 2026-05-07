@@ -17,5 +17,20 @@ module.exports = {
         NEXTAUTH_URL: 'http://localhost:3002',
       },
     },
+    {
+      name: 'scholars-tea-socket',
+      script: 'server/dist/index.js',
+      cwd: __dirname,
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '512M',
+      env: {
+        NODE_ENV: 'production',
+        DATABASE_URL: `postgresql://dbuser:***@localhost:5432/scholars_tea?host=${process.env.PG_SOCKET_DIR || '/data/home/zju321/pgdata/run'}`,
+        NEXTAUTH_SECRET: 'your-secret-change-in-production',
+        SOCKET_PORT: '3001',
+      },
+    },
   ],
 };

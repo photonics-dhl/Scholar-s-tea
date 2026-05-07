@@ -1,0 +1,56 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e83]
+  - generic [ref=e155]:
+    - banner [ref=e156]:
+      - generic [ref=e157]:
+        - link "Scholar's Tea" [ref=e158] [cursor=pointer]:
+          - /url: /
+          - img [ref=e160]
+          - generic [ref=e163]: Scholar's Tea
+        - navigation [ref=e164]:
+          - link "学科" [ref=e165] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e166]
+            - text: 学科
+          - link "课题组" [ref=e169] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e170]
+            - text: 课题组
+          - link "思想工坊" [ref=e175] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e176]
+            - text: 思想工坊
+          - link "茶话会" [ref=e178] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e179]
+            - text: 茶话会
+          - link "TOP10" [ref=e182] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e183]
+            - text: TOP10
+        - button "搜索 /" [ref=e189] [cursor=pointer]:
+          - img [ref=e190]
+          - generic [ref=e193]: 搜索
+          - generic [ref=e194]: /
+        - button "测" [ref=e196] [cursor=pointer]:
+          - generic [ref=e198]: 测
+    - main [ref=e199]:
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - generic [ref=e203]:
+            - button [ref=e204] [cursor=pointer]:
+              - img [ref=e205]
+            - generic [ref=e207]:
+              - heading "Claude测试房间" [level=1] [ref=e209]
+              - paragraph [ref=e213]: Claude AI 可测试的聊天室
+          - button "0" [ref=e215] [cursor=pointer]:
+            - img [ref=e216]
+            - generic [ref=e221]: "0"
+        - generic [ref=e225]:
+          - generic [ref=e226]:
+            - textbox "连接中..." [disabled] [ref=e227]
+            - button [disabled]:
+              - img
+          - paragraph [ref=e228]: 0/500
+    - contentinfo [ref=e229]:
+      - paragraph [ref=e231]: Scholar's Tea 学者茶话会 · 高校学术交流社区

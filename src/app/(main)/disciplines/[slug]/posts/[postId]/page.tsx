@@ -284,25 +284,27 @@ export default function PostDetailPage() {
         </div>
 
         {/* Vote & Content */}
-        <div className="flex gap-6">
-          {/* Vote */}
-          <div className="flex flex-col items-center gap-1">
+        <div className="flex gap-4">
+          {/* Vote - 弱化设计 */}
+          <div className="flex flex-col items-center gap-0.5 min-w-[36px]">
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7 text-gray-300 hover:text-gray-400"
               onClick={() => handleVote(1)}
               disabled={voting}
             >
-              <ArrowUp className={`h-5 w-5 ${post.upvotes > 0 ? 'text-orange-500' : ''}`} />
+              <ArrowUp className="h-4 w-4" />
             </Button>
-            <span className="text-lg font-semibold">{post.score}</span>
+            <span className="text-sm font-medium text-muted-foreground/70">{post.score}</span>
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7 text-gray-300 hover:text-gray-400"
               onClick={() => handleVote(-1)}
               disabled={voting}
             >
-              <ArrowDown className={`h-5 w-5 ${post.downvotes > 0 ? 'text-blue-500' : ''}`} />
+              <ArrowDown className="h-4 w-4" />
             </Button>
           </div>
 
@@ -361,13 +363,13 @@ export default function PostDetailPage() {
             <div key={comment.id} className="space-y-4">
               {/* Main Comment */}
               <div className="flex gap-4">
-                <div className="flex flex-col items-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowUp className="h-4 w-4" />
+                <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
+                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-300 hover:text-gray-400">
+                    <ArrowUp className="h-3 w-3" />
                   </Button>
-                  <span className="text-sm font-medium">{comment.score}</span>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ArrowDown className="h-4 w-4" />
+                  <span className="text-xs text-muted-foreground/60">{comment.score}</span>
+                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-300 hover:text-gray-400">
+                    <ArrowDown className="h-3 w-3" />
                   </Button>
                 </div>
                 <div className="flex-1">
@@ -412,12 +414,12 @@ export default function PostDetailPage() {
                     <div className="mt-4 ml-4 pl-4 border-l space-y-4">
                       {comment.children.map((child) => (
                         <div key={child.id} className="flex gap-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <Button variant="ghost" size="icon" className="h-5 w-5">
+                          <div className="flex flex-col items-center gap-0.5 min-w-[24px]">
+                            <Button variant="ghost" size="icon" className="h-4 w-4 text-gray-300 hover:text-gray-400">
                               <ArrowUp className="h-3 w-3" />
                             </Button>
-                            <span className="text-xs font-medium">{child.score}</span>
-                            <Button variant="ghost" size="icon" className="h-5 w-5">
+                            <span className="text-[10px] text-muted-foreground/60">{child.score}</span>
+                            <Button variant="ghost" size="icon" className="h-4 w-4 text-gray-300 hover:text-gray-400">
                               <ArrowDown className="h-3 w-3" />
                             </Button>
                           </div>

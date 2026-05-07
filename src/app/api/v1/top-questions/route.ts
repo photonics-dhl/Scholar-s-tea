@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { getTopTenPosts, getAllTimeTopPosts } from '@/services/top-questions';
 
 export async function GET(request: NextRequest) {

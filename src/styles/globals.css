@@ -279,3 +279,116 @@ html {
   background-image: radial-gradient(circle, var(--journal-border) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* ===== Markdown 渲染样式 ===== */
+.markdown-body {
+  word-break: break-word;
+}
+.markdown-body .markdown-h1,
+.markdown-body .markdown-h2,
+.markdown-body .markdown-h3,
+.markdown-body .markdown-h4 {
+  font-weight: 600;
+  margin: 0.75em 0 0.4em;
+  color: inherit;
+  line-height: 1.35;
+}
+.markdown-body .markdown-h1 {
+  font-size: 1.25em;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.3em;
+}
+.markdown-body .markdown-h2 {
+  font-size: 1.15em;
+}
+.markdown-body .markdown-h3 {
+  font-size: 1.05em;
+}
+.markdown-body .markdown-h4 {
+  font-size: 1em;
+}
+.markdown-body .markdown-p {
+  margin: 0.5em 0;
+}
+.markdown-body .markdown-p:first-child {
+  margin-top: 0;
+}
+.markdown-body .markdown-p:last-child {
+  margin-bottom: 0;
+}
+.markdown-body .markdown-ul {
+  margin: 0.5em 0;
+  padding-left: 1.25em;
+  list-style-type: disc;
+}
+.markdown-body .markdown-ul .markdown-li {
+  margin: 0.25em 0;
+}
+.markdown-body .markdown-blockquote {
+  margin: 0.75em 0;
+  padding: 0.5em 0.875em;
+  border-left: 3px solid var(--convo-blue);
+  background-color: hsl(var(--muted) / 0.5);
+  border-radius: 0 0.375rem 0.375rem 0;
+  color: hsl(var(--muted-foreground));
+}
+.markdown-body .markdown-pre {
+  margin: 0.75em 0;
+  padding: 0.75em 1em;
+  background-color: #1e1e2e;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  font-size: 0.8125em;
+  line-height: 1.6;
+}
+.markdown-body .markdown-pre code {
+  color: #cdd6f4;
+  background: none;
+  padding: 0;
+  font-family: ui-monospace, 'JetBrains Mono', monospace;
+}
+.markdown-body .markdown-code {
+  padding: 0.15em 0.4em;
+  background-color: hsl(var(--muted));
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: ui-monospace, 'JetBrains Mono', monospace;
+  color: hsl(var(--foreground));
+}
+.markdown-body .markdown-link {
+  color: var(--tea-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.markdown-body .markdown-link:hover {
+  border-bottom-color: var(--tea-primary);
+}
+.markdown-body .markdown-hr {
+  margin: 1em 0;
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+}
+.markdown-body strong {
+  font-weight: 600;
+  color: inherit;
+}
+.markdown-body em {
+  font-style: italic;
+}
+.markdown-body s {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* AI 消息气泡内的 Markdown 微调 */
+.markdown-body .markdown-pre:first-child,
+.markdown-body .markdown-blockquote:first-child,
+.markdown-body .markdown-p:first-child {
+  margin-top: 0;
+}
+.markdown-body .markdown-pre:last-child,
+.markdown-body .markdown-blockquote:last-child,
+.markdown-body .markdown-p:last-child {
+  margin-bottom: 0;
+}

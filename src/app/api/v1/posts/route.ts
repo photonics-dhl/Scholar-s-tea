@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const disciplineId = searchParams.get('disciplineId') || undefined;
+    const groupId = searchParams.get('groupId') || undefined;
     const authorId = searchParams.get('authorId') || undefined;
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
     const pageSize = searchParams.get('pageSize') ? parseInt(searchParams.get('pageSize')!) : 20;
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
 
     const result = await getPosts({
       disciplineId,
+      groupId,
       authorId,
       page,
       pageSize,
@@ -66,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, disciplineId, tags } = body;
+    const { title, content, disciplineId, groupId, tags } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest) {
       title,
       content,
       disciplineId,
+      groupId,
       tags,
     });
 

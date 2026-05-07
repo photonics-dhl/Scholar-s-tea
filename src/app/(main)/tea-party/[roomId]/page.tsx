@@ -93,18 +93,14 @@ export default function TeaPartyRoomPage() {
     fetchRoom();
   }, [roomId, setMessages]);
 
-  // Join room via socket when connected
+  // Leave room on unmount
   useEffect(() => {
-    if (socket && isConnected && room) {
-      joinSocketRoom();
-    }
-
     return () => {
       if (socket && isConnected) {
         leaveSocketRoom();
       }
     };
-  }, [socket, isConnected, room?.id]);
+  }, [socket, isConnected]);
 
   // Listen for socket events
   useEffect(() => {

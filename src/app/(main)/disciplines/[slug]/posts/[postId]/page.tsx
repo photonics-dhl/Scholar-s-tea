@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { sanitizeHtml } from '@/lib/utils/sanitize';
 
 interface Author {
   id: string;
@@ -306,9 +307,15 @@ export default function PostDetailPage() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <div className="flex-1 prose prose-sm max-w-none">
+            <div
+              className="prose-content"
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(post.content),
+              }}
+            />
+          </div>
         </div>
 
         {/* Actions */}

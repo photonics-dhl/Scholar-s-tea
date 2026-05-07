@@ -17,7 +17,19 @@ interface TopQuestion {
 
 interface TopQuestionsResponse {
   success: boolean;
-  data: TopQuestion[];
+  data: {
+    entries: {
+      rank: number;
+      post: TopQuestion;
+      voteCount: number;
+    }[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    year: number;
+    month: number;
+  };
 }
 
 export default function TopQuestionsPage() {
@@ -31,7 +43,7 @@ export default function TopQuestionsPage() {
       .then((res) => res.json())
       .then((data: TopQuestionsResponse) => {
         if (data.success) {
-          setQuestions(data.data);
+          setQuestions(data.data.entries.map(e => e.post));
         }
       })
       .catch(console.error)
@@ -135,8 +147,8 @@ export default function TopQuestionsPage() {
                       {question.title}
                     </h3>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <span>{question.author.name || '匿名用户'}</span>
-                      <span>{new Date(question.createdAt).toLocaleDateString('zh-CN')}</span>
+                      <span>{question.author?.name || '匿名用户'}</span>
+                      <span>{question.createdAt ? new Date(question.createdAt).toLocaleDateString('zh-CN') : '-'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm font-medium text-journal-gold">

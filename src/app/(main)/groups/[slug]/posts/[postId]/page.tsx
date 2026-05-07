@@ -1,0 +1,485 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import {
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+  MessageSquare,
+  Eye,
+  Pin,
+  Lock,
+  Share2,
+  Flag,
+  Clock,
+  Send,
+  CornerDownRight,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { sanitizeHtml } from '@/lib/utils/sanitize';
+import { cn } from '@/lib/utils/cn';
+
+interface Author {
+  id: string;
+  name: string | null;
+  avatar: string | null;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  author: Author;
+  isPinned: boolean;
+  isLocked: boolean;
+  viewCount: number;
+  createdAt: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  tags: { tag: { id: string; name: string } }[];
+  _count: { comments: number };
+}
+
+interface CommentAuthor {
+  id: string;
+  name: string | null;
+  avatar: string | null;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  author: CommentAuthor;
+  isPinned: boolean;
+  createdAt: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  children: Comment[];
+}
+
+interface PostResponse {
+  success: boolean;
+  data: Post;
+}
+
+interface CommentsResponse {
+  success: boolean;
+  data: Comment[];
+}
+
+export default function GroupPostDetailPage() {
+  const params = useParams<{ slug: string; postId: string }>();
+  const slug = params.slug;
+  const postId = params.postId;
+  const router = useRouter();
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [commentContent, setCommentContent] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState('');
+  const [voting, setVoting] = useState(false);
+  const [userVote, setUserVote] = useState<0 | 1 | -1>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [postRes, commentsRes] = await Promise.all([
+          fetch(`/api/v1/posts/${postId}`),
+          fetch(`/api/v1/comments?postId=${postId}`),
+        ]);
+
+        const postData: PostResponse = await postRes.json();
+        const commentsData: CommentsResponse = await commentsRes.json();
+
+        if (postData.success) {
+          setPost(postData.data);
+        } else {
+          router.push(`/groups/${slug}/posts`);
+        }
+
+        if (commentsData.success) {
+          setComments(commentsData.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+        router.push(`/groups/${slug}/posts`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [postId, slug, router]);
+
+  const handleVote = async (value: 1 | -1) => {
+    if (voting) return;
+    setVoting(true);
+    try {
+      const res = await fetch(`/api/v1/posts/${postId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value }),
+      });
+      const data = await res.json();
+      if (data.success && post) {
+        const prevVote = userVote;
+        const newVote = data.data.value as 0 | 1 | -1;
+        setUserVote(newVote);
+        setPost({
+          ...post,
+          score: data.data.value === 0
+            ? post.score - value
+            : data.data.value === value
+              ? post.score + value
+              : post.score + value * 2,
+          upvotes: newVote === 1
+            ? prevVote === 1 ? post.upvotes : post.upvotes + 1
+            : prevVote === 1 ? post.upvotes - 1 : post.upvotes,
+          downvotes: newVote === -1
+            ? prevVote === -1 ? post.downvotes : post.downvotes + 1
+            : prevVote === -1 ? post.downvotes - 1 : post.downvotes,
+        });
+      }
+    } catch (err) {
+      console.error('Vote failed:', err);
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!commentContent.trim()) return;
+    try {
+      const res = await fetch('/api/v1/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, content: commentContent }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setComments([...comments, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }]);
+        setCommentContent('');
+        if (post) {
+          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
+        }
+      }
+    } catch (err) {
+      console.error('Comment failed:', err);
+    }
+  };
+
+  const handleReply = async (parentId: string) => {
+    if (!replyContent.trim()) return;
+    try {
+      const res = await fetch('/api/v1/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, content: replyContent, parentId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setComments(comments.map((c) => {
+          if (c.id === parentId) {
+            return { ...c, children: [...c.children, { ...data.data, children: [], upvotes: 0, downvotes: 0, score: 0 }] };
+          }
+          return c;
+        }));
+        setReplyContent('');
+        setReplyingTo(null);
+        if (post) {
+          setPost({ ...post, _count: { comments: post._count.comments + 1 } });
+        }
+      }
+    } catch (err) {
+      console.error('Reply failed:', err);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('zh-CN', {
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+  };
+
+  const formatRelative = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffMins < 1) return '刚刚';
+    if (diffMins < 60) return `${diffMins}分钟前`;
+    if (diffHours < 24) return `${diffHours}小时前`;
+    if (diffDays < 7) return `${diffDays}天前`;
+    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 max-w-4xl">
+        <Skeleton className="h-4 w-96 mb-4" />
+        <Skeleton className="h-10 w-full mb-6" />
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  if (!post) return null;
+
+  return (
+    <div className="container mx-auto py-6 max-w-4xl">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-5">
+        <Link href="/groups" className="hover:text-foreground transition-colors">课题组</Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <Link href={`/groups/${slug}`} className="hover:text-foreground transition-colors">{post.author.name || '课题组'}</Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <Link href={`/groups/${slug}/posts`} className="hover:text-foreground transition-colors">讨论</Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <span className="text-foreground truncate max-w-[200px]">{post.title}</span>
+      </nav>
+
+      {/* Post Card */}
+      <article className="rounded-xl border bg-card shadow-sm mb-6">
+        {/* Post Header */}
+        <div className="p-6 pb-4">
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            {post.isPinned && (
+              <Badge className="bg-tea-accent hover:bg-tea-accent text-white">
+                <Pin className="h-3 w-3 mr-1" /> 置顶
+              </Badge>
+            )}
+            {post.isLocked && (
+              <Badge variant="secondary"><Lock className="h-3 w-3 mr-1" /> 锁定</Badge>
+            )}
+            {post.tags.map(({ tag }) => (
+              <Badge key={tag.id} variant="outline" className="font-normal">
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 leading-snug">{post.title}</h1>
+
+          {/* Author Bar */}
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="text-xs bg-tea-primary/10 text-tea-primary">
+                {post.author.name?.slice(0, 2) || '匿名'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{post.author.name || '匿名用户'}</span>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {formatDate(post.createdAt)}</span>
+                <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.viewCount} 浏览</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Vote & Content */}
+        <div className="flex gap-0">
+          {/* 左侧投票区 */}
+          <div className="flex flex-col items-center gap-1 px-4 py-6 bg-muted/20 min-w-[72px]">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'h-9 w-9 rounded-lg transition-all',
+                userVote === 1
+                  ? 'bg-orange-100 text-orange-600 hover:bg-orange-200 hover:text-orange-700'
+                  : 'hover:bg-tea-primary/10 hover:text-tea-primary'
+              )}
+              onClick={() => handleVote(1)}
+              disabled={voting}
+            >
+              <ArrowUp className="h-5 w-5" />
+            </Button>
+            <span className={cn(
+              'text-lg font-bold tabular-nums',
+              userVote === 1 ? 'text-orange-600' : userVote === -1 ? 'text-blue-600' : 'text-foreground'
+            )}>
+              {post.score}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'h-9 w-9 rounded-lg transition-all',
+                userVote === -1
+                  ? 'bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-700'
+                  : 'hover:bg-destructive/10 hover:text-destructive'
+              )}
+              onClick={() => handleVote(-1)}
+              disabled={voting}
+            >
+              <ArrowDown className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* 右侧内容区 */}
+          <div className="flex-1 p-6 pl-4">
+            <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-a:text-tea-primary prose-a:no-underline hover:prose-a:underline">
+              <div
+                className="prose-content"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Actions */}
+        <div className="flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground gap-1.5">
+              <Share2 className="h-4 w-4" /> 分享
+            </Button>
+          </div>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive gap-1.5">
+            <Flag className="h-4 w-4" /> 举报
+          </Button>
+        </div>
+      </article>
+
+      {/* Comments Section */}
+      <section className="rounded-xl border bg-card shadow-sm">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
+            {post._count.comments} 条评论
+          </h2>
+        </div>
+
+        {/* Comment Form */}
+        {!post.isLocked && (
+          <div className="px-6 py-4 border-b bg-muted/10">
+            <Textarea
+              placeholder="写下你的评论..."
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+              className="mb-3 min-h-[80px] resize-y"
+            />
+            <div className="flex justify-end">
+              <Button
+                onClick={handleSubmitComment}
+                disabled={!commentContent.trim()}
+                size="sm"
+                className="gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" />
+                发布评论
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Comments List */}
+        <div className="divide-y divide-border/50">
+          {comments.map((comment) => (
+            <div key={comment.id} className="px-6 py-4">
+              {/* 一级评论 */}
+              <div className="flex gap-3">
+                <Avatar className="h-8 w-8 mt-0.5">
+                  <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                    {comment.author.name?.slice(0, 2) || '匿'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-medium">{comment.author.name || '匿名用户'}</span>
+                    <span className="text-xs text-muted-foreground">{formatRelative(comment.createdAt)}</span>
+                    {comment.score > 0 && (
+                      <Badge variant="outline" className="text-[10px] h-4 px-1 border-orange-200 text-orange-600">
+                        <ArrowUp className="h-2.5 w-2.5 mr-0.5" />
+                        {comment.score}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-foreground leading-relaxed mb-2">{comment.content}</p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs text-muted-foreground hover:text-tea-primary"
+                      onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                    >
+                      <CornerDownRight className="h-3 w-3 mr-1" />
+                      {replyingTo === comment.id ? '取消回复' : '回复'}
+                    </Button>
+                  </div>
+
+                  {/* Reply Form */}
+                  {replyingTo === comment.id && (
+                    <div className="mt-3 flex gap-2">
+                      <Textarea
+                        placeholder={`回复 @${comment.author.name || '匿名'}...`}
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        className="flex-1 min-h-[60px] text-sm"
+                        rows={2}
+                      />
+                      <div className="flex flex-col gap-1.5">
+                        <Button size="sm" onClick={() => handleReply(comment.id)} className="gap-1">
+                          <Send className="h-3 w-3" /> 发布
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setReplyingTo(null)}>
+                          取消
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 子评论 */}
+                  {comment.children.length > 0 && (
+                    <div className="mt-3 space-y-3 pl-3 border-l-2 border-border/40">
+                      {comment.children.map((child) => (
+                        <div key={child.id} className="flex gap-2.5">
+                          <Avatar className="h-6 w-6 mt-0.5">
+                            <AvatarFallback className="text-[10px] bg-muted text-muted-foreground">
+                              {child.author.name?.slice(0, 2) || '匿'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-sm font-medium">{child.author.name || '匿名用户'}</span>
+                              <span className="text-xs text-muted-foreground">{formatRelative(child.createdAt)}</span>
+                            </div>
+                            <p className="text-sm text-foreground leading-relaxed">{child.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {comments.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-40" />
+            <p className="text-sm">暂无评论，来说点什么吧</p>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

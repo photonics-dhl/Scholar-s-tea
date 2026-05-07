@@ -1,30 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
-import { CitationStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/v1/citations/pending - List pending citations for verification
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;
-    const pageSize = searchParams.get('pageSize') ? parseInt(searchParams.get('pageSize')!) : 20;
+    const pageSize = searchParams.get('pageSize') ? parseInt(searchParams.get('pageSize')!) : 10;
 
-    const where = { status: CitationStatus.PENDING };
-
-    const [total, citations] = await Promise.all([
-      prisma.communityCitation.count({ where }),
-      prisma.communityCitation.findMany({
-        where,
+    const [total, publications] = await Promise.all([
+      prisma.publication.count(),
+      prisma.publication.findMany({
         include: {
-          citingUser: { select: { id: true, name: true, avatar: true } },
-          publication: { select: { id: true, title: true } },
-          group: { select: { id: true, name: true } },
-          citingPost: { select: { id: true, title: true } },
-          citingComment: { select: { id: true, content: true } },
+          group: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          _count: {
+            select: {
+              citedCitations: true,
+            },
+          },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { citationCount: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: citations,
+      data: publications,
       meta: {
         page,
         pageSize,
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('GET /api/v1/citations/pending error:', error);
+    console.error('GET /api/v1/publications error:', error);
     return NextResponse.json(
       {
         success: false,

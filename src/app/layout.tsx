@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Providers } from '@/components/providers/Providers';
+import { FloatingChat } from '@/components/features/hermes/FloatingChat';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -24,7 +25,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <FloatingChat />
+        </Providers>
       </body>
     </html>
   );

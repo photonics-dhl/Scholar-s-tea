@@ -48,6 +48,7 @@ export function useHermesChat(initialMode: HermesMode = 'kawaii') {
         const response = await fetch('/api/v1/hermes/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
           body: JSON.stringify({
             messages: [...messages, userMessage].map((m) => ({
               role: m.role,

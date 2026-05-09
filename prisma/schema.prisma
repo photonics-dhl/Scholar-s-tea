@@ -482,6 +482,7 @@ enum MessageType {
   IMAGE
   FILE
   SYSTEM
+  STICKER
 }
 
 // ============================================

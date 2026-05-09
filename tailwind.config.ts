@@ -113,6 +113,9 @@ const config: Config = {
         'hermes-spin-slow': 'hermesSpinSlow 2s linear infinite',
         'hermes-float-heart': 'hermesFloatHeart 1.8s ease-in-out infinite',
         'hermes-dizzy-star': 'hermesDizzyStar 1s ease-in-out infinite',
+        'hermes-blink': 'hermesBlink 0.15s ease-in-out',
+        'hermes-peek': 'hermesPeek 2s ease-in-out infinite',
+        'hermes-sway': 'hermesSway 2s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -237,6 +240,19 @@ const config: Config = {
         hermesDizzyStar: {
           '0%, 100%': { opacity: '1', transform: 'rotate(0deg) scale(1)' },
           '50%': { opacity: '0.5', transform: 'rotate(180deg) scale(0.8)' },
+        },
+        hermesBlink: {
+          '0%': { transform: 'scaleY(0)' },
+          '50%': { transform: 'scaleY(1)' },
+          '100%': { transform: 'scaleY(0)' },
+        },
+        hermesPeek: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(-3px) rotate(3deg)' },
+        },
+        hermesSway: {
+          '0%, 100%': { transform: 'rotate(-5deg)' },
+          '50%': { transform: 'rotate(5deg)' },
         },
       },
       transitionTimingFunction: {

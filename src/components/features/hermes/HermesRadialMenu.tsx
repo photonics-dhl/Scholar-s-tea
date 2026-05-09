@@ -9,6 +9,12 @@ import {
   Hand,
   Heart,
   Shuffle,
+  BookOpen,
+  Search,
+  HelpCircle,
+  Coffee,
+  Lightbulb,
+  MessageSquare,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -18,7 +24,15 @@ export type RadialAction =
   | 'dance'
   | 'greet'
   | 'love'
-  | 'random';
+  | 'random'
+  | 'study'
+  | 'insight'
+  | 'confused'
+  | 'tea'
+  | 'inspired'
+  | 'debate'
+  | 'eureka'
+  | 'tea_sip';
 
 interface MenuItem {
   action: RadialAction;
@@ -32,19 +46,19 @@ interface MenuItem {
 const MENU_ITEMS: MenuItem[] = [
   {
     action: 'encourage',
-    label: '给我加油',
+    label: '安慰我',
     icon: Sparkles,
     color: 'text-amber-500',
     bgColor: 'bg-amber-50 hover:bg-amber-100 border-amber-200',
-    angle: -50,
+    angle: -60,
   },
   {
     action: 'rest',
-    label: '休息会儿',
+    label: '放松心情',
     icon: Moon,
     color: 'text-indigo-500',
     bgColor: 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200',
-    angle: -25,
+    angle: -40,
   },
   {
     action: 'greet',
@@ -52,31 +66,95 @@ const MENU_ITEMS: MenuItem[] = [
     icon: Hand,
     color: 'text-sky-500',
     bgColor: 'bg-sky-50 hover:bg-sky-100 border-sky-200',
-    angle: 0,
+    angle: -20,
   },
   {
     action: 'dance',
-    label: '跳支舞',
+    label: '跳舞',
     icon: Music,
     color: 'text-rose-500',
     bgColor: 'bg-rose-50 hover:bg-rose-100 border-rose-200',
-    angle: 25,
+    angle: 0,
   },
   {
     action: 'love',
-    label: '比心',
+    label: '好心情',
     icon: Heart,
     color: 'text-pink-500',
     bgColor: 'bg-pink-50 hover:bg-pink-100 border-pink-200',
-    angle: 50,
+    angle: 20,
+  },
+  {
+    action: 'study',
+    label: '格物致知',
+    icon: BookOpen,
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200',
+    angle: 40,
+  },
+  {
+    action: 'insight',
+    label: '洞察先机',
+    icon: Search,
+    color: 'text-violet-500',
+    bgColor: 'bg-violet-50 hover:bg-violet-100 border-violet-200',
+    angle: 60,
+  },
+  {
+    action: 'confused',
+    label: 'AI不懂',
+    icon: HelpCircle,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50 hover:bg-orange-100 border-orange-200',
+    angle: 80,
+  },
+  {
+    action: 'tea',
+    label: '茶会恭候',
+    icon: Coffee,
+    color: 'text-tea-primary',
+    bgColor: 'bg-tea-bg hover:bg-tea-mint/30 border-tea-primary/20',
+    angle: -80,
+  },
+  {
+    action: 'inspired',
+    label: '灵感爆棚',
+    icon: Lightbulb,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-50 hover:bg-yellow-100 border-yellow-200',
+    angle: -100,
+  },
+  {
+    action: 'eureka',
+    label: '原来如此',
+    icon: Sparkles,
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-50 hover:bg-cyan-100 border-cyan-200',
+    angle: 100,
+  },
+  {
+    action: 'tea_sip',
+    label: '茶润学识',
+    icon: Coffee,
+    color: 'text-tea-primary',
+    bgColor: 'bg-tea-bg hover:bg-tea-mint/30 border-tea-primary/20',
+    angle: 120,
+  },
+  {
+    action: 'debate',
+    label: '学术辩论',
+    icon: MessageSquare,
+    color: 'text-red-500',
+    bgColor: 'bg-red-50 hover:bg-red-100 border-red-200',
+    angle: 140,
   },
   {
     action: 'random',
     label: '随机',
     icon: Shuffle,
-    color: 'text-tea-primary',
-    bgColor: 'bg-tea-bg hover:bg-tea-mint/30 border-tea-primary/20',
-    angle: 75,
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-50 hover:bg-gray-100 border-gray-200',
+    angle: 160,
   },
 ];
 
@@ -140,7 +218,7 @@ export function HermesRadialMenu({
   // Anchor center position
   const centerX = anchorX + anchorSize / 2;
   const centerY = anchorY + anchorSize / 2;
-  const radius = 90; // distance from center to each button
+  const radius = 105; // distance from center to each button
 
   return (
     <div
@@ -153,12 +231,12 @@ export function HermesRadialMenu({
     >
       {/* Fan-shaped background */}
       <div
-        className="absolute rounded-full bg-white/60 backdrop-blur-sm border border-gray-200/50 shadow-lg animate-scale-in pointer-events-auto"
+        className="absolute rounded-full bg-white/70 backdrop-blur-sm border border-gray-200/50 shadow-lg animate-scale-in pointer-events-auto"
         style={{
-          width: radius * 2.6,
-          height: radius * 2.6,
-          left: -radius * 0.3,
-          top: -radius * 1.3,
+          width: radius * 2.8,
+          height: radius * 2.8,
+          left: -radius * 0.4,
+          top: -radius * 1.4,
         }}
       />
 
@@ -174,7 +252,7 @@ export function HermesRadialMenu({
             onClick={() => handleSelect(item.action)}
             className={cn(
               'absolute flex flex-col items-center justify-center gap-0.5',
-              'w-12 h-12 rounded-full border shadow-md',
+              'w-11 h-11 rounded-full border shadow-md',
               'transition-all duration-200 ease-out',
               'hover:scale-110 hover:shadow-lg active:scale-95',
               'pointer-events-auto cursor-pointer',
@@ -182,15 +260,15 @@ export function HermesRadialMenu({
               'animate-fade-in-up'
             )}
             style={{
-              left: x - 24,
-              top: y - 24,
-              animationDelay: `${index * 40}ms`,
+              left: x - 22,
+              top: y - 22,
+              animationDelay: `${index * 30}ms`,
               animationFillMode: 'both',
             }}
             title={item.label}
           >
-            <Icon className={cn('w-4 h-4', item.color)} />
-            <span className={cn('text-[9px] font-medium leading-none', item.color)}>
+            <Icon className={cn('w-3.5 h-3.5', item.color)} />
+            <span className={cn('text-[8px] font-medium leading-none', item.color)}>
               {item.label}
             </span>
           </button>

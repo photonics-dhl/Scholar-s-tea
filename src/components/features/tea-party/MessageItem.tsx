@@ -6,7 +6,7 @@ import { FileText, Image, Download } from 'lucide-react';
 interface Message {
   id: string;
   content: string;
-  type: 'TEXT' | 'IMAGE' | 'FILE' | 'SYSTEM';
+  type: 'TEXT' | 'IMAGE' | 'FILE' | 'SYSTEM' | 'STICKER';
   roomId: string;
   userId: string;
   createdAt: string;
@@ -106,6 +106,22 @@ function MessageBubble({ message, isOwn }: { message: Message; isOwn?: boolean }
           className="max-w-full h-auto object-cover"
           loading="lazy"
           onClick={() => window.open(message.content, '_blank')}
+        />
+      </div>
+    );
+  }
+
+  if (message.type === 'STICKER') {
+    return (
+      <div className={cn(
+        'rounded-xl overflow-hidden',
+        isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'
+      )}>
+        <img 
+          src={message.content} 
+          alt="表情包" 
+          className="w-28 h-28 object-contain"
+          loading="lazy"
         />
       </div>
     );

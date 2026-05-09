@@ -269,6 +269,9 @@ class ArxivSearcher:
                     print(f"  ERROR: ArXiv search failed for {category_id}: {e}")
                     return []
                 time.sleep(3)
+        # All 3 attempts exhausted - return empty to avoid crash on next ET.fromstring
+        print(f"  ERROR: ArXiv search exhausted all retries for {category_id}")
+        return []
 
         # 检查响应是否为有效 XML（429 时 ArXiv 可能返回 HTML）
         content = response.content
@@ -1585,7 +1588,7 @@ class FeishuCardSender:
         headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
         payload = {"receive_id": chat_id, "msg_type": "interactive", "content": json.dumps(card_content, ensure_ascii=False)}
         try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30, proxies=FEISHU_PROXIES)
+            response = requests.post(url, headers=headers, json=payload, timeout=30, proxies=FEISHU_PROXIES)
             result = response.json()
             if result.get("code") == 0:
                 print(f"  SUCCESS: Card sent to {chat_id}")
@@ -1719,7 +1722,8 @@ class FeishuCardSender:
         payload = {"receive_id": chat_id, "msg_type": "interactive", "content": card_content_str}
 
         try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30, proxies=FEISHU_PROXIES)
+            # content 字段已经是 JSON 字符串，直接用 requests.post(json=payload) 让其自动处理编码
+            response = requests.post(url, headers=headers, json=payload, timeout=30, proxies=FEISHU_PROXIES)
             result = response.json()
             if result.get("code") == 0:
                 message_id = result.get("data", {}).get("message_id", "")
@@ -2098,15 +2102,33 @@ class FeishuCardSender:
                     return text[:idx+1]
             return text[:max_len-1] + "…"
 
-        # 2. 提取发展趋势和启发（从论文分析中获取）
-        innovation_trend = ""
-        impact_insight = ""
+        # 2. 提取发展趋势和启发（从多篇论文分析中综合）
+        # 发展趋势：从 related_work 和 research思路 提取（反映领域横向联系和整体方向）
+        # 启发：从 impact 提取（反映研究意义和应用价值）
+        trend_parts = []
+        insight_parts = []
         for paper in papers[:3]:
             analysis = paper.get("analysis", {})
             if analysis:
-                innovation_trend = _smart_truncate(analysis.get("innovation", "")) or innovation_trend
-                impact_insight = _smart_truncate(analysis.get("impact", "")) or impact_insight
-                if innovation_trend and impact_insight:
+                related = _smart_truncate(analysis.get("related_work", ""), 60)
+                research = _smart_truncate(analysis.get("research思路", ""), 60)
+                impact = _smart_truncate(analysis.get("impact", ""), 60)
+                if related:
+                    trend_parts.append(related)
+                elif research:
+                    trend_parts.append(research)
+                if impact:
+                    insight_parts.append(impact)
+
+        # 综合多篇论文趋势：去重后拼接
+        innovation_trend = ""
+        if trend_parts:
+            seen = set()
+            for t in trend_parts:
+                key = t[:20]
+                if key not in seen:
+                    seen.add(key)
+                    innovation_trend = t
                     break
 
         if not innovation_trend:
@@ -2123,6 +2145,17 @@ class FeishuCardSender:
                 innovation_trend = "、".join(top_words) + " 等方向"
             else:
                 innovation_trend = "技术向实际应用转型"
+
+        # 启发：综合多篇 impact
+        impact_insight = ""
+        if insight_parts:
+            seen = set()
+            for i in insight_parts:
+                key = i[:20]
+                if key not in seen:
+                    seen.add(key)
+                    impact_insight = i
+                    break
 
         if not impact_insight:
             impact_insight = "跨学科交叉是突破口"
@@ -2235,7 +2268,7 @@ class FeishuCardSender:
             payload["in_reply_to"] = in_reply_to
 
         try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=30, proxies=FEISHU_PROXIES)
+            response = requests.post(url, headers=headers, json=payload, timeout=30, proxies=FEISHU_PROXIES)
             result = response.json()
             if result.get("code") == 0:
                 message_id = result.get("data", {}).get("message_id", "")

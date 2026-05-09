@@ -144,6 +144,54 @@ const COMFORT_MESSAGES: Record<RadialAction, string[]> = {
     '有你在的世界真好~',
     '我要给你一个大大的拥抱！🤗',
   ],
+  study: [
+    '格物致知，学无止境！📚',
+    '书中自有黄金屋，书中自有颜如玉~',
+    '今天的学习目标，完成了吗？',
+    '知识改变命运，学习成就未来！',
+  ],
+  insight: [
+    '洞察先机，明察秋毫！🔍',
+    '我发现了一个有趣的规律~',
+    '换个角度看问题，会有新发现！',
+    '这就是学术的魅力所在~',
+  ],
+  confused: [
+    '这个问题有点难呢...🤔',
+    'AI 也有不懂的时候呀~',
+    '让我们一起研究研究？',
+    '不懂就问，不丢人！',
+  ],
+  tea: [
+    '茶会恭候，随时欢迎！🍵',
+    '来杯龙井提提神？',
+    '茶香四溢，思绪万千~',
+    '喝茶聊天，人生一大乐事~',
+  ],
+  inspired: [
+    '灵感爆棚！💡',
+    '我想到一个好主意！',
+    '创造力如泉涌~',
+    '智慧的火花在闪耀！',
+  ],
+  debate: [
+    '学术辩论，理越辩越明！📖',
+    '让我们来一场思想的碰撞~',
+    '不同的观点才能激发创新！',
+    '真理越辩越明~',
+  ],
+  eureka: [
+    '原来如此！恍然大悟！✨',
+    '这就是答案！太棒了！',
+    '知识的拼图又完整了一块~',
+    '成就感满满！',
+  ],
+  tea_sip: [
+    '茶润学识，口齿留香~ 🍵',
+    '好茶配好知识，人生美满~',
+    '品味茶香，沉淀思绪...',
+    '一杯好茶，一段好时光~',
+  ],
   random: [],
 };
 
@@ -169,9 +217,11 @@ export function FloatingChat() {
   const dragStartRef = useRef<{ sx: number; sy: number; ix: number; iy: number } | null>(null);
   const dragTargetRef = useRef<HTMLElement | null>(null);
 
-  // ===== 右键扇形菜单状态 =====
+  // ===== 动作菜单状态（双击唤起） =====
   const [radialOpen, setRadialOpen] = useState(false);
   const [avatarCommand, setAvatarCommand] = useState<AvatarCommand | undefined>(undefined);
+  const lastClickTimeRef = useRef<number>(0);
+  const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 同步 ref 避免闭包问题
   useEffect(() => {
@@ -200,7 +250,13 @@ export function FloatingChat() {
       });
     };
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+    };
   }, []);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -250,7 +306,26 @@ export function FloatingChat() {
     savePosition(posRef.current.x, posRef.current.y);
 
     if (distance < 5) {
-      setIsOpen(true);
+      const now = Date.now();
+      const timeSinceLastClick = now - lastClickTimeRef.current;
+
+      if (timeSinceLastClick < 300) {
+        // 双击：打开动作菜单
+        if (clickTimerRef.current) {
+          clearTimeout(clickTimerRef.current);
+          clickTimerRef.current = null;
+        }
+        lastClickTimeRef.current = 0;
+        setRadialOpen(true);
+      } else {
+        // 单击：延迟打开聊天面板，等待可能的第二次点击
+        lastClickTimeRef.current = now;
+        clickTimerRef.current = setTimeout(() => {
+          setIsOpen(true);
+          lastClickTimeRef.current = 0;
+          clickTimerRef.current = null;
+        }, 250);
+      }
     }
   }, [isDragging]);
 
@@ -266,6 +341,11 @@ export function FloatingChat() {
     }
 
     dragStartRef.current = null;
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+      lastClickTimeRef.current = 0;
+    }
     const saved = getSavedPosition();
     if (saved) {
       const clamped = clampPosition(saved.x, saved.y);
@@ -274,10 +354,16 @@ export function FloatingChat() {
     }
   }, [isDragging]);
 
-  // ===== 右键菜单处理 =====
+  // ===== 右键菜单处理（保留作为备选） =====
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     if (isOpen || isDragging) return;
+    // 取消可能待处理的单击
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+    lastClickTimeRef.current = 0;
     setRadialOpen(true);
   }, [isOpen, isDragging]);
 
@@ -304,6 +390,30 @@ export function FloatingChat() {
         break;
       case 'love':
         setAvatarCommand({ action: 'love', bubble });
+        break;
+      case 'study':
+        setAvatarCommand({ action: 'study', bubble });
+        break;
+      case 'insight':
+        setAvatarCommand({ action: 'insight', bubble });
+        break;
+      case 'confused':
+        setAvatarCommand({ action: 'confused', bubble });
+        break;
+      case 'tea':
+        setAvatarCommand({ action: 'tea', bubble });
+        break;
+      case 'inspired':
+        setAvatarCommand({ action: 'inspired', bubble });
+        break;
+      case 'debate':
+        setAvatarCommand({ action: 'debate', bubble });
+        break;
+      case 'eureka':
+        setAvatarCommand({ action: 'eureka', bubble });
+        break;
+      case 'tea_sip':
+        setAvatarCommand({ action: 'tea_sip', bubble });
         break;
       case 'random':
         setAvatarCommand({ action: 'random' });
@@ -368,7 +478,7 @@ export function FloatingChat() {
             isDragging && 'cursor-grabbing',
             !isDragging && 'cursor-grab'
           )}
-          title="AI 助手 Hermes（按住拖拽，右键菜单）"
+          title="学者熊猫 Hermes（按住拖拽，双击菜单）"
           role="button"
           tabIndex={0}
         >
@@ -393,7 +503,7 @@ export function FloatingChat() {
             <span>拖拽</span>
           </div>
 
-          {/* 右键提示 */}
+          {/* 双击提示 */}
           <div
             className={cn(
               'absolute -top-3 right-0 translate-x-1/2',
@@ -403,7 +513,7 @@ export function FloatingChat() {
               'pointer-events-none whitespace-nowrap'
             )}
           >
-            右键菜单
+            动作菜单
           </div>
 
           <div>
@@ -426,7 +536,7 @@ export function FloatingChat() {
           {!isOpen && (
             <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
               <span className="text-[10px] bg-white/90 text-tea-primary px-2 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium">
-                点我聊天~ 右键有惊喜
+                点我聊天~ 双击动作菜单
               </span>
             </div>
           )}

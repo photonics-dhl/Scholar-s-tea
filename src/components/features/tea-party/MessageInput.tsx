@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Send, Smile, Image, Paperclip, X } from 'lucide-react';
+import { Send, Smile, Image, Paperclip, X, Sticker } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 
@@ -18,20 +18,41 @@ const QUICK_EMOJIS = [
   '😊','😅','😭','😤','🥳','🤯','😴','🤓','😎','🤗',
 ];
 
+// Sticker assets — 学者熊猫表情包
+const STICKERS = [
+  { name: 'gewu-zhixin', src: '/stickers/gewu-zhixin.png', label: '格物知新' },
+  { name: 'thinking', src: '/stickers/thinking.png', label: '思考中' },
+  { name: 'tired', src: '/stickers/tired.png', label: '学不动了' },
+  { name: 'insight', src: '/stickers/insight.png', label: '洞察先机' },
+  { name: 'confused', src: '/stickers/confused.png', label: 'AI也不懂' },
+  { name: 'tea-welcome', src: '/stickers/tea-welcome.png', label: '茶会恭候' },
+  { name: 'inspired', src: '/stickers/inspired.png', label: '灵感爆棚' },
+  { name: 'debate', src: '/stickers/debate.png', label: '学术辩论' },
+  { name: 'keep-going', src: '/stickers/keep-going.png', label: '洞察先机' },
+  { name: 'continue-study', src: '/stickers/continue-study.png', label: '继续格物' },
+  { name: 'eureka', src: '/stickers/eureka.png', label: '原来如此' },
+  { name: 'tea-sip', src: '/stickers/tea-sip.png', label: '茶润学识' },
+];
+
 export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) {
   const [content, setContent] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
+  const [showSticker, setShowSticker] = useState(false);
   const [uploading, setUploading] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emojiRef = useRef<HTMLDivElement>(null);
+  const stickerRef = useRef<HTMLDivElement>(null);
 
-  // Close emoji picker on click outside
+  // Close picker on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
         setShowEmoji(false);
+      }
+      if (stickerRef.current && !stickerRef.current.contains(e.target as Node)) {
+        setShowSticker(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -84,6 +105,11 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
       textarea.focus();
       textarea.setSelectionRange(start + emoji.length, start + emoji.length);
     }, 0);
+  };
+
+  const sendSticker = (stickerSrc: string) => {
+    onSend(stickerSrc, 'STICKER');
+    setShowSticker(false);
   };
 
   const handleFileUpload = async (file: File, type: 'IMAGE' | 'FILE') => {
@@ -159,7 +185,10 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
               'h-8 w-8 text-gray-400 hover:text-gray-600',
               showEmoji && 'text-tea-primary bg-tea-primary/10'
             )}
-            onClick={() => setShowEmoji(!showEmoji)}
+            onClick={() => {
+              setShowEmoji(!showEmoji);
+              setShowSticker(false);
+            }}
             disabled={disabled || uploading}
           >
             <Smile className="h-5 w-5" />
@@ -182,6 +211,65 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
                     onClick={() => insertEmoji(emoji)}
                   >
                     {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sticker Button */}
+        <div className="relative" ref={stickerRef}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'h-8 w-8 text-gray-400 hover:text-gray-600',
+              showSticker && 'text-tea-primary bg-tea-primary/10'
+            )}
+            onClick={() => {
+              setShowSticker(!showSticker);
+              setShowEmoji(false);
+            }}
+            disabled={disabled || uploading}
+          >
+            <Sticker className="h-5 w-5" />
+          </Button>
+
+          {/* Sticker Picker */}
+          {showSticker && (
+            <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-xl shadow-lg p-3 w-[320px] z-50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-muted-foreground font-medium">学者熊猫表情包</span>
+                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setShowSticker(false)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-4 gap-2 max-h-[240px] overflow-y-auto">
+                {STICKERS.map((sticker) => (
+                  <button
+                    key={sticker.name}
+                    className="flex flex-col items-center gap-1 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => sendSticker(sticker.src)}
+                    title={sticker.label}
+                  >
+                    <div className="w-16 h-16 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={sticker.src}
+                        alt={sticker.label}
+                        className="w-full h-full object-contain"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          const fallback = (e.target as HTMLImageElement).parentElement;
+                          if (fallback) fallback.innerHTML = `<span class="text-2xl">🐼</span>`;
+                        }}
+                      />
+                    </div>
+                    <span className="text-[9px] text-muted-foreground truncate w-full text-center">
+                      {sticker.label}
+                    </span>
                   </button>
                 ))}
               </div>

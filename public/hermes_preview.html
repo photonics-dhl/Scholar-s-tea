@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hermes 熊猫预览 V2 — 极简 Kakao 风格</title>
+  <title>Hermes 熊猫预览 V3 — Kakao 粗描边 Q 版</title>
   <style>
     body {
       margin: 0;
@@ -75,22 +75,24 @@
       line-height: 1.8;
     }
     .changelog li.done { color: #2a9d5c; }
+    .changelog li.new { color: #2563eb; font-weight: 600; }
     .changelog li.del { color: #c44; text-decoration: line-through; }
   </style>
 </head>
 <body>
-  <h1>🐼 Hermes 熊猫预览 V2</h1>
-  <p class="subtitle">极简 Kakao 风格 — 纯色 + 形状叠加（200px 放大展示）</p>
+  <h1>🐼 Hermes 熊猫预览 V3</h1>
+  <p class="subtitle">Kakao Friends 粗描边 Q 版 — 大头圆眼 + 粗轮廓线 + ω 萌嘴</p>
 
   <div class="changelog">
-    <h3>📝 本次变更</h3>
+    <h3>📝 V3 核心改进</h3>
     <ul>
-      <li class="del">❌ SVG feTurbulence 毛绒滤镜（导致边缘扭曲）</li>
-      <li class="del">❌ 所有径向渐变定义（视觉噪音）</li>
-      <li class="done">✅ 经典熊猫多层大眼（眼圈+眼白+瞳孔+双高光）</li>
-      <li class="done">✅ 圆润大头比例（头身比 2:1）</li>
-      <li class="done">✅ 极简 3 色：纯白 / 深炭 #1a1a2e / 腮红粉</li>
-      <li class="done">✅ 耳朵内凹细节 + 头部下方阴影</li>
+      <li class="new">🔵 粗描边系统 — 头部/耳朵/身体/手脚全部加 1-2px 深色轮廓线</li>
+      <li class="new">🔵 头部变圆 — rx≈ry，从扁椭圆变成圆球</li>
+      <li class="new">🔵 眼睛放大 20% — 瞳孔增大到 0.38sz，高光更大更亮</li>
+      <li class="new">🔵 腮红变大 — rx=0.075s（原来 0.055s），像一团粉色</li>
+      <li class="new">🔵 ω 萌嘴 — 默认小嘴改为倒三角圆润底</li>
+      <li class="new">🔵 身体更圆润 — rx=0.23/ry=0.16，像水滴形</li>
+      <li class="del">V2 纯色极简风格</li>
     </ul>
   </div>
 
@@ -100,6 +102,8 @@
 
   <script>
     const S = 200;
+    const STROKE = '#1a1a2e';
+    const STROKE_W = s => s * 0.018;
     const moods = [
       { name: 'idle', label: '默认' },
       { name: 'happy', label: '开心' },
@@ -113,137 +117,143 @@
 
     function getBlush(mood) {
       switch(mood) {
-        case 'love': case 'shy': return { o: 0.65, c: '255,140,160' };
-        case 'angry': return { o: 0.5, c: '255,120,100' };
-        case 'happy': return { o: 0.45, c: '255,160,170' };
-        case 'sleepy': return { o: 0.2, c: '180,180,210' };
-        default: return { o: 0.35, c: '255,170,180' };
+        case 'love': case 'shy': return { o: 0.7, c: '255,130,150' };
+        case 'angry': return { o: 0.55, c: '255,110,90' };
+        case 'happy': return { o: 0.5, c: '255,150,165' };
+        case 'sleepy': return { o: 0.25, c: '180,180,210' };
+        default: return { o: 0.4, c: '255,160,175' };
       }
     }
 
     function renderEyes(s, mood, blinking) {
-      const eyeY = s * 0.34, leftX = s * 0.37, rightX = s * 0.63, sz = s * 0.075;
+      const eyeY = s * 0.36, leftX = s * 0.36, rightX = s * 0.64, sz = s * 0.09;
 
       if (blinking || mood === 'sleepy') {
         return `
-          <path d="M ${leftX - sz * 0.8} ${eyeY} Q ${leftX} ${eyeY + sz * 0.4} ${leftX + sz * 0.8} ${eyeY}"
-            stroke="#1a1a2e" stroke-width="${s * 0.025}" fill="none" stroke-linecap="round" />
-          <path d="M ${rightX - sz * 0.8} ${eyeY} Q ${rightX} ${eyeY + sz * 0.4} ${rightX + sz * 0.8} ${eyeY}"
-            stroke="#1a1a2e" stroke-width="${s * 0.025}" fill="none" stroke-linecap="round" />
+          <path d="M ${leftX - sz * 0.7} ${eyeY + sz * 0.15} Q ${leftX} ${eyeY + sz * 0.55} ${leftX + sz * 0.7} ${eyeY + sz * 0.15}"
+            stroke="${STROKE}" stroke-width="${s * 0.028}" fill="none" stroke-linecap="round" />
+          <path d="M ${rightX - sz * 0.7} ${eyeY + sz * 0.15} Q ${rightX} ${eyeY + sz * 0.55} ${rightX + sz * 0.7} ${eyeY + sz * 0.15}"
+            stroke="${STROKE}" stroke-width="${s * 0.028}" fill="none" stroke-linecap="round" />
         `;
       }
 
       const normalEye = (cx, rot) => `
-        <ellipse cx="${cx}" cy="${eyeY}" rx="${sz}" ry="${sz * 0.85}" fill="#1a1a2e" transform="rotate(${rot} ${cx} ${eyeY})" />
-        <circle cx="${cx}" cy="${eyeY - sz * 0.05}" r="${sz * 0.55}" fill="#fff" />
-        <circle cx="${cx - sz * 0.02}" cy="${eyeY + sz * 0.02}" r="${sz * 0.3}" fill="#0a0a14" />
-        <circle cx="${cx + sz * 0.12}" cy="${eyeY - sz * 0.18}" r="${sz * 0.14}" fill="#fff" />
-        <circle cx="${cx - sz * 0.1}" cy="${eyeY + sz * 0.1}" r="${sz * 0.07}" fill="#fff" opacity="0.7" />
+        <ellipse cx="${cx}" cy="${eyeY}" rx="${sz * 1.05}" ry="${sz * 0.88}" fill="${STROKE}" transform="rotate(${rot} ${cx} ${eyeY})" />
+        <circle cx="${cx}" cy="${eyeY - sz * 0.02}" r="${sz * 0.68}" fill="#fff" />
+        <circle cx="${cx}" cy="${eyeY + sz * 0.02}" r="${sz * 0.38}" fill="${STROKE}" />
+        <circle cx="${cx - sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
+        <circle cx="${cx + sz * 0.16}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
+        <circle cx="${cx + sz * 0.08}" cy="${eyeY - sz * 0.08}" r="${sz * 0.05}" fill="#fff" opacity="0.9" />
       `;
 
       switch(mood) {
         case 'happy':
           return `
-            <path d="M ${leftX - sz * 0.9} ${eyeY + sz * 0.25} Q ${leftX} ${eyeY - sz * 0.35} ${leftX + sz * 0.9} ${eyeY + sz * 0.25}"
-              stroke="#1a1a2e" stroke-width="${s * 0.032}" fill="none" stroke-linecap="round" />
-            <path d="M ${rightX - sz * 0.9} ${eyeY + sz * 0.25} Q ${rightX} ${eyeY - sz * 0.35} ${rightX + sz * 0.9} ${eyeY + sz * 0.25}"
-              stroke="#1a1a2e" stroke-width="${s * 0.032}" fill="none" stroke-linecap="round" />
+            <path d="M ${leftX - sz * 0.9} ${eyeY + sz * 0.3} Q ${leftX} ${eyeY - sz * 0.35} ${leftX + sz * 0.9} ${eyeY + sz * 0.3}"
+              stroke="${STROKE}" stroke-width="${s * 0.035}" fill="none" stroke-linecap="round" />
+            <path d="M ${rightX - sz * 0.9} ${eyeY + sz * 0.3} Q ${rightX} ${eyeY - sz * 0.35} ${rightX + sz * 0.9} ${eyeY + sz * 0.3}"
+              stroke="${STROKE}" stroke-width="${s * 0.035}" fill="none" stroke-linecap="round" />
           `;
         case 'love': {
-          const heart = cx => `<path d="M ${cx} ${eyeY + sz * 0.25} C ${cx - sz * 0.7} ${eyeY - sz * 0.3}, ${cx - sz * 0.7} ${eyeY + sz * 0.6}, ${cx} ${eyeY + sz * 0.25} C ${cx + sz * 0.7} ${eyeY + sz * 0.6}, ${cx + sz * 0.7} ${eyeY - sz * 0.3}, ${cx} ${eyeY + sz * 0.25}" fill="#E84A5F" />`;
+          const heart = cx => `<path d="M ${cx} ${eyeY + sz * 0.25} C ${cx - sz * 0.75} ${eyeY - sz * 0.35}, ${cx - sz * 0.75} ${eyeY + sz * 0.65}, ${cx} ${eyeY + sz * 0.25} C ${cx + sz * 0.75} ${eyeY + sz * 0.65}, ${cx + sz * 0.75} ${eyeY - sz * 0.35}, ${cx} ${eyeY + sz * 0.25}" fill="#E84A5F" stroke="${STROKE}" stroke-width="${s * 0.012}" />`;
           return heart(leftX) + heart(rightX);
         }
         case 'surprised':
           return `
-            <ellipse cx="${leftX}" cy="${eyeY}" rx="${sz * 1.1}" ry="${sz}" fill="#1a1a2e" transform="rotate(-5 ${leftX} ${eyeY})" />
-            <circle cx="${leftX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.65}" fill="#fff" />
-            <circle cx="${leftX}" cy="${eyeY}" r="${sz * 0.4}" fill="#0a0a14" />
-            <circle cx="${leftX + sz * 0.15}" cy="${eyeY - sz * 0.2}" r="${sz * 0.18}" fill="#fff" />
-            <ellipse cx="${rightX}" cy="${eyeY}" rx="${sz * 1.1}" ry="${sz}" fill="#1a1a2e" transform="rotate(5 ${rightX} ${eyeY})" />
-            <circle cx="${rightX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.65}" fill="#fff" />
-            <circle cx="${rightX}" cy="${eyeY}" r="${sz * 0.4}" fill="#0a0a14" />
-            <circle cx="${rightX + sz * 0.15}" cy="${eyeY - sz * 0.2}" r="${sz * 0.18}" fill="#fff" />
+            <ellipse cx="${leftX}" cy="${eyeY}" rx="${sz * 1.15}" ry="${sz * 1.05}" fill="${STROKE}" transform="rotate(-6 ${leftX} ${eyeY})" />
+            <circle cx="${leftX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.72}" fill="#fff" />
+            <circle cx="${leftX}" cy="${eyeY + sz * 0.02}" r="${sz * 0.45}" fill="${STROKE}" />
+            <circle cx="${leftX + sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
+            <circle cx="${leftX - sz * 0.12}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
+            <ellipse cx="${rightX}" cy="${eyeY}" rx="${sz * 1.15}" ry="${sz * 1.05}" fill="${STROKE}" transform="rotate(6 ${rightX} ${eyeY})" />
+            <circle cx="${rightX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.72}" fill="#fff" />
+            <circle cx="${rightX}" cy="${eyeY + sz * 0.02}" r="${sz * 0.45}" fill="${STROKE}" />
+            <circle cx="${rightX + sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
+            <circle cx="${rightX - sz * 0.12}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
           `;
         case 'angry': {
           const angryEye = (cx, sx) => `
-            <line x1="${cx - sx}" y1="${eyeY - sz * 0.6}" x2="${cx + sx * 0.35}" y2="${eyeY + sz * 0.2}"
-              stroke="#1a1a2e" stroke-width="${s * 0.025}" stroke-linecap="round" />
-            <ellipse cx="${cx}" cy="${eyeY + sz * 0.2}" rx="${sz * 0.6}" ry="${sz * 0.5}" fill="#1a1a2e" />
-            <circle cx="${cx - sx * 0.15}" cy="${eyeY + sz * 0.1}" r="${sz * 0.2}" fill="#fff" />
+            <line x1="${cx - sx}" y1="${eyeY - sz * 0.65}" x2="${cx + sx * 0.4}" y2="${eyeY + sz * 0.25}"
+              stroke="${STROKE}" stroke-width="${s * 0.028}" stroke-linecap="round" />
+            <ellipse cx="${cx}" cy="${eyeY + sz * 0.25}" rx="${sz * 0.65}" ry="${sz * 0.55}" fill="${STROKE}" />
+            <circle cx="${cx - sx * 0.15}" cy="${eyeY + sz * 0.15}" r="${sz * 0.22}" fill="#fff" />
+            <circle cx="${cx - sx * 0.12}" cy="${eyeY + sz * 0.12}" r="${sz * 0.1}" fill="#fff" opacity="0.7" />
           `;
           return angryEye(leftX, sz) + angryEye(rightX, -sz);
         }
         case 'thinking':
         case 'shy': {
           const thinkEye = (cx, rot, ry) => `
-            <ellipse cx="${cx}" cy="${eyeY}" rx="${sz * 0.85}" ry="${sz * ry}" fill="#1a1a2e" transform="rotate(${rot} ${cx} ${eyeY})" />
-            <circle cx="${cx}" cy="${eyeY - sz * 0.05}" r="${sz * 0.45}" fill="#fff" />
-            <circle cx="${cx - sz * 0.05}" cy="${eyeY}" r="${sz * 0.25}" fill="#0a0a14" />
-            <circle cx="${cx + sz * 0.1}" cy="${eyeY - sz * 0.15}" r="${sz * 0.12}" fill="#fff" />
+            <ellipse cx="${cx}" cy="${eyeY}" rx="${sz * 0.92}" ry="${sz * ry}" fill="${STROKE}" transform="rotate(${rot} ${cx} ${eyeY})" />
+            <circle cx="${cx}" cy="${eyeY - sz * 0.05}" r="${sz * 0.50}" fill="#fff" />
+            <circle cx="${cx - sz * 0.05}" cy="${eyeY + sz * 0.02}" r="${sz * 0.28}" fill="${STROKE}" />
+            <circle cx="${cx + sz * 0.12}" cy="${eyeY - sz * 0.18}" r="${sz * 0.14}" fill="#fff" />
           `;
-          return thinkEye(leftX, -5, 0.55) + thinkEye(rightX, 5, 0.65);
+          return thinkEye(leftX, -6, 0.58) + thinkEye(rightX, 6, 0.68);
         }
         default:
-          return normalEye(leftX, -8) + normalEye(rightX, 8);
+          return normalEye(leftX, -12) + normalEye(rightX, 12);
       }
     }
 
     function renderMouth(s, mood) {
-      const mx = s * 0.50, my = s * 0.445, w = s * 0.12;
+      const mx = s * 0.50, my = s * 0.455, w = s * 0.10;
       switch(mood) {
         case 'happy': case 'love':
-          return `<path d="M ${mx - w} ${my} Q ${mx} ${my + w * 1.3} ${mx + w} ${my}" stroke="#1a1a2e" stroke-width="${s * 0.022}" stroke-linecap="round" fill="none" />`;
+          return `<path d="M ${mx - w} ${my} Q ${mx} ${my + w * 1.8} ${mx + w} ${my}" stroke="${STROKE}" stroke-width="${s * 0.026}" stroke-linecap="round" fill="none" />`;
         case 'surprised':
-          return `<ellipse cx="${mx}" cy="${my + s * 0.01}" rx="${s * 0.022}" ry="${s * 0.032}" fill="#1a1a2e" />`;
+          return `<ellipse cx="${mx}" cy="${my + s * 0.012}" rx="${s * 0.025}" ry="${s * 0.035}" fill="${STROKE}" />`;
         case 'thinking':
-          return `<path d="M ${mx - w * 0.7} ${my + s * 0.01} Q ${mx} ${my - s * 0.01} ${mx + w * 0.7} ${my + s * 0.01}" stroke="#1a1a2e" stroke-width="${s * 0.018}" stroke-linecap="round" fill="none" />`;
+          return `<path d="M ${mx - w * 0.6} ${my + s * 0.008} Q ${mx} ${my - s * 0.012} ${mx + w * 0.6} ${my + s * 0.008}" stroke="${STROKE}" stroke-width="${s * 0.020}" stroke-linecap="round" fill="none" />`;
         case 'angry':
-          return `<path d="M ${mx - w * 0.8} ${my + s * 0.02} Q ${mx} ${my - s * 0.02} ${mx + w * 0.8} ${my + s * 0.02}" stroke="#1a1a2e" stroke-width="${s * 0.022}" stroke-linecap="round" fill="none" />`;
+          return `<path d="M ${mx - w * 0.7} ${my + s * 0.025} Q ${mx} ${my - s * 0.015} ${mx + w * 0.7} ${my + s * 0.025}" stroke="${STROKE}" stroke-width="${s * 0.024}" stroke-linecap="round" fill="none" />`;
         case 'sleepy':
-          return `<ellipse cx="${mx}" cy="${my}" rx="${s * 0.016}" ry="${s * 0.012}" fill="#1a1a2e" />`;
+          return `<ellipse cx="${mx}" cy="${my + s * 0.005}" rx="${s * 0.018}" ry="${s * 0.014}" fill="${STROKE}" />`;
         case 'shy':
-          return `<path d="M ${mx - w * 0.6} ${my + s * 0.005} Q ${mx} ${my + w * 0.5} ${mx + w * 0.6} ${my + s * 0.005}" stroke="#1a1a2e" stroke-width="${s * 0.018}" stroke-linecap="round" fill="none" />`;
+          return `<path d="M ${mx - w * 0.5} ${my} Q ${mx - w * 0.15} ${my + w * 0.6} ${mx} ${my + w * 0.3} Q ${mx + w * 0.15} ${my + w * 0.6} ${mx + w * 0.5} ${my}" stroke="${STROKE}" stroke-width="${s * 0.020}" stroke-linecap="round" fill="none" />`;
         default:
-          return `<path d="M ${mx - w} ${my} Q ${mx} ${my + w * 0.7} ${mx + w} ${my}" stroke="#1a1a2e" stroke-width="${s * 0.02}" stroke-linecap="round" fill="none" />`;
+          return `<path d="M ${mx - w * 0.65} ${my} Q ${mx - w * 0.2} ${my + w * 0.7} ${mx} ${my + w * 0.4} Q ${mx + w * 0.2} ${my + w * 0.7} ${mx + w * 0.65} ${my}" stroke="${STROKE}" stroke-width="${s * 0.022}" stroke-linecap="round" fill="none" />`;
       }
     }
 
     function renderArms(s) {
+      const sw = STROKE_W(s);
       return `
-        <ellipse cx="${s * 0.30}" cy="${s * 0.62}" rx="${s * 0.045}" ry="${s * 0.065}" fill="#1a1a2e" />
-        <ellipse cx="${s * 0.70}" cy="${s * 0.62}" rx="${s * 0.045}" ry="${s * 0.065}" fill="#1a1a2e" />
+        <ellipse cx="${s * 0.28}" cy="${s * 0.66}" rx="${s * 0.05}" ry="${s * 0.07}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+        <ellipse cx="${s * 0.72}" cy="${s * 0.66}" rx="${s * 0.05}" ry="${s * 0.07}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
       `;
     }
 
     function renderPanda(s, mood, blinking) {
       const b = getBlush(mood);
+      const sw = STROKE_W(s);
       return `
         <svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
-          <ellipse cx="${s * 0.5}" cy="${s * 0.92}" rx="${s * 0.26}" ry="${s * 0.035}" fill="rgba(0,0,0,0.07)" />
+          <ellipse cx="${s * 0.5}" cy="${s * 0.92}" rx="${s * 0.24}" ry="${s * 0.032}" fill="rgba(0,0,0,0.08)" />
 
-          <ellipse cx="${s * 0.37}" cy="${s * 0.80}" rx="${s * 0.065}" ry="${s * 0.05}" fill="#1a1a2e" />
-          <ellipse cx="${s * 0.63}" cy="${s * 0.80}" rx="${s * 0.065}" ry="${s * 0.05}" fill="#1a1a2e" />
+          <ellipse cx="${s * 0.36}" cy="${s * 0.82}" rx="${s * 0.07}" ry="${s * 0.055}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+          <ellipse cx="${s * 0.64}" cy="${s * 0.82}" rx="${s * 0.07}" ry="${s * 0.055}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
 
-          <ellipse cx="${s * 0.5}" cy="${s * 0.58}" rx="${s * 0.21}" ry="${s * 0.14}" fill="#1a1a2e" />
-          <ellipse cx="${s * 0.5}" cy="${s * 0.59}" rx="${s * 0.13}" ry="${s * 0.10}" fill="#faf8f5" />
+          <ellipse cx="${s * 0.5}" cy="${s * 0.62}" rx="${s * 0.23}" ry="${s * 0.16}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+          <ellipse cx="${s * 0.5}" cy="${s * 0.63}" rx="${s * 0.15}" ry="${s * 0.12}" fill="#faf8f5" stroke="${STROKE}" stroke-width="${sw * 0.6}" />
 
-          <ellipse cx="${s * 0.20}" cy="${s * 0.16}" rx="${s * 0.09}" ry="${s * 0.08}" fill="#1a1a2e" />
-          <ellipse cx="${s * 0.20}" cy="${s * 0.17}" rx="${s * 0.055}" ry="${s * 0.045}" fill="#3d3d4a" />
-          <ellipse cx="${s * 0.80}" cy="${s * 0.16}" rx="${s * 0.09}" ry="${s * 0.08}" fill="#1a1a2e" />
-          <ellipse cx="${s * 0.80}" cy="${s * 0.17}" rx="${s * 0.055}" ry="${s * 0.045}" fill="#3d3d4a" />
+          <ellipse cx="${s * 0.18}" cy="${s * 0.14}" rx="${s * 0.10}" ry="${s * 0.09}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+          <ellipse cx="${s * 0.18}" cy="${s * 0.15}" rx="${s * 0.06}" ry="${s * 0.05}" fill="#3d3d4a" />
+          <ellipse cx="${s * 0.82}" cy="${s * 0.14}" rx="${s * 0.10}" ry="${s * 0.09}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+          <ellipse cx="${s * 0.82}" cy="${s * 0.15}" rx="${s * 0.06}" ry="${s * 0.05}" fill="#3d3d4a" />
 
-          <ellipse cx="${s * 0.5}" cy="${s * 0.36}" rx="${s * 0.27}" ry="${s * 0.24}" fill="#fff" />
-          <ellipse cx="${s * 0.5}" cy="${s * 0.52}" rx="${s * 0.20}" ry="${s * 0.06}" fill="#f0ece5" opacity="0.5" />
+          <ellipse cx="${s * 0.5}" cy="${s * 0.35}" rx="${s * 0.28}" ry="${s * 0.26}" fill="#fff" stroke="${STROKE}" stroke-width="${sw}" />
+          <ellipse cx="${s * 0.5}" cy="${s * 0.54}" rx="${s * 0.20}" ry="${s * 0.06}" fill="#f0ece5" opacity="0.5" />
 
           ${renderEyes(s, mood, blinking)}
 
-          <ellipse cx="${s * 0.50}" cy="${s * 0.435}" rx="${s * 0.032}" ry="${s * 0.022}" fill="#1a1a2e" />
-          <ellipse cx="${s * 0.495}" cy="${s * 0.428}" rx="${s * 0.01}" ry="${s * 0.005}" fill="white" opacity="0.5" />
+          <ellipse cx="${s * 0.50}" cy="${s * 0.445}" rx="${s * 0.035}" ry="${s * 0.025}" fill="${STROKE}" />
+          <ellipse cx="${s * 0.495}" cy="${s * 0.438}" rx="${s * 0.012}" ry="${s * 0.006}" fill="white" opacity="0.6" />
 
           ${renderMouth(s, mood)}
 
-          <ellipse cx="${s * 0.25}" cy="${s * 0.405}" rx="${s * 0.055}" ry="${s * 0.035}" fill="rgba(${b.c},${b.o})" />
-          <ellipse cx="${s * 0.75}" cy="${s * 0.405}" rx="${s * 0.055}" ry="${s * 0.035}" fill="rgba(${b.c},${b.o})" />
+          <ellipse cx="${s * 0.24}" cy="${s * 0.42}" rx="${s * 0.075}" ry="${s * 0.05}" fill="rgba(${b.c},${b.o})" />
+          <ellipse cx="${s * 0.76}" cy="${s * 0.42}" rx="${s * 0.075}" ry="${s * 0.05}" fill="rgba(${b.c},${b.o})" />
 
           ${renderArms(s)}
         </svg>

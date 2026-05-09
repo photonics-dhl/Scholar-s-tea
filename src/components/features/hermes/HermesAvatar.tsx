@@ -197,27 +197,38 @@ function pickRandom<T>(arr: T[]): T {
 }
 
 /* ============================================================
-   SVG 熊猫绘制函数
+   SVG 熊猫绘制函数 — 极简 Kakao 风格
    ============================================================ */
 
-/** 根据 mood 渲染眼睛 */
+/** 经典熊猫多层有神大眼 */
 function renderEyes(s: number, mood: HermesMood, blinking: boolean) {
   const eyeY = s * 0.34
-  const leftX = s * 0.35
-  const rightX = s * 0.65
-  const sz = s * 0.10
+  const leftX = s * 0.37
+  const rightX = s * 0.63
+  const sz = s * 0.075
 
-  // 闭眼状态（眨眼 / 睡觉 / 无聊）
+  // 闭眼
   if (blinking || mood === 'sleepy' || mood === 'bored') {
     return (
       <>
-        <path d={`M ${leftX - sz} ${eyeY} Q ${leftX} ${eyeY + sz * 0.35} ${leftX + sz} ${eyeY}`}
-          stroke="#1a1a2e" strokeWidth={s * 0.022} fill="none" strokeLinecap="round" />
-        <path d={`M ${rightX - sz} ${eyeY} Q ${rightX} ${eyeY + sz * 0.35} ${rightX + sz} ${eyeY}`}
-          stroke="#1a1a2e" strokeWidth={s * 0.022} fill="none" strokeLinecap="round" />
+        <path d={`M ${leftX - sz * 0.8} ${eyeY} Q ${leftX} ${eyeY + sz * 0.4} ${leftX + sz * 0.8} ${eyeY}`}
+          stroke="#1a1a2e" strokeWidth={s * 0.025} fill="none" strokeLinecap="round" />
+        <path d={`M ${rightX - sz * 0.8} ${eyeY} Q ${rightX} ${eyeY + sz * 0.4} ${rightX + sz * 0.8} ${eyeY}`}
+          stroke="#1a1a2e" strokeWidth={s * 0.025} fill="none" strokeLinecap="round" />
       </>
     )
   }
+
+  // 默认眼睛结构：眼圈+眼白+瞳孔+双高光
+  const normalEye = (cx: number, rot: number) => (
+    <>
+      <ellipse cx={cx} cy={eyeY} rx={sz} ry={sz * 0.85} fill="#1a1a2e" transform={`rotate(${rot} ${cx} ${eyeY})`} />
+      <circle cx={cx} cy={eyeY - sz * 0.05} r={sz * 0.55} fill="#fff" />
+      <circle cx={cx - sz * 0.02} cy={eyeY + sz * 0.02} r={sz * 0.3} fill="#0a0a14" />
+      <circle cx={cx + sz * 0.12} cy={eyeY - sz * 0.18} r={sz * 0.14} fill="#fff" />
+      <circle cx={cx - sz * 0.1} cy={eyeY + sz * 0.1} r={sz * 0.07} fill="#fff" opacity={0.7} />
+    </>
+  )
 
   switch (mood) {
     case 'happy':
@@ -227,98 +238,84 @@ function renderEyes(s: number, mood: HermesMood, blinking: boolean) {
     case 'inspired':
     case 'tea_time':
     case 'tea_sipping':
-      // 笑眼 ^ ^
       return (
         <>
-          <path d={`M ${leftX - sz} ${eyeY + sz * 0.2} Q ${leftX} ${eyeY - sz * 0.3} ${leftX + sz} ${eyeY + sz * 0.2}`}
-            stroke="#1a1a2e" strokeWidth={s * 0.028} fill="none" strokeLinecap="round" />
-          <path d={`M ${rightX - sz} ${eyeY + sz * 0.2} Q ${rightX} ${eyeY - sz * 0.3} ${rightX + sz} ${eyeY + sz * 0.2}`}
-            stroke="#1a1a2e" strokeWidth={s * 0.028} fill="none" strokeLinecap="round" />
+          <path d={`M ${leftX - sz * 0.9} ${eyeY + sz * 0.25} Q ${leftX} ${eyeY - sz * 0.35} ${leftX + sz * 0.9} ${eyeY + sz * 0.25}`}
+            stroke="#1a1a2e" strokeWidth={s * 0.032} fill="none" strokeLinecap="round" />
+          <path d={`M ${rightX - sz * 0.9} ${eyeY + sz * 0.25} Q ${rightX} ${eyeY - sz * 0.35} ${rightX + sz * 0.9} ${eyeY + sz * 0.25}`}
+            stroke="#1a1a2e" strokeWidth={s * 0.032} fill="none" strokeLinecap="round" />
         </>
       )
-    case 'love':
-      // 爱心眼
-      return (
-        <>
-          <path d={`M ${leftX} ${eyeY + sz * 0.2} C ${leftX - sz * 0.6} ${eyeY - sz * 0.3}, ${leftX - sz * 0.6} ${eyeY + sz * 0.5}, ${leftX} ${eyeY + sz * 0.2} C ${leftX + sz * 0.6} ${eyeY + sz * 0.5}, ${leftX + sz * 0.6} ${eyeY - sz * 0.3}, ${leftX} ${eyeY + sz * 0.2}`}
-            fill="#E84A5F" />
-          <path d={`M ${rightX} ${eyeY + sz * 0.2} C ${rightX - sz * 0.6} ${eyeY - sz * 0.3}, ${rightX - sz * 0.6} ${eyeY + sz * 0.5}, ${rightX} ${eyeY + sz * 0.2} C ${rightX + sz * 0.6} ${eyeY + sz * 0.5}, ${rightX + sz * 0.6} ${eyeY - sz * 0.3}, ${rightX} ${eyeY + sz * 0.2}`}
-            fill="#E84A5F" />
-        </>
+    case 'love': {
+      const heart = (cx: number) => (
+        <path d={`M ${cx} ${eyeY + sz * 0.25} C ${cx - sz * 0.7} ${eyeY - sz * 0.3}, ${cx - sz * 0.7} ${eyeY + sz * 0.6}, ${cx} ${eyeY + sz * 0.25} C ${cx + sz * 0.7} ${eyeY + sz * 0.6}, ${cx + sz * 0.7} ${eyeY - sz * 0.3}, ${cx} ${eyeY + sz * 0.25}`} fill="#E84A5F" />
       )
+      return (<>{heart(leftX)}{heart(rightX)}</>)
+    }
     case 'surprised':
-      // 惊讶大眼
       return (
         <>
-          <circle cx={leftX} cy={eyeY} r={sz * 0.9} fill="#1a1a2e" />
-          <circle cx={leftX - sz * 0.2} cy={eyeY - sz * 0.25} r={sz * 0.3} fill="white" />
-          <circle cx={rightX} cy={eyeY} r={sz * 0.9} fill="#1a1a2e" />
-          <circle cx={rightX - sz * 0.2} cy={eyeY - sz * 0.25} r={sz * 0.3} fill="white" />
+          <ellipse cx={leftX} cy={eyeY} rx={sz * 1.1} ry={sz} fill="#1a1a2e" transform={`rotate(-5 ${leftX} ${eyeY})`} />
+          <circle cx={leftX} cy={eyeY - sz * 0.05} r={sz * 0.65} fill="#fff" />
+          <circle cx={leftX} cy={eyeY} r={sz * 0.4} fill="#0a0a14" />
+          <circle cx={leftX + sz * 0.15} cy={eyeY - sz * 0.2} r={sz * 0.18} fill="#fff" />
+          <ellipse cx={rightX} cy={eyeY} rx={sz * 1.1} ry={sz} fill="#1a1a2e" transform={`rotate(5 ${rightX} ${eyeY})`} />
+          <circle cx={rightX} cy={eyeY - sz * 0.05} r={sz * 0.65} fill="#fff" />
+          <circle cx={rightX} cy={eyeY} r={sz * 0.4} fill="#0a0a14" />
+          <circle cx={rightX + sz * 0.15} cy={eyeY - sz * 0.2} r={sz * 0.18} fill="#fff" />
         </>
       )
     case 'angry':
-    case 'debate':
-      // 生气眼（倒八字 + 小圆眼）
-      return (
+    case 'debate': {
+      const angryEye = (cx: number, sx: number) => (
         <>
-          <line x1={leftX - sz} y1={eyeY - sz * 0.5} x2={leftX + sz * 0.3} y2={eyeY + sz * 0.15}
-            stroke="#1a1a2e" strokeWidth={s * 0.02} strokeLinecap="round" />
-          <circle cx={leftX} cy={eyeY + sz * 0.15} r={sz * 0.55} fill="#1a1a2e" />
-          <circle cx={leftX - sz * 0.15} cy={eyeY + sz * 0.05} r={sz * 0.18} fill="white" />
-          <line x1={rightX + sz} y1={eyeY - sz * 0.5} x2={rightX - sz * 0.3} y2={eyeY + sz * 0.15}
-            stroke="#1a1a2e" strokeWidth={s * 0.02} strokeLinecap="round" />
-          <circle cx={rightX} cy={eyeY + sz * 0.15} r={sz * 0.55} fill="#1a1a2e" />
-          <circle cx={rightX - sz * 0.15} cy={eyeY + sz * 0.05} r={sz * 0.18} fill="white" />
+          <line x1={cx - sx} y1={eyeY - sz * 0.6} x2={cx + sx * 0.35} y2={eyeY + sz * 0.2}
+            stroke="#1a1a2e" strokeWidth={s * 0.025} strokeLinecap="round" />
+          <ellipse cx={cx} cy={eyeY + sz * 0.2} rx={sz * 0.6} ry={sz * 0.5} fill="#1a1a2e" />
+          <circle cx={cx - sx * 0.15} cy={eyeY + sz * 0.1} r={sz * 0.2} fill="#fff" />
         </>
       )
+      return (<>{angryEye(leftX, sz)}{angryEye(rightX, -sz)}</>)
+    }
     case 'thinking':
     case 'curious':
-    case 'confused':
-      // 思考眼（半睁）
-      return (
+    case 'confused': {
+      const thinkEye = (cx: number, rot: number, ry: number) => (
         <>
-          <ellipse cx={leftX} cy={eyeY} rx={sz * 0.7} ry={sz * 0.45} fill="#1a1a2e" />
-          <circle cx={leftX - sz * 0.1} cy={eyeY - sz * 0.05} r={sz * 0.2} fill="white" />
-          <ellipse cx={rightX} cy={eyeY} rx={sz * 0.7} ry={sz * 0.55} fill="#1a1a2e" />
-          <circle cx={rightX - sz * 0.1} cy={eyeY - sz * 0.1} r={sz * 0.22} fill="white" />
+          <ellipse cx={cx} cy={eyeY} rx={sz * 0.85} ry={sz * ry} fill="#1a1a2e" transform={`rotate(${rot} ${cx} ${eyeY})`} />
+          <circle cx={cx} cy={eyeY - sz * 0.05} r={sz * 0.45} fill="#fff" />
+          <circle cx={cx - sz * 0.05} cy={eyeY} r={sz * 0.25} fill="#0a0a14" />
+          <circle cx={cx + sz * 0.1} cy={eyeY - sz * 0.15} r={sz * 0.12} fill="#fff" />
         </>
       )
-    case 'shy':
-      // 害羞眼（向下看）
-      return (
+      return (<>{thinkEye(leftX, -5, 0.55)}{thinkEye(rightX, 5, 0.65)}</>)
+    }
+    case 'shy': {
+      const shyEye = (cx: number, rot: number) => (
         <>
-          <ellipse cx={leftX} cy={eyeY + sz * 0.1} rx={sz * 0.65} ry={sz * 0.55} fill="#1a1a2e" />
-          <circle cx={leftX + sz * 0.1} cy={eyeY + sz * 0.15} r={sz * 0.18} fill="white" />
-          <ellipse cx={rightX} cy={eyeY + sz * 0.1} rx={sz * 0.65} ry={sz * 0.55} fill="#1a1a2e" />
-          <circle cx={rightX + sz * 0.1} cy={eyeY + sz * 0.15} r={sz * 0.18} fill="white" />
+          <ellipse cx={cx} cy={eyeY + sz * 0.1} rx={sz * 0.8} ry={sz * 0.65} fill="#1a1a2e" transform={`rotate(${rot} ${cx} ${eyeY})`} />
+          <circle cx={cx + sz * 0.1} cy={eyeY + sz * 0.2} r={sz * 0.4} fill="#fff" />
+          <circle cx={cx + sz * 0.15} cy={eyeY + sz * 0.25} r={sz * 0.22} fill="#0a0a14" />
+          <circle cx={cx + sz * 0.2} cy={eyeY + sz * 0.15} r={sz * 0.1} fill="#fff" />
         </>
       )
+      return (<>{shyEye(leftX, -5)}{shyEye(rightX, 5)}</>)
+    }
     case 'dizzy':
-      // 眩晕眼（× ×）
       return (
         <>
-          <text x={leftX - sz * 0.35} y={eyeY + sz * 0.25} fontSize={sz * 1.2} fill="#1a1a2e" fontWeight="bold" fontFamily="sans-serif">×</text>
-          <text x={rightX - sz * 0.35} y={eyeY + sz * 0.25} fontSize={sz * 1.2} fill="#1a1a2e" fontWeight="bold" fontFamily="sans-serif">×</text>
+          <text x={leftX - sz * 0.4} y={eyeY + sz * 0.3} fontSize={sz * 1.3} fill="#1a1a2e" fontWeight="bold" fontFamily="sans-serif">×</text>
+          <text x={rightX - sz * 0.4} y={eyeY + sz * 0.3} fontSize={sz * 1.3} fill="#1a1a2e" fontWeight="bold" fontFamily="sans-serif">×</text>
         </>
       )
     default:
-      // 正常睁眼（加大版）
-      return (
-        <>
-          <ellipse cx={leftX} cy={eyeY} rx={sz * 0.65} ry={sz * 0.8} fill="#1a1a2e" />
-          <circle cx={leftX - sz * 0.12} cy={eyeY - sz * 0.25} r={sz * 0.22} fill="white" />
-          <ellipse cx={rightX} cy={eyeY} rx={sz * 0.65} ry={sz * 0.8} fill="#1a1a2e" />
-          <circle cx={rightX - sz * 0.12} cy={eyeY - sz * 0.25} r={sz * 0.22} fill="white" />
-        </>
-      )
+      return (<>{normalEye(leftX, -8)}{normalEye(rightX, 8)}</>)
   }
 }
 
 /** 根据 mood 渲染嘴巴 */
 function renderMouth(s: number, mood: HermesMood) {
-  const mx = s * 0.50
-  const my = s * 0.44
-  const w = s * 0.14
+  const mx = s * 0.50, my = s * 0.445, w = s * 0.12
 
   switch (mood) {
     case 'happy':
@@ -327,38 +324,30 @@ function renderMouth(s: number, mood: HermesMood) {
     case 'eureka':
     case 'inspired':
     case 'love':
-      // 大笑
-      return <path d={`M ${mx - w} ${my} Q ${mx} ${my + w * 1.2} ${mx + w} ${my}`}
-        stroke="#1a1a2e" strokeWidth={s * 0.02} strokeLinecap="round" fill="none" />
+      return <path d={`M ${mx - w} ${my} Q ${mx} ${my + w * 1.3} ${mx + w} ${my}`}
+        stroke="#1a1a2e" strokeWidth={s * 0.022} strokeLinecap="round" fill="none" />
     case 'surprised':
-      // 惊讶O嘴
-      return <ellipse cx={mx} cy={my + s * 0.015} rx={s * 0.025} ry={s * 0.035} fill="#1a1a2e" />
+      return <ellipse cx={mx} cy={my + s * 0.01} rx={s * 0.022} ry={s * 0.032} fill="#1a1a2e" />
     case 'thinking':
     case 'curious':
     case 'confused':
-      // 思考嘴（微张）
       return <path d={`M ${mx - w * 0.7} ${my + s * 0.01} Q ${mx} ${my - s * 0.01} ${mx + w * 0.7} ${my + s * 0.01}`}
         stroke="#1a1a2e" strokeWidth={s * 0.018} strokeLinecap="round" fill="none" />
     case 'angry':
     case 'debate':
-      // 生气嘴（倒U）
       return <path d={`M ${mx - w * 0.8} ${my + s * 0.02} Q ${mx} ${my - s * 0.02} ${mx + w * 0.8} ${my + s * 0.02}`}
         stroke="#1a1a2e" strokeWidth={s * 0.022} strokeLinecap="round" fill="none" />
     case 'sleepy':
     case 'bored':
-      //  sleepy嘴（微张小o）
-      return <ellipse cx={mx} cy={my} rx={s * 0.018} ry={s * 0.012} fill="#1a1a2e" />
+      return <ellipse cx={mx} cy={my} rx={s * 0.016} ry={s * 0.012} fill="#1a1a2e" />
     case 'shy':
-      // 害羞嘴（小微笑）
       return <path d={`M ${mx - w * 0.6} ${my + s * 0.005} Q ${mx} ${my + w * 0.5} ${mx + w * 0.6} ${my + s * 0.005}`}
         stroke="#1a1a2e" strokeWidth={s * 0.018} strokeLinecap="round" fill="none" />
     case 'dizzy':
-      // 波浪嘴
       return <path d={`M ${mx - w} ${my} Q ${mx - w * 0.5} ${my + s * 0.02} ${mx} ${my} Q ${mx + w * 0.5} ${my - s * 0.02} ${mx + w} ${my}`}
         stroke="#1a1a2e" strokeWidth={s * 0.018} strokeLinecap="round" fill="none" />
     default:
-      // 默认微笑
-      return <path d={`M ${mx - w} ${my} Q ${mx} ${my + w * 0.6} ${mx + w} ${my}`}
+      return <path d={`M ${mx - w} ${my} Q ${mx} ${my + w * 0.7} ${mx + w} ${my}`}
         stroke="#1a1a2e" strokeWidth={s * 0.02} strokeLinecap="round" fill="none" />
   }
 }
@@ -385,61 +374,22 @@ function getBlushProps(mood: HermesMood): { opacity: number; color: string } {
   }
 }
 
-/** 渲染手臂（从身体伸出的圆润小手） */
+/** 渲染手臂 */
 function renderArms(s: number, _mood: HermesMood, isWaving: boolean, isDancing: boolean) {
-  const leftArmClass = isWaving
-    ? 'animate-hermes-wave-left'
-    : isDancing
-      ? 'animate-hermes-dance'
-      : ''
-
+  const leftArmClass = isWaving ? 'animate-hermes-wave-left' : isDancing ? 'animate-hermes-dance' : ''
   return (
     <>
-      {/* 左手 — 从身体左侧伸出 */}
-      <g
-        className={cn(leftArmClass)}
-        style={{
-          transformOrigin: `${s * 0.30}px ${s * 0.65}px`,
-          animationDuration: isDancing ? '0.9s' : undefined,
-        }}
-      >
-        {/* 手臂线条 */}
-        <path
-          d={`M ${s * 0.30} ${s * 0.65} Q ${s * 0.20} ${s * 0.72} ${s * 0.12} ${s * 0.72}`}
-          stroke="#1a1a2a"
-          strokeWidth={s * 0.055}
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* 手掌 */}
-        <ellipse cx={s * 0.11} cy={s * 0.725} rx={s * 0.055} ry={s * 0.05} fill="#1a1a2a" />
-        {/* 掌心高光 */}
-        <ellipse cx={s * 0.105} cy={s * 0.738} rx={s * 0.022} ry={s * 0.015} fill="#2a2a3a" opacity={0.5} />
+      <g className={cn(leftArmClass)} style={{ transformOrigin: `${s * 0.30}px ${s * 0.55}px`, animationDuration: isDancing ? '0.9s' : undefined }}>
+        <ellipse cx={s * 0.30} cy={s * 0.62} rx={s * 0.045} ry={s * 0.065} fill="#1a1a2e" />
       </g>
-      {/* 右手 — 从身体右侧伸出 */}
-      <g
-        className={cn(isDancing && 'animate-hermes-dance')}
-        style={{
-          transformOrigin: `${s * 0.70}px ${s * 0.65}px`,
-          animationDuration: isDancing ? '0.9s' : undefined,
-          animationDelay: isDancing ? '0.45s' : undefined,
-        }}
-      >
-        <path
-          d={`M ${s * 0.70} ${s * 0.65} Q ${s * 0.80} ${s * 0.72} ${s * 0.88} ${s * 0.72}`}
-          stroke="#1a1a2a"
-          strokeWidth={s * 0.055}
-          strokeLinecap="round"
-          fill="none"
-        />
-        <ellipse cx={s * 0.89} cy={s * 0.725} rx={s * 0.055} ry={s * 0.05} fill="#1a1a2a" />
-        <ellipse cx={s * 0.895} cy={s * 0.738} rx={s * 0.022} ry={s * 0.015} fill="#2a2a3a" opacity={0.5} />
+      <g className={cn(isDancing && 'animate-hermes-dance')} style={{ transformOrigin: `${s * 0.70}px ${s * 0.55}px`, animationDuration: isDancing ? '0.9s' : undefined, animationDelay: isDancing ? '0.45s' : undefined }}>
+        <ellipse cx={s * 0.70} cy={s * 0.62} rx={s * 0.045} ry={s * 0.065} fill="#1a1a2e" />
       </g>
     </>
   )
 }
 
-/** 主 SVG 熊猫渲染 — 无眼镜无帽子，大眼睛可爱熊猫 */
+/** 主 SVG 熊猫渲染 — 极简 Kakao 风格可爱熊猫 */
 function PandaSVG({
   size,
   mood,
@@ -454,83 +404,52 @@ function PandaSVG({
   isDancing: boolean
 }) {
   const s = size
-  const blush = getBlushProps(mood)
+  const { opacity, color } = getBlushProps(mood)
 
   return (
-    <svg
-      viewBox={`0 0 ${s} ${s}`}
-      width={s}
-      height={s}
-      className="drop-shadow-md"
-    >
-      <defs>
-        {/* 脸的高光 */}
-        <radialGradient id={`faceHighlight-${s}`} cx="35%" cy="30%" r="55%">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.5)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-        </radialGradient>
-        {/* 腮红 */}
-        <radialGradient id={`blush-${s}`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={`rgba(${blush.color},${blush.opacity})`} />
-          <stop offset="100%" stopColor={`rgba(${blush.color},0)`} />
-        </radialGradient>
-        {/* 肚子高光 */}
-        <radialGradient id={`belly-${s}`} cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#f0f0f0" />
-        </radialGradient>
-      </defs>
-
+    <svg viewBox={`0 0 ${s} ${s}`} width={s} height={s} className="drop-shadow-md">
       {/* 底部阴影 */}
-      <ellipse cx={s * 0.5} cy={s * 0.95} rx={s * 0.26} ry={s * 0.035} fill="rgba(0,0,0,0.08)" />
+      <ellipse cx={s * 0.5} cy={s * 0.92} rx={s * 0.26} ry={s * 0.035} fill="rgba(0,0,0,0.07)" />
 
-      {/* 腿 */}
-      <ellipse cx={s * 0.40} cy={s * 0.88} rx={s * 0.055} ry={s * 0.045} fill="#1a1a2a" />
-      <ellipse cx={s * 0.60} cy={s * 0.88} rx={s * 0.055} ry={s * 0.045} fill="#1a1a2a" />
-      {/* 脚掌 */}
-      <ellipse cx={s * 0.40} cy={s * 0.885} rx={s * 0.03} ry={s * 0.02} fill="#2a2a3a" opacity={0.4} />
-      <ellipse cx={s * 0.60} cy={s * 0.885} rx={s * 0.03} ry={s * 0.02} fill="#2a2a3a" opacity={0.4} />
+      {/* 脚 */}
+      <ellipse cx={s * 0.37} cy={s * 0.80} rx={s * 0.065} ry={s * 0.05} fill="#1a1a2e" />
+      <ellipse cx={s * 0.63} cy={s * 0.80} rx={s * 0.065} ry={s * 0.05} fill="#1a1a2e" />
 
       {/* 身体 */}
-      <ellipse cx={s * 0.5} cy={s * 0.72} rx={s * 0.20} ry={s * 0.14} fill="#fafafa" stroke="#e8e8e8" strokeWidth={s * 0.003} />
+      <ellipse cx={s * 0.5} cy={s * 0.58} rx={s * 0.21} ry={s * 0.14} fill="#1a1a2e" />
       {/* 肚子 */}
-      <ellipse cx={s * 0.5} cy={s * 0.74} rx={s * 0.12} ry={s * 0.08} fill={`url(#belly-${s})`} />
+      <ellipse cx={s * 0.5} cy={s * 0.59} rx={s * 0.13} ry={s * 0.10} fill="#faf8f5" />
 
       {/* 耳朵 */}
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')}
-        style={{ transformOrigin: `${s * 0.16}px ${s * 0.18}px` }}>
-        <circle cx={s * 0.16} cy={s * 0.18} r={s * 0.09} fill="#1a1a2a" />
-        <circle cx={s * 0.16} cy={s * 0.18} r={s * 0.055} fill="#2a2a3a" opacity={0.4} />
+      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.20}px ${s * 0.16}px` }}>
+        <ellipse cx={s * 0.20} cy={s * 0.16} rx={s * 0.09} ry={s * 0.08} fill="#1a1a2e" />
+        <ellipse cx={s * 0.20} cy={s * 0.17} rx={s * 0.055} ry={s * 0.045} fill="#3d3d4a" />
       </g>
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')}
-        style={{ transformOrigin: `${s * 0.84}px ${s * 0.18}px`, animationDelay: '0.15s' }}>
-        <circle cx={s * 0.84} cy={s * 0.18} r={s * 0.09} fill="#1a1a2a" />
-        <circle cx={s * 0.84} cy={s * 0.18} r={s * 0.055} fill="#2a2a3a" opacity={0.4} />
+      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.80}px ${s * 0.16}px`, animationDelay: '0.15s' }}>
+        <ellipse cx={s * 0.80} cy={s * 0.16} rx={s * 0.09} ry={s * 0.08} fill="#1a1a2e" />
+        <ellipse cx={s * 0.80} cy={s * 0.17} rx={s * 0.055} ry={s * 0.045} fill="#3d3d4a" />
       </g>
 
       {/* 头部 */}
-      <circle cx={s * 0.5} cy={s * 0.38} r={s * 0.28} fill="#fafafa" stroke="#e8e8e8" strokeWidth={s * 0.004} />
-      <circle cx={s * 0.5} cy={s * 0.38} r={s * 0.28} fill={`url(#faceHighlight-${s})`} />
+      <ellipse cx={s * 0.5} cy={s * 0.36} rx={s * 0.27} ry={s * 0.24} fill="#fff" />
+      {/* 头部下方阴影 */}
+      <ellipse cx={s * 0.5} cy={s * 0.52} rx={s * 0.20} ry={s * 0.06} fill="#f0ece5" opacity={0.5} />
 
-      {/* 黑眼圈 */}
-      <ellipse cx={s * 0.35} cy={s * 0.34} rx={s * 0.11} ry={s * 0.09} fill="#1a1a2a" opacity={0.88} />
-      <ellipse cx={s * 0.65} cy={s * 0.34} rx={s * 0.11} ry={s * 0.09} fill="#1a1a2a" opacity={0.88} />
-
-      {/* 眼睛（动态，加大版） */}
+      {/* 眼睛 */}
       {renderEyes(s, mood, blinking)}
 
       {/* 鼻子 */}
-      <ellipse cx={s * 0.50} cy={s * 0.405} rx={s * 0.038} ry={s * 0.025} fill="#1a1a2e" />
-      <ellipse cx={s * 0.495} cy={s * 0.398} rx={s * 0.012} ry={s * 0.006} fill="white" opacity={0.4} />
+      <ellipse cx={s * 0.50} cy={s * 0.435} rx={s * 0.032} ry={s * 0.022} fill="#1a1a2e" />
+      <ellipse cx={s * 0.495} cy={s * 0.428} rx={s * 0.01} ry={s * 0.005} fill="white" opacity={0.5} />
 
-      {/* 嘴巴（动态） */}
+      {/* 嘴巴 */}
       {renderMouth(s, mood)}
 
       {/* 腮红 */}
-      <circle cx={s * 0.24} cy={s * 0.44} r={s * 0.08} fill={`url(#blush-${s})`} />
-      <circle cx={s * 0.76} cy={s * 0.44} r={s * 0.08} fill={`url(#blush-${s})`} />
+      <ellipse cx={s * 0.25} cy={s * 0.405} rx={s * 0.055} ry={s * 0.035} fill={`rgba(${color},${opacity})`} />
+      <ellipse cx={s * 0.75} cy={s * 0.405} rx={s * 0.055} ry={s * 0.035} fill={`rgba(${color},${opacity})`} />
 
-      {/* 手臂（动态，从身体伸出） */}
+      {/* 手臂 */}
       {renderArms(s, mood, isWaving, isDancing)}
     </svg>
   )

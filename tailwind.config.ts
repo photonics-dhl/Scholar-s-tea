@@ -116,6 +116,12 @@ const config: Config = {
         'hermes-blink': 'hermesBlink 0.15s ease-in-out',
         'hermes-peek': 'hermesPeek 2s ease-in-out infinite',
         'hermes-sway': 'hermesSway 2s ease-in-out infinite',
+        'hermes-breathe-origin': 'hermesBreatheOrigin 2.5s ease-in-out infinite',
+        'hermes-ear-wiggle': 'hermesEarWiggle 2s ease-in-out infinite',
+        'hermes-pop': 'hermesPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'hermes-jump': 'hermesJump 0.5s ease-out',
+        'hermes-ripple': 'hermesRipple 0.6s ease-out forwards',
+        'hermes-particle': 'hermesParticle 1s ease-out forwards',
       },
       keyframes: {
         shimmer: {
@@ -253,6 +259,34 @@ const config: Config = {
         hermesSway: {
           '0%, 100%': { transform: 'rotate(-5deg)' },
           '50%': { transform: 'rotate(5deg)' },
+        },
+        hermesBreatheOrigin: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.03)' },
+        },
+        hermesEarWiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-5deg)' },
+          '75%': { transform: 'rotate(5deg)' },
+        },
+        hermesPop: {
+          '0%': { transform: 'scale(0.5)', opacity: '0' },
+          '70%': { transform: 'scale(1.15)' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        hermesJump: {
+          '0%': { transform: 'translateY(0) scale(1)' },
+          '30%': { transform: 'translateY(-12px) scale(0.95, 1.05)' },
+          '60%': { transform: 'translateY(4px) scale(1.05, 0.95)' },
+          '100%': { transform: 'translateY(0) scale(1)' },
+        },
+        hermesRipple: {
+          '0%': { transform: 'scale(0.8)', opacity: '1' },
+          '100%': { transform: 'scale(2.5)', opacity: '0' },
+        },
+        hermesParticle: {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '100%': { transform: 'translate(var(--tx), var(--ty)) scale(0)', opacity: '0' },
         },
       },
       transitionTimingFunction: {

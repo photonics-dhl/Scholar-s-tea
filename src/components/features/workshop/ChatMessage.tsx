@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { User, Bot, AlertCircle, Lightbulb } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { StreamText } from './StreamText'
@@ -133,12 +134,7 @@ export function ChatMessageItem({
         )}
 
         {/* Timestamp */}
-        <p className="text-[11px] text-muted-foreground mt-1.5 px-1">
-          {new Date(message.timestamp).toLocaleTimeString('zh-CN', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </p>
+        <Timestamp timestamp={message.timestamp} />
 
         {/* RAG Citations (only for completed assistant messages) */}
         {!showStream && isAssistant && message.ragContext && message.ragContext.length > 0 && (
@@ -148,5 +144,25 @@ export function ChatMessageItem({
         )}
       </div>
     </div>
+  )
+}
+
+/** SSR-safe timestamp component */
+function Timestamp({ timestamp }: { timestamp: number }) {
+  const [timeStr, setTimeStr] = useState('')
+
+  useEffect(() => {
+    setTimeStr(
+      new Date(timestamp).toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    )
+  }, [timestamp])
+
+  return (
+    <p className="text-[11px] text-muted-foreground mt-1.5 px-1 min-h-[1em]">
+      {timeStr}
+    </p>
   )
 }

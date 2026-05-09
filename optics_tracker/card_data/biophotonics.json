@@ -2,81 +2,27 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Quantum-enhanced biosensing enables earlier detection of bacterial growth",
-      "abstract": "Rapid detection of bacterial growth is crucial in clinical, food safety, and environmental contexts, yet conventional optical methods are limited by noise and require hours of incubation. Here, we present the first experimental demonstration of a quantum-enhanced photometric measurement for early bacterial detection using squeezed light. By monitoring the optical absorbance of an Escherichia coli culture with a quantum probe, we achieve a sensitivity beyond the shot-noise limit, enabling identification of growth onset up to 30 minutes earlier than with a classical sensor. The noise reduction is validated through statistical modeling with a truncated Gaussian distribution and hypothesis testing, confirming earlier detection with low false-alarm rates. This work illustrates how quantum resources can improve real-time, non-invasive diagnostics. Our results pave the way for quantum-enhanced biosensors that accelerate detection of microbial growth and other biological processes without increasing photodamage.",
-      "arxiv_id": "2512.12057v1",
-      "published": "2025-12-12",
-      "url": "http://arxiv.org/abs/2512.12057v1",
-      "authors": [
-        "Rayssa B. de Andrade",
-        "Anne Egholm Høgh",
-        "Gaetana Spedalieri"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "首次实验验证利用压缩光实现超越标准量子极限的光度测量，使大肠杆菌生长检测比传统光学方法提前30分钟识别生长起始点。",
-        "research思路": "解决传统光学检测受限于散粒噪声（shot-noise limit）需要数小时孵育才能检测细菌的问题，通过引入量子资源（压缩态光场）降低探测噪声，实现更早期的无创检测。",
-        "experiment": "采用压缩光作为探针监测大肠杆菌培养物的光吸收率变化，结合截断高斯分布的统计建模和假设检验验证噪声降低效果，评估检测灵敏度和误报率。",
-        "innovation": "首次将量子增强测量应用于生物传感领域，实现超越经典 shot-noise limit 的检测灵敏度；首次实验证明量子资源可将微生物生长检测时间提前30分钟以上。",
-        "related_work": "包括量子计量学中的压缩光应用研究（如 Giovannetti 2011）、传统光度法细菌检测技术、基于光吸收的微生物监测系统，以及量子生物传感器的理论框架（如 Degen 2017）。",
-        "impact": "开辟了量子增强实时、无创生物诊断的新方向，证明了量子资源在临床、食品安全的实际应用潜力，为加速微生物检测和其他生物过程监测提供了新范式。"
-      },
-      "domain_trend": {
-        "trend": "量子增强传感与微型化光学器件正推动生物光子学从宏观成像向超高灵敏度量子检测和可穿戴实时监测方向加速演进",
-        "key_topics": [
-          "量子增强生物传感突破标准量子极限",
-          "微流控光学器件低成本制造",
-          "光学与精准医疗深度融合",
-          "可穿戴实时监测技术",
-          "X射线相位对比成像临床转化"
-        ],
-        "development_direction": "生物光子学正经历从经典光学向量子增强、从实验室向临床转化、从侵入性向无创实时监测的范式转变，量子测量与微流控微型化技术成为实现超高灵敏度和便携化的双引擎，推动光学与生命科学、材料科学、量子信息的多学科深度交叉融合。"
-      }
-    },
-    {
-      "title": "Microfluidic gratings for X-ray Phase Contrast Imaging",
-      "abstract": "Fabrication of X-ray gratings has surged in the last two decades thanks to their vast employment in X-ray Phase Contrast Imaging, an imaging technique able to boost X-ray sensitivity to detect otherwise invisible details. These high aspect ratio devices are usually fabricated by complex, costly, multi-step processes that limit their size and volume scaling. These steps commonly involve UV or X-ray lithography, semiconductor selective etching and high-Z metal plating, usually Au, which require expensive tools and materials. Here we present a proof-of-concept fabrication via soft lithography and Hg infusion of microfluidic X-ray absorption gratings and their performance in biomedical imaging. Such fabrication technique requires fewer, less expensive, and more scalable processes using alternative and more sustainable materials, while showing comparable visibility with their conventional Au-based, solid equivalent. Our results constitute a promising shift in X-ray optics fabrication that could significantly lower barriers to commercialization and accelerate the practical deployment of X-ray Phase Contrast Imaging.",
-      "arxiv_id": "2512.07598v1",
-      "published": "2025-12-08",
-      "url": "http://arxiv.org/abs/2512.07598v1",
-      "authors": [
-        "Alessandro Rossi",
-        "Francesco Coccimiglio",
-        "Antonio Ferraro"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "提出基于软光刻和汞灌注的微流控X射线光栅制造方法，以低成本、可扩展的工艺实现与传统Au基固体光栅相当的成像性能。",
-        "research思路": "解决传统X射线光栅高成本、复杂工艺、难以规模化的问题，采用微流控结构结合液态金属灌注，探索替代传统硅基刻蚀+Au电镀的简化制造路线。",
-        "experiment": "采用软光刻技术在SU-8中制作高深宽比微结构通道，通过毛细作用灌注液态汞形成高吸收率光栅条，最后封装并进行X射线可视度和成像性能测试。",
-        "innovation": "首次将微流控结构与汞灌注相结合用于X射线吸收光栅制造，工艺步骤减少、材料成本降低，同时保持与传统Au基光栅相当的光学可视度。",
-        "related_work": " Talbot-Lau干涉仪架构中的光栅设计、X射线相位对比成像技术发展、传统高深宽比光栅的UV/X射线光刻和电镀制造工艺。",
-        "impact": "为X射线光学制造提供新的低成本的替代方案，推动相位对比成像从实验室向临床和工业应用的规模化转化，对生物医学成像领域具有重要意义。"
-      }
-    },
-    {
-      "title": "Shining a Light on the Future of Biophotonics - PMC",
-      "abstract": "Biophotonics—the interdisciplinary fusion of light‐based technologies with biology and medicine—is rapidly transforming research,",
-      "source": "tavily",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12245495/",
+      "title": "Issue Editorial Masthead",
+      "abstract": "",
+      "doi": "10.1021/imv004i002_2045113",
+      "url": "https://doi.org/10.1021/imv004i002_2045113",
       "authors": [],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "Chemical &amp; Biomedical Imaging",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "该文是一篇关于生物光子学（Biophotonics）领域的前瞻性综述，探讨光基技术在生物医学研究中的前沿进展与未来发展方向。",
-        "research思路": "解决光与生物系统相互作用的机理探索问题，以及如何将光学技术高效应用于疾病诊断、治疗和生物成像等临床转化挑战。",
-        "experiment": "综述性论文，汇总光学成像、光动力疗法、荧光显微镜、激光手术等关键技术的原理与应用案例，属于文献综合分析。",
-        "innovation": "作为综述文章，其创新在于整合跨学科最新成果，展望生物光子学在精准医疗、可穿戴设备和实时监测等新兴方向的应用潜力。",
-        "related_work": "该领域重要工作包括：光学相干断层成像（OCT）、共聚焦显微镜、拉曼光谱技术在生物医学中的应用，以及光遗传学的发展。",
-        "impact": "对推动光学技术与生命科学的深度融合具有指导意义，为生物医学研究提供了光基技术创新的系统性参考框架。"
+        "summary": "该请求无法处理，因为\"Issue Editorial Masthead\"并非研究论文，而是期刊/会议的编辑委员会名单页。",
+        "research思路": "无有效研究内容可供分析。编辑masthead通常仅列出期刊编辑人员、职务及联系信息，不包含科学研究内容。",
+        "experiment": "无实验方案可供提取。",
+        "innovation": "无创新点可供识别。",
+        "related_work": "无法提供关联工作。建议提供实际研究论文的标题、摘要或ArXiv ID。",
+        "impact": "无法进行学术评价。"
       },
       "domain_trend": {
-        "trend": ""
+        "trend": "无法根据提供的信息生成趋势概括。请提供有效的学术论文及其6维度分析。",
+        "key_topics": [],
+        "development_direction": "请提供具体的生物与医学光子学研究论文列表，以便进行准确的分析和趋势预测。"
       }
     }
   ]

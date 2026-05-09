@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Plus,
   MessageSquare,
@@ -45,9 +45,16 @@ export function AgentSidebar({
   const [hoveredSession, setHoveredSession] = useState<string | null>(null)
   const activeMode = getAgentMode(mode)
 
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp)
-    const now = new Date()
+    // SSR-safe: avoid hydration mismatch by using a fixed reference during SSR
+    const now = mounted ? new Date() : date
     const diff = now.getTime() - date.getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 

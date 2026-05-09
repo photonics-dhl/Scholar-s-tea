@@ -57,7 +57,8 @@ function saveSessions(sessions: ChatSession[]) {
 }
 
 export function useChat(initialMode: AgentMode = 'general') {
-  const [sessions, setSessions] = useState<ChatSession[]>(loadSessions)
+  // SSR-safe: start with empty sessions to avoid hydration mismatch
+  const [sessions, setSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [mode, setMode] = useState<AgentMode>(initialMode)
@@ -65,6 +66,16 @@ export function useChat(initialMode: AgentMode = 'general') {
   const [error, setError] = useState<string | null>(null)
   const [streamingContent, setStreamingContent] = useState('')
   const abortRef = useRef<AbortController | null>(null)
+  const [initialized, setInitialized] = useState(false)
+
+  // Load from localStorage on client side only
+  useEffect(() => {
+    if (!initialized) {
+      const loaded = loadSessions()
+      setSessions(loaded)
+      setInitialized(true)
+    }
+  }, [initialized])
 
   // Current session derived from sessions list
   const currentSession = sessions.find((s) => s.id === currentSessionId) || null

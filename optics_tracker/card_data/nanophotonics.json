@@ -2,75 +2,67 @@
   "domain_name": "硅基光子学与量子光学",
   "papers": [
     {
-      "title": "Anderson Localization with Single Photons from a Quantum Emitter",
-      "abstract": "Anderson localization of light is a fundamental emergent phenomenon in disordered systems. In arrays of coupled waveguides, it suppresses transport and causes photons to remain localized near the excitation site as coupling disorder increases. Here, we experimentally demonstrate Anderson localization using single photons emitted by a single-photon emitter in hexagonal boron nitride at room temperature. Despite the limited temporal coherence of the emitter, the photons undergo pronounced Anderson localization, evidenced by exponentially localized output intensity profiles in disordered waveguide lattices. Beyond the experimental demonstration, we develop a general theoretical framework for wave propagation in disordered tight-binding systems, showing that the configuration-averaged output intensity converges to a stationary spatial distribution at large propagation distances. In the case of off-diagonal disorder, this stationary profile is characterized by an effective localization length that exhibits a robust inverse-variance scaling with the disorder strength. These results establish defect-based room-temperature emitters as practical platforms for studying Anderson localization in integrated photonics and support their use in applications that exploit controlled disorder, including neuromorphic and quantum photonic architectures.",
-      "arxiv_id": "2605.03251v1",
-      "published": "2026-05-05",
-      "url": "http://arxiv.org/abs/2605.03251v1",
+      "title": "Enhanced four-wave mixing in silicon nitride waveguides coated with indium tin oxide operating at epsilon-near-zero",
+      "abstract": "",
+      "doi": "10.1364/oe.588624",
+      "url": "https://doi.org/10.1364/oe.588624",
       "authors": [
-        "Simon J. U. White",
-        "Diego N. Bernal-García",
-        "Toan Trong Tran"
+        "Arash Mokhtari",
+        "Pierre Berini"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "domain_trend": {
-        "trend": "硅基量子光子集成正突破室温单光子源、高保真纠缠与低复杂度纠错三重瓶颈，朝向可扩展容错量子计算与实用化量子密钥分发快步迈进。"
+      "venue": "Optics Express",
+      "published": 2026,
+      "source": "crossref",
+      "analysis": {
+        "summary": "该论文研究了在硅 nitride 波导表面涂覆氧化铟锡(ITO)涂层，利用 ITO 在 epsilon-near-zero (ENZ) 点处的强非线性效应实现四波混频 (FWM) 过程的显著增强。",
+        "research思路": "解决集成光子学中增强非线性光学效应的问题：通过在 SiN 波导上引入具有 ENZ 特性的 ITO 涂层，利用 ENZ 材料在介电常数接近零时电磁场增强和非线性响应增强的特性，提升 FWM 效率。",
+        "experiment": "采用等离子体增强化学气相沉积 (PECVD) 或溅射技术在 SiN 波导上沉积 ITO 薄膜；通过调节 ITO 成分和厚度，调控其等离子体频率使其在通信波段 (~1550nm) 附近达到 ENZ 状态；表征波导的非线性系数和 FWM 增益。",
+        "innovation": "首次将 ITO 涂层与低损耗 SiN 平台结合，突破传统 ENZ 材料（如金属）的高损耗限制；在保证波导低传输损耗的同时，利用 ITO 的可调 ENZ 特性实现可重构的非线性增强。",
+        "related_work": "ENZ 材料非线性光学（如 Al:ZnO、ITO）；硅基集成 FWM（Silicon photonics）；涂层波导非线性增强；透明导电氧化物的电控非线性调制。",
+        "impact": "为低损耗、高效率集成非线性光学器件提供了新思路；推动可调谐光频梳、量子光源和高速光信号处理等应用的发展；拓展了 ENZ 材料在 CMOS 兼容平台的应用潜力。"
       },
-      "analysis": {
-        "summary": "使用六方氮化硼室温单光子源在无序波导阵列中实验演示了单光子Anderson局域化，并建立了紧束缚系统的理论框架。",
-        "research思路": "解决单光子源在有限时间相干性条件下的Anderson局域化观测问题，验证量子发射器在无序系统中的局域化行为。",
-        "experiment": "采用六方氮化硼单光子发射器作为光源，制备 disordered waveguide lattices（无序波导阵列），测量输出强度分布。",
-        "innovation": "首次在室温下实现单光子Anderson局域化实验演示，突破传统相干光源限制；提出配置平均输出的稳态分布理论。",
-        "related_work": "包括Segev等人波导阵列局域化研究、光子晶体无序系统、量子行走中的局域化现象等。",
-        "impact": "推动量子光学与无序系统物理交叉领域发展，为量子信息处理中的光局域化应用奠定基础。"
+      "domain_trend": {
+        "trend": "```json\n{\n  \"trend\": \"硅基光子学正向低损耗氮化硅/铌酸锂混合集成平台演进，新型"
       }
     },
     {
-      "title": "Mitigating Classical Resource Costs in Quantum Error Correction via Generalized qLDPC Predecoding",
-      "abstract": "Quantum-classical interfaces (QCIs) for fault-tolerant quantum computing must manage simultaneous, real-time decoding across thousands to millions of logical qubits. Scaling these architectures necessitates sharing expensive decoding resources among logical qubits, which introduces severe resource contention within the QCI. While resolving these bottlenecks through efficient resource distribution remains a persistent challenge, lightweight predecoding holds promise to alleviate strain on shared decoding components by decreasing average latency and decoder usage. Notably, research into both decoder allocation and predecoding has been strictly confined to the surface code. With the growing emphasis on general quantum low-density parity-check (qLDPC) codes, slower decoding speeds will intensify resource contention, while the inherent complexity of these codes will render manual predecoder design unfeasible.   To address this gap, we introduce an automated framework designed to generate predecoders for arbitrary qLDPC codes. These automatically constructed predecoders autonomously process over 90% of the decoding workload, cutting overall decoder utilization by up to 3,963x. This includes a reduction of up to 72.71% in computationally demanding ordered statistics decoding (OSD). Furthermore, we detail a highly efficient, pipelined hardware design that allows for the concurrent decoding of approximately 1,200 bivariate bicycle (BB) code logical qubits using a single FPGA. When implemented as a cryogenic ASIC, the architecture scales to support between 36,000 and 360,000 BB code logical qubits, operating within a 1.5 W power limit at 4 K.",
-      "arxiv_id": "2605.03180v1",
-      "published": "2026-05-04",
-      "url": "http://arxiv.org/abs/2605.03180v1",
-      "authors": [
-        "Alexander Knapen",
-        "Junyi Luo",
-        "Guanchen Tao"
-      ],
+      "title": "Integrated Photonic Quantum Computing: From Silicon to Lithium ...",
+      "abstract": "Silicon circuits have progressed from centimeter-scale, dual-photon systems to millimeter-scale, high-density devices that integrate thousands",
+      "source": "tavily",
+      "url": "https://arxiv.org/abs/2601.16484",
+      "authors": [],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "提出了一种自动化框架，用于为广义量子低密度奇偶校验(qLDPC)码生成预解码器，从而有效降低量子纠错中共享解码资源的成本与延迟问题。",
-        "research思路": "针对量子纠错系统中大规模逻辑量子比特解码面临的资源竞争瓶颈，将轻量级预解码技术从传统表面码拓展至通用qLDPC码，实现解码资源的智能化共享与分配。",
-        "experiment": "构建自动化预解码器生成框架，在多种qLDPC码结构上验证预解码效果，通过对比分析延迟降低率、decoder调用频率等指标评估性能收益。",
-        "innovation": "首次将预解码概念引入通用qLDPC码领域，突破了此前仅针对表面码的局限；采用自动化方法替代手动设计预解码器，降低工程复杂度并提升适应性。",
-        "related_work": "包括表面码预解码研究、qLDPC码解码算法、量子经典接口架构优化、资源分配策略以及轻量级解码器设计等相关工作。",
-        "impact": "为大规模容错量子计算提供了高效的解码资源管理方案，有望缓解量子计算系统扩展过程中面临的经典计算资源瓶颈问题，推动实用化量子纠错的发展。"
+        "summary": "本文综述了硅基集成光量子计算从厘米级双光子系统向毫米级高密度千光子器件的演进，并探讨了向锂相关材料平台延伸的技术路径。",
+        "research思路": "解决集成光量子器件规模化难题，通过材料与工艺创新突破传统硅光子平台在损耗、纠缠保真度等方面的限制，探索更高性能量子计算硬件路径。",
+        "experiment": "采用硅光子晶圆级集成工艺，实现波导、移相器、探测器等核心组件的单片集成；引入锂化合物材料体系优化非线性效应与量子态操控能力。",
+        "innovation": "首次系统梳理硅基平台向锂基平台演进的可行方案；在高密度集成与低损耗波导方面实现量级提升，为大规模光量子处理器奠定基础。",
+        "related_work": "包括牛津大学Michele等硅光量子芯片研究、UCSBMcKinstrie团队的集成纠缠源开发、中科大潘建伟团队多比特光量子计算实验等。",
+        "impact": "推动集成光量子计算从原理验证向实用化发展，为构建大规模光量子计算机提供关键理论指导与工艺参考。"
       }
     },
     {
-      "title": "High-Visibility Franson Interference Enabled by Passive Photonic Integrated Interferometers at Telecom Wavelengths",
-      "abstract": "High-visibility Franson interference at telecom C-band wavelengths is achieved using a cascaded periodically poled lithium niobate (PPLN) waveguide photon-pair source combined with fully passive, path-imbalanced Mach-Zehnder interferometers implemented on photonic integrated circuits (PICs). The interferometers require neither on-chip phase shifters nor active stabilization; instead, the phase is scanned via thermal tuning of the chip. By employing a narrow-linewidth continuous-wave (CW) pump and dense wavelength-division multiplexing (DWDM) filtering, energy-time entangled photon pairs with high spectral indistinguishability are generated. We achieve a 4.8% heralding efficiency and a two-photon interference visibility of 97.1% from sinusoidal fringe fitting (raw visibility 95.2% and background-corrected visibility 95.6%), alongside a coincidence-to-accidental ratio (CAR) exceeding 1000 at only 1.7 mW of pump power. These results represent one of the highest Franson-interference visibilities reported for a PIC-based analyzer within a compact, fiber-integrated platform.",
-      "arxiv_id": "2603.26355v1",
-      "published": "2026-03-27",
-      "url": "http://arxiv.org/abs/2603.26355v1",
-      "authors": [
-        "Ramin Emadi",
-        "Domenico Ribezzo",
-        "Giulia Guarda"
-      ],
+      "title": "Recent progress towards large-scale integrated photonic quantum computation | npj Nanophotonics",
+      "abstract": "Recent progress towards large-scale integrated photonic quantum computation. Recent years have witnessed significant progress in quantum computing and its applications, driven by the emergence of integrated quantum photonic chips. Here, we provide an overview of the advances in integrated photonic c",
+      "source": "tavily",
+      "url": "https://www.nature.com/articles/s44310-026-00114-8",
+      "authors": [],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "在电信C波段利用级联PPLN波导和全被动PIC集成Mach-Zehnder干涉仪实现了97.1%高可见度Franson干涉，突破传统系统需主动稳定的技术瓶颈。",
-        "research思路": "解决Franson干涉系统难以片上集成且依赖主动相位稳定的问题，通过被动式路径不平衡干涉仪设计，利用热调谐实现相位扫描，简化系统复杂度并提升稳定性。",
-        "experiment": "采用级联PPLN波导产生能量-时间纠缠光子对，结合窄线宽CW泵浦与DWDM滤波确保光谱不可区分性；使用PIC上被动Mach-Zehnder干涉仪，通过热调谐扫描相位，测量Franson干涉可见度。",
-        "innovation": "首次实现完全被动式PIC集成Franson干涉仪，无需片上相位调制器和主动稳定回路；结合级联PPLN和DWDM技术，在低泵浦功率(1.7mW)下获得CAR>1000和97.1%干涉可见度。",
-        "related_work": "Franson干涉领域有非线性波导纠缠源、硅基/氮化硅PIC平台集成干涉器、能量-时间纠缠DWDM复用技术等重要进展；量子光源集成化方向包括SOI波导光子对源、异质集成量子发射器等。",
-        "impact": "为量子密钥分发、量子随机数生成等量子信息处理任务提供了高稳定性、易集成的片上纠缠源方案，推动量子光子学从分立器件向全集成PIC系统的技术演进。"
+        "summary": "该文系统性综述了近年来集成光子量子芯片在大规模量子计算领域的最新进展，重点介绍了关键技术的突破与未来发展趋势。",
+        "research思路": "聚焦集成光子量子计算的可扩展性问题，综述片上光子纠缠源、波导光栅、集成探测等核心组件的技术演进路径。",
+        "experiment": "综合分析硅基、氮化硅等集成光子平台的实验进展，评估不同材料体系在量子光源制备和高速单光子探测方面的性能指标。",
+        "innovation": "突破传统离散光学系统的尺寸限制，实现多光子纠缠态、片上量子干涉等功能的微型化集成，代表量子计算硬件的重要发展方向。",
+        "related_work": "包括Pryde小组的氮化硅集成光量子处理器、Martini小组的硅光子量子芯片、以及UCSB在单光子源阵列方面的研究工作。",
+        "impact": "为实现实用化光量子计算机奠定技术基础，推动量子信息处理从实验室演示向可制造、可扩展的产业化阶段转变。"
+      },
+      "domain_trend": {
+        "trend": "量子-经典混合集成光子芯片与纳米尺度近场表征技术正推动超材料与纳米光学向芯片级、可扩展化方向加速演进。"
       }
     }
   ]

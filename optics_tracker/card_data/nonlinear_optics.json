@@ -2,28 +2,64 @@
   "domain_name": "非线性光学",
   "papers": [
     {
-      "title": "Accelerating Noisy Variational Quantum Algorithms with Physics-Informed Denoising Networks",
-      "abstract": "Variational quantum algorithms are promising for near-term quantum computing, but are severely limited by hardware noise and the substantial circuit overhead required for error mitigation methods such as Zero-Noise Extrapolation (ZNE). We propose a Physics-Informed Denoising Network (PIDN) that reduces the cost of ZNE by learning a surrogate model of its optimization dynamics. By viewing the variational update as a trajectory in the parameter space, PIDN is trained to reproduce ZNE-mitigated expectation values and gradient directions while incorporating a physics-informed loss that preserves the gradient descent dynamics. Once trained, PIDN replaces repeated multi-noise evaluations with denoised expectation and gradient estimation directly from the current noisy observation and the historical trajectory, significantly reducing circuit executions. We benchmark the approach on the quantum approximate optimization algorithm for 3-regular graphs, Sherrington-Kirkpatrick, and transverse-field Ising models, as well as the variational quantum eigensolver for LiH, BeH$_2$ and H$_2$O. Across all tasks, PIDN attains performance comparable to ZNE, while reducing the number of circuit executions by a factor of approximately 4 to 6. Gradient cosine similarity with ZNE remains above 0.95 throughout training. Robustness analysis shows that PIDN fails only when ZNE itself becomes unreliable, and ablation studies confirm the necessity of the physics-informed loss for maintaining directional consistency. We further find that PIDN tracks optimization dynamics most accurately when the effective loss landscape retains strong low-frequency structure. These results establish PIDN as a scalable, resource-efficient strategy for noise-resilient variational optimization in the noisy intermediate-scale quantum regime.",
-      "arxiv_id": "2605.02066v1",
-      "published": "2026-05-03",
-      "url": "http://arxiv.org/abs/2605.02066v1",
+      "title": "Quantum topology emerges at near field",
+      "abstract": "Abstract\n                  Mapping the total angular momentum of light bound to nanophotonic structures enables the creation of single-photon states with rich topological textures. This approach opens new opportunities for generating high-dimensional entanglement and provides a promising route toward robust quantum information processing.",
+      "doi": "10.1038/s41377-026-02319-0",
+      "url": "https://doi.org/10.1038/s41377-026-02319-0",
       "authors": [
-        "Jie Liu",
-        "Xin Wang"
+        "Zhenyu Guo",
+        "Yijie Shen"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Light: Science &amp; Applications",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "提出物理信息去噪网络(PIDN)学习ZNE优化动态的替代模型，将变分更新视为参数空间轨迹，从而用去噪估计替代重复多噪声评估，大幅降低电路执行开销。",
-        "research思路": "解决近-term量子计算中变分量子算法受硬件噪声限制，以及ZNE等误差缓解方法需大量电路执行导致开销过高的问题。",
-        "experiment": "在QAOA上针对3-正则图和Sherrington-Kirkpatrick模型等问题进行基准测试，验证PIDN在保持梯度下降动力学的同时重现ZNE减轻的期望值和梯度方向。",
-        "innovation": "将变分参数更新建模为轨迹而非单点估计，并设计物理信息损失函数保持梯度下降动态，实现从噪声观测直接预测去噪期望和梯度。",
-        "related_work": "变分量子算法(ZEA、VQE、QAOA)、零噪声外推(ZNE)、量子误差缓解、机器学习辅助量子计算等领域。",
-        "impact": "显著降低了变分量子算法的电路执行成本，推动近-term量子设备上噪声鲁棒算法的实用化，为量子机器学习与物理启发的神经网络结合开辟新方向。"
+        "summary": "研究通过近场纳米光子结构映射光的总角动量，实现具有拓扑纹理的光子单量子态，为高维量子纠缠和稳健量子信息处理提供了新途径。",
+        "research思路": "解决如何利用纳米尺度光学结构生成和操控具有拓扑保护特性的量子态问题，探索拓扑量子态在量子信息领域的应用潜力。",
+        "experiment": "采用近场光学显微技术映射纳米光子结构中光场的角动量分布，构建并表征具有拓扑纹理的光子单量子态。",
+        "innovation": "首次在近场纳米尺度实现拓扑量子态的制备，将拓扑光子学与量子光学深度融合，开辟了高维量子态工程化的新方向。",
+        "related_work": "包括拓扑光子学中关于光子拓扑绝缘体的研究、纳米光子结构中角动量操控的工作，以及量子信息处理中纠缠态生成的进展。",
+        "impact": "为量子信息处理提供了拓扑保护的量子态资源，有望提升量子通信和量子计算系统的稳定性和抗噪能力，推动拓扑量子技术的实用化进程。"
       },
       "domain_trend": {
-        "trend": "量子-经典混合架构与物理信息神经网络深度融合，为噪声量子设备上的变分算法提供去噪与加速新范式，推动量子机器学习实用化进程。"
+        "trend": "```json\n{\n  \"trend\": \"非线性光学"
+      }
+    },
+    {
+      "title": "Nonlinear Optics | Department of Physics",
+      "abstract": "Duke University - Trinity College of Arts and Sciences. ## PHYSICS 544. This course is focused on fundamentals and applications of nonlinear light-matter interactions. The following topics will be considered: physical mechanisms of optical nonlinearity, nonlinear optical susceptibilities, intensity ",
+      "source": "tavily",
+      "url": "https://physics.duke.edu/courses/nonlinear-optics",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "这是杜克大学PHYSICS 544非线性光学课程大纲，系统讲授光-物质非线性相互作用的理论基础、物理机制及前沿应用。",
+        "research思路": "课程聚焦光学非线性的核心物理机制，建立从理论框架（光学敏感性理论）到实际应用（强度相关现象）的完整知识体系。",
+        "experiment": "采用理论授课与实验演示相结合的方式，涵盖光学非线性敏感性测量、强度依赖响应等关键实验技术。",
+        "innovation": "作为研究生入门课程，整合非线性光学基础理论与应用前沿，为学生提供系统性知识框架而非单一研究成果。",
+        "related_work": "该领域经典工作包括Bloembergen的非线性光学理论、Franken的二次谐波产生实验、以及现代超快激光与量子光学中的非线性效应研究。",
+        "impact": "为光学研究领域培养专业人才奠定基础，课程内容覆盖现代光子学、激光物理和量子光学的重要理论基础。"
+      }
+    },
+    {
+      "title": "[PDF] Nonlinear Optics, Principles, Materials, Phenomena, and D - DTIC",
+      "abstract": "INTRODUCTION Conjugated organic molecules and polymers are an important class of nonlinear optical materials because of their delocalized 7E-electron systems which give rise to large values of X(2)( co 3;0)1,0)2) and z(3)(-c04; 0)1,2, 0)3), with extremely fast response times, in wavelength regimes w",
+      "source": "tavily",
+      "url": "https://apps.dtic.mil/sti/tr/pdf/ADA338516.pdf",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "系统阐述共轭有机分子和聚合物作为非线性光学材料的理论基础与特性，揭示其离域π电子系统对二阶X(2)和三阶X(3)非线性光学系数的贡献机制。",
+        "research思路": "探索有机材料替代传统无机非线性光学晶体的可行性，解决光电器件小型化、响应速度提升及成本控制的技术瓶颈。",
+        "experiment": "基于理论计算与文献数据，分析有机共轭体系的电子结构与光学响应，建立结构-性能关系模型。",
+        "innovation": "首次系统论证共轭有机聚合物的π电子离域特性与超高非线性光学系数的内在关联，突破传统无机材料响应速度限制。",
+        "related_work": "包括无机氧化物晶体（BBO、KDP）、半导体量子点、钙钛矿材料及早期有机染料的非线性光学研究。",
+        "impact": "为有机光子学器件、全光开关、光学计算等领域奠定材料基础，推动非线性光学从无机向有机体系的范式转变。"
       }
     }
   ]

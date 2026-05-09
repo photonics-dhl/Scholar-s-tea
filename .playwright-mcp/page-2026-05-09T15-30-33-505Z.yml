@@ -1,0 +1,285 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - img [ref=e15]
+        - text: 高校学术交流社区 · AI 赋能研究
+      - heading "学者茶话会" [level=1] [ref=e17]
+      - paragraph [ref=e18]: Scholar's Tea
+      - paragraph [ref=e19]: 连接优秀研究者，分享学术见解，发现前沿研究。AI 助手随时为你提供论文分析、基金申请、文献综述等学术支持。
+      - generic [ref=e21]:
+        - img [ref=e22]
+        - textbox "搜索课题组、学科、论文..." [ref=e25]
+        - button "搜索" [ref=e26] [cursor=pointer]
+      - generic [ref=e27]:
+        - button "试试 AI 助手" [ref=e28] [cursor=pointer]:
+          - link "试试 AI 助手" [ref=e29]:
+            - /url: /workshop
+            - img [ref=e30]
+            - text: 试试 AI 助手
+        - button "探索学科" [ref=e32] [cursor=pointer]:
+          - link "探索学科" [ref=e33]:
+            - /url: /disciplines
+            - img [ref=e34]
+            - text: 探索学科
+    - generic [ref=e43]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - img [ref=e47]
+          - heading "最新讨论" [level=2] [ref=e49]
+        - generic [ref=e50]:
+          - button [ref=e51] [cursor=pointer]:
+            - img [ref=e52]
+          - button [ref=e54] [cursor=pointer]:
+            - img [ref=e55]
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - img [ref=e61]
+          - heading "热门论文" [level=2] [ref=e64]
+        - generic [ref=e65]:
+          - button [ref=e66] [cursor=pointer]:
+            - img [ref=e67]
+          - button [ref=e69] [cursor=pointer]:
+            - img [ref=e70]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - img [ref=e76]
+          - heading "活跃课题组" [level=2] [ref=e81]
+        - generic [ref=e82]:
+          - button [ref=e83] [cursor=pointer]:
+            - img [ref=e84]
+          - button [ref=e86] [cursor=pointer]:
+            - img [ref=e87]
+    - generic [ref=e90]:
+      - generic [ref=e91]:
+        - img [ref=e92]
+        - heading "快捷入口" [level=2] [ref=e95]
+      - generic [ref=e96]:
+        - generic [ref=e97]:
+          - heading "核心模块" [level=3] [ref=e98]
+          - generic [ref=e99]:
+            - link "学科社区 探索学科领域 进入" [ref=e100] [cursor=pointer]:
+              - /url: /disciplines
+              - generic [ref=e102]:
+                - img [ref=e104]
+                - heading "学科社区" [level=4] [ref=e107]
+                - paragraph [ref=e108]: 探索学科领域
+                - generic [ref=e109]:
+                  - generic [ref=e110]: 进入
+                  - img [ref=e111]
+            - link "课题组 发现研究团队 进入" [ref=e113] [cursor=pointer]:
+              - /url: /groups
+              - generic [ref=e115]:
+                - img [ref=e117]
+                - heading "课题组" [level=4] [ref=e122]
+                - paragraph [ref=e123]: 发现研究团队
+                - generic [ref=e124]:
+                  - generic [ref=e125]: 进入
+                  - img [ref=e126]
+            - link "茶话会 实时交流讨论 进入" [ref=e128] [cursor=pointer]:
+              - /url: /tea-party
+              - generic [ref=e130]:
+                - img [ref=e132]
+                - heading "茶话会" [level=4] [ref=e134]
+                - paragraph [ref=e135]: 实时交流讨论
+                - generic [ref=e136]:
+                  - generic [ref=e137]: 进入
+                  - img [ref=e138]
+            - link "思想工坊 AI 学术助手 进入" [ref=e140] [cursor=pointer]:
+              - /url: /workshop
+              - generic [ref=e142]:
+                - img [ref=e144]
+                - heading "思想工坊" [level=4] [ref=e146]
+                - paragraph [ref=e147]: AI 学术助手
+                - generic [ref=e148]:
+                  - generic [ref=e149]: 进入
+                  - img [ref=e150]
+            - link "TOP10 月度热门排行 进入" [ref=e152] [cursor=pointer]:
+              - /url: /top-questions
+              - generic [ref=e154]:
+                - img [ref=e156]
+                - heading "TOP10" [level=4] [ref=e162]
+                - paragraph [ref=e163]: 月度热门排行
+                - generic [ref=e164]:
+                  - generic [ref=e165]: 进入
+                  - img [ref=e166]
+            - link "知识库 学术资源汇聚 进入" [ref=e168] [cursor=pointer]:
+              - /url: /disciplines
+              - generic [ref=e170]:
+                - img [ref=e172]
+                - heading "知识库" [level=4] [ref=e176]
+                - paragraph [ref=e177]: 学术资源汇聚
+                - generic [ref=e178]:
+                  - generic [ref=e179]: 进入
+                  - img [ref=e180]
+            - link "通知中心 消息与提醒 进入" [ref=e182] [cursor=pointer]:
+              - /url: /profile
+              - generic [ref=e184]:
+                - img [ref=e186]
+                - heading "通知中心" [level=4] [ref=e189]
+                - paragraph [ref=e190]: 消息与提醒
+                - generic [ref=e191]:
+                  - generic [ref=e192]: 进入
+                  - img [ref=e193]
+        - generic [ref=e195]:
+          - heading "AI 工具" [level=3] [ref=e196]
+          - generic [ref=e197]:
+            - link "论文助手 AI 辅助论文分析 进入" [ref=e198] [cursor=pointer]:
+              - /url: /workshop?mode=paper
+              - generic [ref=e200]:
+                - img [ref=e202]
+                - heading "论文助手" [level=4] [ref=e205]
+                - paragraph [ref=e206]: AI 辅助论文分析
+                - generic [ref=e207]:
+                  - generic [ref=e208]: 进入
+                  - img [ref=e209]
+            - link "基金申请 项目书撰写辅助 进入" [ref=e211] [cursor=pointer]:
+              - /url: /workshop?mode=grant
+              - generic [ref=e213]:
+                - img [ref=e215]
+                - heading "基金申请" [level=4] [ref=e217]
+                - paragraph [ref=e218]: 项目书撰写辅助
+                - generic [ref=e219]:
+                  - generic [ref=e220]: 进入
+                  - img [ref=e221]
+            - link "文献综述 梳理研究脉络 进入" [ref=e223] [cursor=pointer]:
+              - /url: /workshop?mode=survey
+              - generic [ref=e225]:
+                - img [ref=e227]
+                - heading "文献综述" [level=4] [ref=e230]
+                - paragraph [ref=e231]: 梳理研究脉络
+                - generic [ref=e232]:
+                  - generic [ref=e233]: 进入
+                  - img [ref=e234]
+            - link "我的研究 论文与动态 进入" [ref=e236] [cursor=pointer]:
+              - /url: /profile
+              - generic [ref=e238]:
+                - img [ref=e240]
+                - heading "我的研究" [level=4] [ref=e242]
+                - paragraph [ref=e243]: 论文与动态
+                - generic [ref=e244]:
+                  - generic [ref=e245]: 进入
+                  - img [ref=e246]
+        - generic [ref=e248]:
+          - heading "个人中心" [level=3] [ref=e249]
+          - link "方向探索 发现研究灵感 进入" [ref=e251] [cursor=pointer]:
+            - /url: /workshop?mode=research
+            - generic [ref=e253]:
+              - img [ref=e255]
+              - heading "方向探索" [level=4] [ref=e257]
+              - paragraph [ref=e258]: 发现研究灵感
+              - generic [ref=e259]:
+                - generic [ref=e260]: 进入
+                - img [ref=e261]
+    - generic [ref=e263]:
+      - generic [ref=e264]:
+        - generic [ref=e265]:
+          - img [ref=e266]
+          - heading "活跃学者" [level=2] [ref=e271]
+        - paragraph [ref=e272]: 加入 0+ 研究者的学术交流社区
+      - generic [ref=e273]:
+        - generic [ref=e275]:
+          - generic [ref=e277]: ZM
+          - generic [ref=e278]: 张明
+        - generic [ref=e280]:
+          - generic [ref=e282]: LH
+          - generic [ref=e283]: 李华
+        - generic [ref=e285]:
+          - generic [ref=e287]: WF
+          - generic [ref=e288]: 王芳
+        - generic [ref=e290]:
+          - generic [ref=e292]: ZQ
+          - generic [ref=e293]: 赵强
+        - generic [ref=e295]:
+          - generic [ref=e297]: LY
+          - generic [ref=e298]: 刘洋
+        - generic [ref=e300]:
+          - generic [ref=e302]: CJ
+          - generic [ref=e303]: 陈静
+        - generic [ref=e305]:
+          - generic [ref=e307]: YF
+          - generic [ref=e308]: 杨帆
+        - generic [ref=e310]:
+          - generic [ref=e312]: HL
+          - generic [ref=e313]: 黄磊
+    - generic [ref=e316]:
+      - img [ref=e318]
+      - generic [ref=e324]:
+        - heading "TOP10 问题" [level=3] [ref=e325]
+        - paragraph [ref=e326]: 每月最受欢迎的研究讨论，看看社区最热门的话题
+      - button "查看排行" [ref=e327] [cursor=pointer]:
+        - link "查看排行" [ref=e328]:
+          - /url: /top-questions
+          - text: 查看排行
+          - img [ref=e329]
+    - contentinfo [ref=e331]:
+      - generic [ref=e333]:
+        - generic [ref=e334]:
+          - img [ref=e335]
+          - generic [ref=e338]: Scholar's Tea 学者茶话会
+        - paragraph [ref=e339]: 高校学术交流社区 · 连接学者，创造价值
+        - generic [ref=e340]:
+          - link "学科" [ref=e341] [cursor=pointer]:
+            - /url: /disciplines
+          - link "课题组" [ref=e342] [cursor=pointer]:
+            - /url: /groups
+          - link "TOP10" [ref=e343] [cursor=pointer]:
+            - /url: /top-questions
+          - link "茶话会" [ref=e344] [cursor=pointer]:
+            - /url: /tea-party
+          - link "思想工坊" [ref=e345] [cursor=pointer]:
+            - /url: /workshop
+  - button "拖拽 让我缓一缓... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e347]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e351] [cursor=pointer]:
+      - generic [ref=e353]: 让我缓一缓...
+      - iframe [ref=e356]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e358] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 转得好快...
+            - iframe [ref=e359] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e360]

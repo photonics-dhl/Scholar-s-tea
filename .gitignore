@@ -38,6 +38,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Private keys / credentials
+*.pem
+
+
 # Prisma
 prisma/*.db
 prisma/*.db-journal
@@ -48,7 +52,12 @@ uploads/
 # Logs
 *.log
 logs/
+tests/logs/
 .mcp.json
+
+# Test artifacts (screenshots, debug outputs)
+tests/screenshots/
+
 
 # Claude Code local settings (contain credentials)
 .claude/settings.local.json

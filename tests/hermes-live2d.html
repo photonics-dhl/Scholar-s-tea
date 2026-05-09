@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Live2D</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+  <script src="/live2dcubismcore.min.js" defer></script>
+  <script src="/lib/pixi6.min.js" defer></script>
+  <script src="/lib/cubism4-v4.min.js" defer></script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <script>
+    (function() {
+      const container = document.getElementById('canvas-container')
+      const urlParams = new URLSearchParams(window.location.search)
+      const size = parseInt(urlParams.get('size')) || 64
+      const mood = urlParams.get('mood') || 'idle'
+
+      const moodToMotion = {
+        idle: 'Idle',
+        studying: 'Idle',
+        tea_time: 'Idle',
+        tea_sipping: 'Idle',
+        happy: 'Flick3',
+        dancing: 'Flick3',
+        eureka: 'Flick3',
+        inspired: 'Flick3',
+        waving: 'Tap',
+        surprised: 'Shake',
+        thinking: 'Flick',
+        confused: 'Flick',
+        curious: 'Flick',
+        insight: 'Flick',
+        love: 'Tap',
+        angry: 'Shake',
+        debate: 'Shake',
+        sleepy: 'Idle',
+        bored: 'Idle',
+        shy: 'Tap',
+        dizzy: 'Shake',
+      }
+
+      let model = null
+      let currentMood = mood
+      let app = null
+
+      async function init() {
+        if (!window.PIXI || !window.PIXI.live2d) {
+          setTimeout(init, 200)
+          return
+        }
+
+        const PIXI = window.PIXI
+        const { Live2DModel, MotionPriority } = PIXI.live2d
+
+        app = new PIXI.Application({
+          width: size,
+          height: size,
+          backgroundAlpha: 0,
+          antialias: true,
+          resolution: window.devicePixelRatio || 1,
+          autoDensity: true,
+        })
+        container.appendChild(app.view)
+
+        try {
+          model = await Live2DModel.from('/live2d/wanko/wanko_touch.model3.json')
+
+          // Use internal canvas dimensions for correct scaling
+          const cw = model.internalModel?.getCanvasWidth ? model.internalModel.getCanvasWidth() : 2
+          const ch = model.internalModel?.getCanvasHeight ? model.internalModel.getCanvasHeight() : 2
+
+          // Fallback: if bounds look like texture size (>100), use canvas dims
+          let modelW = model.width
+          let modelH = model.height
+          if (modelW > 100 || modelH > 100 || modelW <= 0 || modelH <= 0) {
+            modelW = cw
+            modelH = ch
+          }
+
+          // Cover mode: fill the avatar frame, slight overshoot to avoid gaps
+          const scaleX = size / modelW
+          const scaleY = size / modelH
+          const scale = Math.max(scaleX, scaleY) * 1.05
+
+          model.scale.set(scale)
+          model.anchor.set(0.5, 0.5)
+          model.x = size / 2
+          model.y = size / 2
+          app.stage.addChild(model)
+
+          // Idle loop
+          const playIdle = () => {
+            if (!model) return
+            model.motion('Idle', undefined, MotionPriority.IDLE)
+              .catch(() => {})
+              .then(() => setTimeout(playIdle, 3000 + Math.random() * 2000))
+          }
+          setTimeout(playIdle, 1000)
+
+          // Initial mood
+          playMood(currentMood)
+
+          // Notify parent when ready
+          window.parent.postMessage({ type: 'hermes-live2d-ready' }, '*')
+        } catch (err) {
+          console.error('Live2D load error:', err)
+          window.parent.postMessage({ type: 'hermes-live2d-error', error: err.message }, '*')
+        }
+      }
+
+      function playMood(moodName) {
+        if (!model) return
+        const group = moodToMotion[moodName] || 'Idle'
+        model.motion(group, undefined, window.PIXI.live2d.MotionPriority.NORMAL).catch(() => {})
+      }
+
+      // Wait for Cubism Core to load
+      if (window.Live2DCubismCore) {
+        init()
+      } else {
+        let attempts = 0
+        const checkInterval = setInterval(() => {
+          if (window.Live2DCubismCore) {
+            clearInterval(checkInterval)
+            init()
+          } else if (++attempts > 100) {
+            clearInterval(checkInterval)
+            console.error('Live2D Cubism Core failed to load')
+          }
+        }, 100)
+      }
+
+      // Listen for messages from parent
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'hermes-mood') {
+          currentMood = e.data.mood
+          playMood(currentMood)
+        }
+        if (e.data && e.data.type === 'hermes-tap') {
+          if (model) {
+            model.motion('Tap', undefined, window.PIXI.live2d.MotionPriority.NORMAL).catch(() => {})
+          }
+        }
+      })
+
+      // Mouse tracking
+      window.addEventListener('mousemove', (e) => {
+        if (!model) return
+        const rect = container.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / rect.width * 2 - 1
+        const y = (e.clientY - rect.top) / rect.height * 2 - 1
+        model.focus(x, y)
+      })
+
+      // Handle clicks / double-clicks on canvas directly
+      function sendTap() {
+        window.parent.postMessage({ type: 'hermes-tap' }, '*')
+        if (model) {
+          model.motion('Tap', undefined, window.PIXI.live2d.MotionPriority.NORMAL).catch(() => {})
+        }
+      }
+      function sendDoubleTap() {
+        window.parent.postMessage({ type: 'hermes-double-tap' }, '*')
+        if (model) {
+          // Play a random "special" motion on double-tap
+          const specials = ['Flick3', 'Shake', 'Flick', 'FlickUp', 'FlickLeft']
+          const pick = specials[Math.floor(Math.random() * specials.length)]
+          model.motion(pick, undefined, window.PIXI.live2d.MotionPriority.NORMAL).catch(() => {})
+        }
+      }
+
+      app.view.addEventListener('click', sendTap)
+      app.view.addEventListener('dblclick', sendDoubleTap)
+    })()
+  </script>
+</body>
+</html>

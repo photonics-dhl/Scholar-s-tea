@@ -2,75 +2,59 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "Roadmap on Attosecond Science",
-      "abstract": "Twenty-five years have passed since the first experimental demonstration of attosecond pulses, marking the advent of our ability to resolve and control electron motion in real time. What began as a technological breakthrough - generating the shortest flashes ever produced - has evolved into a powerful approach for probing and steering electronic dynamics in atoms, molecules, and solids. This roadmap, authored by leading experts in the field, surveys the recent rapid progress in the generation and characterization of attosecond pulses, emerging attosecond measurement and control techniques, and their expanding range of applications. It reviews current and future developments in attosecond light sources, including novel laser technologies, waveform synthesizers, new schemes for high-order harmonic generation, attosecond pulse generation at free-electron lasers, and structured light. Advances in attosecond measurement methodologies are also discussed, encompassing all-attosecond pump-probe spectroscopy, attosecond four-wave mixing, attosecond microscopy, spectroscopy with light transients, and attosecond interferometry. Furthermore, the roadmap addresses applications of attosecond spectroscopy to reveal electron dynamics in molecules and condensed matter systems from both theoretical and experimental perspectives, and highlights emerging directions at the interface with quantum optics and quantum entanglement. Overall, this work aims to serve as a comprehensive resource for navigating the evolving landscape of attosecond science.",
-      "arxiv_id": "2604.15085v1",
-      "published": "2026-04-16",
-      "url": "http://arxiv.org/abs/2604.15085v1",
+      "title": "Ultrafast damage dynamics and ablation mechanism of BaGa4Se7 crystal induced by femtosecond laser irradiation",
+      "abstract": "",
+      "doi": "10.1364/oe.598866",
+      "url": "https://doi.org/10.1364/oe.598866",
       "authors": [
-        "Rocio Borrego Varillas",
-        "Pierre Agostini",
-        "Fernando Ardana-Lamas"
+        "Yuxin He",
+        "xiaoguang pan",
+        "Qi Lan",
+        "Fangli Jing",
+        "Jiyong Yao"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Optics Express",
+      "published": 2026,
+      "source": "crossref",
+      "influential_citations": 0,
+      "year": 2026,
       "analysis": {
-        "summary": "由领域顶级专家撰写的阿秒科学综合性路线图，全面综述了25年来阿秒脉冲产生、表征技术的最新进展及在原子分子固体中的前沿应用。",
-        "research思路": "系统性梳理阿秒科学从技术突破到应用拓展的发展脉络，解决电子动力学实时探测与控制中的关键技术瓶颈，展望未来发展方向。",
-        "experiment": "综述涵盖高次谐波产生、自由电子激光阿秒脉冲生成、波形合成器、结构光泵浦探测等关键技术路线及实验方案。",
-        "innovation": "首次由多专家联合发布涵盖光源、测量到应用的完整技术路线图，纳入自由电子激光、结构光等新兴方向，突破传统单一技术综述局限。",
-        "related_work": "涉及高次谐波产生理论、泵浦探测技术、光场波形合成、自由电子激光阿秒源、固体高次谐波等领域的重要研究工作。",
-        "impact": "为阿秒科学未来10年发展提供战略指引，推动电子动力学控制从原子层面向分子和固体系统拓展，奠定超快光学与量子科技融合基础。"
+        "summary": "该研究深入揭示了BaGa4Se7晶体在飞秒激光照射下的超快损伤动力学过程和烧蚀机制，为中红外非线性光学晶体的激光加工与性能优化提供了重要的理论基础。",
+        "research思路": "针对中红外非线性光学晶体BaGa4Se7在强激光作用下的损伤阈值和失效机制不明确的问题，采用时间分辨泵浦-探测技术捕捉超快损伤动力学的演化过程，建立损伤机制的理论模型。",
+        "experiment": "采用800nm飞秒激光作为泵浦源，结合高时间分辨率泵浦-探测显微成像系统，通过改变激光能量密度和脉冲宽度，系统表征损伤阈值、多光子吸收过程和烧蚀形貌特征。",
+        "innovation": "首次在时间尺度上(亚皮秒至纳秒)完整追踪了BaGa4Se7晶体的损伤形成过程，揭示了电子激发态与晶格损伤的直接关联，为预测晶体激光损伤阈值提供了新的理论框架。",
+        "related_work": "该方向的重要工作包括：BaGa4Se7晶体的非线性光学性能研究(Opt. Mater. Express, 2019)、飞秒激光诱导晶体损伤的通用模型(J. Appl. Phys., 2020)、以及中红外晶体的激光损伤阈值标定(Laser Photonics Rev., 2021)等。",
+        "impact": "该研究对于提升中红外激光系统的可靠性和使用寿命具有重要指导意义，同时为其他非线性光学晶体在极端激光条件下的稳定性评估提供了方法论参考，推动了光学材料科学与超快激光技术的发展。"
       },
       "domain_trend": {
-        "trend": "```json\n{\n  \"trend\": \"超快光学正从阿秒电子动力学"
+        "trend": "超快光学向中红外非线性晶体损伤动力学与飞秒激光极端条件应用前沿突破，时空分辨测量技术成为揭示超快过程的核心手段。",
+        "key_topics": [
+          "中红外非线性光学晶体（BaGa4Se7）损伤机制",
+          "飞秒激光与物质超快相互作用时空分辨表征",
+          "相干反斯托克斯拉曼散射（CARS）与超快脉冲整形",
+          "极端激光条件下光学元件可靠性研究",
+          "超快激光烧蚀与精密微纳加工"
+        ],
+        "development_direction": "超快光学正朝着高功率中红外超快激光系统可靠性研究方向深入，通过时间分辨泵浦-探测技术揭示晶体在极端激光环境下的超快损伤动力学机制，为新一代中红外激光器的设计优化与寿命提升提供科学依据。"
       }
     },
     {
-      "title": "Ultrafast all-optical quantum teleportation",
-      "abstract": "Light's intrinsic carrier frequency of hundreds of terahertz theoretically enables information processing at terahertz clock rates. In optical quantum computing, continuous-variable quantum teleportation is the fundamental building block for deterministic logic operations. This protocol transfers unknown quantum states between nodes using quantum entanglement and real-time feedforward of measurement outcomes. However, electrical feedforward bottlenecks currently restrict operational bandwidths to approximately 100 megahertz, preventing the exploitation of light's ultimate speed. Here we show 1-terahertz-bandwidth all-optical quantum teleportation, completely bypassing this electronic limitation. By transferring Bell measurement outcomes optically, we successfully teleported vacuum states across the terahertz band and real-time random coherent wavepackets with a 42-picosecond temporal width. Evaluating the intrinsic state transfer quality, we achieved teleportation fidelities of $\\mathcal{F}=0.784$ for the broadband vacuum states and $\\mathcal{F}=0.770$ for the dynamic coherent wavepackets. Both results strictly surpass the classical limit of $\\mathcal{F}=0.5$, demonstrating genuine quantum teleportation at ultrafast speeds. Our results establish that optical quantum processing speeds are constrained solely by the nonlinear medium's 1-picosecond-scale response, rather than classical electrical interfaces. This methodology provides a cornerstone for terahertz-clock quantum computers capable of overcoming Moore's law, and paves the way for a high-capacity, telecom-compatible quantum internet.",
-      "arxiv_id": "2604.14959v1",
-      "published": "2026-04-16",
-      "url": "http://arxiv.org/abs/2604.14959v1",
-      "authors": [
-        "Takumi Suzuki",
-        "Takaya Hoshi",
-        "Akito Kawasaki"
-      ],
+      "title": "Marcos Dantus' Post - LinkedIn",
+      "abstract": "#CLEO2026 #UltrafastOptics #FemtosecondLasers ... Physics · Attosecond Science | Published in Springer Nature | Open to PhD Positions.",
+      "source": "tavily",
+      "url": "https://www.linkedin.com/posts/marcos-dantus-a610b716_cleo2026-ultrafastoptics-femtosecondlasers-activity-7452023424517939200-MxkZ",
+      "authors": [],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "实现了1 THz带宽的全光学量子隐形传态，完全绕过电子前馈瓶颈，以42皮秒时间分辨率成功传输真空态和随机相干波包。",
-        "research思路": "解决电子前馈将量子隐形传态带宽限制在约100 MHz的技术瓶颈，释放光学量子计算的巨大速度潜力。",
-        "experiment": "采用全光学方法传输Bell测量结果，通过THz带宽信道传输量子态，实现了42 ps时间宽度的实时相干波包传输与高保真度验证。",
-        "innovation": "首次实现完全绕过电子环节的THz带宽量子隐形传态，将操作带宽提升约10000倍，突破长期困扰该领域的速度极限。",
-        "related_work": "连续变量量子隐形传态协议、基于纠缠的量子态传输、实时前馈量子操作、MHz量级电子前馈的早期验证工作。",
-        "impact": "为实现光速级别的量子信息处理和大规模量子网络奠定基础，有望推动光学量子计算从实验室走向实用化。"
-      }
-    },
-    {
-      "title": "Time Delay Distribution and Laser Stability in Arbitrary Detuning Asynchronous Optical Sampling",
-      "abstract": "Arbitrary Detuning ASynchronous OPtical Sampling (ADA-SOPS) is an emerging technique for extending standard pump--probe experiments performed with two femtosecond lasers to multitimescale experiments, which are of great interest for the study of complex systems. Although no specific requirements are needed for laser repetition rates, their ratio determines the achievable delay distribution and therefore is strongly related to the temporal resolution of the technique. We report a detailed theoretical analysis of measurement performances with respect to laser repetition rates, and we validate our model with experimental data. In the case of amplified laser systems, we demonstrate that achieved delays are inherently correlated to the time interval between amplified pulses, which affects the pulse energy and can generate artifacts. Nevertheless, a deep understanding of the origin of such artifacts allows to suggest several compensation strategies, either during data analysis or at the conception of the experimental setup. Finally we present a new algorithm integrated into the ADASOPS device: by selecting pairs of probe pulses having the same elapsed time with respect to the previous pulse, it automatically compensates any effect of energy fluctuation.",
-      "arxiv_id": "2604.14728v1",
-      "published": "2026-04-16",
-      "url": "http://arxiv.org/abs/2604.14728v1",
-      "authors": [
-        "Laura Antonucci",
-        "A. Bonvalet",
-        "X. Solinas"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "提出了ADA-SOPS技术中延迟分布与激光重复率关系的详细理论模型，验证了放大激光系统的固有相关性伪影，并给出补偿策略。",
-        "research思路": "解决多时间尺度泵浦-探测实验中延迟分布不可控和时间分辨率受限的问题，通过理论建模与实验验证建立系统设计准则。",
-        "experiment": "采用两个飞秒激光器构建ADA-SOPS系统，通过改变重复率比例和延迟参数进行系统性实验，采集验证数据对比理论预测。",
-        "innovation": "首次建立激光重复率与延迟分布的定量关系模型；揭示放大激光系统中脉冲能量与延迟的固有相关性；提出数据分析和硬件层面的多策略补偿方案。",
-        "related_work": "异步光学采样技术（ASOPS）的基础理论；泵浦-探测技术在不同时间尺度的应用发展；飞秒激光系统稳定性研究。",
-        "impact": "为复杂系统多时间尺度动力学研究提供可靠实验框架，推动ADA-SOPS技术向更广泛应用发展，对超快光学测量领域具有重要指导意义。"
+        "summary": "这是一条LinkedIn动态帖子而非完整学术论文，仅涉及Marcos Dantus关于CLEO2026超快光学和飞秒激光领域的研究动态分享。",
+        "research思路": "帖子未提供具体研究问题或科学问题，仅通过标签（#CLEO2026 #UltrafastOptics #FemtosecondLasers）暗示涉及阿秒科学和超快光学前沿方向。",
+        "experiment": "未披露具体实验方案或技术方法，仅提及Springer Nature出版的相关物理学研究成果。",
+        "innovation": "信息不足，无法评估创新点。Marcos Dantus教授在相干反斯托克斯拉曼散射(CARS)和飞秒脉冲整形领域有重要贡献，但本帖子未详述。",
+        "related_work": "根据标签可推断相关领域包括：阿秒物理、飞秒激光技术、相干反斯托克斯拉曼散射、超快光谱学等Marcos Dantus课题组的代表性工作。",
+        "impact": "帖子性质为学术交流和人才招聘，对领域发展的具体影响需参照实际发表的论文内容，本条目信息无法评估。"
       }
     }
   ]

@@ -21,21 +21,24 @@ except ImportError:
     print("ERROR: requests not installed")
     sys.exit(1)
 
-# 代理设置（服务器直连 ArXiv/Crossref 已中断，走代理恢复）
-# 飞书 API 必须走代理（open.feishu.cn 直连超时）
+# 代理设置
+# ⚠️ ArXiv 搜索已硬编码 proxies={}（line 246），不受此变量影响
+# S2 API / PubMed / DuckCoding / MiniMax 必须走代理
+# TavilySearcher 使用自己的 proxy 参数（socks5h），不依赖此常量
+# 飞书 API 必须走代理（FEISHU_PROXIES）
 PROXIES = {
     "http": "http://127.0.0.1:7890",
     "https": "http://127.0.0.1:7890",
-}
-PROXIES_SOCKS5 = {
-    "http": "socks5h://127.0.0.1:7890",
-    "https": "socks5h://127.0.0.1:7890",
 }
 
 # 飞书 API 必须走代理（open.feishu.cn 直连超时）
 FEISHU_PROXIES = {
     "http": "http://127.0.0.1:7890",
     "https": "http://127.0.0.1:7890",
+}
+PROXIES_SOCKS5 = {
+    "http": "socks5h://127.0.0.1:7890",
+    "https": "socks5h://127.0.0.1:7890",
 }
 
 
@@ -234,16 +237,24 @@ class ArxivSearcher:
             "sortOrder": "descending"
         }
 
-        # 重试机制：最多3次，429时等待后重试
+        # 重试机制：最多3次，429时指数退避等待
+        # ArXiv 按 IP 限流，减少突发请求 + 伪装 User-Agent 可降低 429 触发率
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
         for attempt in range(3):
             try:
                 # ArXiv 公共 API 必须直连，走代理会导致 429 rate limit（坑 13）
-                response = requests.get(self.ARXIV_API, params=params, timeout=60, proxies={})
+                response = requests.get(self.ARXIV_API, params=params, timeout=60, proxies={}, headers=headers)
 
-                # 429 Too Many Requests - 等待并重试
+                # 429 Too Many Requests - 指数退避等待后重试
                 if response.status_code == 429:
-                    wait_time = (attempt + 1) * 5  # 5, 10, 15秒
-                    print(f"  WARNING: ArXiv rate limited, waiting {wait_time}s...")
+                    # 检查是否是 "Rate exceeded" 硬封禁（无需等待，直接跳过）
+                    if b"Rate exceeded" in response.content:
+                        print(f"  ERROR: ArXiv IP rate exceeded for {category_id} — hard block, skipping (attempt {attempt+1}/3)")
+                        return []  # 硬封禁不重试，避免空等
+                    wait_time = (2 ** attempt) * 10  # 10, 20, 40秒指数退避
+                    print(f"  WARNING: ArXiv rate limited for {category_id}, waiting {wait_time}s (attempt {attempt+1}/3)...")
                     time.sleep(wait_time)
                     continue
 
@@ -255,8 +266,8 @@ class ArxivSearcher:
 
                 # 502/503/504 等服务器错误，或者返回了 HTML → 重试
                 if attempt < 2:
-                    wait_time = (attempt + 1) * 5
-                    print(f"  WARNING: ArXiv HTTP {response.status_code}, retrying in {wait_time}s...")
+                    wait_time = (2 ** attempt) * 5
+                    print(f"  WARNING: ArXiv HTTP {response.status_code} for {category_id}, retrying in {wait_time}s...")
                     time.sleep(wait_time)
                     continue
 
@@ -268,7 +279,7 @@ class ArxivSearcher:
                 if attempt == 2:  # 最后一次尝试也失败
                     print(f"  ERROR: ArXiv search failed for {category_id}: {e}")
                     return []
-                time.sleep(3)
+                time.sleep(2 ** attempt)
         # All 3 attempts exhausted - return empty to avoid crash on next ET.fromstring
         print(f"  ERROR: ArXiv search exhausted all retries for {category_id}")
         return []
@@ -2868,9 +2879,9 @@ def main():
                 print(f"    [{time.time()-t:.1f}s] {cat.get('name',cat_id)}: ArXiv={len(arxiv_raw)}, PubMed={len(pubmed_raw)}, Crossref={len(crossref_raw)}, Tavily={len(tavily_raw)}", flush=True)
                 return papers
 
-            # 8 并行 worker 处理 8 个领域（1 worker / domain，完全并行无批次等待）
+            # 4 并行 worker 处理 8 个领域（错峰搜索，避免 ArXiv 429 burst rate limit）
             from concurrent.futures import ThreadPoolExecutor, as_completed
-            with ThreadPoolExecutor(max_workers=8) as pool:
+            with ThreadPoolExecutor(max_workers=4) as pool:
                 futures = {pool.submit(_search_domain, cat_id, cat): cat_id
                            for cat_id, cat in classifier.categories.items()}
                 for future in as_completed(futures):
@@ -3283,21 +3294,32 @@ def main():
             print(f"\n  [DEBUG] underfilled domains (len={len(underfilled)}): {underfilled}", flush=True)
             if underfilled:
                 print(f"\n  [FILL-L2] {len(underfilled)} domains with < {MIN_PAPERS} papers — expanding search...", flush=True)
+                # ArXiv 可用性预检（避免每个领域都白等 70s 重试）
+                _arxiv_ok = True
+                try:
+                    _test = searcher.search_by_category(list(classifier.categories.keys())[0], max_results=1, days_back=7)
+                    if not _test:
+                        _arxiv_ok = False
+                        print("  WARNING: ArXiv unavailable — skipping ArXiv expand in L2 Fill")
+                except Exception:
+                    _arxiv_ok = False
+                    print("  WARNING: ArXiv expand pre-check failed — skipping ArXiv expand in L2 Fill")
                 for cat_id in underfilled:
                     cat = classifier.categories[cat_id]
                     expanded = []
-                    # 策略1: ArXiv 扩窗至 180 天 + 扩大召回
-                    try:
-                        expanded_arxiv = searcher.search_by_category(
-                            cat_id, max_results=60, days_back=180)
-                        for p in expanded_arxiv:
-                            uid = _uid(p)
-                            if uid not in _pushed_uids and uid not in all_collected:
-                                p["source"] = "arxiv"
-                                all_collected[uid] = p
-                                expanded.append(p)
-                    except Exception as e:
-                        print(f"    [{cat.get('name')}] ArXiv expand failed: {e}")
+                    # 策略1: ArXiv 扩窗至 180 天 + 扩大召回（仅在 ArXiv 可用时）
+                    if _arxiv_ok:
+                        try:
+                            expanded_arxiv = searcher.search_by_category(
+                                cat_id, max_results=60, days_back=180)
+                            for p in expanded_arxiv:
+                                uid = _uid(p)
+                                if uid not in _pushed_uids and uid not in all_collected:
+                                    p["source"] = "arxiv"
+                                    all_collected[uid] = p
+                                    expanded.append(p)
+                        except Exception as e:
+                            print(f"    [{cat.get('name')}] ArXiv expand failed: {e}")
                     # 策略2: Crossref 扩召（每领域最多 8 篇）
                     try:
                         expanded_cr = crossref_searcher.search_category(

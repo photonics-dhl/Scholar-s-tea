@@ -2,29 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { cn } from '@/lib/utils/cn'
+import { AcademicPandaSVG, type HermesMood as SVGMood } from '@/components/features/hermes/AcademicPandaSVG'
+import { PandaParticles } from './PandaParticles'
 
-export type HermesMood =
-  | 'idle'
-  | 'happy'
-  | 'thinking'
-  | 'sleepy'
-  | 'dancing'
-  | 'waving'
-  | 'surprised'
-  | 'curious'
-  | 'love'
-  | 'angry'
-  | 'shy'
-  | 'dizzy'
-  | 'bored'
-  | 'studying'
-  | 'insight'
-  | 'confused'
-  | 'tea_time'
-  | 'inspired'
-  | 'debate'
-  | 'eureka'
-  | 'tea_sipping'
+export type HermesMood = SVGMood
 
 /** 外部命令接口 — 让父组件可以命令 Avatar 执行动作 */
 export interface AvatarCommand {
@@ -50,11 +31,16 @@ interface HermesAvatarProps {
   size?: number
   mood?: HermesMood
   onClick?: () => void
+  onDoubleClick?: () => void
   className?: string
   interactive?: boolean
   isDragging?: boolean
   /** 外部命令 — 传入新对象即触发对应动作 */
   command?: AvatarCommand
+  /** 是否启用增强互动效果 */
+  enhancedEffects?: boolean
+  /** 渲染模式：svg = 熊猫矢量图, live2d = Live2D 模型 */
+  renderMode?: 'svg' | 'live2d'
 }
 
 /* ============ 气泡消息库 ============ */
@@ -197,333 +183,20 @@ function pickRandom<T>(arr: T[]): T {
 }
 
 /* ============================================================
-   SVG 熊猫绘制函数 — Kakao Friends 粗描边卡通风格 V4
-   自适应比例：小尺寸(size≤64)自动放大眼睛/耳朵/腮红比例
+   增强版 AI 学术熊猫 Avatar — Live2D 风格交互
    ============================================================ */
-
-const STROKE = '#1a1a2e'
-const STROKE_W = (s: number) => s * 0.018
-const WHITE = '#fff'
-const DARK = '#1a1a2e'
-const PINK = '#ff8fa3'
-
-/** 自适应比例 — 小尺寸下增大特征占比，补偿细节丢失 */
-function ar(s: number): number { return s <= 64 ? 1.35 : 1.0 }
-
-/** 经典 Kakao 风格多层有神大眼 */
-function renderEyes(s: number, mood: HermesMood, blinking: boolean) {
-  const r = ar(s)
-  const eyeY = s * 0.35
-  const leftX = s * 0.32
-  const rightX = s * 0.68
-  const sz = s * 0.085 * r
-
-  // 闭眼
-  if (blinking || mood === 'sleepy' || mood === 'bored') {
-    return (
-      <>
-        <path d={`M ${leftX - sz * 0.7} ${eyeY + sz * 0.15} Q ${leftX} ${eyeY + sz * 0.55} ${leftX + sz * 0.7} ${eyeY + sz * 0.15}`}
-          stroke={STROKE} strokeWidth={s * 0.028} fill="none" strokeLinecap="round" />
-        <path d={`M ${rightX - sz * 0.7} ${eyeY + sz * 0.15} Q ${rightX} ${eyeY + sz * 0.55} ${rightX + sz * 0.7} ${eyeY + sz * 0.15}`}
-          stroke={STROKE} strokeWidth={s * 0.028} fill="none" strokeLinecap="round" />
-      </>
-    )
-  }
-
-  // 默认大眼睛结构：倾斜眼圈 + 大眼白 + 大瞳孔 + 高光
-  const normalEye = (cx: number, rot: number) => {
-    // 小尺寸下简化结构：去掉看不见的次高光/微高光，把空间给主高光
-    const isSmall = s <= 64
-    return (
-      <>
-        {/* 黑眼圈 — 更大角度，更像熊猫墨镜 */}
-        <ellipse cx={cx} cy={eyeY} rx={sz * 1.05} ry={sz * 0.88}
-          fill={DARK} transform={`rotate(${rot} ${cx} ${eyeY})`} />
-        {/* 眼白 — 小尺寸下更大 */}
-        <circle cx={cx} cy={eyeY - sz * 0.02} r={sz * (isSmall ? 0.75 : 0.68)} fill={WHITE} />
-        {/* 瞳孔 — 小尺寸下更大 */}
-        <circle cx={cx} cy={eyeY + sz * 0.02} r={sz * (isSmall ? 0.45 : 0.38)} fill={DARK} />
-        {/* 主高光 — 大而亮 */}
-        <circle cx={cx - sz * 0.18} cy={eyeY - sz * 0.22} r={sz * (isSmall ? 0.28 : 0.22)} fill={WHITE} />
-        {/* 次高光 — 仅大尺寸显示 */}
-        {!isSmall && <circle cx={cx + sz * 0.16} cy={eyeY + sz * 0.18} r={sz * 0.11} fill={WHITE} opacity={0.8} />}
-        {/* 微高光 — 仅大尺寸显示 */}
-        {!isSmall && <circle cx={cx + sz * 0.08} cy={eyeY - sz * 0.08} r={sz * 0.05} fill={WHITE} opacity={0.9} />}
-      </>
-    )
-  }
-
-  switch (mood) {
-    case 'happy':
-    case 'dancing':
-    case 'waving':
-    case 'eureka':
-    case 'inspired':
-    case 'tea_time':
-    case 'tea_sipping':
-      return (
-        <>
-          <path d={`M ${leftX - sz * 0.9} ${eyeY + sz * 0.3} Q ${leftX} ${eyeY - sz * 0.35} ${leftX + sz * 0.9} ${eyeY + sz * 0.3}`}
-            stroke={STROKE} strokeWidth={s * 0.035} fill="none" strokeLinecap="round" />
-          <path d={`M ${rightX - sz * 0.9} ${eyeY + sz * 0.3} Q ${rightX} ${eyeY - sz * 0.35} ${rightX + sz * 0.9} ${eyeY + sz * 0.3}`}
-            stroke={STROKE} strokeWidth={s * 0.035} fill="none" strokeLinecap="round" />
-        </>
-      )
-    case 'love': {
-      const heart = (cx: number) => (
-        <path d={`M ${cx} ${eyeY + sz * 0.25} C ${cx - sz * 0.75} ${eyeY - sz * 0.35}, ${cx - sz * 0.75} ${eyeY + sz * 0.65}, ${cx} ${eyeY + sz * 0.25} C ${cx + sz * 0.75} ${eyeY + sz * 0.65}, ${cx + sz * 0.75} ${eyeY - sz * 0.35}, ${cx} ${eyeY + sz * 0.25}`} fill="#E84A5F" stroke={STROKE} strokeWidth={s * 0.012} />
-      )
-      return (<>{heart(leftX)}{heart(rightX)}</>)
-    }
-    case 'surprised':
-      return (
-        <>
-          <ellipse cx={leftX} cy={eyeY} rx={sz * 1.15} ry={sz * 1.05} fill={DARK} transform={`rotate(-6 ${leftX} ${eyeY})`} />
-          <circle cx={leftX} cy={eyeY - sz * 0.05} r={sz * 0.72} fill={WHITE} />
-          <circle cx={leftX} cy={eyeY + sz * 0.02} r={sz * 0.45} fill={DARK} />
-          <circle cx={leftX + sz * 0.18} cy={eyeY - sz * 0.22} r={sz * 0.22} fill={WHITE} />
-          <circle cx={leftX - sz * 0.12} cy={eyeY + sz * 0.18} r={sz * 0.11} fill={WHITE} opacity={0.8} />
-          <ellipse cx={rightX} cy={eyeY} rx={sz * 1.15} ry={sz * 1.05} fill={DARK} transform={`rotate(6 ${rightX} ${eyeY})`} />
-          <circle cx={rightX} cy={eyeY - sz * 0.05} r={sz * 0.72} fill={WHITE} />
-          <circle cx={rightX} cy={eyeY + sz * 0.02} r={sz * 0.45} fill={DARK} />
-          <circle cx={rightX + sz * 0.18} cy={eyeY - sz * 0.22} r={sz * 0.22} fill={WHITE} />
-          <circle cx={rightX - sz * 0.12} cy={eyeY + sz * 0.18} r={sz * 0.11} fill={WHITE} opacity={0.8} />
-        </>
-      )
-    case 'angry':
-    case 'debate': {
-      const angryEye = (cx: number, sx: number) => (
-        <>
-          <line x1={cx - sx} y1={eyeY - sz * 0.65} x2={cx + sx * 0.4} y2={eyeY + sz * 0.25}
-            stroke={STROKE} strokeWidth={s * 0.028} strokeLinecap="round" />
-          <ellipse cx={cx} cy={eyeY + sz * 0.25} rx={sz * 0.65} ry={sz * 0.55} fill={DARK} />
-          <circle cx={cx - sx * 0.15} cy={eyeY + sz * 0.15} r={sz * 0.22} fill={WHITE} />
-          <circle cx={cx - sx * 0.12} cy={eyeY + sz * 0.12} r={sz * 0.1} fill={WHITE} opacity={0.7} />
-        </>
-      )
-      return (<>{angryEye(leftX, sz)}{angryEye(rightX, -sz)}</>)
-    }
-    case 'thinking':
-    case 'curious':
-    case 'confused': {
-      const thinkEye = (cx: number, rot: number, ry: number) => (
-        <>
-          <ellipse cx={cx} cy={eyeY} rx={sz * 0.92} ry={sz * ry} fill={DARK} transform={`rotate(${rot} ${cx} ${eyeY})`} />
-          <circle cx={cx} cy={eyeY - sz * 0.05} r={sz * 0.50} fill={WHITE} />
-          <circle cx={cx - sz * 0.05} cy={eyeY + sz * 0.02} r={sz * 0.28} fill={DARK} />
-          <circle cx={cx + sz * 0.12} cy={eyeY - sz * 0.18} r={sz * 0.14} fill={WHITE} />
-        </>
-      )
-      return (<>{thinkEye(leftX, -6, 0.58)}{thinkEye(rightX, 6, 0.68)}</>)
-    }
-    case 'shy': {
-      const shyEye = (cx: number, rot: number) => (
-        <>
-          <ellipse cx={cx} cy={eyeY + sz * 0.12} rx={sz * 0.88} ry={sz * 0.68} fill={DARK} transform={`rotate(${rot} ${cx} ${eyeY})`} />
-          <circle cx={cx + sz * 0.12} cy={eyeY + sz * 0.22} r={sz * 0.45} fill={WHITE} />
-          <circle cx={cx + sz * 0.18} cy={eyeY + sz * 0.28} r={sz * 0.25} fill={DARK} />
-          <circle cx={cx + sz * 0.22} cy={eyeY + sz * 0.18} r={sz * 0.12} fill={WHITE} />
-        </>
-      )
-      return (<>{shyEye(leftX, -6)}{shyEye(rightX, 6)}</>)
-    }
-    case 'dizzy':
-      return (
-        <>
-          <text x={leftX - sz * 0.45} y={eyeY + sz * 0.35} fontSize={sz * 1.4} fill={DARK} fontWeight="bold" fontFamily="sans-serif">×</text>
-          <text x={rightX - sz * 0.45} y={eyeY + sz * 0.35} fontSize={sz * 1.4} fill={DARK} fontWeight="bold" fontFamily="sans-serif">×</text>
-        </>
-      )
-    default:
-      return (<>{normalEye(leftX, -12)}{normalEye(rightX, 12)}</>)
-  }
-}
-
-/** 根据 mood 渲染嘴巴 — ω 萌嘴风格 */
-function renderMouth(s: number, mood: HermesMood) {
-  const mx = s * 0.50, my = s * 0.455, w = s * 0.10
-
-  switch (mood) {
-    case 'happy':
-    case 'dancing':
-    case 'waving':
-    case 'eureka':
-    case 'inspired':
-    case 'love':
-      // 大大的 D 形笑
-      return <path d={`M ${mx - w} ${my} Q ${mx} ${my + w * 1.8} ${mx + w} ${my}`}
-        stroke={STROKE} strokeWidth={s * 0.026} strokeLinecap="round" fill="none" />
-    case 'surprised':
-      return <ellipse cx={mx} cy={my + s * 0.012} rx={s * 0.025} ry={s * 0.035} fill={DARK} />
-    case 'thinking':
-    case 'curious':
-    case 'confused':
-      return <path d={`M ${mx - w * 0.6} ${my + s * 0.008} Q ${mx} ${my - s * 0.012} ${mx + w * 0.6} ${my + s * 0.008}`}
-        stroke={STROKE} strokeWidth={s * 0.020} strokeLinecap="round" fill="none" />
-    case 'angry':
-    case 'debate':
-      return <path d={`M ${mx - w * 0.7} ${my + s * 0.025} Q ${mx} ${my - s * 0.015} ${mx + w * 0.7} ${my + s * 0.025}`}
-        stroke={STROKE} strokeWidth={s * 0.024} strokeLinecap="round" fill="none" />
-    case 'sleepy':
-    case 'bored':
-      return <ellipse cx={mx} cy={my + s * 0.005} rx={s * 0.018} ry={s * 0.014} fill={DARK} />
-    case 'shy':
-      // ω 形小嘴
-      return <path d={`M ${mx - w * 0.5} ${my} Q ${mx - w * 0.15} ${my + w * 0.6} ${mx} ${my + w * 0.3} Q ${mx + w * 0.15} ${my + w * 0.6} ${mx + w * 0.5} ${my}`}
-        stroke={STROKE} strokeWidth={s * 0.020} strokeLinecap="round" fill="none" />
-    case 'dizzy':
-      return <path d={`M ${mx - w} ${my} Q ${mx - w * 0.5} ${my + s * 0.025} ${mx} ${my} Q ${mx + w * 0.5} ${my - s * 0.025} ${mx + w} ${my}`}
-        stroke={STROKE} strokeWidth={s * 0.020} strokeLinecap="round" fill="none" />
-    default:
-      // 默认 ω 萌嘴
-      return <path d={`M ${mx - w * 0.65} ${my} Q ${mx - w * 0.2} ${my + w * 0.7} ${mx} ${my + w * 0.4} Q ${mx + w * 0.2} ${my + w * 0.7} ${mx + w * 0.65} ${my}`}
-        stroke={STROKE} strokeWidth={s * 0.022} strokeLinecap="round" fill="none" />
-  }
-}
-
-/** 腮红透明度和颜色 */
-function getBlushProps(mood: HermesMood): { opacity: number; color: string } {
-  switch (mood) {
-    case 'love':
-    case 'shy':
-      return { opacity: 0.7, color: '255,130,150' }
-    case 'angry':
-    case 'debate':
-      return { opacity: 0.55, color: '255,110,90' }
-    case 'happy':
-    case 'dancing':
-    case 'waving':
-    case 'eureka':
-      return { opacity: 0.5, color: '255,150,165' }
-    case 'sleepy':
-    case 'bored':
-      return { opacity: 0.25, color: '180,180,210' }
-    default:
-      return { opacity: 0.4, color: '255,160,175' }
-  }
-}
-
-/** 渲染手臂 */
-function renderArms(s: number, _mood: HermesMood, isWaving: boolean, isDancing: boolean) {
-  const leftArmClass = isWaving ? 'animate-hermes-wave-left' : isDancing ? 'animate-hermes-dance' : ''
-  return (
-    <>
-      <g className={cn(leftArmClass)} style={{ transformOrigin: `${s * 0.28}px ${s * 0.58}px`, animationDuration: isDancing ? '0.9s' : undefined }}>
-        <ellipse cx={s * 0.28} cy={s * 0.66} rx={s * 0.05} ry={s * 0.07} fill={DARK} />
-      </g>
-      <g className={cn(isDancing && 'animate-hermes-dance')} style={{ transformOrigin: `${s * 0.72}px ${s * 0.58}px`, animationDuration: isDancing ? '0.9s' : undefined, animationDelay: isDancing ? '0.45s' : undefined }}>
-        <ellipse cx={s * 0.72} cy={s * 0.66} rx={s * 0.05} ry={s * 0.07} fill={DARK} />
-      </g>
-    </>
-  )
-}
-
-/** 主 SVG 熊猫渲染 — Kakao Friends 粗描边 Q 版风格 */
-function PandaSVG({
-  size,
-  mood,
-  blinking,
-  isWaving,
-  isDancing,
-}: {
-  size: number
-  mood: HermesMood
-  blinking: boolean
-  isWaving: boolean
-  isDancing: boolean
-}) {
-  const s = size
-  const r = ar(s)
-  const { opacity, color } = getBlushProps(mood)
-  const sw = STROKE_W(s)
-
-  // V4 比例参数 — 头部更大更圆，身体更小巧
-  const headRx = s * 0.29
-  const headRy = s * 0.28
-  const headCy = s * 0.32
-
-  const earRx = s * 0.10 * r
-  const earRy = s * 0.09 * r
-  const earCy = s * 0.12
-  const earInnerRx = s * 0.06 * r
-  const earInnerRy = s * 0.05 * r
-
-  const bodyRx = s * 0.20
-  const bodyRy = s * 0.13
-  const bodyCy = s * 0.58
-  const bellyRx = s * 0.13
-  const bellyRy = s * 0.10
-
-  const footRx = s * 0.07
-  const footRy = s * 0.055
-  const footCy = s * 0.82
-
-  const blushRx = s * 0.09 * r
-  const blushRy = s * 0.06 * r
-  const blushCy = s * 0.40
-
-  return (
-    <svg viewBox={`0 0 ${s} ${s}`} width={s} height={s} className="drop-shadow-md">
-      {/* 底部阴影 */}
-      <ellipse cx={s * 0.5} cy={s * 0.92} rx={s * 0.24} ry={s * 0.032} fill="rgba(0,0,0,0.08)" />
-
-      {/* 脚 */}
-      <ellipse cx={s * 0.36} cy={footCy} rx={footRx} ry={footRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-      <ellipse cx={s * 0.64} cy={footCy} rx={footRx} ry={footRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-
-      {/* 身体 — 小巧圆润 */}
-      <ellipse cx={s * 0.5} cy={bodyCy} rx={bodyRx} ry={bodyRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-      {/* 肚子 */}
-      <ellipse cx={s * 0.5} cy={bodyCy + s * 0.01} rx={bellyRx} ry={bellyRy} fill="#faf8f5" stroke={STROKE} strokeWidth={sw * 0.6} />
-
-      {/* 耳朵 — 大而圆 */}
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.18}px ${earCy}px` }}>
-        <ellipse cx={s * 0.18} cy={earCy} rx={earRx} ry={earRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-        <ellipse cx={s * 0.18} cy={earCy + s * 0.01} rx={earInnerRx} ry={earInnerRy} fill="#3d3d4a" />
-      </g>
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.82}px ${earCy}px`, animationDelay: '0.15s' }}>
-        <ellipse cx={s * 0.82} cy={earCy} rx={earRx} ry={earRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-        <ellipse cx={s * 0.82} cy={earCy + s * 0.01} rx={earInnerRx} ry={earInnerRy} fill="#3d3d4a" />
-      </g>
-
-      {/* 头部 — 正圆大球 */}
-      <ellipse cx={s * 0.5} cy={headCy} rx={headRx} ry={headRy} fill={WHITE} stroke={STROKE} strokeWidth={sw} />
-      {/* 头部下方柔和阴影 */}
-      <ellipse cx={s * 0.5} cy={headCy + s * 0.19} rx={s * 0.20} ry={s * 0.06} fill="#f0ece5" opacity={0.5} />
-
-      {/* 眼睛 */}
-      {renderEyes(s, mood, blinking)}
-
-      {/* 鼻子 */}
-      <ellipse cx={s * 0.50} cy={s * 0.42} rx={s * 0.038} ry={s * 0.026} fill={DARK} />
-      <ellipse cx={s * 0.495} cy={s * 0.413} rx={s * 0.013} ry={s * 0.007} fill="white" opacity={0.6} />
-
-      {/* 嘴巴 */}
-      {renderMouth(s, mood)}
-
-      {/* 腮红 — 大而圆 */}
-      <ellipse cx={s * 0.22} cy={blushCy} rx={blushRx} ry={blushRy} fill={`rgba(${color},${opacity})`} />
-      <ellipse cx={s * 0.78} cy={blushCy} rx={blushRx} ry={blushRy} fill={`rgba(${color},${opacity})`} />
-
-      {/* 手臂 */}
-      {renderArms(s, mood, isWaving, isDancing)}
-    </svg>
-  )
-}
-
-/* ============================================================
-   HermesAvatar 主组件
-   ============================================================ */
-
 
 export function HermesAvatar({
   size = 56,
   mood: controlledMood,
   onClick,
+  onDoubleClick,
   className,
   interactive = true,
   isDragging = false,
   command,
+  enhancedEffects = true,
+  renderMode = 'live2d',
 }: HermesAvatarProps) {
   const [internalMood, setInternalMood] = useState<HermesMood>('idle')
   const [speechBubble, setSpeechBubble] = useState<string | null>(null)
@@ -534,7 +207,10 @@ export function HermesAvatar({
   const [isHovered, setIsHovered] = useState(false)
   const [headTilt, setHeadTilt] = useState(0)
   const [dizzyStars, setDizzyStars] = useState(false)
-  const [blinking, setBlinking] = useState(false)
+  const [rippleTrigger, setRippleTrigger] = useState(0)
+  const [particleTrigger, setParticleTrigger] = useState(0)
+  const [particleOrigin, setParticleOrigin] = useState({ x: 0, y: 0 })
+  const [particleType, setParticleType] = useState<'hearts' | 'stars' | 'sparkles' | 'mixed'>('mixed')
 
   const bubbleTimerRef = useRef<NodeJS.Timeout | null>(null)
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -543,8 +219,8 @@ export function HermesAvatar({
   const dragStartTimeRef = useRef<number>(0)
   const commandTimerRef = useRef<NodeJS.Timeout | null>(null)
   const prevCommandRef = useRef<AvatarCommand | undefined>(undefined)
-  const blinkTimerRef = useRef<NodeJS.Timeout | null>(null)
   const moodRef = useRef<HermesMood>('idle')
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   const mood = controlledMood || internalMood
 
@@ -552,6 +228,30 @@ export function HermesAvatar({
   useEffect(() => {
     moodRef.current = mood
   }, [mood])
+
+  // Live2D iframe communication
+  useEffect(() => {
+    if (renderMode !== 'live2d' || !iframeRef.current) return
+    iframeRef.current.contentWindow?.postMessage({ type: 'hermes-mood', mood }, '*')
+  }, [mood, renderMode])
+
+
+  /* ============ 粒子特效触发 ============ */
+  const spawnParticles = useCallback((type: 'hearts' | 'stars' | 'sparkles' | 'mixed' = 'mixed') => {
+    if (!enhancedEffects || !containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    setParticleOrigin({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    })
+    setParticleType(type)
+    setParticleTrigger(prev => prev + 1)
+  }, [enhancedEffects])
+
+  const spawnRipple = useCallback(() => {
+    if (!enhancedEffects) return
+    setRippleTrigger(prev => prev + 1)
+  }, [enhancedEffects])
 
   /* ============ 工具函数 ============ */
   const resetAction = useCallback(() => {
@@ -563,7 +263,6 @@ export function HermesAvatar({
 
   /** 根据气泡文本触发匹配的可爱小动作 */
   const triggerMiniActionFromText = useCallback((text: string, duration: number) => {
-    // 只在 idle 状态下触发，避免覆盖外部命令或已有动作
     if (moodRef.current !== 'idle') return
 
     const t = text.toLowerCase()
@@ -571,20 +270,24 @@ export function HermesAvatar({
 
     if (t.includes('茶') || t.includes('tea') || t.includes('喝')) {
       setInternalMood('tea_time')
+      spawnParticles('sparkles')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('睡') || t.includes('困') || t.includes('休息') || t.includes('累') || t.includes('zzz')) {
       setInternalMood('sleepy')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('爱') || t.includes('喜欢') || t.includes('么么') || t.includes('❤') || t.includes('♥') || t.includes('💗')) {
       setInternalMood('love')
+      spawnParticles('hearts')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('舞') || t.includes('跳') || t.includes('摇摆') || t.includes('舞王') || t.includes('音乐') || t.includes('🎵')) {
       setIsDancing(true)
       setInternalMood('dancing')
+      spawnParticles('stars')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('开心') || t.includes('棒') || t.includes('加油') || t.includes('好心情') || t.includes('好棒') || t.includes('赞') || t.includes('✨') || t.includes('耶')) {
       setIsBouncing(true)
       setInternalMood('happy')
+      spawnParticles('stars')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('学习') || t.includes('读书') || t.includes('知识') || t.includes('📚') || t.includes('书')) {
       setInternalMood('studying')
@@ -592,6 +295,7 @@ export function HermesAvatar({
     } else if (t.includes('发现') || t.includes('原来') || t.includes('答案') || t.includes('恍然大悟')) {
       setIsBouncing(true)
       setInternalMood('eureka')
+      spawnParticles('stars')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('思考') || t.includes('想') || t.includes('🤔') || t.includes('？') || t.includes('?')) {
       setInternalMood('thinking')
@@ -601,6 +305,7 @@ export function HermesAvatar({
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('灵感') || t.includes('主意') || t.includes('💡')) {
       setInternalMood('inspired')
+      spawnParticles('sparkles')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('洞察') || t.includes('观察') || t.includes('🔍')) {
       setInternalMood('insight')
@@ -608,51 +313,39 @@ export function HermesAvatar({
     } else if (t.includes('挥手') || t.includes('嗨') || t.includes('hello') || t.includes('hi') || t.includes('👋') || t.includes('你好')) {
       setIsWaving(true)
       setInternalMood('waving')
-      actionTimer = setTimeout(resetAction, duration)
+      actionTimer = setTimeout(() => {
+        setIsWaving(false)
+        setInternalMood('idle')
+      }, duration)
     } else if (t.includes('生气') || t.includes('哼') || t.includes('😠')) {
       setInternalMood('angry')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('害羞') || t.includes('羞') || t.includes('😳')) {
       setInternalMood('shy')
+      spawnParticles('hearts')
       actionTimer = setTimeout(resetAction, duration)
     } else if (t.includes('惊讶') || t.includes('哇') || t.includes('啊') || t.includes('😲')) {
       setInternalMood('surprised')
+      spawnParticles('mixed')
       actionTimer = setTimeout(resetAction, duration)
     }
 
     if (actionTimer) {
       commandTimerRef.current = actionTimer
     }
-  }, [resetAction])
+  }, [resetAction, spawnParticles])
 
   const showBubble = useCallback((text?: string, duration = 2500) => {
     setSpeechBubble(text || null)
     if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
     if (text) {
       bubbleTimerRef.current = setTimeout(() => setSpeechBubble(null), duration)
-      // 根据气泡文本触发匹配小动作
       triggerMiniActionFromText(text, duration)
     }
   }, [triggerMiniActionFromText])
 
   const resetIdleTimer = useCallback(() => {
     lastInteractRef.current = Date.now()
-  }, [])
-
-  /* ============ 自动眨眼 ============ */
-  useEffect(() => {
-    const scheduleBlink = () => {
-      const delay = 2500 + Math.random() * 3500
-      blinkTimerRef.current = setTimeout(() => {
-        setBlinking(true)
-        setTimeout(() => setBlinking(false), 150)
-        scheduleBlink()
-      }, delay)
-    }
-    scheduleBlink()
-    return () => {
-      if (blinkTimerRef.current) clearTimeout(blinkTimerRef.current)
-    }
   }, [])
 
   /* ============ 外部命令处理 ============ */
@@ -671,113 +364,121 @@ export function HermesAvatar({
         case 'wave':
           setIsWaving(true)
           setInternalMood('waving')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.greet), 2500)
+          spawnParticles('mixed')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.greet), 3000)
           commandTimerRef.current = setTimeout(() => {
             setIsWaving(false)
             setInternalMood('idle')
-          }, 1500)
+          }, 3000)
           break
 
         case 'dance':
           setIsDancing(true)
           setInternalMood('dancing')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.dance), 2500)
+          spawnParticles('stars')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.dance), 3000)
           commandTimerRef.current = setTimeout(() => {
             setIsDancing(false)
             setInternalMood('idle')
-          }, 2000)
+          }, 4000)
           break
 
         case 'sleep':
           setInternalMood('sleepy')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.rest), 3000)
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.rest), 3500)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2500)
+          }, 4000)
           break
 
         case 'love':
           setInternalMood('love')
-          showBubble(command.bubble || pickRandom(BUBBLES.love), 2500)
+          spawnParticles('hearts')
+          showBubble(command.bubble || pickRandom(BUBBLES.love), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'happy':
           setIsBouncing(true)
           setInternalMood('happy')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.encourage), 3000)
+          spawnParticles('stars')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.encourage), 3500)
           commandTimerRef.current = setTimeout(() => {
             setIsBouncing(false)
             setInternalMood('idle')
-          }, 1500)
+          }, 3000)
           break
 
         case 'study':
           setInternalMood('studying')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.study), 2500)
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.study), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'insight':
           setInternalMood('insight')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.insight), 2500)
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.insight), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'confused':
           setInternalMood('confused')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.confused), 2500)
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.confused), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 4000)
           break
 
         case 'tea':
           setInternalMood('tea_time')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.tea), 2500)
+          spawnParticles('sparkles')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.tea), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'inspired':
           setInternalMood('inspired')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.inspired), 2500)
+          spawnParticles('sparkles')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.inspired), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'debate':
           setInternalMood('debate')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.debate), 2500)
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.debate), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 4000)
           break
 
         case 'eureka':
           setIsBouncing(true)
           setInternalMood('eureka')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.eureka), 2500)
+          spawnParticles('stars')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.eureka), 3000)
           commandTimerRef.current = setTimeout(() => {
             setIsBouncing(false)
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'tea_sip':
           setInternalMood('tea_sipping')
-          showBubble(command.bubble || pickRandom(BUBBLES.comfort.tea_sip), 2500)
+          spawnParticles('sparkles')
+          showBubble(command.bubble || pickRandom(BUBBLES.comfort.tea_sip), 3000)
           commandTimerRef.current = setTimeout(() => {
             setInternalMood('idle')
-          }, 2000)
+          }, 3500)
           break
 
         case 'random': {
@@ -785,64 +486,70 @@ export function HermesAvatar({
             () => {
               setIsWaving(true)
               setInternalMood('waving')
-              showBubble('猜猜我要做什么？👋', 2000)
+              spawnParticles('mixed')
+              showBubble('猜猜我要做什么？👋', 2500)
               commandTimerRef.current = setTimeout(() => {
                 setIsWaving(false)
                 setInternalMood('idle')
-              }, 1500)
+              }, 3000)
             },
             () => {
               setIsDancing(true)
               setInternalMood('dancing')
-              showBubble('随机舞王登场！💃', 2000)
+              spawnParticles('stars')
+              showBubble('随机舞王登场！💃', 2500)
               commandTimerRef.current = setTimeout(() => {
                 setIsDancing(false)
                 setInternalMood('idle')
-              }, 2000)
+              }, 4000)
             },
             () => {
               setInternalMood('love')
-              showBubble(pickRandom(BUBBLES.love), 2000)
+              spawnParticles('hearts')
+              showBubble(pickRandom(BUBBLES.love), 2500)
               commandTimerRef.current = setTimeout(() => {
                 setInternalMood('idle')
-              }, 2000)
+              }, 3500)
             },
             () => {
               setIsBouncing(true)
               setInternalMood('happy')
-              showBubble(pickRandom(BUBBLES.comfort.encourage), 2500)
+              spawnParticles('stars')
+              showBubble(pickRandom(BUBBLES.comfort.encourage), 3000)
               commandTimerRef.current = setTimeout(() => {
                 setIsBouncing(false)
                 setInternalMood('idle')
-              }, 1200)
+              }, 3000)
             },
             () => {
               setInternalMood('curious')
-              showBubble('咦？这是什么？🤔', 1500)
+              showBubble('咦？这是什么？🤔', 2000)
               commandTimerRef.current = setTimeout(() => {
                 setInternalMood('idle')
-              }, 1500)
+              }, 2500)
             },
             () => {
               setInternalMood('insight')
-              showBubble(pickRandom(BUBBLES.comfort.insight), 2000)
+              showBubble(pickRandom(BUBBLES.comfort.insight), 2500)
               commandTimerRef.current = setTimeout(() => {
                 setInternalMood('idle')
-              }, 2000)
+              }, 3500)
             },
             () => {
               setInternalMood('tea_time')
-              showBubble(pickRandom(BUBBLES.comfort.tea), 2000)
+              spawnParticles('sparkles')
+              showBubble(pickRandom(BUBBLES.comfort.tea), 2500)
               commandTimerRef.current = setTimeout(() => {
                 setInternalMood('idle')
-              }, 2000)
+              }, 3500)
             },
             () => {
               setInternalMood('eureka')
-              showBubble(pickRandom(BUBBLES.comfort.eureka), 2000)
+              spawnParticles('stars')
+              showBubble(pickRandom(BUBBLES.comfort.eureka), 2500)
               commandTimerRef.current = setTimeout(() => {
                 setInternalMood('idle')
-              }, 2000)
+              }, 3500)
             },
           ]
           pickRandom(actions)()
@@ -852,7 +559,7 @@ export function HermesAvatar({
     }
 
     execute()
-  }, [command, showBubble, resetIdleTimer])
+  }, [command, showBubble, resetIdleTimer, spawnParticles])
 
   /* ============ 鼠标交互 ============ */
   const handleMouseEnter = useCallback(() => {
@@ -884,11 +591,11 @@ export function HermesAvatar({
       if (dragDuration > 800) {
         setInternalMood('dizzy')
         setDizzyStars(true)
-        showBubble(pickRandom(BUBBLES.dizzy), 2000)
+        showBubble(pickRandom(BUBBLES.dizzy), 2500)
         setTimeout(() => {
           setDizzyStars(false)
           setInternalMood('idle')
-        }, 2000)
+        }, 3500)
       } else {
         setInternalMood('idle')
       }
@@ -904,8 +611,8 @@ export function HermesAvatar({
         const actions: (() => void)[] = [
           () => {
             setInternalMood('bored')
-            showBubble('哈~ 欠~ 🥱', 2000)
-            setTimeout(() => setInternalMood('idle'), 2000)
+            showBubble('哈~ 欠~ 🥱', 2500)
+            setTimeout(() => setInternalMood('idle'), 3500)
           },
           () => {
             setHeadTilt(15)
@@ -917,23 +624,25 @@ export function HermesAvatar({
           },
           () => {
             setInternalMood('sleepy')
-            showBubble('Zzz... 好困...', 2500)
-            setTimeout(() => setInternalMood('idle'), 2500)
+            showBubble('Zzz... 好困...', 3000)
+            setTimeout(() => setInternalMood('idle'), 4000)
           },
           () => {
             setInternalMood('love')
-            showBubble(pickRandom(BUBBLES.love), 2000)
-            setTimeout(() => setInternalMood('idle'), 2000)
+            spawnParticles('hearts')
+            showBubble(pickRandom(BUBBLES.love), 2500)
+            setTimeout(() => setInternalMood('idle'), 3500)
           },
           () => {
             setInternalMood('curious')
-            showBubble('嗯？什么声音？', 1500)
-            setTimeout(() => setInternalMood('idle'), 1500)
+            showBubble('嗯？什么声音？', 2000)
+            setTimeout(() => setInternalMood('idle'), 2500)
           },
           () => {
             setInternalMood('tea_time')
-            showBubble('来杯茶怎么样？🍵', 2000)
-            setTimeout(() => setInternalMood('idle'), 2000)
+            spawnParticles('sparkles')
+            showBubble('来杯茶怎么样？🍵', 2500)
+            setTimeout(() => setInternalMood('idle'), 3500)
           },
         ]
         pickRandom(actions)()
@@ -944,43 +653,51 @@ export function HermesAvatar({
     return () => {
       if (idleTimerRef.current) clearInterval(idleTimerRef.current)
     }
-  }, [mood, isDragging, controlledMood, showBubble, resetIdleTimer])
+  }, [mood, isDragging, controlledMood, showBubble, resetIdleTimer, spawnParticles])
 
   /* ============ 点击交互 ============ */
   const doWave = useCallback(() => {
     setIsWaving(true)
     setInternalMood('waving')
+    spawnParticles('mixed')
     showBubble('嗨~ 我在这里！👋')
     setTimeout(() => {
       setIsWaving(false)
       setInternalMood('idle')
     }, 1200)
-  }, [showBubble])
+  }, [showBubble, spawnParticles])
 
   const doDance = useCallback(() => {
     setIsDancing(true)
     setInternalMood('dancing')
+    spawnParticles('stars')
     showBubble('啦啦啦~ 看我跳舞！💃')
     setTimeout(() => {
       setIsDancing(false)
       setInternalMood('idle')
     }, 1800)
-  }, [showBubble])
+  }, [showBubble, spawnParticles])
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       resetIdleTimer()
       if (!interactive) {
         onClick?.()
+        // Forward tap to Live2D iframe so it plays the Tap motion
+        if (renderMode === 'live2d' && iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.postMessage({ type: 'hermes-tap' }, '*')
+        }
         return
       }
 
       const nextCount = clickCount + 1
       setClickCount(nextCount)
+      spawnRipple()
 
       if (nextCount % 3 === 1) {
         setIsBouncing(true)
         setInternalMood('happy')
+        spawnParticles('stars')
         showBubble(pickRandom(BUBBLES.greeting))
         setTimeout(() => {
           setIsBouncing(false)
@@ -994,8 +711,73 @@ export function HermesAvatar({
 
       onClick?.()
     },
-    [clickCount, interactive, onClick, showBubble, doWave, doDance, resetIdleTimer]
+    [clickCount, interactive, onClick, showBubble, doWave, doDance, resetIdleTimer, spawnParticles, spawnRipple]
   )
+
+  /** Internal double-click handler (used by context menu fallback) */
+  const handleDoubleClick = useCallback(() => {
+    if (!interactive) return
+    resetIdleTimer()
+    spawnParticles('mixed')
+    const actions = [
+      doWave,
+      doDance,
+      () => {
+        setInternalMood('sleepy')
+        showBubble('Zzz... 我要睡觉觉了~')
+        setTimeout(() => setInternalMood('idle'), 2000)
+      },
+      () => {
+        setInternalMood('angry')
+        showBubble('哼！别戳我！')
+        setTimeout(() => setInternalMood('idle'), 1500)
+      },
+      () => {
+        setInternalMood('shy')
+        spawnParticles('hearts')
+        showBubble('哎呀，羞羞~')
+        setTimeout(() => setInternalMood('idle'), 1500)
+      },
+      () => {
+        setInternalMood('love')
+        spawnParticles('hearts')
+        showBubble(pickRandom(BUBBLES.love))
+        setTimeout(() => setInternalMood('idle'), 2000)
+      },
+      () => {
+        setInternalMood('tea_time')
+        spawnParticles('sparkles')
+        showBubble('来喝杯茶吧~ 🍵')
+        setTimeout(() => setInternalMood('idle'), 2000)
+      },
+      () => {
+        setInternalMood('insight')
+        showBubble('我好像发现了什么！🔍')
+        setTimeout(() => setInternalMood('idle'), 2000)
+      },
+    ]
+    pickRandom(actions)()
+  }, [interactive, doWave, doDance, showBubble, resetIdleTimer, spawnParticles])
+
+  // Live2D iframe tap / double-tap handler
+  useEffect(() => {
+    if (renderMode !== 'live2d') return
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'hermes-tap') {
+        handleClick({} as any)
+      }
+      if (e.data?.type === 'hermes-double-tap') {
+        // Prefer external callback (e.g., FloatingChat radial menu)
+        onDoubleClick?.()
+        // Fall back to internal random action if no external handler
+        if (!onDoubleClick) {
+          handleDoubleClick()
+        }
+      }
+    }
+    window.addEventListener('message', handler)
+    return () => window.removeEventListener('message', handler)
+  }, [renderMode, handleClick, onDoubleClick, handleDoubleClick])
 
   /* ============ 右键菜单 ============ */
   const handleContextMenu = useCallback(
@@ -1003,6 +785,7 @@ export function HermesAvatar({
       if (!interactive) return
       e.preventDefault()
       resetIdleTimer()
+      spawnParticles('mixed')
       const actions = [
         doWave,
         doDance,
@@ -1018,16 +801,19 @@ export function HermesAvatar({
         },
         () => {
           setInternalMood('shy')
+          spawnParticles('hearts')
           showBubble('哎呀，羞羞~')
           setTimeout(() => setInternalMood('idle'), 1500)
         },
         () => {
           setInternalMood('love')
+          spawnParticles('hearts')
           showBubble(pickRandom(BUBBLES.love))
           setTimeout(() => setInternalMood('idle'), 2000)
         },
         () => {
           setInternalMood('tea_time')
+          spawnParticles('sparkles')
           showBubble('来喝杯茶吧~ 🍵')
           setTimeout(() => setInternalMood('idle'), 2000)
         },
@@ -1039,7 +825,7 @@ export function HermesAvatar({
       ]
       pickRandom(actions)()
     },
-    [interactive, doWave, doDance, showBubble, resetIdleTimer]
+    [interactive, doWave, doDance, showBubble, resetIdleTimer, spawnParticles]
   )
 
   /* ============ 受控 mood 恢复 ============ */
@@ -1056,7 +842,6 @@ export function HermesAvatar({
       if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
       if (idleTimerRef.current) clearInterval(idleTimerRef.current)
       if (commandTimerRef.current) clearTimeout(commandTimerRef.current)
-      if (blinkTimerRef.current) clearTimeout(blinkTimerRef.current)
     }
   }, [])
 
@@ -1081,136 +866,203 @@ export function HermesAvatar({
   const isThinking = mood === 'thinking' || mood === 'confused' || mood === 'curious'
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        'relative cursor-pointer select-none',
-        'transition-transform duration-200',
-        animationClass,
-        bodyShake,
-        className
+    <>
+      {/* 粒子特效层 */}
+      {enhancedEffects && (
+        <PandaParticles
+          originX={particleOrigin.x}
+          originY={particleOrigin.y}
+          trigger={particleTrigger}
+          type={particleType}
+          count={10}
+        />
       )}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        width: s,
-        height: s,
-        transform: headTilt !== 0 ? `rotate(${headTilt}deg)` : undefined,
-      }}
-      title="点击我呀~（双击也有惊喜）"
-    >
-      {/* ====== 对话气泡 ====== */}
-      {speechBubble && (
-        <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap">
-          <div className="bg-white/95 text-gray-700 text-[11px] px-3 py-1.5 rounded-xl shadow-lg border border-gray-100 animate-scale-in relative backdrop-blur-sm">
-            {speechBubble}
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-r border-b border-gray-100 rotate-45" />
+
+      <div
+        ref={containerRef}
+        className={cn(
+          'relative cursor-pointer select-none',
+          'transition-transform duration-200',
+          animationClass,
+          bodyShake,
+          className
+        )}
+        onClick={handleClick}
+        onDoubleClick={() => {
+          onDoubleClick?.()
+          if (renderMode === 'live2d' && iframeRef.current?.contentWindow) {
+            iframeRef.current.contentWindow.postMessage({ type: 'hermes-double-tap' }, '*')
+          }
+        }}
+        onContextMenu={handleContextMenu}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          width: s,
+          height: s,
+          transform: headTilt !== 0 ? `rotate(${headTilt}deg)` : undefined,
+        }}
+        title="点击我呀~（双击也有惊喜）"
+      >
+        {/* ====== 对话气泡 ====== */}
+        {speechBubble && (
+          <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-30 whitespace-nowrap">
+            <div className="bg-white/95 text-gray-700 text-[11px] px-3 py-1.5 rounded-xl shadow-lg border border-gray-100 animate-scale-in relative backdrop-blur-sm">
+              {speechBubble}
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-r border-b border-gray-100 rotate-45" />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ====== 纯 SVG 可爱熊猫 ====== */}
-      <PandaSVG
-        size={size}
-        mood={mood}
-        blinking={blinking}
-        isWaving={isWaving}
-        isDancing={isDancing}
-      />
+        {/* ====== 涟漪效果 ====== */}
+        {enhancedEffects && rippleTrigger > 0 && (
+          <span
+            key={rippleTrigger}
+            className="absolute inset-0 rounded-full border-2 border-tea-primary/40 animate-hermes-ripple pointer-events-none z-10"
+          />
+        )}
 
-      {/* ====== 开心/跳舞/灵感时的星星 ====== */}
-      {isCheerful && (
-        <>
-          <span className="absolute -top-1 -left-1 text-xs animate-hermes-twinkle pointer-events-none z-20">✦</span>
-          <span className="absolute -top-1 -right-1 text-[10px] animate-hermes-twinkle pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>★</span>
-          <span className="absolute top-1/2 -right-2 text-[9px] animate-hermes-twinkle pointer-events-none z-20" style={{ animationDelay: '0.4s' }}>✨</span>
-        </>
-      )}
+        {/* ====== 渲染层：Live2D 或 SVG ====== */}
+        {renderMode === 'live2d' ? (
+          <div
+            className="absolute flex items-center justify-center"
+            style={{
+              width: s * 2.2,
+              height: s * 2.2,
+              left: -s * 0.6,
+              top: -s * 0.6,
+            }}
+            onMouseMove={(e) => {
+              if (!iframeRef.current?.contentWindow) return
+              const rect = e.currentTarget.getBoundingClientRect()
+              const x = (e.clientX - rect.left) / rect.width * 2 - 1
+              const y = (e.clientY - rect.top) / rect.height * 2 - 1
+              iframeRef.current.contentWindow.postMessage({ type: 'hermes-mousemove', x, y }, '*')
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              src={`/hermes-live2d.html?size=${Math.round(s * 2.2)}`}
+              className="w-full h-full border-0"
+              style={{ pointerEvents: 'none' }}
+              title="Hermes Live2D"
+            />
+          </div>
+        ) : (
+          <div
+            className="w-full h-full rounded-full overflow-hidden border-2 border-white/80 shadow-lg"
+            style={{
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15), 0 0 0 3px rgba(255,255,255,0.5)',
+            }}
+          >
+            <AcademicPandaSVG mood={mood} size={s} interactive={interactive && enhancedEffects} />
+          </div>
+        )}
 
-      {/* ====== 爱心飘浮 ====== */}
-      {mood === 'love' && (
-        <>
-          <span className="absolute -top-2 -left-2 text-sm text-red-400 animate-hermes-float-heart pointer-events-none z-20">♥</span>
-          <span className="absolute -top-1 -right-2 text-xs text-red-400 animate-hermes-float-heart pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>♥</span>
-          <span className="absolute -top-3 left-0 text-[10px] text-pink-400 animate-hermes-float-heart pointer-events-none z-20" style={{ animationDelay: '0.6s' }}>♥</span>
-        </>
-      )}
+        {/* ====== 开心/跳舞/灵感时的星星 ====== */}
+        {isCheerful && (
+          <>
+            <span className="absolute -top-1 -left-1 text-xs animate-hermes-twinkle pointer-events-none z-20">✦</span>
+            <span className="absolute -top-1 -right-1 text-[10px] animate-hermes-twinkle pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>★</span>
+            <span className="absolute top-1/2 -right-2 text-[9px] animate-hermes-twinkle pointer-events-none z-20" style={{ animationDelay: '0.4s' }}>✨</span>
+          </>
+        )}
 
-      {/* ====== 害羞 ====== */}
-      {mood === 'shy' && (
-        <>
-          <span className="absolute -top-1 -left-1 text-xs text-pink-300 animate-hermes-pulse pointer-events-none z-20">💗</span>
-          <span className="absolute -top-1 -right-1 text-[10px] text-pink-300 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>💗</span>
-        </>
-      )}
+        {/* ====== 爱心飘浮 ====== */}
+        {mood === 'love' && (
+          <>
+            <span className="absolute -top-2 -left-2 text-sm text-red-400 animate-hermes-float-heart pointer-events-none z-20">♥</span>
+            <span className="absolute -top-1 -right-2 text-xs text-red-400 animate-hermes-float-heart pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>♥</span>
+            <span className="absolute -top-3 left-0 text-[10px] text-pink-400 animate-hermes-float-heart pointer-events-none z-20" style={{ animationDelay: '0.6s' }}>♥</span>
+          </>
+        )}
 
-      {/* ====== 睡觉 Zzz ====== */}
-      {isSleepy && (
-        <>
-          <span className="absolute -top-2 right-0 text-xs text-blue-300 animate-hermes-pulse pointer-events-none z-20">z</span>
-          <span className="absolute -top-4 right-2 text-[9px] text-blue-300 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>z</span>
-          <span className="absolute -top-6 right-4 text-[8px] text-blue-200 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.6s' }}>z</span>
-        </>
-      )}
+        {/* ====== 害羞 ====== */}
+        {mood === 'shy' && (
+          <>
+            <span className="absolute -top-1 -left-1 text-xs text-pink-300 animate-hermes-pulse pointer-events-none z-20">💗</span>
+            <span className="absolute -top-1 -right-1 text-[10px] text-pink-300 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>💗</span>
+          </>
+        )}
 
-      {/* ====== 无聊叹气 ====== */}
-      {mood === 'bored' && (
-        <span className="absolute -top-2 right-0 text-[10px] text-gray-400 animate-hermes-pulse pointer-events-none z-20">...</span>
-      )}
+        {/* ====== 睡觉 Zzz ====== */}
+        {isSleepy && (
+          <>
+            <span className="absolute -top-2 right-0 text-xs text-blue-300 animate-hermes-pulse pointer-events-none z-20">z</span>
+            <span className="absolute -top-4 right-2 text-[9px] text-blue-300 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>z</span>
+            <span className="absolute -top-6 right-4 text-[8px] text-blue-200 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.6s' }}>z</span>
+          </>
+        )}
 
-      {/* ====== 思考问号 ====== */}
-      {isThinking && (
-        <>
-          <span className="absolute -top-2 right-0 text-sm text-amber-500 font-bold animate-hermes-pulse pointer-events-none z-20">?</span>
-          <span className="absolute -top-4 right-3 text-[10px] text-amber-400 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>?</span>
-        </>
-      )}
+        {/* ====== 无聊叹气 ====== */}
+        {mood === 'bored' && (
+          <span className="absolute -top-2 right-0 text-[10px] text-gray-400 animate-hermes-pulse pointer-events-none z-20">...</span>
+        )}
 
-      {/* ====== 灵感灯泡 ====== */}
-      {mood === 'inspired' && (
-        <span className="absolute -top-3 right-0 text-base animate-hermes-pulse pointer-events-none z-20">💡</span>
-      )}
+        {/* ====== 思考问号 ====== */}
+        {isThinking && (
+          <>
+            <span className="absolute -top-2 right-0 text-sm text-amber-500 font-bold animate-hermes-pulse pointer-events-none z-20">?</span>
+            <span className="absolute -top-4 right-3 text-[10px] text-amber-400 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>?</span>
+          </>
+        )}
 
-      {/* ====== 茶壶 ====== */}
-      {mood === 'tea_time' && (
-        <span className="absolute -top-2 right-0 text-sm animate-hermes-bounce pointer-events-none z-20">🍵</span>
-      )}
+        {/* ====== 疑惑专属 — 大问号 + 思考云 ====== */}
+        {mood === 'confused' && (
+          <>
+            <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-2xl text-orange-500 font-bold animate-hermes-bounce pointer-events-none z-20">?</span>
+            <span className="absolute -top-3 -left-2 text-lg text-amber-400 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.1s' }}>?</span>
+            <span className="absolute top-0 -right-3 text-base text-orange-300 animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.3s' }}>?</span>
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white/90 text-orange-600 text-[10px] px-2 py-0.5 rounded-full shadow-sm border border-orange-200 animate-scale-in pointer-events-none z-20 whitespace-nowrap">
+              嗯？这是什么？
+            </div>
+          </>
+        )}
 
-      {/* ====== 放大镜 ====== */}
-      {mood === 'insight' && (
-        <span className="absolute -top-2 right-0 text-sm animate-hermes-pulse pointer-events-none z-20">🔍</span>
-      )}
+        {/* ====== 灵感灯泡 ====== */}
+        {mood === 'inspired' && (
+          <span className="absolute -top-3 right-0 text-base animate-hermes-pulse pointer-events-none z-20">💡</span>
+        )}
 
-      {/* ====== 辩论书本 ====== */}
-      {mood === 'debate' && (
-        <span className="absolute -top-2 right-0 text-sm animate-hermes-pulse pointer-events-none z-20">📖</span>
-      )}
+        {/* ====== 茶壶 ====== */}
+        {mood === 'tea_time' && (
+          <span className="absolute -top-2 right-0 text-sm animate-hermes-bounce pointer-events-none z-20">🍵</span>
+        )}
 
-      {/* ====== 眩晕星星 ====== */}
-      {dizzyStars && (
-        <>
-          <span className="absolute top-0 left-0 text-sm text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20">★</span>
-          <span className="absolute top-0 right-0 text-xs text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>✦</span>
-          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20" style={{ animationDelay: '0.4s' }}>★</span>
-        </>
-      )}
+        {/* ====== 放大镜 ====== */}
+        {mood === 'insight' && (
+          <span className="absolute -top-2 right-0 text-sm animate-hermes-pulse pointer-events-none z-20">🔍</span>
+        )}
 
-      {/* ====== 惊喜 ====== */}
-      {mood === 'surprised' && (
-        <>
-          <span className="absolute -top-1 -left-1 text-xs animate-hermes-pulse pointer-events-none z-20">❗</span>
-          <span className="absolute -top-1 -right-1 text-[10px] animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.15s' }}>❗</span>
-        </>
-      )}
+        {/* ====== 辩论书本 ====== */}
+        {mood === 'debate' && (
+          <span className="absolute -top-2 right-0 text-sm animate-hermes-pulse pointer-events-none z-20">📖</span>
+        )}
 
-      {/* ====== 悬浮提示 ====== */}
-      {!controlledMood && !speechBubble && isHovered && (
-        <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] bg-tea-primary text-white px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none animate-scale-in">
-          点击聊天~ 右键有菜单哦
-        </span>
-      )}
-    </div>
+        {/* ====== 眩晕星星 ====== */}
+        {dizzyStars && (
+          <>
+            <span className="absolute top-0 left-0 text-sm text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20">★</span>
+            <span className="absolute top-0 right-0 text-xs text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20" style={{ animationDelay: '0.2s' }}>✦</span>
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-amber-400 animate-hermes-dizzy-star pointer-events-none z-20" style={{ animationDelay: '0.4s' }}>★</span>
+          </>
+        )}
+
+        {/* ====== 惊喜 ====== */}
+        {mood === 'surprised' && (
+          <>
+            <span className="absolute -top-1 -left-1 text-xs animate-hermes-pulse pointer-events-none z-20">❗</span>
+            <span className="absolute -top-1 -right-1 text-[10px] animate-hermes-pulse pointer-events-none z-20" style={{ animationDelay: '0.15s' }}>❗</span>
+          </>
+        )}
+
+        {/* ====== 悬浮提示 ====== */}
+        {!controlledMood && !speechBubble && isHovered && (
+          <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] bg-tea-primary text-white px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none animate-scale-in">
+            点击聊天~ 右键有菜单哦
+          </span>
+        )}
+      </div>
+    </>
   )
 }

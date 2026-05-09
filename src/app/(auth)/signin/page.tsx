@@ -121,6 +121,7 @@ export default function SignInPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -131,12 +132,13 @@ export default function SignInPage() {
                   <Label htmlFor="password" className="text-sm font-medium">
                     密码
                   </Label>
-                  <Link
+                  {/* forgot-password page not implemented yet */}
+                  {/* <Link
                     href="/forgot-password"
                     className="text-xs text-primary hover:underline"
                   >
                     忘记密码？
-                  </Link>
+                  </Link> */}
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -146,6 +148,7 @@ export default function SignInPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10"
+                    autoComplete="current-password"
                     required
                   />
                 </div>

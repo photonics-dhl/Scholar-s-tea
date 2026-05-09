@@ -1,0 +1,154 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e18] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e19]
+            - text: 课题组
+          - link "思想工坊" [ref=e24] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e25]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e51]:
+          - generic [ref=e54]: Academic Community
+          - heading "学科社区" [level=1] [ref=e55]
+          - paragraph [ref=e56]: 探索不同学科领域，与学者们交流思想·共 3 个一级学科
+        - generic [ref=e58]:
+          - generic [ref=e60]:
+            - link "数学 研究数量、结构、变化和空间等抽象概念的学科" [ref=e64] [cursor=pointer]:
+              - /url: /disciplines/mathematics
+              - generic [ref=e65]:
+                - img [ref=e67]
+                - heading "数学" [level=2] [ref=e71]
+                - img [ref=e72]
+              - paragraph [ref=e74]: 研究数量、结构、变化和空间等抽象概念的学科
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - img [ref=e77]
+                - generic [ref=e82]: "1"
+                - generic [ref=e83]: 课题组
+              - generic [ref=e84]:
+                - img [ref=e85]
+                - generic [ref=e87]: "0"
+                - generic [ref=e88]: 帖子
+          - generic [ref=e90]:
+            - link "物理学 研究物质、能量、空间和时间等基本物理现象" [ref=e94] [cursor=pointer]:
+              - /url: /disciplines/physics
+              - generic [ref=e95]:
+                - img [ref=e97]
+                - heading "物理学" [level=2] [ref=e101]
+                - img [ref=e102]
+              - paragraph [ref=e104]: 研究物质、能量、空间和时间等基本物理现象
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - img [ref=e107]
+                - generic [ref=e112]: "1"
+                - generic [ref=e113]: 课题组
+              - generic [ref=e114]:
+                - img [ref=e115]
+                - generic [ref=e117]: "1"
+                - generic [ref=e118]: 帖子
+          - generic [ref=e120]:
+            - link "计算机科学 研究计算机科学与技术的各个方向，包括人工智能、软件工程、计算机系统等" [ref=e124] [cursor=pointer]:
+              - /url: /disciplines/computer-science
+              - generic [ref=e125]:
+                - img [ref=e127]
+                - heading "计算机科学" [level=2] [ref=e131]
+                - img [ref=e132]
+              - paragraph [ref=e134]: 研究计算机科学与技术的各个方向，包括人工智能、软件工程、计算机系统等
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - img [ref=e137]
+                - generic [ref=e142]: "2"
+                - generic [ref=e143]: 课题组
+              - generic [ref=e144]:
+                - img [ref=e145]
+                - generic [ref=e147]: "2"
+                - generic [ref=e148]: 帖子
+            - link "人工智能 2组" [ref=e151] [cursor=pointer]:
+              - /url: /disciplines/artificial-intelligence
+              - generic [ref=e152]: 人工智能
+              - generic [ref=e153]: 2组
+    - contentinfo [ref=e154]:
+      - paragraph [ref=e156]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 让我缓一缓... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e158]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e162] [cursor=pointer]:
+      - generic [ref=e164]: 让我缓一缓...
+      - iframe [ref=e167]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e169] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 转得好快...
+            - iframe [ref=e170] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e171]

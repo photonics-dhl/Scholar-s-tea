@@ -12,7 +12,7 @@ import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvata
 import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
 
 const HIDDEN_PATHS = ['/admin'];
-const AVATAR_SIZE = 72;
+const AVATAR_SIZE = 96;
 const PANEL_W = 400;
 const PANEL_H = 560;
 const MARGIN = 12;
@@ -41,9 +41,12 @@ function clamp(val: number, min: number, max: number) {
 
 function getDefaultPosition() {
   if (typeof window === 'undefined') return { x: 0, y: 0 };
+  const isMobile = window.innerWidth < 768;
   return {
     x: window.innerWidth - MARGIN - AVATAR_SIZE,
-    y: Math.round(window.innerHeight / 2 - AVATAR_SIZE / 2),
+    y: isMobile
+      ? window.innerHeight - MARGIN - AVATAR_SIZE - 80 // bottom-right on mobile
+      : Math.round(window.innerHeight / 2 - AVATAR_SIZE / 2), // mid-right on desktop
   };
 }
 
@@ -441,7 +444,7 @@ export function FloatingChat() {
     }
   };
 
-  const hermesMood: HermesMood = isLoading ? 'thinking' : 'idle';
+  const hermesMood: HermesMood | undefined = isLoading ? 'thinking' : undefined;
 
   const panelPos = useMemo(() => {
     if (!mounted) return { left: 0, top: 0, originX: 'center' as const, originY: 'center' as const };
@@ -503,27 +506,15 @@ export function FloatingChat() {
             <span>拖拽</span>
           </div>
 
-          {/* 双击提示 */}
-          <div
-            className={cn(
-              'absolute -top-3 right-0 translate-x-1/2',
-              'px-1.5 py-0.5 rounded-full',
-              'bg-amber-400/90 text-white text-[9px] shadow-sm',
-              'opacity-0 group-hover:opacity-100 transition-opacity',
-              'pointer-events-none whitespace-nowrap'
-            )}
-          >
-            动作菜单
-          </div>
-
-          <div>
+          <div className="scale-75 md:scale-100 origin-center">
             <HermesAvatar
-              size={64}
+              size={96}
               mood={hermesMood}
               className="relative z-10 drop-shadow-lg hover:drop-shadow-xl transition-shadow"
               interactive={false}
               isDragging={isDragging}
               command={avatarCommand}
+              onDoubleClick={() => setRadialOpen(true)}
             />
           </div>
 
@@ -534,9 +525,9 @@ export function FloatingChat() {
 
           {/* 常驻提示文字 */}
           {!isOpen && (
-            <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
-              <span className="text-[10px] bg-white/90 text-tea-primary px-2 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium">
-                点我聊天~ 双击动作菜单
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 pointer-events-none z-10 md:-bottom-[3.75rem] md:top-auto hidden md:block">
+              <span className="text-[10px] bg-white/90 text-tea-primary px-2.5 py-0.5 rounded-full shadow-sm border border-tea-primary/20 font-medium whitespace-nowrap">
+                点击我聊天，双击和我玩耍
               </span>
             </div>
           )}
@@ -672,16 +663,16 @@ export function FloatingChat() {
               {/* Bubble */}
               <div
                 className={cn(
-                  'max-w-[78%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
+                  'max-w-[78%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed select-text',
                   message.role === 'user'
                     ? 'bg-tea-primary text-white rounded-tr-sm'
                     : 'bg-white border border-gray-200/80 text-gray-800 rounded-tl-sm shadow-sm'
                 )}
               >
                 {message.role === 'assistant' ? (
-                  <SimpleMarkdown content={message.content} />
+                  <SimpleMarkdown content={message.content} className="select-text" />
                 ) : (
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p className="whitespace-pre-wrap select-text">{message.content}</p>
                 )}
               </div>
             </div>

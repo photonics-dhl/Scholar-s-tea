@@ -2,52 +2,51 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "Flexible misaligned fiber-optic sensor for respiration and heart rate monitoring",
-      "abstract": "",
-      "doi": "10.1016/j.yofte.2026.104579",
-      "url": "https://doi.org/10.1016/j.yofte.2026.104579",
-      "authors": [
-        "Mei Yang",
-        "Yinggang Liu",
-        "Zhihao Wei",
-        "Min Shao"
-      ],
+      "title": "APEDCET2026 Instruction Booklet | PDF | Vector Space - Scribd",
+      "abstract": "... optical fiber, Principles of fiber communication (qualitative treatment only), Advantages of fiber optic communication. Lasers and Holography: Lasers",
+      "source": "tavily",
+      "url": "https://www.scribd.com/document/997957920/APEDCET2026-Instruction-Booklet",
+      "authors": [],
       "citations": 0,
-      "venue": "Optical Fiber Technology",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "请提供论文摘要或完整内容，以便进行准确的结构化分析。",
-        "research思路": "（需获取论文信息后再填写）",
-        "experiment": "（需获取论文信息后再填写）",
-        "innovation": "（需获取论文信息后再填写）",
-        "related_work": "（需获取论文信息后再填写）",
-        "impact": "（需获取论文信息后再填写）"
-      },
-      "domain_trend": {
-        "trend": "光纤传感向柔性可穿戴与多物理量融合演进，光通信聚焦大气湍流闪烁抑制与偏振态调控，理论框架趋于统一多阶统计描述。"
+        "summary": "这是一份考试指南文件（非正式学术论文），内容涉及光纤通信基础、激光原理和全息术等光学基础知识。",
+        "research思路": "APEDCET2026作为考试说明文件，旨在界定考核范围而非开展原创研究，涉及光纤通信优势和激光全息等基础知识点的覆盖。",
+        "experiment": "文档为大纲性质，未包含实验方案；涉及光纤通信的定性描述、激光产生原理及全息记录基础技术的理论介绍。",
+        "innovation": "作为考试指导文件，不涉及研究创新；内容为光学基础知识的标准化归纳，聚焦光纤通信优于传统通信的技术优势阐述。",
+        "related_work": "光纤通信领域重要工作包括：低损耗光纤研发、波分复用技术、光纤非线性光学效应研究；激光领域涉及各种激光器类型及全息存储技术。",
+        "impact": "该文档作为教育评估材料，对光学基础知识普及有教学指导意义，但不具备学术研究价值，无法推动领域技术进步。",
+        "warning": "注意：提供的内容为考试指南/说明书，非ArXiv学术论文。信息不足以支撑深度学术分析，建议提供完整论文PDF或链接。"
       }
     },
     {
-      "title": "Spatio-Temporal Scintillation Mitigation via Polarizations Coupled Higher-Order Correlation",
-      "abstract": "We present a unified theoretical framework linking second and fourth order statistical correlations of stochastic electromagnetic beams to the scintillation index observed after propagation through Kolmogorov atmospheric turbulence. We derive the beam coherence polarization matrix and its propagation law in a random medium. An algebraic connection is established between the second order polarization matrix J, its fourth order Gram counterpart obtained from the square of J, the classical degree of polarization P, the fourth order degree of polarization, and the scintillation index of the beam intensity. A key result is a closed form purity relation connecting the trace of the squared polarization matrix to the square of its trace, which shows that unpolarized natural beams exhibit a large scintillation index. The analysis demonstrates that scintillation can be reduced by polarizing the beam using suitable polarizer sets. This reduction occurs independently of the atmospheric turbulence strength parameter. Experimental results further show that simultaneous control of coherence and polarization, achievable using a pseudo random phase plate, provides a practical approach for minimizing scintillation in free space optical communication links.",
-      "arxiv_id": "2603.07058v1",
-      "published": "2026-03-07",
-      "url": "http://arxiv.org/abs/2603.07058v1",
-      "authors": [
-        "Shouvik Sadhukhan",
-        "C. S. Narayanamurthy"
-      ],
+      "title": "US20020145607A1 - Integrated system for quickly ... - Google Patents",
+      "abstract": "The optical fiber can include partial reflectors located at each end thereof so that for each laser pulse entering the fiber a train of pulses will exit the",
+      "source": "tavily",
+      "url": "https://patents.google.com/patent/US20020145607A1/en",
+      "authors": [],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "建立了随机电磁光束二阶极化矩阵与四阶闪烁指数的统一理论框架，揭示极化度与闪烁效应的数学关联，证明通过人工极化可有效抑制大气湍流引起的强度闪烁。",
-        "research思路": "针对自由空间光通信中大气湍流导致的闪烁效应问题，从电磁光束的二阶和四阶统计相关性的数学联系出发，建立极化状态与闪烁指数的理论桥梁。",
-        "experiment": "采用Kolmogorov湍流模型进行理论推导，建立光束相干极化矩阵的传播定律，构造Gram矩阵建立纯度关系表达式，理论验证不同极化状态下的闪烁指数变化规律。",
-        "innovation": "首次建立二阶极化矩阵J与其四阶Gram矩阵的代数联系，推导出纯度关系tr(J²)/(tr J)²，发现非极化自然光束具有大闪烁指数，为闪烁抑制提供新理论路径。",
-        "related_work": "与Wolf的相干性矩阵理论、曼纳克概率密度模型、量子光学高阶相关研究相关，涉及自由空间光通信中的闪烁抑制技术、偏振复用通信系统等研究方向。",
-        "impact": "为大气湍流中光束闪烁抑制提供了理论工具，对自由空间光通信、激光雷达等应用有重要意义，推动了光学相干性理论与统计光学交叉领域的发展。"
+        "summary": "本专利描述了一种集成系统，利用光纤两端的部分反射器将单个激光脉冲转换为脉冲序列输出，实现快速脉冲产生。",
+        "research思路": "解决如何在紧凑集成系统中高效产生短脉冲序列的问题，通过光纤内多次反射实现脉冲分裂与时序控制。",
+        "experiment": "采用光纤技术，在光纤两端设置部分反射器构成法布里-珀罗腔结构，使输入的单个激光脉冲经多次反射产生脉冲串。",
+        "innovation": "相比传统分立元件系统，该集成化设计简化了光路结构，利用光纤特性实现自触发式脉冲序列产生，降低系统复杂度。",
+        "related_work": "该技术可能关联到OCT（光学相干断层扫描）系统、光纤激光器、脉冲激光技术等相关领域的重要研究。",
+        "impact": "该技术可用于需要脉冲序列的光学测量与传感系统，对光学检测、医学成像等应用领域具有潜在应用价值。"
+      },
+      "domain_trend": {
+        "trend": "光通信与光纤传感领域正加速向集成化、智能化方向发展，脉冲产生与序列控制技术成为快速响应的关键突破口，推动医疗成像与传感系统的小型化革新。",
+        "key_topics": [
+          "光纤集成化技术",
+          "脉冲序列产生与控制",
+          "高速光学测量系统",
+          "光学传感与成像融合",
+          "系统小型化与自触发机制"
+        ],
+        "development_direction": "从分立元件向高度集成的光纤系统演进，利用光纤本身特性（如部分反射）实现自触发式脉冲序列产生，降低系统复杂度并提升响应速度。重点发展方向包括：1）光子集成技术用于光通信与传感模块；2）多功能光纤器件开发；3）医疗成像与工业检测的实时光学测量系统；4）智能传感网络中的快速脉冲响应技术。未来趋势将聚焦于光电融合、边缘计算集成以及跨领域（生物医学、环境监测）应用拓展。"
       }
     }
   ]

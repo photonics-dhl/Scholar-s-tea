@@ -1,0 +1,182 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e23] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e24]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - complementary [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - img [ref=e51]
+              - generic [ref=e61]: 对话历史
+            - button "新建对话" [ref=e63] [cursor=pointer]:
+              - img [ref=e64]
+          - button "新建对话" [ref=e66] [cursor=pointer]:
+            - img [ref=e67]
+            - generic [ref=e68]: 新建对话
+          - generic [ref=e70]:
+            - img [ref=e71]
+            - generic [ref=e81]: 通用助手
+          - generic [ref=e83]:
+            - button "你好，请简单介绍一下你自己 2天前 通用助手" [ref=e84] [cursor=pointer]:
+              - img [ref=e85]
+              - generic [ref=e95]:
+                - paragraph [ref=e96]: 你好，请简单介绍一下你自己
+                - generic [ref=e97]:
+                  - generic [ref=e98]: 2天前
+                  - generic [ref=e99]: 通用助手
+            - button "你好，请简单介绍一下你自己 2天前 通用助手" [ref=e100] [cursor=pointer]:
+              - img [ref=e101]
+              - generic [ref=e111]:
+                - paragraph [ref=e112]: 你好，请简单介绍一下你自己
+                - generic [ref=e113]:
+                  - generic [ref=e114]: 2天前
+                  - generic [ref=e115]: 通用助手
+          - generic [ref=e116]: 对话保存在本地浏览器中
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - button [ref=e120] [cursor=pointer]:
+                - img [ref=e121]
+              - button "通用助手" [ref=e124] [cursor=pointer]:
+                - img [ref=e125]
+                - generic [ref=e135]: 通用助手
+                - img [ref=e136]
+            - generic [ref=e138]:
+              - img [ref=e139]
+              - generic [ref=e141]: 思想工坊
+          - generic [ref=e143]:
+            - generic [ref=e145]:
+              - img [ref=e147]
+              - heading "通用学术助手" [level=2] [ref=e161]
+              - paragraph [ref=e162]: 有任何学术问题都可以向我咨询
+              - generic [ref=e163]:
+                - generic [ref=e164]:
+                  - img [ref=e165]
+                  - generic [ref=e167]: 解答学术概念和方法论问题
+                - generic [ref=e168]:
+                  - img [ref=e169]
+                  - generic [ref=e171]: 提供研究方向建议
+                - generic [ref=e172]:
+                  - img [ref=e173]
+                  - generic [ref=e175]: 帮助梳理论文逻辑结构
+                - generic [ref=e176]:
+                  - img [ref=e177]
+                  - generic [ref=e179]: 推荐相关文献和理论
+              - generic [ref=e180]:
+                - paragraph [ref=e181]: 试试这些：
+                - button "研究方向 我想了解「强化学习在机器人控制中的应用」这个方向的最新研究进展和潜在突破口，能给我一些建议吗？" [ref=e182] [cursor=pointer]:
+                  - img [ref=e183]
+                  - generic [ref=e185]:
+                    - generic [ref=e186]: 研究方向
+                    - generic [ref=e187]: 我想了解「强化学习在机器人控制中的应用」这个方向的最新研究进展和潜在突破口，能给我一些建议吗？
+                  - img [ref=e188]
+                - button "概念解释 请用通俗易懂的方式解释「注意力机制」的核心原理，并说明它在自然语言处理中的关键作用。" [ref=e190] [cursor=pointer]:
+                  - img [ref=e191]
+                  - generic [ref=e194]:
+                    - generic [ref=e195]: 概念解释
+                    - generic [ref=e196]: 请用通俗易懂的方式解释「注意力机制」的核心原理，并说明它在自然语言处理中的关键作用。
+                  - img [ref=e197]
+                - button "论文结构 我正在写一篇关于「联邦学习隐私保护」的综述论文，请帮我梳理论文的大纲结构和各章节要点。" [ref=e199] [cursor=pointer]:
+                  - img [ref=e200]
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: 论文结构
+                    - generic [ref=e205]: 我正在写一篇关于「联邦学习隐私保护」的综述论文，请帮我梳理论文的大纲结构和各章节要点。
+                  - img [ref=e206]
+            - generic [ref=e209]:
+              - generic [ref=e210]:
+                - generic [ref=e211]:
+                  - textbox "通用助手模式：输入你的问题..." [ref=e212]
+                  - button "粘贴长文本" [ref=e213] [cursor=pointer]:
+                    - img [ref=e214]
+                - button [disabled]:
+                  - img
+              - paragraph [ref=e216]: Enter 发送 · Shift+Enter 换行 · 粘贴长文本自动识别为附件
+    - contentinfo [ref=e217]:
+      - paragraph [ref=e219]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 天旋地转... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e221]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e225] [cursor=pointer]:
+      - generic [ref=e227]: 天旋地转...
+      - iframe [ref=e230]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 头晕晕...
+            - iframe [ref=e232] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 转得好快...
+            - iframe [ref=e233] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e234]

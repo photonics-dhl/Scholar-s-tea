@@ -1,325 +1,515 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hermes 熊猫预览 V4 — 自适应比例优化</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 40px;
-      background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d4 100%);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-    h1 {
-      color: #1a1a2e;
-      margin-bottom: 8px;
-      font-size: 24px;
-    }
-    .subtitle {
-      color: #888;
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      max-width: 900px;
-    }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      transition: transform 0.2s;
-    }
-    .card:hover {
-      transform: translateY(-4px);
-    }
-    .card-label {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #666;
-      font-weight: 500;
-    }
-    .hero {
-      margin-bottom: 30px;
-    }
-    .hero svg {
-      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
-    }
-    .changelog {
-      background: white;
-      border-radius: 16px;
-      padding: 20px 28px;
-      margin-bottom: 30px;
-      max-width: 600px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .changelog h3 {
-      margin: 0 0 12px 0;
-      font-size: 15px;
-      color: #1a1a2e;
-    }
-    .changelog ul {
-      margin: 0;
-      padding-left: 18px;
-      font-size: 13px;
-      color: #555;
-      line-height: 1.8;
-    }
-    .changelog li.done { color: #2a9d5c; }
-    .changelog li.new { color: #2563eb; font-weight: 600; }
-    .size-compare {
-      display: flex;
-      gap: 40px;
-      margin-bottom: 30px;
-      align-items: flex-end;
-    }
-    .size-box {
-      text-align: center;
-    }
-    .size-label {
-      font-size: 12px;
-      color: #888;
-      margin-top: 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes 熊猫增强预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  h1 { color: #2d6a4f; margin-bottom: 8px; font-size: 24px; }
+  .subtitle { color: #6b7280; margin-bottom: 30px; font-size: 14px; }
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 24px;
+    max-width: 900px;
+    width: 100%;
+    margin-bottom: 40px;
+  }
+  .demo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .demo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .demo-label { font-size: 12px; color: #4b5563; font-weight: 500; }
+
+  /* 动画定义 */
+  @keyframes hermesFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  @keyframes hermesBreatheOrigin {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  @keyframes hermesBounce {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(0.85) rotate(-5deg); }
+    50% { transform: scale(1.15) rotate(3deg); }
+    75% { transform: scale(0.95) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes hermesPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+  }
+  @keyframes hermesTwinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+  @keyframes hermesDance {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    10% { transform: translateY(-8px) rotate(-10deg); }
+    20% { transform: translateY(0) rotate(10deg); }
+    30% { transform: translateY(-6px) rotate(-8deg); }
+    40% { transform: translateY(0) rotate(8deg); }
+    50% { transform: translateY(-10px) rotate(0deg) scale(1.1); }
+    60% { transform: translateY(0) rotate(-5deg); }
+    70% { transform: translateY(-4px) rotate(5deg); }
+    80% { transform: translateY(0) rotate(-3deg); }
+    90% { transform: translateY(-2px) rotate(3deg); }
+  }
+  @keyframes hermesShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+  }
+  @keyframes hermesFloatHeart {
+    0%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+    50% { opacity: 0.7; transform: translateY(-6px) scale(1.15); }
+  }
+
+  .anim-float { animation: hermesFloat 3s ease-in-out infinite; }
+  .anim-breathe { animation: hermesBreatheOrigin 2.5s ease-in-out infinite; }
+  .anim-bounce { animation: hermesBounce 0.6s ease-out; }
+  .anim-dance { animation: hermesDance 1.8s ease-in-out infinite; }
+  .anim-shake { animation: hermesShake 0.4s ease-in-out infinite; }
+
+  /* 粒子 */
+  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+  .particle {
+    position: absolute;
+    font-size: 16px;
+    opacity: 0;
+    animation: particleFly 1s ease-out forwards;
+  }
+  @keyframes particleFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+
+  /* 交互熊猫容器 */
+  .interactive-panda {
+    position: fixed;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .interactive-panda:hover { transform: translateY(-50%) scale(1.05); }
+
+  .bubble {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #374151;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .bubble.show { opacity: 1; }
+  .bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: white;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 800px;
+    margin-top: 20px;
+  }
+  .btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 20px;
+    background: #2d6a4f;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: #1b4332; transform: translateY(-1px); }
+  .btn:active { transform: scale(0.95); }
+</style>
 </head>
 <body>
-  <h1>🐼 Hermes 熊猫预览 V4</h1>
-  <p class="subtitle">自适应比例 — 小尺寸(size≤64)自动放大眼睛/耳朵/腮红 35%</p>
+<h1>🐼 Hermes 熊猫增强预览</h1>
+<p class="subtitle">Live2D 风格交互效果：眼睛跟随鼠标、自动眨眼、呼吸律动、耳朵微动、粒子特效</p>
 
-  <div class="changelog">
-    <h3>📝 V4 核心改进</h3>
-    <ul>
-      <li class="new">🔵 自适应比例 — size≤64 时眼睛/耳朵/腮红放大 35%</li>
-      <li class="new">🔵 头部更大更圆 — rx=0.29/ry=0.28, cy=0.32（上移）</li>
-      <li class="new">🔵 眼睛更分开 — leftX=0.32/rightX=0.68（占脸部 60%+）</li>
-      <li class="new">🔵 耳朵更大更高 — rx=0.10*r, cy=0.12</li>
-      <li class="new">🔵 腮红更大 — rx=0.09*r, ry=0.06*r</li>
-      <li class="new">🔵 身体更小巧 — rx=0.20/ry=0.13</li>
-      <li class="done">✅ V3 粗描边系统保留</li>
-    </ul>
-  </div>
+<div class="demo-grid" id="demoGrid"></div>
 
-  <div class="size-compare">
-    <div class="size-box">
-      <div id="hero56"></div>
-      <div class="size-label">56px（实际尺寸）</div>
-    </div>
-    <div class="size-box">
-      <div id="hero200"></div>
-      <div class="size-label">200px（放大展示）</div>
-    </div>
-  </div>
+<div class="controls">
+  <button class="btn" onclick="setMood('idle')">idle</button>
+  <button class="btn" onclick="setMood('happy')">happy</button>
+  <button class="btn" onclick="setMood('thinking')">thinking</button>
+  <button class="btn" onclick="setMood('sleepy')">sleepy</button>
+  <button class="btn" onclick="setMood('dancing')">dancing</button>
+  <button class="btn" onclick="setMood('waving')">waving</button>
+  <button class="btn" onclick="setMood('surprised')">surprised</button>
+  <button class="btn" onclick="setMood('love')">love</button>
+  <button class="btn" onclick="setMood('angry')">angry</button>
+  <button class="btn" onclick="setMood('shy')">shy</button>
+  <button class="btn" onclick="setMood('dizzy')">dizzy</button>
+  <button class="btn" onclick="setMood('bored')">bored</button>
+  <button class="btn" onclick="setMood('studying')">studying</button>
+  <button class="btn" onclick="setMood('insight')">insight</button>
+  <button class="btn" onclick="setMood('confused')">confused</button>
+  <button class="btn" onclick="setMood('tea_time')">tea_time</button>
+  <button class="btn" onclick="setMood('inspired')">inspired</button>
+  <button class="btn" onclick="setMood('debate')">debate</button>
+  <button class="btn" onclick="setMood('eureka')">eureka</button>
+  <button class="btn" onclick="spawnParticles()">✨ 粒子特效</button>
+</div>
 
-  <div class="grid" id="grid"></div>
+<!-- 交互熊猫 -->
+<div class="interactive-panda" id="mainPanda" onclick="onPandaClick()">
+  <div class="bubble" id="pandaBubble">点击我呀~</div>
+  <div id="pandaSvg" style="width:80px;height:80px;"></div>
+</div>
 
-  <script>
-    const STROKE = '#1a1a2e';
-    const STROKE_W = s => s * 0.018;
-    function ar(s) { return s <= 64 ? 1.35 : 1.0; }
+<div class="particles" id="particles"></div>
 
-    const moods = [
-      { name: 'idle', label: '默认' },
-      { name: 'happy', label: '开心' },
-      { name: 'love', label: '爱心' },
-      { name: 'surprised', label: '惊讶' },
-      { name: 'sleepy', label: ' sleepy' },
-      { name: 'thinking', label: '思考' },
-      { name: 'angry', label: '生气' },
-      { name: 'shy', label: '害羞' },
-    ];
+<script>
+const MOODS = ['idle','happy','thinking','sleepy','dancing','waving','surprised','love','angry','shy','dizzy','bored','studying','insight','confused','tea_time','inspired','debate','eureka','tea_sipping'];
+let currentMood = 'idle';
+let pupilOffset = { x: 0, y: 0 };
+let isBlinking = false;
+let earWiggle = 0;
+let blinkTimer = null;
+let earTimer = null;
 
-    function getBlush(mood) {
-      switch(mood) {
-        case 'love': case 'shy': return { o: 0.7, c: '255,130,150' };
-        case 'angry': return { o: 0.55, c: '255,110,90' };
-        case 'happy': return { o: 0.5, c: '255,150,165' };
-        case 'sleepy': return { o: 0.25, c: '180,180,210' };
-        default: return { o: 0.4, c: '255,160,175' };
-      }
-    }
+// 颜色常量
+const C = {
+  white: '#FFFFFF',
+  black: '#1A1A1A',
+  blush: '#FFB6C1',
+  blushDeep: '#FF9EB0',
+  gold: '#D4A853',
+  cap: '#2C2C2C',
+  glasses: '#5C4A3A',
+  glassesRim: '#8B7355',
+};
 
-    function renderEyes(s, mood, blinking) {
-      const r = ar(s);
-      const eyeY = s * 0.35, leftX = s * 0.32, rightX = s * 0.68, sz = s * 0.085 * r;
+function getEyeConfig(mood) {
+  switch(mood) {
+    case 'happy': case 'dancing': case 'waving': case 'eureka':
+      return { eyes: 'happy', mouth: 'laugh', blush: true };
+    case 'thinking': case 'insight': case 'curious': case 'confused':
+      return { eyes: 'thinking', mouth: 'pout', glasses: true };
+    case 'sleepy': case 'bored':
+      return { eyes: 'sleepy', mouth: 'smallO', glasses: true, breathe: true };
+    case 'surprised':
+      return { eyes: 'surprised', mouth: 'O', glasses: true };
+    case 'love':
+      return { eyes: 'love', mouth: 'smile', blushDeep: true, glasses: true };
+    case 'angry': case 'debate':
+      return { eyes: 'angry', mouth: 'frown', glasses: true };
+    case 'shy':
+      return { eyes: 'shy', mouth: 'flat', blushDeep: true, glasses: true };
+    case 'dizzy':
+      return { eyes: 'dizzy', mouth: 'wavy', glasses: true };
+    case 'inspired':
+      return { eyes: 'inspired', mouth: 'laugh', blush: true, glasses: true };
+    default:
+      return { eyes: 'normal', mouth: 'smile', glasses: true, breathe: true };
+  }
+}
 
-      if (blinking || mood === 'sleepy') {
-        return `
-          <path d="M ${leftX - sz * 0.7} ${eyeY + sz * 0.15} Q ${leftX} ${eyeY + sz * 0.55} ${leftX + sz * 0.7} ${eyeY + sz * 0.15}"
-            stroke="${STROKE}" stroke-width="${s * 0.028}" fill="none" stroke-linecap="round" />
-          <path d="M ${rightX - sz * 0.7} ${eyeY + sz * 0.15} Q ${rightX} ${eyeY + sz * 0.55} ${rightX + sz * 0.7} ${eyeY + sz * 0.15}"
-            stroke="${STROKE}" stroke-width="${s * 0.028}" fill="none" stroke-linecap="round" />
-        `;
-      }
+function renderPanda(mood, size, containerId, interactive = false) {
+  const cfg = getEyeConfig(mood);
+  const s = size;
+  const px = interactive ? pupilOffset.x : 0;
+  const py = interactive ? pupilOffset.y : 0;
+  const blink = interactive ? isBlinking : false;
+  const ear = interactive ? earWiggle : 0;
 
-      const normalEye = (cx, rot) => `
-        <ellipse cx="${cx}" cy="${eyeY}" rx="${sz * 1.05}" ry="${sz * 0.88}" fill="${STROKE}" transform="rotate(${rot} ${cx} ${eyeY})" />
-        <circle cx="${cx}" cy="${eyeY - sz * 0.02}" r="${sz * 0.68}" fill="#fff" />
-        <circle cx="${cx}" cy="${eyeY + sz * 0.02}" r="${sz * 0.38}" fill="${STROKE}" />
-        <circle cx="${cx - sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
-        <circle cx="${cx + sz * 0.16}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
-        <circle cx="${cx + sz * 0.08}" cy="${eyeY - sz * 0.08}" r="${sz * 0.05}" fill="#fff" opacity="0.9" />
-      `;
+  const animClass = mood === 'dancing' ? 'anim-dance' :
+                    mood === 'happy' ? 'anim-bounce' :
+                    mood === 'angry' || mood === 'debate' ? 'anim-shake' :
+                    cfg.breathe ? 'anim-breathe' : 'anim-float';
 
-      switch(mood) {
-        case 'happy':
-          return `
-            <path d="M ${leftX - sz * 0.9} ${eyeY + sz * 0.3} Q ${leftX} ${eyeY - sz * 0.35} ${leftX + sz * 0.9} ${eyeY + sz * 0.3}"
-              stroke="${STROKE}" stroke-width="${s * 0.035}" fill="none" stroke-linecap="round" />
-            <path d="M ${rightX - sz * 0.9} ${eyeY + sz * 0.3} Q ${rightX} ${eyeY - sz * 0.35} ${rightX + sz * 0.9} ${eyeY + sz * 0.3}"
-              stroke="${STROKE}" stroke-width="${s * 0.035}" fill="none" stroke-linecap="round" />
-          `;
-        case 'love': {
-          const heart = cx => `<path d="M ${cx} ${eyeY + sz * 0.25} C ${cx - sz * 0.75} ${eyeY - sz * 0.35}, ${cx - sz * 0.75} ${eyeY + sz * 0.65}, ${cx} ${eyeY + sz * 0.25} C ${cx + sz * 0.75} ${eyeY + sz * 0.65}, ${cx + sz * 0.75} ${eyeY - sz * 0.35}, ${cx} ${eyeY + sz * 0.25}" fill="#E84A5F" stroke="${STROKE}" stroke-width="${s * 0.012}" />`;
-          return heart(leftX) + heart(rightX);
-        }
-        case 'surprised':
-          return `
-            <ellipse cx="${leftX}" cy="${eyeY}" rx="${sz * 1.15}" ry="${sz * 1.05}" fill="${STROKE}" transform="rotate(-6 ${leftX} ${eyeY})" />
-            <circle cx="${leftX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.72}" fill="#fff" />
-            <circle cx="${leftX}" cy="${eyeY + sz * 0.02}" r="${sz * 0.45}" fill="${STROKE}" />
-            <circle cx="${leftX + sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
-            <circle cx="${leftX - sz * 0.12}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
-            <ellipse cx="${rightX}" cy="${eyeY}" rx="${sz * 1.15}" ry="${sz * 1.05}" fill="${STROKE}" transform="rotate(6 ${rightX} ${eyeY})" />
-            <circle cx="${rightX}" cy="${eyeY - sz * 0.05}" r="${sz * 0.72}" fill="#fff" />
-            <circle cx="${rightX}" cy="${eyeY + sz * 0.02}" r="${sz * 0.45}" fill="${STROKE}" />
-            <circle cx="${rightX + sz * 0.18}" cy="${eyeY - sz * 0.22}" r="${sz * 0.22}" fill="#fff" />
-            <circle cx="${rightX - sz * 0.12}" cy="${eyeY + sz * 0.18}" r="${sz * 0.11}" fill="#fff" opacity="0.8" />
-          `;
-        case 'angry': {
-          const angryEye = (cx, sx) => `
-            <line x1="${cx - sx}" y1="${eyeY - sz * 0.65}" x2="${cx + sx * 0.4}" y2="${eyeY + sz * 0.25}"
-              stroke="${STROKE}" stroke-width="${s * 0.028}" stroke-linecap="round" />
-            <ellipse cx="${cx}" cy="${eyeY + sz * 0.25}" rx="${sz * 0.65}" ry="${sz * 0.55}" fill="${STROKE}" />
-            <circle cx="${cx - sx * 0.15}" cy="${eyeY + sz * 0.15}" r="${sz * 0.22}" fill="#fff" />
-            <circle cx="${cx - sx * 0.12}" cy="${eyeY + sz * 0.12}" r="${sz * 0.1}" fill="#fff" opacity="0.7" />
-          `;
-          return angryEye(leftX, sz) + angryEye(rightX, -sz);
-        }
-        case 'thinking':
-        case 'shy': {
-          const thinkEye = (cx, rot, ry) => `
-            <ellipse cx="${cx}" cy="${eyeY}" rx="${sz * 0.92}" ry="${sz * ry}" fill="${STROKE}" transform="rotate(${rot} ${cx} ${eyeY})" />
-            <circle cx="${cx}" cy="${eyeY - sz * 0.05}" r="${sz * 0.50}" fill="#fff" />
-            <circle cx="${cx - sz * 0.05}" cy="${eyeY + sz * 0.02}" r="${sz * 0.28}" fill="${STROKE}" />
-            <circle cx="${cx + sz * 0.12}" cy="${eyeY - sz * 0.18}" r="${sz * 0.14}" fill="#fff" />
-          `;
-          return thinkEye(leftX, -6, 0.58) + thinkEye(rightX, 6, 0.68);
-        }
-        default:
-          return normalEye(leftX, -12) + normalEye(rightX, 12);
-      }
-    }
+  let eyesSVG = '';
+  if (cfg.eyes === 'normal') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="6.5" fill="${C.white}"/>
+      <circle cx="${36+px}" cy="${52+py}" r="3.5" fill="${C.black}" style="transform-origin:36px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <circle cx="${37.5+px}" cy="${51+py}" r="1.8" fill="${C.white}" style="opacity:${blink?0:1};transition:opacity 0.08s"/>
+      <circle cx="64" cy="52" r="6.5" fill="${C.white}"/>
+      <circle cx="${64+px}" cy="${52+py}" r="3.5" fill="${C.black}" style="transform-origin:64px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <circle cx="${65.5+px}" cy="${51+py}" r="1.8" fill="${C.white}" style="opacity:${blink?0:1};transition:opacity 0.08s"/>
+    `;
+  } else if (cfg.eyes === 'happy') {
+    eyesSVG = `
+      <path d="M 30 54 Q 36 48 42 54" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 58 54 Q 64 48 70 54" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (cfg.eyes === 'thinking') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="6.5" fill="${C.white}"/>
+      <circle cx="${36+px*0.5}" cy="${51+py-1.5}" r="3.5" fill="${C.black}" style="transform-origin:36px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <circle cx="${37.5+px*0.5}" cy="${49.5+py-1.5}" r="1.8" fill="${C.white}" style="opacity:${blink?0:1};transition:opacity 0.08s"/>
+      <path d="M 58 53 Q 64 56 70 53" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (cfg.eyes === 'sleepy') {
+    eyesSVG = `
+      <path d="M 30 52 Q 36 55 42 52" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 58 52 Q 64 55 70 52" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (cfg.eyes === 'surprised') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="7.5" fill="${C.white}"/>
+      <circle cx="${36+px}" cy="${52+py}" r="4" fill="${C.black}" style="transform-origin:36px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <circle cx="${38+px}" cy="${50.5+py}" r="2" fill="${C.white}" style="opacity:${blink?0:1};transition:opacity 0.08s"/>
+      <circle cx="64" cy="52" r="7.5" fill="${C.white}"/>
+      <circle cx="${64+px}" cy="${52+py}" r="4" fill="${C.black}" style="transform-origin:64px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <circle cx="${66+px}" cy="${50.5+py}" r="2" fill="${C.white}" style="opacity:${blink?0:1};transition:opacity 0.08s"/>
+    `;
+  } else if (cfg.eyes === 'love') {
+    eyesSVG = `
+      <path d="M 36 56 C 32 52, 30 48, 34 46 C 36 45, 36 48, 36 48 C 36 48, 36 45, 38 46 C 42 48, 40 52, 36 56Z" fill="#E85A5A"/>
+      <path d="M 64 56 C 60 52, 58 48, 62 46 C 64 45, 64 48, 64 48 C 64 48, 64 45, 66 46 C 70 48, 68 52, 64 56Z" fill="#E85A5A"/>
+    `;
+  } else if (cfg.eyes === 'angry') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="6.5" fill="${C.white}"/>
+      <circle cx="${36+px}" cy="${52+py}" r="3.5" fill="${C.black}" style="transform-origin:36px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <path d="M 30 48 L 40 51" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="64" cy="52" r="6.5" fill="${C.white}"/>
+      <circle cx="${64+px}" cy="${52+py}" r="3.5" fill="${C.black}" style="transform-origin:64px 52px;transform:${blink?'scaleY(0.05)':'scaleY(1)'};transition:transform 0.08s"/>
+      <path d="M 70 48 L 60 51" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>
+    `;
+  } else if (cfg.eyes === 'shy') {
+    eyesSVG = `
+      <path d="M 30 52 Q 36 55 42 52" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 58 52 Q 64 55 70 52" fill="none" stroke="${C.black}" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (cfg.eyes === 'dizzy') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="6.5" fill="${C.white}"/>
+      <path d="M 36 52 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="none" stroke="${C.black}" stroke-width="1.5"/>
+      <path d="M 36 52 m -1.5 0 a 1.5 1.5 0 1 0 3 0 a 1.5 1.5 0 1 0 -3 0" fill="none" stroke="${C.black}" stroke-width="1"/>
+      <circle cx="64" cy="52" r="6.5" fill="${C.white}"/>
+      <path d="M 64 52 m -3 0 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0" fill="none" stroke="${C.black}" stroke-width="1.5"/>
+      <path d="M 64 52 m -1.5 0 a 1.5 1.5 0 1 0 3 0 a 1.5 1.5 0 1 0 -3 0" fill="none" stroke="${C.black}" stroke-width="1"/>
+    `;
+  } else if (cfg.eyes === 'inspired') {
+    eyesSVG = `
+      <circle cx="36" cy="52" r="7" fill="${C.white}"/>
+      <polygon points="36,47 37,50 40,50 38,52 39,55 36,53 33,55 34,52 32,50 35,50" fill="#FFD700"/>
+      <circle cx="64" cy="52" r="7" fill="${C.white}"/>
+      <polygon points="64,47 65,50 68,50 66,52 67,55 64,53 61,55 62,52 60,50 63,50" fill="#FFD700"/>
+    `;
+  }
 
-    function renderMouth(s, mood) {
-      const mx = s * 0.50, my = s * 0.46, w = s * 0.10;
-      switch(mood) {
-        case 'happy': case 'love':
-          return `<path d="M ${mx - w} ${my} Q ${mx} ${my + w * 1.8} ${mx + w} ${my}" stroke="${STROKE}" stroke-width="${s * 0.026}" stroke-linecap="round" fill="none" />`;
-        case 'surprised':
-          return `<ellipse cx="${mx}" cy="${my + s * 0.012}" rx="${s * 0.025}" ry="${s * 0.035}" fill="${STROKE}" />`;
-        case 'thinking':
-          return `<path d="M ${mx - w * 0.6} ${my + s * 0.008} Q ${mx} ${my - s * 0.012} ${mx + w * 0.6} ${my + s * 0.008}" stroke="${STROKE}" stroke-width="${s * 0.020}" stroke-linecap="round" fill="none" />`;
-        case 'angry':
-          return `<path d="M ${mx - w * 0.7} ${my + s * 0.025} Q ${mx} ${my - s * 0.015} ${mx + w * 0.7} ${my + s * 0.025}" stroke="${STROKE}" stroke-width="${s * 0.024}" stroke-linecap="round" fill="none" />`;
-        case 'sleepy':
-          return `<ellipse cx="${mx}" cy="${my + s * 0.005}" rx="${s * 0.018}" ry="${s * 0.014}" fill="${STROKE}" />`;
-        case 'shy':
-          return `<path d="M ${mx - w * 0.5} ${my} Q ${mx - w * 0.15} ${my + w * 0.6} ${mx} ${my + w * 0.3} Q ${mx + w * 0.15} ${my + w * 0.6} ${mx + w * 0.5} ${my}" stroke="${STROKE}" stroke-width="${s * 0.020}" stroke-linecap="round" fill="none" />`;
-        default:
-          return `<path d="M ${mx - w * 0.65} ${my} Q ${mx - w * 0.2} ${my + w * 0.7} ${mx} ${my + w * 0.4} Q ${mx + w * 0.2} ${my + w * 0.7} ${mx + w * 0.65} ${my}" stroke="${STROKE}" stroke-width="${s * 0.022}" stroke-linecap="round" fill="none" />`;
-      }
-    }
+  let mouthSVG = '';
+  if (cfg.mouth === 'smile') mouthSVG = `<path d="M 44 68 Q 50 74 56 68" fill="none" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (cfg.mouth === 'laugh') mouthSVG = `<path d="M 43 68 Q 50 78 57 68" fill="none" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/><path d="M 46 71 Q 50 74 54 71" fill="none" stroke="${C.black}" stroke-width="1" stroke-linecap="round" opacity="0.5"/>`;
+  else if (cfg.mouth === 'O') mouthSVG = `<ellipse cx="50" cy="70" rx="4" ry="5" fill="${C.black}"/>`;
+  else if (cfg.mouth === 'flat') mouthSVG = `<line x1="45" y1="70" x2="55" y2="70" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (cfg.mouth === 'pout') mouthSVG = `<path d="M 46 70 Q 50 68 54 70" fill="none" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (cfg.mouth === 'frown') mouthSVG = `<path d="M 44 72 Q 50 68 56 72" fill="none" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (cfg.mouth === 'wavy') mouthSVG = `<path d="M 44 70 Q 47 67 50 70 Q 53 73 56 70" fill="none" stroke="${C.black}" stroke-width="2" stroke-linecap="round"/>`;
+  else if (cfg.mouth === 'smallO') mouthSVG = `<ellipse cx="50" cy="70" rx="2.5" ry="3" fill="${C.black}"/>`;
 
-    function renderArms(s) {
-      const sw = STROKE_W(s);
-      return `
-        <ellipse cx="${s * 0.28}" cy="${s * 0.66}" rx="${s * 0.05}" ry="${s * 0.07}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-        <ellipse cx="${s * 0.72}" cy="${s * 0.66}" rx="${s * 0.05}" ry="${s * 0.07}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-      `;
-    }
+  const glassesSVG = cfg.glasses ? `
+    <circle cx="36" cy="52" r="14" fill="none" stroke="${C.glassesRim}" stroke-width="2"/>
+    <circle cx="36" cy="52" r="12.5" fill="none" stroke="${C.glasses}" stroke-width="0.8" opacity="0.3"/>
+    <circle cx="64" cy="52" r="14" fill="none" stroke="${C.glassesRim}" stroke-width="2"/>
+    <circle cx="64" cy="52" r="12.5" fill="none" stroke="${C.glasses}" stroke-width="0.8" opacity="0.3"/>
+    <path d="M 46 54 Q 50 56 54 54" fill="none" stroke="${C.glassesRim}" stroke-width="1.5"/>
+    <line x1="22" y1="52" x2="16" y2="48" stroke="${C.glassesRim}" stroke-width="1.5"/>
+    <line x1="78" y1="52" x2="84" y2="48" stroke="${C.glassesRim}" stroke-width="1.5"/>
+  ` : '';
 
-    function renderPanda(s, mood, blinking) {
-      const r = ar(s);
-      const b = getBlush(mood);
-      const sw = STROKE_W(s);
+  const blushSVG = cfg.blushDeep ? `<ellipse cx="27" cy="60" rx="5" ry="3" fill="${C.blushDeep}" opacity="0.6"/><ellipse cx="73" cy="60" rx="5" ry="3" fill="${C.blushDeep}" opacity="0.6"/>` :
+                     cfg.blush ? `<ellipse cx="27" cy="60" rx="5" ry="3" fill="${C.blush}" opacity="0.6"/><ellipse cx="73" cy="60" rx="5" ry="3" fill="${C.blush}" opacity="0.6"/>` : '';
 
-      const headRx = s * 0.29;
-      const headRy = s * 0.28;
-      const headCy = s * 0.32;
+  const svg = `
+    <svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible" class="${animClass}">
+      <defs>
+        <filter id="panda-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.15)"/>
+        </filter>
+      </defs>
+      <g filter="url(#panda-shadow)">
+        <ellipse cx="50" cy="86" rx="22" ry="12" fill="${C.black}"/>
+        <ellipse cx="50" cy="85" rx="14" ry="8" fill="${C.white}"/>
+        <g style="transform-origin:50px 56px">
+          <circle cx="50" cy="56" r="32" fill="${C.white}"/>
+        </g>
+        <g style="transform-origin:22px 30px;transform:rotate(${ear}deg)">
+          <ellipse cx="22" cy="30" rx="10" ry="12" fill="${C.black}"/>
+          <ellipse cx="22" cy="32" rx="5" ry="6" fill="#333"/>
+        </g>
+        <g style="transform-origin:78px 30px;transform:rotate(${-ear}deg)">
+          <ellipse cx="78" cy="30" rx="10" ry="12" fill="${C.black}"/>
+          <ellipse cx="78" cy="32" rx="5" ry="6" fill="#333"/>
+        </g>
+        <ellipse cx="36" cy="52" rx="11" ry="13" fill="${C.black}"/>
+        <ellipse cx="64" cy="52" rx="11" ry="13" fill="${C.black}"/>
+        <g style="transition:opacity 0.3s ease">${eyesSVG}</g>
+        <g style="transition:opacity 0.3s">${glassesSVG}</g>
+        <ellipse cx="50" cy="63" rx="3.5" ry="2.5" fill="${C.black}"/>
+        <g style="transition:all 0.3s ease">${mouthSVG}</g>
+        <g style="transition:opacity 0.4s ease">${blushSVG}</g>
+        <g>
+          <ellipse cx="50" cy="18" rx="22" ry="5" fill="${C.cap}"/>
+          <ellipse cx="50" cy="17" rx="20" ry="4" fill="#3A3A3A"/>
+          <path d="M 32 16 L 50 4 L 68 16 L 50 12 Z" fill="${C.cap}"/>
+          <path d="M 32 16 L 50 4 L 50 12 L 32 16" fill="#3A3A3A"/>
+          <line x1="62" y1="8" x2="62" y2="22" stroke="${C.gold}" stroke-width="1.5"/>
+          <circle cx="62" cy="23" r="2.5" fill="${C.gold}"/>
+        </g>
+      </g>
+    </svg>
+  `;
 
-      const earRx = s * 0.10 * r;
-      const earRy = s * 0.09 * r;
-      const earCy = s * 0.12;
-      const earInnerRx = s * 0.06 * r;
-      const earInnerRy = s * 0.05 * r;
+  document.getElementById(containerId).innerHTML = svg;
+}
 
-      const bodyRx = s * 0.20;
-      const bodyRy = s * 0.13;
-      const bodyCy = s * 0.58;
-      const bellyRx = s * 0.13;
-      const bellyRy = s * 0.10;
+// 鼠标跟随
+window.addEventListener('mousemove', (e) => {
+  const mainPanda = document.getElementById('mainPanda');
+  if (!mainPanda) return;
+  const rect = mainPanda.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const dx = e.clientX - centerX;
+  const dy = e.clientY - centerY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const maxOff = 3.5;
+  const maxDist = 400;
+  const factor = Math.min(dist / maxDist, 1);
+  const angle = Math.atan2(dy, dx);
+  pupilOffset = {
+    x: Math.cos(angle) * maxOff * factor,
+    y: Math.sin(angle) * maxOff * factor,
+  };
+  renderPanda(currentMood, 80, 'pandaSvg', true);
+});
 
-      const footRx = s * 0.07;
-      const footRy = s * 0.055;
-      const footCy = s * 0.82;
+// 自动眨眼
+function scheduleBlink() {
+  const delay = 2000 + Math.random() * 4000;
+  blinkTimer = setTimeout(() => {
+    isBlinking = true;
+    renderPanda(currentMood, 80, 'pandaSvg', true);
+    setTimeout(() => {
+      isBlinking = false;
+      renderPanda(currentMood, 80, 'pandaSvg', true);
+      scheduleBlink();
+    }, 120);
+  }, delay);
+}
 
-      const blushRx = s * 0.09 * r;
-      const blushRy = s * 0.06 * r;
-      const blushCy = s * 0.40;
+// 耳朵微动
+function startEarWiggle() {
+  earTimer = setInterval(() => {
+    earWiggle = Math.sin(Date.now() / 800) * 3;
+    renderPanda(currentMood, 80, 'pandaSvg', true);
+  }, 50);
+}
 
-      return `
-        <svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
-          <ellipse cx="${s * 0.5}" cy="${s * 0.92}" rx="${s * 0.24}" ry="${s * 0.032}" fill="rgba(0,0,0,0.08)" />
+function setMood(mood) {
+  currentMood = mood;
+  renderPanda(currentMood, 80, 'pandaSvg', true);
+  const bubble = document.getElementById('pandaBubble');
+  bubble.textContent = '当前 mood: ' + mood;
+  bubble.classList.add('show');
+  setTimeout(() => bubble.classList.remove('show'), 2000);
+}
 
-          <ellipse cx="${s * 0.36}" cy="${footCy}" rx="${footRx}" ry="${footRy}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-          <ellipse cx="${s * 0.64}" cy="${footCy}" rx="${footRx}" ry="${footRy}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
+function onPandaClick() {
+  spawnParticles();
+  const bubble = document.getElementById('pandaBubble');
+  const messages = ['嗨~ 👋', '好开心！', '点我点我~', '啦啦啦~', 'Zzz...', '么么哒！', '要喝茶吗？🍵'];
+  bubble.textContent = messages[Math.floor(Math.random() * messages.length)];
+  bubble.classList.add('show');
+  setTimeout(() => bubble.classList.remove('show'), 2000);
+}
 
-          <ellipse cx="${s * 0.5}" cy="${bodyCy}" rx="${bodyRx}" ry="${bodyRy}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-          <ellipse cx="${s * 0.5}" cy="${bodyCy + s * 0.01}" rx="${bellyRx}" ry="${bellyRy}" fill="#faf8f5" stroke="${STROKE}" stroke-width="${sw * 0.6}" />
+function spawnParticles() {
+  const container = document.getElementById('particles');
+  const mainPanda = document.getElementById('mainPanda');
+  const rect = mainPanda.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const emojis = ['♥', '★', '✨', '💗', '✦'];
+  const colors = ['#FF6B8A', '#FFD700', '#A0E7E5', '#B4F8C8', '#FFAEBC'];
 
-          <ellipse cx="${s * 0.18}" cy="${earCy}" rx="${earRx}" ry="${earRy}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-          <ellipse cx="${s * 0.18}" cy="${earCy + s * 0.01}" rx="${earInnerRx}" ry="${earInnerRy}" fill="#3d3d4a" />
-          <ellipse cx="${s * 0.82}" cy="${earCy}" rx="${earRx}" ry="${earRy}" fill="${STROKE}" stroke="${STROKE}" stroke-width="${sw}" />
-          <ellipse cx="${s * 0.82}" cy="${earCy + s * 0.01}" rx="${earInnerRx}" ry="${earInnerRy}" fill="#3d3d4a" />
+  for (let i = 0; i < 10; i++) {
+    const p = document.createElement('span');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.color = colors[Math.floor(Math.random() * colors.length)];
+    const angle = (Math.PI * 2 * i) / 10 + (Math.random() - 0.5) * 0.5;
+    const dist = 60 + Math.random() * 80;
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist - 40 + 'px');
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
 
-          <ellipse cx="${s * 0.5}" cy="${headCy}" rx="${headRx}" ry="${headRy}" fill="#fff" stroke="${STROKE}" stroke-width="${sw}" />
-          <ellipse cx="${s * 0.5}" cy="${headCy + s * 0.19}" rx="${s * 0.20}" ry="${s * 0.06}" fill="#f0ece5" opacity="0.5" />
+// 初始化
+function init() {
+  const grid = document.getElementById('demoGrid');
+  MOODS.forEach(mood => {
+    const item = document.createElement('div');
+    item.className = 'demo-item';
+    const id = 'panda-' + mood;
+    item.innerHTML = `<div id="${id}" style="width:60px;height:60px;"></div><span class="demo-label">${mood}</span>`;
+    grid.appendChild(item);
+    renderPanda(mood, 60, id, false);
+  });
 
-          ${renderEyes(s, mood, blinking)}
+  renderPanda(currentMood, 80, 'pandaSvg', true);
+  scheduleBlink();
+  startEarWiggle();
 
-          <ellipse cx="${s * 0.50}" cy="${s * 0.42}" rx="${s * 0.038}" ry="${s * 0.026}" fill="${STROKE}" />
-          <ellipse cx="${s * 0.495}" cy="${s * 0.413}" rx="${s * 0.013}" ry="${s * 0.007}" fill="white" opacity="0.6" />
+  document.getElementById('pandaBubble').classList.add('show');
+  setTimeout(() => document.getElementById('pandaBubble').classList.remove('show'), 3000);
+}
 
-          ${renderMouth(s, mood)}
-
-          <ellipse cx="${s * 0.22}" cy="${blushCy}" rx="${blushRx}" ry="${blushRy}" fill="rgba(${b.c},${b.o})" />
-          <ellipse cx="${s * 0.78}" cy="${blushCy}" rx="${blushRx}" ry="${blushRy}" fill="rgba(${b.c},${b.o})" />
-
-          ${renderArms(s)}
-        </svg>
-      `;
-    }
-
-    document.getElementById('hero56').innerHTML = renderPanda(56, 'idle', false);
-    document.getElementById('hero200').innerHTML = renderPanda(200, 'idle', false);
-
-    const grid = document.getElementById('grid');
-    moods.forEach(({name, label}) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = renderPanda(120, name, false) + `<div class="card-label">${label}</div>`;
-      grid.appendChild(card);
-    });
-  </script>
+init();
+</script>
 </body>
 </html>

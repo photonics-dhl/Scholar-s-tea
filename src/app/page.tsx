@@ -65,6 +65,12 @@ export default function HomePage() {
   const [recentPubs, setRecentPubs] = useState<FeedPublication[]>([])
   const [activeGroups, setActiveGroups] = useState<FeedGroup[]>([])
   const [loading, setLoading] = useState(true)
+
+  // SSR-safe date formatter
+  const formatDate = (dateString: string): string => {
+    if (typeof window === 'undefined') return dateString.slice(0, 10)
+    return new Date(dateString).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+  }
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -101,7 +107,7 @@ export default function HomePage() {
             id: p.id,
             title: p.title,
             author: p.author?.name || '匿名用户',
-            time: new Date(p.createdAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+            time: formatDate(p.createdAt),
           }))
         )
       }
@@ -113,7 +119,7 @@ export default function HomePage() {
             title: p.title,
             authors: p.authors?.join(', ') || '未知作者',
             journal: p.doi ? `DOI: ${p.doi}` : undefined,
-            time: p.year ? `${p.year}年` : new Date(p.createdAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }),
+            time: p.year ? `${p.year}年` : formatDate(p.createdAt),
             citationCount: p.citationCount,
             doi: p.doi,
           }))

@@ -230,24 +230,28 @@ function renderEyes(s: number, mood: HermesMood, blinking: boolean) {
     )
   }
 
-  // 默认大眼睛结构：倾斜眼圈 + 大眼白 + 大瞳孔 + 双高光
-  const normalEye = (cx: number, rot: number) => (
-    <>
-      {/* 黑眼圈 — 更大角度，更像熊猫墨镜 */}
-      <ellipse cx={cx} cy={eyeY} rx={sz * 1.05} ry={sz * 0.88}
-        fill={DARK} transform={`rotate(${rot} ${cx} ${eyeY})`} />
-      {/* 眼白 — 更大更圆 */}
-      <circle cx={cx} cy={eyeY - sz * 0.02} r={sz * 0.68} fill={WHITE} />
-      {/* 瞳孔 — 更大！这是可爱的核心 */}
-      <circle cx={cx} cy={eyeY + sz * 0.02} r={sz * 0.38} fill={DARK} />
-      {/* 主高光 — 大而亮，左上 */}
-      <circle cx={cx - sz * 0.18} cy={eyeY - sz * 0.22} r={sz * 0.22} fill={WHITE} />
-      {/* 次高光 — 右下小反光 */}
-      <circle cx={cx + sz * 0.16} cy={eyeY + sz * 0.18} r={sz * 0.11} fill={WHITE} opacity={0.8} />
-      {/* 微小高光点 — 增加水润感 */}
-      <circle cx={cx + sz * 0.08} cy={eyeY - sz * 0.08} r={sz * 0.05} fill={WHITE} opacity={0.9} />
-    </>
-  )
+  // 默认大眼睛结构：倾斜眼圈 + 大眼白 + 大瞳孔 + 高光
+  const normalEye = (cx: number, rot: number) => {
+    // 小尺寸下简化结构：去掉看不见的次高光/微高光，把空间给主高光
+    const isSmall = s <= 64
+    return (
+      <>
+        {/* 黑眼圈 — 更大角度，更像熊猫墨镜 */}
+        <ellipse cx={cx} cy={eyeY} rx={sz * 1.05} ry={sz * 0.88}
+          fill={DARK} transform={`rotate(${rot} ${cx} ${eyeY})`} />
+        {/* 眼白 — 小尺寸下更大 */}
+        <circle cx={cx} cy={eyeY - sz * 0.02} r={sz * (isSmall ? 0.75 : 0.68)} fill={WHITE} />
+        {/* 瞳孔 — 小尺寸下更大 */}
+        <circle cx={cx} cy={eyeY + sz * 0.02} r={sz * (isSmall ? 0.45 : 0.38)} fill={DARK} />
+        {/* 主高光 — 大而亮 */}
+        <circle cx={cx - sz * 0.18} cy={eyeY - sz * 0.22} r={sz * (isSmall ? 0.28 : 0.22)} fill={WHITE} />
+        {/* 次高光 — 仅大尺寸显示 */}
+        {!isSmall && <circle cx={cx + sz * 0.16} cy={eyeY + sz * 0.18} r={sz * 0.11} fill={WHITE} opacity={0.8} />}
+        {/* 微高光 — 仅大尺寸显示 */}
+        {!isSmall && <circle cx={cx + sz * 0.08} cy={eyeY - sz * 0.08} r={sz * 0.05} fill={WHITE} opacity={0.9} />}
+      </>
+    )
+  }
 
   switch (mood) {
     case 'happy':

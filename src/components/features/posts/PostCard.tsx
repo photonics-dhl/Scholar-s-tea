@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/button'
+import { RelativeTime } from '@/components/ui/RelativeTime'
 
 interface PostCardProps {
   post: {
@@ -166,7 +167,7 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
             </span>
             <span className="hidden sm:flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {formatRelativeTime(post.createdAt)}
+              <RelativeTime date={post.createdAt} />
             </span>
           </div>
         </div>
@@ -175,17 +176,4 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
   )
 }
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 1) return '刚刚'
-  if (diffMins < 60) return `${diffMins}分钟前`
-  if (diffHours < 24) return `${diffHours}小时前`
-  if (diffDays < 7) return `${diffDays}天前`
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
-}

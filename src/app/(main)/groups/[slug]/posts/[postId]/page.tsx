@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RelativeTime } from '@/components/ui/RelativeTime';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -187,25 +188,7 @@ export default function GroupPostDetailPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN', {
-      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit',
-    });
-  };
 
-  const formatRelative = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-  };
 
   if (loading) {
     return (
@@ -264,7 +247,7 @@ export default function GroupPostDetailPage() {
             <div className="flex flex-col">
               <span className="text-sm font-medium">{post.author.name || '匿名用户'}</span>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {formatDate(post.createdAt)}</span>
+                <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> <RelativeTime date={post.createdAt} variant="full" /></span>
                 <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.viewCount} 浏览</span>
               </div>
             </div>

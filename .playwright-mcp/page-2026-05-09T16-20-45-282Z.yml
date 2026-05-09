@@ -1,0 +1,92 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - heading "加入我们" [level=1] [ref=e6]
+      - paragraph [ref=e7]: 创建账号，开启学术交流之旅
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - heading "注册" [level=3] [ref=e10]
+        - paragraph [ref=e11]: 填写信息创建您的账号
+      - generic [ref=e12]:
+        - button "使用 GitHub 注册" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: 使用 GitHub 注册
+        - generic [ref=e22]: 或使用邮箱注册
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - text: 昵称
+            - generic [ref=e25]:
+              - img [ref=e26]
+              - textbox "昵称" [ref=e29]:
+                - /placeholder: 您的昵称
+          - generic [ref=e30]:
+            - text: 邮箱
+            - generic [ref=e31]:
+              - img [ref=e32]
+              - textbox "邮箱" [ref=e35]:
+                - /placeholder: your@email.com
+          - generic [ref=e36]:
+            - text: 密码
+            - generic [ref=e37]:
+              - img [ref=e38]
+              - textbox "密码" [ref=e41]:
+                - /placeholder: 设置密码
+          - button "创建账号" [ref=e42] [cursor=pointer]
+    - paragraph [ref=e43]:
+      - text: 已有账号？
+      - link "登录" [ref=e44] [cursor=pointer]:
+        - /url: /signin
+  - button "拖拽 转得好快... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e46]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e50] [cursor=pointer]:
+      - generic [ref=e52]: 转得好快...
+      - iframe [ref=e55]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 转得好快...
+            - iframe [ref=e57] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e58] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e59]

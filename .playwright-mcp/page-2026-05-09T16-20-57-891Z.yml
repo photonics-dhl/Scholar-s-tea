@@ -1,0 +1,225 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e24] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e25]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - img [ref=e54]
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - heading "人工智能实验室" [level=1] [ref=e60]
+                  - generic [ref=e61]:
+                    - img [ref=e62]
+                    - text: 已认证
+                - paragraph [ref=e65]: 浙江大学 · 计算机科学与技术学院
+            - button "关注" [ref=e66] [cursor=pointer]
+          - paragraph [ref=e67]: 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。
+          - generic [ref=e68]:
+            - generic [ref=e69]: 计算机科学
+            - generic [ref=e70]: 人工智能
+            - generic [ref=e71]: 机器学习
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - paragraph [ref=e74]: "3"
+              - paragraph [ref=e75]: 成员
+            - generic [ref=e76]:
+              - paragraph [ref=e77]: "1"
+              - paragraph [ref=e78]: 论文
+            - generic [ref=e79]:
+              - paragraph [ref=e80]: "1"
+              - paragraph [ref=e81]: 动态
+            - generic [ref=e82]:
+              - paragraph [ref=e83]: "1"
+              - paragraph [ref=e84]: 专利
+            - generic [ref=e85]:
+              - paragraph [ref=e86]: "95"
+              - paragraph [ref=e87]: 评分
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - tablist [ref=e90]:
+              - tab "概况" [selected] [ref=e91] [cursor=pointer]:
+                - img [ref=e92]
+                - text: 概况
+              - tab "论文 (1)" [ref=e97] [cursor=pointer]:
+                - img [ref=e98]
+                - text: 论文 (1)
+              - tab "动态 (1)" [ref=e101] [cursor=pointer]:
+                - img [ref=e102]
+                - text: 动态 (1)
+              - tab "专利 (1)" [ref=e105] [cursor=pointer]:
+                - img [ref=e106]
+                - text: 专利 (1)
+              - tab "成员 (3)" [ref=e109] [cursor=pointer]:
+                - img [ref=e110]
+                - text: 成员 (3)
+              - tab "讨论 (1)" [ref=e115] [cursor=pointer]:
+                - img [ref=e116]
+                - text: 讨论 (1)
+            - tabpanel "概况" [ref=e118]:
+              - generic [ref=e119]:
+                - generic [ref=e120]:
+                  - generic [ref=e122]:
+                    - heading "课题组简介" [level=3] [ref=e123]:
+                      - img [ref=e124]
+                      - text: 课题组简介
+                    - paragraph [ref=e127]: 浙江大学人工智能实验室，专注于机器学习、深度学习、计算机视觉等研究方向。实验室拥有先进的GPU计算资源和丰富的学术资源。
+                  - generic [ref=e128]:
+                    - heading "最近活动" [level=3] [ref=e129]
+                    - generic [ref=e130]:
+                      - generic [ref=e131]:
+                        - img [ref=e134]
+                        - generic [ref=e138]:
+                          - generic [ref=e139]:
+                            - generic [ref=e140]: 新成员
+                            - generic [ref=e141]: 2026/4/27
+                          - heading "张教授 加入课题组" [level=4] [ref=e142]
+                      - generic [ref=e143]:
+                        - img [ref=e146]
+                        - generic [ref=e150]:
+                          - generic [ref=e151]:
+                            - generic [ref=e152]: 新成员
+                            - generic [ref=e153]: 2026/4/27
+                          - heading "李研究员 加入课题组" [level=4] [ref=e154]
+                      - generic [ref=e155]:
+                        - img [ref=e158]
+                        - generic [ref=e161]:
+                          - generic [ref=e162]:
+                            - generic [ref=e163]: 新成员
+                            - generic [ref=e164]: 2026/4/27
+                          - heading "王同学 加入课题组" [level=4] [ref=e165]
+                - generic [ref=e166]:
+                  - generic [ref=e167]:
+                    - heading "研究领域" [level=3] [ref=e168]
+                    - generic [ref=e169]:
+                      - generic [ref=e170] [cursor=pointer]: 计算机科学
+                      - generic [ref=e171] [cursor=pointer]: 人工智能
+                      - generic [ref=e172] [cursor=pointer]: 机器学习
+                  - generic [ref=e173]:
+                    - heading "所属机构" [level=3] [ref=e174]
+                    - generic [ref=e175]:
+                      - generic [ref=e176]:
+                        - img [ref=e177]
+                        - generic [ref=e181]: 浙江大学
+                      - generic [ref=e183]: 计算机科学与技术学院
+                  - generic [ref=e184]:
+                    - heading "数据统计" [level=3] [ref=e185]
+                    - generic [ref=e186]:
+                      - generic [ref=e187]:
+                        - img [ref=e188]
+                        - paragraph [ref=e193]: "3"
+                        - paragraph [ref=e194]: 成员
+                      - generic [ref=e195]:
+                        - img [ref=e196]
+                        - paragraph [ref=e199]: "1"
+                        - paragraph [ref=e200]: 论文
+                      - generic [ref=e201]:
+                        - img [ref=e202]
+                        - paragraph [ref=e205]: "1"
+                        - paragraph [ref=e206]: 动态
+                      - generic [ref=e207]:
+                        - img [ref=e208]
+                        - paragraph [ref=e211]: "1"
+                        - paragraph [ref=e212]: 专利
+                  - generic [ref=e214]:
+                    - img [ref=e216]
+                    - heading "AI 智能分析" [level=3] [ref=e218]
+                    - paragraph [ref=e219]: 基于论文、专利和成员数据生成深度分析
+                    - button "开始分析" [ref=e220] [cursor=pointer]:
+                      - img [ref=e221]
+                      - text: 开始分析
+          - button "课题组设置" [ref=e224] [cursor=pointer]:
+            - link "课题组设置" [ref=e225]:
+              - /url: /groups/ai-lab-zju/settings
+              - img [ref=e226]
+              - text: 课题组设置
+    - contentinfo [ref=e229]:
+      - paragraph [ref=e231]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 让我缓一缓... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e233]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e237] [cursor=pointer]:
+      - generic [ref=e239]: 让我缓一缓...
+      - iframe [ref=e242]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 天旋地转...
+            - iframe [ref=e244] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 天旋地转...
+            - iframe [ref=e245] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e246]

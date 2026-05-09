@@ -1,0 +1,149 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e18] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e19]
+            - text: 课题组
+          - link "思想工坊" [ref=e24] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e25]
+            - text: 思想工坊
+          - link "茶话会" [ref=e27] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e28]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - button "返回列表" [ref=e49] [cursor=pointer]:
+          - link "返回列表" [ref=e50]:
+            - /url: /disciplines/computer-science/posts
+            - img [ref=e51]
+            - text: 返回列表
+        - generic [ref=e53]:
+          - heading "发布新帖" [level=1] [ref=e54]
+          - paragraph [ref=e55]: 分享你的研究见解，与社区交流讨论
+        - generic [ref=e56]:
+          - textbox "标题（最多 200 字）" [ref=e57]
+          - generic [ref=e59]: 0/200
+        - generic [ref=e60]:
+          - generic [ref=e61]: 正文内容
+          - button "AI 优化" [disabled]:
+            - img
+            - generic: AI 优化
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - button "粗体 (Ctrl+B)" [ref=e65] [cursor=pointer]:
+              - img [ref=e66]
+            - button "斜体 (Ctrl+I)" [ref=e69] [cursor=pointer]:
+              - img [ref=e70]
+            - button "删除线" [ref=e72] [cursor=pointer]:
+              - img [ref=e73]
+            - button "行内代码" [ref=e76] [cursor=pointer]:
+              - img [ref=e77]
+            - button "标题 1" [ref=e81] [cursor=pointer]:
+              - img [ref=e82]
+            - button "标题 2" [ref=e84] [cursor=pointer]:
+              - img [ref=e85]
+            - button "无序列表" [ref=e88] [cursor=pointer]:
+              - img [ref=e89]
+            - button "有序列表" [ref=e90] [cursor=pointer]:
+              - img [ref=e91]
+            - button "引用" [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+            - button "分割线" [ref=e99] [cursor=pointer]:
+              - img [ref=e100]
+            - button "撤销 (Ctrl+Z)" [disabled]:
+              - img
+            - button "重做 (Ctrl+Y)" [disabled]:
+              - img
+          - paragraph [ref=e107]
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - img [ref=e110]
+            - generic [ref=e113]: 标签
+          - generic [ref=e114]:
+            - textbox "添加标签，按回车确认" [ref=e115]
+            - button "添加" [ref=e116] [cursor=pointer]
+        - generic [ref=e117]:
+          - paragraph [ref=e118]: 请遵守社区规范，发布有价值的学术内容
+          - button "发布帖子" [disabled]:
+            - img
+            - text: 发布帖子
+    - contentinfo [ref=e119]:
+      - paragraph [ref=e121]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 让我缓一缓... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e123]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e127] [cursor=pointer]:
+      - generic [ref=e129]: 让我缓一缓...
+      - iframe [ref=e132]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e134] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 头晕晕...
+            - iframe [ref=e135] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e136]

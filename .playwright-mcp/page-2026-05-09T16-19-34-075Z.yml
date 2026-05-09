@@ -1,0 +1,125 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e23] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e24]
+            - text: 思想工坊
+          - link "茶话会" [ref=e26] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e27]
+            - text: 茶话会
+          - link "TOP10" [ref=e29] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e30]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - img [ref=e53]
+            - generic [ref=e59]: Community Ranking
+          - heading "TOP10 问题" [level=1] [ref=e60]
+          - paragraph [ref=e61]: 每月最受欢迎的研究讨论，看看社区最热门的话题
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - img [ref=e65]
+              - combobox [ref=e67]:
+                - option "2026年" [selected]
+                - option "2025年"
+              - combobox [ref=e68]:
+                - option "1月"
+                - option "2月"
+                - option "3月"
+                - option "4月"
+                - option "5月" [selected]
+                - option "6月"
+                - option "7月"
+                - option "8月"
+                - option "9月"
+                - option "10月"
+                - option "11月"
+                - option "12月"
+            - generic [ref=e69]: 2026年5月 TOP10
+          - generic [ref=e70]:
+            - img [ref=e72]
+            - heading "暂无排名数据" [level=3] [ref=e78]
+            - paragraph [ref=e79]: 2026年5月还没有帖子获得投票
+    - contentinfo [ref=e80]:
+      - paragraph [ref=e82]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 头晕晕... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e84]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e88] [cursor=pointer]:
+      - generic [ref=e90]: 头晕晕...
+      - iframe [ref=e93]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 天旋地转...
+            - iframe [ref=e95] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 头晕晕...
+            - iframe [ref=e96] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e97]

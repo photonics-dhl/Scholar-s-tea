@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils/cn'
+import { RelativeTime } from '@/components/ui/RelativeTime'
 
 interface CommentAuthor {
   id: string
@@ -47,20 +48,7 @@ interface CommentSectionProps {
   onLikeComment?: (commentId: string) => void
 }
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 1) return '刚刚'
-  if (diffMins < 60) return `${diffMins}分钟前`
-  if (diffHours < 24) return `${diffHours}小时前`
-  if (diffDays < 7) return `${diffDays}天前`
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
-}
 
 /* ===================== 单条回复卡片 ===================== */
 function ReplyCard({
@@ -122,7 +110,7 @@ function ReplyCard({
               </span>
             )}
             <span className="text-[11px] text-muted-foreground ml-auto">
-              {formatRelativeTime(comment.createdAt)}
+              <RelativeTime date={comment.createdAt} />
             </span>
           </div>
 
@@ -250,7 +238,7 @@ function CommentCard({
             )}
           </div>
           <span className="text-[11px] text-muted-foreground shrink-0">
-            {formatRelativeTime(comment.createdAt)}
+            <RelativeTime date={comment.createdAt} />
           </span>
         </div>
 

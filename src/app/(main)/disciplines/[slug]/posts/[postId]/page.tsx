@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { sanitizeHtml } from '@/lib/utils/sanitize';
 import { CommentSection } from '@/components/features/posts/CommentSection';
+import { RelativeTime } from '@/components/ui/RelativeTime';
 
 interface Author {
   id: string;
@@ -205,15 +206,7 @@ export default function PostDetailPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+
 
   if (loading) {
     return (
@@ -256,7 +249,7 @@ export default function PostDetailPage() {
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
           <span>{post.author.name || '匿名用户'}</span>
-          <span>{formatDate(post.createdAt)}</span>
+          <span><RelativeTime date={post.createdAt} variant="full" /></span>
           <span className="flex items-center gap-1">
             <Eye className="h-4 w-4" /> {post.viewCount}
           </span>

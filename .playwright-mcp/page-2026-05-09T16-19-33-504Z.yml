@@ -1,0 +1,156 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Scholar's Tea" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Scholar's Tea
+        - navigation [ref=e12]:
+          - link "学科" [ref=e13] [cursor=pointer]:
+            - /url: /disciplines
+            - img [ref=e14]
+            - text: 学科
+          - link "课题组" [ref=e17] [cursor=pointer]:
+            - /url: /groups
+            - img [ref=e18]
+            - text: 课题组
+          - link "思想工坊" [ref=e23] [cursor=pointer]:
+            - /url: /workshop
+            - img [ref=e24]
+            - text: 思想工坊
+          - link "茶话会" [ref=e26] [cursor=pointer]:
+            - /url: /tea-party
+            - img [ref=e27]
+            - text: 茶话会
+          - link "TOP10" [ref=e30] [cursor=pointer]:
+            - /url: /top-questions
+            - img [ref=e31]
+            - text: TOP10
+        - button "搜索 /" [ref=e37] [cursor=pointer]:
+          - img [ref=e38]
+          - generic [ref=e41]: 搜索
+          - generic [ref=e42]: /
+        - button "登录" [ref=e44] [cursor=pointer]:
+          - link "登录" [ref=e45]:
+            - /url: /signin
+    - main [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - img [ref=e54]
+              - generic [ref=e56]: Live Chat
+            - heading "茶话会" [level=1] [ref=e57]
+            - paragraph [ref=e58]: 加入实时聊天室，与研究者交流思想·共 3 个房间
+          - button "创建房间" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - text: 创建房间
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - searchbox "搜索房间..." [ref=e67]
+            - button "搜索" [ref=e68] [cursor=pointer]
+          - generic [ref=e69]:
+            - img [ref=e70]
+            - generic [ref=e72]: 共 3 个房间
+          - generic [ref=e73]:
+            - 'link "Claude测试房间 主持人: Hongliang Dang Claude AI 可测试的聊天室 1 / 50 14" [ref=e74] [cursor=pointer]':
+              - /url: /tea-party/cmohc960p0005755efk83pfsm
+              - generic [ref=e77]:
+                - generic [ref=e79]:
+                  - heading "Claude测试房间" [level=3] [ref=e81]
+                  - paragraph [ref=e82]: "主持人: Hongliang Dang"
+                - paragraph [ref=e83]: Claude AI 可测试的聊天室
+                - generic [ref=e84]:
+                  - generic [ref=e85]:
+                    - img [ref=e86]
+                    - generic [ref=e91]: 1 / 50
+                  - generic [ref=e95]:
+                    - img [ref=e96]
+                    - generic [ref=e98]: "14"
+            - 'link "量子计算讨论组 主持人: 张教授 量子计算前沿进展讨论 1 / 30 2" [ref=e99] [cursor=pointer]':
+              - /url: /tea-party/cmogy6j5v001mf4r14icgi8ip
+              - generic [ref=e102]:
+                - generic [ref=e104]:
+                  - heading "量子计算讨论组" [level=3] [ref=e106]
+                  - paragraph [ref=e107]: "主持人: 张教授"
+                - paragraph [ref=e108]: 量子计算前沿进展讨论
+                - generic [ref=e109]:
+                  - generic [ref=e110]:
+                    - img [ref=e111]
+                    - generic [ref=e116]: 1 / 30
+                  - generic [ref=e120]:
+                    - img [ref=e121]
+                    - generic [ref=e123]: "2"
+            - 'link "AI研究交流室 主持人: 张教授 人工智能研究者交流群 2 / 50 17" [ref=e124] [cursor=pointer]':
+              - /url: /tea-party/cmogy6j44001kf4r1exaakjre
+              - generic [ref=e127]:
+                - generic [ref=e129]:
+                  - heading "AI研究交流室" [level=3] [ref=e131]
+                  - paragraph [ref=e132]: "主持人: 张教授"
+                - paragraph [ref=e133]: 人工智能研究者交流群
+                - generic [ref=e134]:
+                  - generic [ref=e135]:
+                    - img [ref=e136]
+                    - generic [ref=e141]: 2 / 50
+                  - generic [ref=e145]:
+                    - img [ref=e146]
+                    - generic [ref=e148]: "17"
+    - contentinfo [ref=e149]:
+      - paragraph [ref=e151]: Scholar's Tea 学者茶话会 · 高校学术交流社区
+  - button "拖拽 天旋地转... Hermes Live2D ★ ✦ ★ 点击我聊天，双击和我玩耍" [ref=e153]:
+    - generic:
+      - img
+      - generic: 拖拽
+    - generic "点击我呀~（双击也有惊喜）" [ref=e157] [cursor=pointer]:
+      - generic [ref=e159]: 天旋地转...
+      - iframe [ref=e162]:
+        
+      - generic: ★
+      - generic: ✦
+      - generic: ★
+    - generic: 点击我聊天，双击和我玩耍
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e164] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+          - generic:
+            - heading "Hermes" [level=3]:
+              - text: Hermes
+              - img
+            - paragraph: 你的常驻 AI 助手
+        - generic:
+          - button "清空对话":
+            - img
+          - button "最小化":
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - generic "点击我呀~（双击也有惊喜）":
+            - generic:
+              - generic: 让我缓一缓...
+            - iframe [ref=e165] [cursor=pointer]:
+              
+            - generic: ★
+            - generic: ✦
+            - generic: ★
+        - generic:
+          - generic:
+            - paragraph: 你好！我是 Hermes，你的常驻 AI 助手。有什么我可以帮你的吗？
+    - generic:
+      - generic:
+        - textbox "问点什么..."
+        - button [disabled]:
+          - img
+  - alert [ref=e166]

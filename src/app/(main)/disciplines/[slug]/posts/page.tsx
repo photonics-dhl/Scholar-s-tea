@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RelativeTime } from '@/components/ui/RelativeTime';
 
 interface Author {
   id: string;
@@ -87,7 +88,7 @@ export default function DisciplinePostsPage() {
         // Fetch discipline info
         const discRes = await fetch(`/api/v1/disciplines/${slug}`);
         const discData: DisciplineResponse = await discRes.json();
-        if (discData.success) {
+        if (discData.success && discData.data?.discipline) {
           setDisciplineName(discData.data.discipline.name);
         }
 
@@ -110,20 +111,7 @@ export default function DisciplinePostsPage() {
     fetchData();
   }, [slug, page, sort]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-    return date.toLocaleDateString('zh-CN');
-  };
 
   const stripHtml = (html: string) => {
     return html.replace(/<[^>]*>/g, '').slice(0, 150);
@@ -242,7 +230,7 @@ export default function DisciplinePostsPage() {
                         <Eye className="h-4 w-4" />
                         {post.viewCount}
                       </span>
-                      <span>{formatDate(post.createdAt)}</span>
+                      <span><RelativeTime date={post.createdAt} /></span>
                     </div>
                   </div>
                 </div>

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { MessageSquare, Eye, Pin, Lock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge'
+import { RelativeTime } from '@/components/ui/RelativeTime';
 
 interface Post {
   id: string;
@@ -40,14 +41,7 @@ export function GroupDiscussions({ groupId, slug }: { groupId: string; slug: str
       .finally(() => setLoading(false));
   }, [groupId]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
-    if (diffDays < 1) return '今天';
-    if (diffDays < 7) return `${diffDays}天前`;
-    return date.toLocaleDateString('zh-CN');
-  };
+
 
   const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').slice(0, 120);
 
@@ -115,7 +109,7 @@ export function GroupDiscussions({ groupId, slug }: { groupId: string; slug: str
                         <Eye className="h-3 w-3" />
                         {post.viewCount}
                       </span>
-                      <span>{formatDate(post.createdAt)}</span>
+                      <span><RelativeTime date={post.createdAt} variant="short" /></span>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground self-center flex-shrink-0" />

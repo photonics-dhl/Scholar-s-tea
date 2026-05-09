@@ -14,6 +14,8 @@ import { AgentModeSelector } from '@/components/features/workshop/AgentModeSelec
 import { ChatMessageItem } from '@/components/features/workshop/ChatMessage'
 import { ChatInput } from '@/components/features/workshop/ChatInput'
 import { WelcomeScreen } from '@/components/features/workshop/WelcomeScreen'
+import { PeerReviewPanel } from '@/components/features/workshop/PeerReviewPanel'
+import { PaperGenerationPanel } from '@/components/features/workshop/PaperGenerationPanel'
 
 export default function WorkshopPage() {
   const {
@@ -51,7 +53,7 @@ export default function WorkshopPage() {
     }
   }
 
-  const handleSend = (content: string) => {
+  const handleSend = (content: string, options?: Record<string, unknown>) => {
     // Map mode to action for the API
     const actionMap: Record<AgentMode, string | undefined> = {
       general: undefined,
@@ -60,10 +62,13 @@ export default function WorkshopPage() {
       survey: 'survey',
       research: 'suggest',
       community_manager: undefined,
+      peer_review: 'peer_review',
+      paper_generation: 'paper_generation',
     }
 
     sendMessage(content, {
       action: actionMap[mode],
+      ...options,
     })
   }
 
@@ -219,12 +224,18 @@ export default function WorkshopPage() {
 
             {/* Input */}
             <div className="border-t border-tea-primary/10 p-4 bg-background">
-              <ChatInput
-                onSend={handleSend}
-                onStop={stopGeneration}
-                loading={loading}
-                placeholder={`${activeMode.label}模式：输入你的问题...`}
-              />
+              {mode === 'peer_review' && messages.length === 0 && !loading ? (
+                <PeerReviewPanel onSend={handleSend} loading={loading} />
+              ) : mode === 'paper_generation' && messages.length === 0 && !loading ? (
+                <PaperGenerationPanel onSend={handleSend} loading={loading} />
+              ) : (
+                <ChatInput
+                  onSend={handleSend}
+                  onStop={stopGeneration}
+                  loading={loading}
+                  placeholder={`${activeMode.label}模式：输入你的问题...`}
+                />
+              )}
             </div>
           </CardContent>
         </Card>

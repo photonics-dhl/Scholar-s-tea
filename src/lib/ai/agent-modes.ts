@@ -11,6 +11,8 @@ import {
   BookOpen,
   Lightbulb,
   Shield,
+  Gavel,
+  PenTool,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -21,6 +23,8 @@ export type AgentMode =
   | 'survey'
   | 'research'
   | 'community_manager'
+  | 'peer_review'
+  | 'paper_generation'
 
 export interface AgentModeConfig {
   id: AgentMode
@@ -360,6 +364,117 @@ export const agentModes: Record<AgentMode, AgentModeConfig> = {
         icon: Brain,
         label: '运营建议',
         text: '基于当前社区数据，请给出 3-5 条提升社区活跃度和内容质量的具体建议。',
+      },
+    ],
+  },
+
+  peer_review: {
+    id: 'peer_review',
+    label: 'AI审稿',
+    description: '模拟同行评审，多维度评估论文质量',
+    icon: Gavel,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+    borderColor: 'border-red-500/20',
+    systemPrompt: `${basePrompt}
+
+你现在的角色是「学术期刊同行评审专家」，熟悉 Nature、Science、IEEE、ACM 等顶级期刊的评审标准和流程。
+
+评审维度（1-10分制）：
+1. 原创性 (Novelty) — 研究问题是否新颖，与现有工作的区别
+2. 方法论 (Methodology) — 实验设计、数据分析方法的合理性
+3. 结果可靠性 (Soundness) — 数据是否支撑结论，统计显著性
+4. 写作质量 (Writing) — 结构、逻辑、语言表达
+5. 引用规范 (References) — 参考文献的完整性和相关性
+6. 可复现性 (Reproducibility) — 代码、数据是否公开，方法是否清晰
+7. 影响力 (Impact) — 对领域的潜在贡献
+
+评审流程：
+1. 通读论文，提炼核心贡献
+2. 按维度评分并给出详细评语
+3. 给出综合意见：Accept / Minor Revision / Major Revision / Reject
+4. 列出具体的修改建议清单
+
+请保持客观、专业、建设性的态度，评审意见要具体、可操作。`,
+    welcome: {
+      title: 'AI 同行评审',
+      subtitle: '模拟顶级期刊审稿人，多维度评估你的论文',
+      features: [
+        '7个维度量化评分，客观评估论文质量',
+        '详细的逐条评审意见，指出具体不足',
+        '给出综合评审结论和修改建议',
+        '支持分段粘贴，逐步完成评审',
+      ],
+    },
+    quickPrompts: [
+      {
+        icon: Gavel,
+        label: '全面评审',
+        text: '请对这篇论文进行全面的同行评审，从原创性、方法论、结果可靠性、写作质量、引用规范、可复现性和影响力七个维度进行评分和评价。',
+      },
+      {
+        icon: FileText,
+        label: '方法评审',
+        text: '请重点评审这篇论文的研究方法部分，评估实验设计的合理性、数据分析的严谨性、对照组设置是否充分。',
+      },
+      {
+        icon: Lightbulb,
+        label: '改进建议',
+        text: '基于这篇论文的内容，请给出具体的修改建议，包括：如何提升创新性、完善实验设计、改进写作表达。',
+      },
+    ],
+  },
+
+  paper_generation: {
+    id: 'paper_generation',
+    label: 'AI论文生成',
+    description: '从选题到成稿的全流程学术写作辅助',
+    icon: PenTool,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
+    borderColor: 'border-emerald-500/20',
+    systemPrompt: `${basePrompt}
+
+你现在的角色是「学术写作全流程助手」，参考 Nature Reviews、Science 等顶级期刊的写作风格，帮助研究者完成从选题到成稿的全过程。
+
+工作流包含5个阶段：
+1. 选题立项 — 根据研究方向生成开题报告框架，包括研究背景、科学问题、创新点
+2. 架构规划 — 设计论文结构，拆出关键评审节点，规划各章节逻辑
+3. 正文写作 — 分段生成学术文本，保持严谨的学术表达风格
+4. 数据/图表 — 提供统计方法建议，描述图表呈现方式
+5. 排版交付 — 生成 LaTeX 或 Markdown 格式的完整文稿
+
+写作原则：
+- 学术严谨，逻辑清晰，论证充分
+- 遵循 IMRAD 结构（Introduction, Methods, Results, And Discussion）
+- 使用准确的学术术语，避免口语化表达
+- 适当引用相关文献，标注需要补充的证据位
+- 每个章节都要有明确的主题句和支撑论据`,
+    welcome: {
+      title: 'AI 论文生成助手',
+      subtitle: '从选题到成稿，全流程辅助学术写作',
+      features: [
+        '5阶段工作流：选题→架构→写作→数据→排版',
+        'Nature Reviews 风格学术写作模板',
+        '自动生成论文框架和各章节内容',
+        '支持导出 Markdown / LaTeX / 纯文本',
+      ],
+    },
+    quickPrompts: [
+      {
+        icon: Lightbulb,
+        label: '选题立项',
+        text: '我的研究方向是「联邦学习中的隐私保护」，请帮我生成一份开题报告框架，包括研究背景、核心科学问题、预期创新点。',
+      },
+      {
+        icon: BookOpen,
+        label: '论文架构',
+        text: '请为我的论文「基于图神经网络的药物分子性质预测」设计完整的论文结构，包括各章节标题、核心内容要点和逻辑关系。',
+      },
+      {
+        icon: FileText,
+        label: '正文写作',
+        text: '请帮我撰写论文的「引言」部分，主题是「大语言模型在科学发现中的应用」，要求：阐述研究背景、指出当前挑战、说明本文贡献。',
       },
     ],
   },

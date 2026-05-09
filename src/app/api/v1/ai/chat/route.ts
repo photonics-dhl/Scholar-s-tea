@@ -9,6 +9,8 @@ import {
   suggestResearchDirections,
   grantApplication,
   surveyGeneration,
+  peerReview,
+  generatePaper,
 } from '@/lib/ai/claude-service'
 import { getContextForQuery } from '@/lib/ai/rag-service'
 import { agentModes, type AgentMode } from '@/lib/ai/agent-modes'
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
       stream: useStream,
     } = body as {
       messages?: ChatMessage[]
-      action?: 'analyze' | 'suggest' | 'grant' | 'survey'
+      action?: 'analyze' | 'suggest' | 'grant' | 'survey' | 'peer_review' | 'paper_generation'
       context?: {
         discipline?: string
         papers?: Array<{
@@ -99,6 +101,48 @@ export async function POST(request: NextRequest) {
         body.topic || messages?.[messages.length - 1]?.content || '',
         body.context
       )
+      if (result.error) {
+        return NextResponse.json(
+          { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },
+          { status: 500 }
+        )
+      }
+      return NextResponse.json({
+        success: true,
+        data: { content: result.content },
+        meta: null,
+      })
+    }
+
+    if (action === 'peer_review') {
+      const result = await peerReview(
+        body.content || messages?.[messages.length - 1]?.content || '',
+        body.focus
+      )
+      if (result.error) {
+        return NextResponse.json(
+          { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },
+          { status: 500 }
+        )
+      }
+      return NextResponse.json({
+        success: true,
+        data: { content: result.content },
+        meta: null,
+      })
+    }
+
+    if (action === 'paper_generation') {
+      const result = await generatePaper(body.stage || 'proposal', {
+        topic: body.topic || messages?.[messages.length - 1]?.content || '',
+        content: body.content,
+        background: body.background,
+        section: body.section,
+        wordCount: body.wordCount,
+        dataDescription: body.dataDescription,
+        analysisGoal: body.analysisGoal,
+        format: body.format,
+      })
       if (result.error) {
         return NextResponse.json(
           { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },

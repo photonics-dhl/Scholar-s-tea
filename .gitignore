@@ -66,3 +66,6 @@ settings.local.json
 # Kimi CLI local sessions and overrides
 .kimi/sessions/
 .kimi/*.local.toml
+
+# Playwright MCP snapshots
+.playwright-mcp/

@@ -155,7 +155,7 @@ export function useChat(initialMode: AgentMode = 'general') {
   )
 
   const sendMessage = useCallback(
-    async (content: string, options?: { action?: string; context?: Record<string, unknown> }) => {
+    async (content: string, options?: Record<string, unknown>) => {
       if (!content.trim() || loading) return
 
       // Ensure we have a session
@@ -205,8 +205,7 @@ export function useChat(initialMode: AgentMode = 'general') {
               role: m.role,
               content: m.content,
             })),
-            action: options?.action,
-            context: options?.context,
+            ...options,
             useRag: true,
           }),
           signal: abortRef.current.signal,

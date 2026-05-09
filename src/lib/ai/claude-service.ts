@@ -274,6 +274,152 @@ export async function surveyGeneration(
   }
 }
 
+// ===== AI 审稿 =====
+
+import {
+  PEER_REVIEW_SYSTEM_PROMPT,
+  buildPeerReviewPrompt,
+} from './peer-review-prompts'
+
+export async function peerReview(
+  paperContent: string,
+  focus?: string
+): Promise<ClaudeResponse> {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
+  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
+
+  if (!apiKey) {
+    return { content: '', error: 'AI 服务未配置' };
+  }
+
+  const prompt = buildPeerReviewPrompt(paperContent, focus);
+
+  try {
+    const response = await _fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'MiniMax-M2.7',
+        messages: [
+          { role: 'system', content: PEER_REVIEW_SYSTEM_PROMPT },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 4096,
+        temperature: 0.5,
+      }),
+      agent: _agent,
+    } as any);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { content: '', error: `AI 服务错误: ${response.status}` };
+    }
+
+    const data = await response.json();
+    return { content: data.choices?.[0]?.message?.content || '' };
+  } catch (error) {
+    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
+  }
+}
+
+// ===== AI 论文生成 =====
+
+import {
+  PAPER_GENERATION_SYSTEM_PROMPT,
+  buildProposalPrompt,
+  buildStructurePrompt,
+  buildWritingPrompt,
+  buildDataAnalysisPrompt,
+  buildFormattingPrompt,
+  type PaperGenerationStage,
+} from './paper-generation-prompts'
+
+export async function generatePaper(
+  stage: PaperGenerationStage,
+  params: {
+    topic: string;
+    content?: string;
+    background?: string;
+    section?: string;
+    wordCount?: number;
+    dataDescription?: string;
+    analysisGoal?: string;
+    format?: 'latex' | 'markdown' | 'plain';
+  }
+): Promise<ClaudeResponse> {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
+  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
+
+  if (!apiKey) {
+    return { content: '', error: 'AI 服务未配置' };
+  }
+
+  let prompt: string;
+  switch (stage) {
+    case 'proposal':
+      prompt = buildProposalPrompt(params.topic, params.background);
+      break;
+    case 'structure':
+      prompt = buildStructurePrompt(params.topic, params.content);
+      break;
+    case 'writing':
+      prompt = buildWritingPrompt(
+        params.section || '引言',
+        params.topic,
+        params.content,
+        params.wordCount
+      );
+      break;
+    case 'data':
+      prompt = buildDataAnalysisPrompt(
+        params.dataDescription || '',
+        params.analysisGoal || ''
+      );
+      break;
+    case 'formatting':
+      prompt = buildFormattingPrompt(
+        params.content || '',
+        params.format || 'markdown'
+      );
+      break;
+    default:
+      return { content: '', error: '未知的论文生成阶段' };
+  }
+
+  try {
+    const response = await _fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'MiniMax-M2.7',
+        messages: [
+          { role: 'system', content: PAPER_GENERATION_SYSTEM_PROMPT },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 4096,
+        temperature: 0.6,
+      }),
+      agent: _agent,
+    } as any);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { content: '', error: `AI 服务错误: ${response.status}` };
+    }
+
+    const data = await response.json();
+    return { content: data.choices?.[0]?.message?.content || '' };
+  } catch (error) {
+    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
+  }
+}
+
 // ===== 流式聊天 =====
 
 export async function chatWithAIStream(

@@ -197,7 +197,8 @@ function pickRandom<T>(arr: T[]): T {
 }
 
 /* ============================================================
-   SVG 熊猫绘制函数 — Kakao Friends 粗描边卡通风格 V3
+   SVG 熊猫绘制函数 — Kakao Friends 粗描边卡通风格 V4
+   自适应比例：小尺寸(size≤64)自动放大眼睛/耳朵/腮红比例
    ============================================================ */
 
 const STROKE = '#1a1a2e'
@@ -206,12 +207,16 @@ const WHITE = '#fff'
 const DARK = '#1a1a2e'
 const PINK = '#ff8fa3'
 
+/** 自适应比例 — 小尺寸下增大特征占比，补偿细节丢失 */
+function ar(s: number): number { return s <= 64 ? 1.35 : 1.0 }
+
 /** 经典 Kakao 风格多层有神大眼 */
 function renderEyes(s: number, mood: HermesMood, blinking: boolean) {
-  const eyeY = s * 0.36
-  const leftX = s * 0.36
-  const rightX = s * 0.64
-  const sz = s * 0.09
+  const r = ar(s)
+  const eyeY = s * 0.35
+  const leftX = s * 0.32
+  const rightX = s * 0.68
+  const sz = s * 0.085 * r
 
   // 闭眼
   if (blinking || mood === 'sleepy' || mood === 'bored') {
@@ -424,8 +429,34 @@ function PandaSVG({
   isDancing: boolean
 }) {
   const s = size
+  const r = ar(s)
   const { opacity, color } = getBlushProps(mood)
   const sw = STROKE_W(s)
+
+  // V4 比例参数 — 头部更大更圆，身体更小巧
+  const headRx = s * 0.29
+  const headRy = s * 0.28
+  const headCy = s * 0.32
+
+  const earRx = s * 0.10 * r
+  const earRy = s * 0.09 * r
+  const earCy = s * 0.12
+  const earInnerRx = s * 0.06 * r
+  const earInnerRy = s * 0.05 * r
+
+  const bodyRx = s * 0.20
+  const bodyRy = s * 0.13
+  const bodyCy = s * 0.58
+  const bellyRx = s * 0.13
+  const bellyRy = s * 0.10
+
+  const footRx = s * 0.07
+  const footRy = s * 0.055
+  const footCy = s * 0.82
+
+  const blushRx = s * 0.09 * r
+  const blushRy = s * 0.06 * r
+  const blushCy = s * 0.40
 
   return (
     <svg viewBox={`0 0 ${s} ${s}`} width={s} height={s} className="drop-shadow-md">
@@ -433,42 +464,42 @@ function PandaSVG({
       <ellipse cx={s * 0.5} cy={s * 0.92} rx={s * 0.24} ry={s * 0.032} fill="rgba(0,0,0,0.08)" />
 
       {/* 脚 */}
-      <ellipse cx={s * 0.36} cy={s * 0.82} rx={s * 0.07} ry={s * 0.055} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-      <ellipse cx={s * 0.64} cy={s * 0.82} rx={s * 0.07} ry={s * 0.055} fill={DARK} stroke={STROKE} strokeWidth={sw} />
+      <ellipse cx={s * 0.36} cy={footCy} rx={footRx} ry={footRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
+      <ellipse cx={s * 0.64} cy={footCy} rx={footRx} ry={footRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
 
-      {/* 身体 — 更圆润的水滴形 */}
-      <ellipse cx={s * 0.5} cy={s * 0.62} rx={s * 0.23} ry={s * 0.16} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-      {/* 肚子 — 更大更明显 */}
-      <ellipse cx={s * 0.5} cy={s * 0.63} rx={s * 0.15} ry={s * 0.12} fill="#faf8f5" stroke={STROKE} strokeWidth={sw * 0.6} />
+      {/* 身体 — 小巧圆润 */}
+      <ellipse cx={s * 0.5} cy={bodyCy} rx={bodyRx} ry={bodyRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
+      {/* 肚子 */}
+      <ellipse cx={s * 0.5} cy={bodyCy + s * 0.01} rx={bellyRx} ry={bellyRy} fill="#faf8f5" stroke={STROKE} strokeWidth={sw * 0.6} />
 
-      {/* 耳朵 — 更大更圆，位置更高 */}
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.18}px ${s * 0.14}px` }}>
-        <ellipse cx={s * 0.18} cy={s * 0.14} rx={s * 0.10} ry={s * 0.09} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-        <ellipse cx={s * 0.18} cy={s * 0.15} rx={s * 0.06} ry={s * 0.05} fill="#3d3d4a" />
+      {/* 耳朵 — 大而圆 */}
+      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.18}px ${earCy}px` }}>
+        <ellipse cx={s * 0.18} cy={earCy} rx={earRx} ry={earRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
+        <ellipse cx={s * 0.18} cy={earCy + s * 0.01} rx={earInnerRx} ry={earInnerRy} fill="#3d3d4a" />
       </g>
-      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.82}px ${s * 0.14}px`, animationDelay: '0.15s' }}>
-        <ellipse cx={s * 0.82} cy={s * 0.14} rx={s * 0.10} ry={s * 0.09} fill={DARK} stroke={STROKE} strokeWidth={sw} />
-        <ellipse cx={s * 0.82} cy={s * 0.15} rx={s * 0.06} ry={s * 0.05} fill="#3d3d4a" />
+      <g className={cn(mood === 'happy' && 'animate-hermes-wiggle')} style={{ transformOrigin: `${s * 0.82}px ${earCy}px`, animationDelay: '0.15s' }}>
+        <ellipse cx={s * 0.82} cy={earCy} rx={earRx} ry={earRy} fill={DARK} stroke={STROKE} strokeWidth={sw} />
+        <ellipse cx={s * 0.82} cy={earCy + s * 0.01} rx={earInnerRx} ry={earInnerRy} fill="#3d3d4a" />
       </g>
 
-      {/* 头部 — 接近正圆的大圆球 */}
-      <ellipse cx={s * 0.5} cy={s * 0.35} rx={s * 0.28} ry={s * 0.26} fill={WHITE} stroke={STROKE} strokeWidth={sw} />
+      {/* 头部 — 正圆大球 */}
+      <ellipse cx={s * 0.5} cy={headCy} rx={headRx} ry={headRy} fill={WHITE} stroke={STROKE} strokeWidth={sw} />
       {/* 头部下方柔和阴影 */}
-      <ellipse cx={s * 0.5} cy={s * 0.54} rx={s * 0.20} ry={s * 0.06} fill="#f0ece5" opacity={0.5} />
+      <ellipse cx={s * 0.5} cy={headCy + s * 0.19} rx={s * 0.20} ry={s * 0.06} fill="#f0ece5" opacity={0.5} />
 
       {/* 眼睛 */}
       {renderEyes(s, mood, blinking)}
 
-      {/* 鼻子 — 稍微下移，倒三角 */}
-      <ellipse cx={s * 0.50} cy={s * 0.445} rx={s * 0.035} ry={s * 0.025} fill={DARK} />
-      <ellipse cx={s * 0.495} cy={s * 0.438} rx={s * 0.012} ry={s * 0.006} fill="white" opacity={0.6} />
+      {/* 鼻子 */}
+      <ellipse cx={s * 0.50} cy={s * 0.42} rx={s * 0.038} ry={s * 0.026} fill={DARK} />
+      <ellipse cx={s * 0.495} cy={s * 0.413} rx={s * 0.013} ry={s * 0.007} fill="white" opacity={0.6} />
 
       {/* 嘴巴 */}
       {renderMouth(s, mood)}
 
-      {/* 腮红 — 更大更圆，像一团粉色 */}
-      <ellipse cx={s * 0.24} cy={s * 0.42} rx={s * 0.075} ry={s * 0.05} fill={`rgba(${color},${opacity})`} />
-      <ellipse cx={s * 0.76} cy={s * 0.42} rx={s * 0.075} ry={s * 0.05} fill={`rgba(${color},${opacity})`} />
+      {/* 腮红 — 大而圆 */}
+      <ellipse cx={s * 0.22} cy={blushCy} rx={blushRx} ry={blushRy} fill={`rgba(${color},${opacity})`} />
+      <ellipse cx={s * 0.78} cy={blushCy} rx={blushRx} ry={blushRy} fill={`rgba(${color},${opacity})`} />
 
       {/* 手臂 */}
       {renderArms(s, mood, isWaving, isDancing)}

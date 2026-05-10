@@ -10,7 +10,7 @@ client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
 WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
 
-def run(cmd, timeout=60):
+def run(cmd, timeout=30):
     full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
     stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
@@ -22,11 +22,8 @@ def run(cmd, timeout=60):
     if err:
         print('ERR:', err[:2000])
     print('RC:', rc)
-    return rc
 
-run('git status')
-run('git log --oneline -3')
-run('ls -la node_modules/.bin/next 2>/dev/null || echo next not found')
-run('ls node_modules | head -20')
+run('ps aux | grep -E "npm|node" | grep -v grep | head -10')
+run('ls node_modules | wc -l')
 
 client.close()

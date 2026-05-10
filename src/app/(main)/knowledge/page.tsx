@@ -219,7 +219,7 @@ export default function KnowledgePage() {
                             {new Date(doc.createdAt).toLocaleDateString('zh-CN')}
                           </span>
                         </div>
-                        {doc.metadata?.url && (
+                        {doc.metadata?.url ? (
                           <a
                             href={String(doc.metadata.url)}
                             target="_blank"
@@ -229,7 +229,7 @@ export default function KnowledgePage() {
                             <ExternalLink className="h-3 w-3" />
                             查看原文
                           </a>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </CardContent>

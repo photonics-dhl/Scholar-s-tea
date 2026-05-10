@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Switch } from '@/components/ui/switch'
+import { cn } from '@/lib/utils/cn'
 
 export default function SettingsPage() {
   const { data: session, status, update } = useSession()
@@ -156,9 +156,9 @@ export default function SettingsPage() {
                   <Label>邮件通知</Label>
                   <p className="text-sm text-muted-foreground">接收重要更新和活动的邮件</p>
                 </div>
-                <Switch
+                <ToggleButton
                   checked={formData.notifications.email}
-                  onCheckedChange={(checked) =>
+                  onChange={(checked) =>
                     setFormData((prev) => ({
                       ...prev,
                       notifications: { ...prev.notifications, email: checked },
@@ -172,9 +172,9 @@ export default function SettingsPage() {
                   <Label>提及通知</Label>
                   <p className="text-sm text-muted-foreground">当有人提及你时发送通知</p>
                 </div>
-                <Switch
+                <ToggleButton
                   checked={formData.notifications.mentions}
-                  onCheckedChange={(checked) =>
+                  onChange={(checked) =>
                     setFormData((prev) => ({
                       ...prev,
                       notifications: { ...prev.notifications, mentions: checked },
@@ -188,9 +188,9 @@ export default function SettingsPage() {
                   <Label>推送通知</Label>
                   <p className="text-sm text-muted-foreground">浏览器桌面推送通知</p>
                 </div>
-                <Switch
+                <ToggleButton
                   checked={formData.notifications.push}
-                  onCheckedChange={(checked) =>
+                  onChange={(checked) =>
                     setFormData((prev) => ({
                       ...prev,
                       notifications: { ...prev.notifications, push: checked },
@@ -215,9 +215,9 @@ export default function SettingsPage() {
                   <Label>公开资料</Label>
                   <p className="text-sm text-muted-foreground">允许其他用户查看你的个人资料</p>
                 </div>
-                <Switch
+                <ToggleButton
                   checked={formData.privacy.publicProfile}
-                  onCheckedChange={(checked) =>
+                  onChange={(checked) =>
                     setFormData((prev) => ({
                       ...prev,
                       privacy: { ...prev.privacy, publicProfile: checked },
@@ -231,9 +231,9 @@ export default function SettingsPage() {
                   <Label>显示邮箱</Label>
                   <p className="text-sm text-muted-foreground">在个人资料中公开你的邮箱地址</p>
                 </div>
-                <Switch
+                <ToggleButton
                   checked={formData.privacy.showEmail}
-                  onCheckedChange={(checked) =>
+                  onChange={(checked) =>
                     setFormData((prev) => ({
                       ...prev,
                       privacy: { ...prev.privacy, showEmail: checked },
@@ -258,5 +258,25 @@ export default function SettingsPage() {
         </Button>
       </div>
     </div>
+  )
+}
+
+function ToggleButton({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={cn(
+        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        checked ? 'bg-primary' : 'bg-input'
+      )}
+    >
+      <span
+        className={cn(
+          'inline-block h-4 w-4 transform rounded-full bg-background transition-transform',
+          checked ? 'translate-x-6' : 'translate-x-1'
+        )}
+      />
+    </button>
   )
 }

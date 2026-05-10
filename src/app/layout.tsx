@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Providers } from '@/components/providers/Providers';
 import { FloatingChat } from '@/components/features/hermes/FloatingChat';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <Providers>
           {children}
-          <FloatingChat />
+          <ErrorBoundary>
+            <FloatingChat />
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>

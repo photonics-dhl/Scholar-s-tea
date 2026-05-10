@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth';
 import { getPosts, createPost } from '@/services/posts';
+import prisma from '@/lib/db/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,6 +71,35 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, content, disciplineId, groupId, tags } = body;
 
+    // Normalize tags: handle both string (comma-separated) and array
+    const normalizedTags = typeof tags === 'string' && tags.length > 0
+      ? tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+      : Array.isArray(tags) ? tags : [];
+
+    // Resolve disciplineId: if it's a slug instead of UUID, look up the actual ID
+    let resolvedDisciplineId = disciplineId;
+    if (disciplineId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(disciplineId)) {
+      const discipline = await prisma.discipline.findUnique({
+        where: { slug: disciplineId },
+        select: { id: true },
+      });
+      if (discipline) {
+        resolvedDisciplineId = discipline.id;
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            data: null,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: '无效的学科板块',
+            },
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     if (!title || !content) {
       return NextResponse.json(
         {
@@ -87,9 +117,9 @@ export async function POST(request: NextRequest) {
     const post = await createPost(session.user.id, {
       title,
       content,
-      disciplineId,
+      disciplineId: resolvedDisciplineId,
       groupId,
-      tags,
+      tags: normalizedTags,
     });
 
     return NextResponse.json({

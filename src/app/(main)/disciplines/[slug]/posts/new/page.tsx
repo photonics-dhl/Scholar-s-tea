@@ -66,6 +66,23 @@ export default function NewPostPage() {
     }
   }
 
+  const handleAiResult = useCallback((type: string, result: string) => {
+    if ((type === 'improve' || type === 'grammar') && selectedText && result) {
+      setContent((prev) => {
+        let idx = prev.indexOf(selectedText)
+        if (idx !== -1) {
+          return prev.slice(0, idx) + result + prev.slice(idx + selectedText.length)
+        }
+        return prev + '\n\n<p><strong>AI 优化结果：</strong></p><p>' + result + '</p>'
+      })
+    } else if (type === 'summary' && result) {
+      setContent((prev) => {
+        const summaryBlock = `<p><strong>📋 AI 摘要：</strong>${result}</p>`
+        return summaryBlock + '\n\n' + prev
+      })
+    }
+  }, [selectedText])
+
   const handleAddTag = () => {
     const tag = tagInput.trim()
     if (tag && !tags.includes(tag) && tags.length < 10) {
@@ -152,6 +169,7 @@ export default function NewPostPage() {
         </span>
         <AiAssistMenu
           onAssist={handleAiAssist}
+          onResult={handleAiResult}
           selectedText={selectedText}
         />
       </div>

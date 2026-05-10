@@ -14,6 +14,8 @@ import {
   Database,
   Bell,
   ArrowRight,
+  Gavel,
+  PenTool,
   type LucideIcon,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -69,6 +71,24 @@ const actions: ActionItem[] = [
   },
   // Row 2: AI tools
   {
+    href: '/workshop?mode=peer_review',
+    icon: Gavel,
+    title: 'AI 审稿',
+    desc: '模拟同行评审',
+    color: 'text-red-500',
+    bgGradient: 'from-red-500/10 to-red-500/5',
+    zone: 'tool',
+  },
+  {
+    href: '/workshop?mode=paper_generation',
+    icon: PenTool,
+    title: 'AI 论文生成',
+    desc: '从选题到成稿',
+    color: 'text-emerald-500',
+    bgGradient: 'from-emerald-500/10 to-emerald-500/5',
+    zone: 'tool',
+  },
+  {
     href: '/workshop?mode=paper',
     icon: FileText,
     title: '论文助手',
@@ -85,24 +105,6 @@ const actions: ActionItem[] = [
     color: 'text-journal-gold',
     bgGradient: 'from-journal-gold/10 to-journal-gold/5',
     zone: 'tool',
-  },
-  {
-    href: '/workshop?mode=survey',
-    icon: BookOpen,
-    title: '文献综述',
-    desc: '梳理研究脉络',
-    color: 'text-convo-blue',
-    bgGradient: 'from-convo-blue/10 to-convo-blue/5',
-    zone: 'tool',
-  },
-  {
-    href: '/top-questions',
-    icon: Trophy,
-    title: 'TOP10',
-    desc: '月度热门排行',
-    color: 'text-journal-gold',
-    bgGradient: 'from-journal-gold/10 to-journal-gold/5',
-    zone: 'scholarly',
   },
   // Row 3: Personal
   {

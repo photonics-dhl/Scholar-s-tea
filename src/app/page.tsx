@@ -79,13 +79,14 @@ export default function HomePage() {
       fetch('/api/v1/disciplines').then((r) => r.json()),
       fetch('/api/v1/posts?pageSize=6').then((r) => r.json()).catch(() => ({ success: false, data: [] })),
       fetch('/api/v1/publications?pageSize=4').then((r) => r.json()).catch(() => ({ success: false, data: [] })),
-    ]).then(([groupsData, disciplinesData, postsData, pubsData]) => {
+      fetch('/api/v1/public-stats').then((r) => r.json()).catch(() => ({ success: false, data: { users: 0 } })),
+    ]).then(([groupsData, disciplinesData, postsData, pubsData, statsData]) => {
       if (groupsData.success) {
         setStats({
           groups: groupsData.meta.total,
           publications: pubsData.meta?.total || 0,
           posts: postsData.meta?.total || 0,
-          users: 0,
+          users: statsData.data?.users || 0,
         })
 
         // Build active groups feed

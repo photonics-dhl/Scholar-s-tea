@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Sparkles, PanelLeft, PanelLeftClose, Bot, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils/cn'
 
 import { useChat } from '@/hooks/useChat'
-import { getAgentMode, type AgentMode } from '@/lib/ai/agent-modes'
+import { getAgentMode, type AgentMode, agentModes } from '@/lib/ai/agent-modes'
 
 import { AgentSidebar } from '@/components/features/workshop/AgentSidebar'
 import { AgentModeSelector } from '@/components/features/workshop/AgentModeSelector'
@@ -17,7 +18,15 @@ import { WelcomeScreen } from '@/components/features/workshop/WelcomeScreen'
 import { PeerReviewPanel } from '@/components/features/workshop/PeerReviewPanel'
 import { PaperGenerationPanel } from '@/components/features/workshop/PaperGenerationPanel'
 
+const VALID_MODES = Object.keys(agentModes) as AgentMode[]
+
 export default function WorkshopPage() {
+  const searchParams = useSearchParams()
+  const initialModeParam = searchParams.get('mode') as AgentMode | null
+  const initialMode = initialModeParam && VALID_MODES.includes(initialModeParam)
+    ? initialModeParam
+    : 'general'
+
   const {
     sessions,
     currentSessionId,
@@ -32,13 +41,22 @@ export default function WorkshopPage() {
     changeMode,
     sendMessage,
     stopGeneration,
-  } = useChat('general')
+  } = useChat(initialMode)
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const [modeInitialized, setModeInitialized] = useState(false)
 
   const activeMode = getAgentMode(mode)
+
+  // Handle URL mode parameter
+  useEffect(() => {
+    if (!modeInitialized && initialMode !== 'general' && mode !== initialMode) {
+      changeMode(initialMode)
+      setModeInitialized(true)
+    }
+  }, [initialMode, mode, changeMode, modeInitialized])
 
   // Auto-scroll to bottom
   useEffect(() => {

@@ -2,27 +2,25 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Issue Editorial Masthead",
+      "title": "Issue Publication Information",
       "abstract": "",
-      "doi": "10.1021/imv004i002_2045113",
-      "url": "https://doi.org/10.1021/imv004i002_2045113",
+      "doi": "10.1021/imv004i004_2070667",
+      "url": "https://doi.org/10.1021/imv004i004_2070667",
       "authors": [],
       "citations": 0,
       "venue": "Chemical &amp; Biomedical Imaging",
       "published": 2026,
       "source": "crossref",
       "analysis": {
-        "summary": "该请求无法处理，因为\"Issue Editorial Masthead\"并非研究论文，而是期刊/会议的编辑委员会名单页。",
-        "research思路": "无有效研究内容可供分析。编辑masthead通常仅列出期刊编辑人员、职务及联系信息，不包含科学研究内容。",
-        "experiment": "无实验方案可供提取。",
-        "innovation": "无创新点可供识别。",
-        "related_work": "无法提供关联工作。建议提供实际研究论文的标题、摘要或ArXiv ID。",
-        "impact": "无法进行学术评价。"
+        "summary": "论文信息缺失，无法进行分析",
+        "research思路": "请提供完整的论文标题、摘要或全文内容",
+        "experiment": "暂无",
+        "innovation": "暂无",
+        "related_work": "暂无",
+        "impact": "请提供论文的完整信息后再进行结构化分析"
       },
       "domain_trend": {
-        "trend": "无法根据提供的信息生成趋势概括。请提供有效的学术论文及其6维度分析。",
-        "key_topics": [],
-        "development_direction": "请提供具体的生物与医学光子学研究论文列表，以便进行准确的分析和趋势预测。"
+        "trend": "# 学术评价分析请求\n\n## 状态说明\n\n根据您提供的信息，当前**论文数据不足以支撑完整的6维度学"
       }
     }
   ]

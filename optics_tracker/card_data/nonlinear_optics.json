@@ -2,64 +2,42 @@
   "domain_name": "非线性光学",
   "papers": [
     {
-      "title": "Quantum topology emerges at near field",
-      "abstract": "Abstract\n                  Mapping the total angular momentum of light bound to nanophotonic structures enables the creation of single-photon states with rich topological textures. This approach opens new opportunities for generating high-dimensional entanglement and provides a promising route toward robust quantum information processing.",
-      "doi": "10.1038/s41377-026-02319-0",
-      "url": "https://doi.org/10.1038/s41377-026-02319-0",
-      "authors": [
-        "Zhenyu Guo",
-        "Yijie Shen"
-      ],
+      "title": "Near Field Optics - an overview | ScienceDirect Topics",
+      "abstract": "# Near Field Optics. Near field optics refers to the behavior of light propagating near a surface, allowing for the selective excitation of fluorescence and high-resolution enhancement of techniques like Raman microscopy, surpassing the resolution limits of conventional optics. This area, which is t",
+      "source": "tavily",
+      "url": "https://www.sciencedirect.com/topics/physics-and-astronomy/near-field-optics",
+      "authors": [],
       "citations": 0,
-      "venue": "Light: Science &amp; Applications",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "研究通过近场纳米光子结构映射光的总角动量，实现具有拓扑纹理的光子单量子态，为高维量子纠缠和稳健量子信息处理提供了新途径。",
-        "research思路": "解决如何利用纳米尺度光学结构生成和操控具有拓扑保护特性的量子态问题，探索拓扑量子态在量子信息领域的应用潜力。",
-        "experiment": "采用近场光学显微技术映射纳米光子结构中光场的角动量分布，构建并表征具有拓扑纹理的光子单量子态。",
-        "innovation": "首次在近场纳米尺度实现拓扑量子态的制备，将拓扑光子学与量子光学深度融合，开辟了高维量子态工程化的新方向。",
-        "related_work": "包括拓扑光子学中关于光子拓扑绝缘体的研究、纳米光子结构中角动量操控的工作，以及量子信息处理中纠缠态生成的进展。",
-        "impact": "为量子信息处理提供了拓扑保护的量子态资源，有望提升量子通信和量子计算系统的稳定性和抗噪能力，推动拓扑量子技术的实用化进程。"
+        "summary": "综述近场光学原理及其在突破传统光学衍射极限、实现高分辨率荧光激发和拉曼显微镜增强方面的应用。",
+        "research思路": "解决传统光学因衍射极限导致的分辨率限制问题，通过研究光与物质在纳米尺度的近场相互作用，实现亚波长尺度的光学探测和成像。",
+        "experiment": "采用近场扫描光学显微镜（SNOM）、尖端增强拉曼光谱（TERS）等技术，利用纳米孔径探针或尖锐金属尖端实现近场光学耦合和信号增强。",
+        "innovation": "首次系统阐述近场光学如何选择性激发荧光并增强拉曼信号，为超越衍射极限的高分辨率光学显微镜提供了理论基础和技术路径。",
+        "related_work": "SNOM的早期发展、TERS技术的完善、金属纳米结构SERS效应研究、以及固体浸没透镜等超分辨率成像方法。",
+        "impact": "为纳米光学和生物光子学提供了关键技术支撑，推动了高分辨率成像、单分子检测和纳米级光谱分析等领域的发展。"
+      }
+    },
+    {
+      "title": "Nonlinear optics in materials: integral transformation of optical four-wave mixing spectra | Journal of Materials Science: Materials in Electronics | Springer Nature Link",
+      "abstract": "# Nonlinear optics in materials: integral transformation of optical four-wave mixing spectra. We analyze the estimation of the third-order susceptibility χ(3) of nonlinear optical (NLO) materials by means of a Hilbert transformation applied to their optical four-wave mixing spectra. In this case, th",
+      "source": "tavily",
+      "url": "https://link.springer.com/article/10.1023/A:1026195507972",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "研究通过Hilbert变换分析光学四波混合光谱，实现对非线性光学材料三阶非线性极化率χ(3)的有效估算。",
+        "research思路": "解决NLO材料三阶非线性光学特性的快速精准表征问题，利用Hilbert变换建立光谱信号与χ(3)的数学关联。",
+        "experiment": "采用光学四波混合（FWM）光谱测量技术获取样品非线性响应信号，结合Hilbert积分变换处理数据提取χ(3)参数。",
+        "innovation": "首次将Hilbert变换应用于四波混合光谱分析，建立实部与虚部的Kramers-Kronig关系，实现χ(3)的完整表征。",
+        "related_work": "Kramers-Kronig变换方法在非线性光学中的应用、四波混合光谱技术、χ(3)测量方法（Z-scan、THG等）",
+        "impact": "为NLO材料表征提供新的数学工具，简化χ(3)测量流程，有助于新型光电材料与光子器件的研发筛选。"
       },
       "domain_trend": {
-        "trend": "```json\n{\n  \"trend\": \"非线性光学"
-      }
-    },
-    {
-      "title": "Nonlinear Optics | Department of Physics",
-      "abstract": "Duke University - Trinity College of Arts and Sciences. ## PHYSICS 544. This course is focused on fundamentals and applications of nonlinear light-matter interactions. The following topics will be considered: physical mechanisms of optical nonlinearity, nonlinear optical susceptibilities, intensity ",
-      "source": "tavily",
-      "url": "https://physics.duke.edu/courses/nonlinear-optics",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "这是杜克大学PHYSICS 544非线性光学课程大纲，系统讲授光-物质非线性相互作用的理论基础、物理机制及前沿应用。",
-        "research思路": "课程聚焦光学非线性的核心物理机制，建立从理论框架（光学敏感性理论）到实际应用（强度相关现象）的完整知识体系。",
-        "experiment": "采用理论授课与实验演示相结合的方式，涵盖光学非线性敏感性测量、强度依赖响应等关键实验技术。",
-        "innovation": "作为研究生入门课程，整合非线性光学基础理论与应用前沿，为学生提供系统性知识框架而非单一研究成果。",
-        "related_work": "该领域经典工作包括Bloembergen的非线性光学理论、Franken的二次谐波产生实验、以及现代超快激光与量子光学中的非线性效应研究。",
-        "impact": "为光学研究领域培养专业人才奠定基础，课程内容覆盖现代光子学、激光物理和量子光学的重要理论基础。"
-      }
-    },
-    {
-      "title": "[PDF] Nonlinear Optics, Principles, Materials, Phenomena, and D - DTIC",
-      "abstract": "INTRODUCTION Conjugated organic molecules and polymers are an important class of nonlinear optical materials because of their delocalized 7E-electron systems which give rise to large values of X(2)( co 3;0)1,0)2) and z(3)(-c04; 0)1,2, 0)3), with extremely fast response times, in wavelength regimes w",
-      "source": "tavily",
-      "url": "https://apps.dtic.mil/sti/tr/pdf/ADA338516.pdf",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "系统阐述共轭有机分子和聚合物作为非线性光学材料的理论基础与特性，揭示其离域π电子系统对二阶X(2)和三阶X(3)非线性光学系数的贡献机制。",
-        "research思路": "探索有机材料替代传统无机非线性光学晶体的可行性，解决光电器件小型化、响应速度提升及成本控制的技术瓶颈。",
-        "experiment": "基于理论计算与文献数据，分析有机共轭体系的电子结构与光学响应，建立结构-性能关系模型。",
-        "innovation": "首次系统论证共轭有机聚合物的π电子离域特性与超高非线性光学系数的内在关联，突破传统无机材料响应速度限制。",
-        "related_work": "包括无机氧化物晶体（BBO、KDP）、半导体量子点、钙钛矿材料及早期有机染料的非线性光学研究。",
-        "impact": "为有机光子学器件、全光开关、光学计算等领域奠定材料基础，推动非线性光学从无机向有机体系的范式转变。"
+        "trend": "非线性光学正加速向纳米尺度演进，通过Hilbert变换等数学工具革新材料表征方法，结合近场光学突破衍射极限，推动超分辨成像与生物光子学深度融合。"
       }
     }
   ]

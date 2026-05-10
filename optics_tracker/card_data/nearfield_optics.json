@@ -2,66 +2,42 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Near-field acoustic gripping for contactless semiconductor die handling",
-      "abstract": "",
-      "doi": "10.1016/j.cirp.2026.04.022",
-      "url": "https://doi.org/10.1016/j.cirp.2026.04.022",
-      "authors": [
-        "Yaoke Wang",
-        "Ziming Zhao",
-        "Yi Shi",
-        "Ping Guo"
-      ],
+      "title": "Near Field Optics | Springer Nature Link",
+      "abstract": "# Near Field Optics. Part of the book series:. This is a preview of subscription content, log in via an institution. ## About this book. ### Scanning Near-Field Optical Microscopy/Near-Field Scanning Optical Microscopy. ### Near-field projection optical microscope (NPOM) as a new approach to nanosca",
+      "source": "tavily",
+      "url": "https://link.springer.com/book/10.1007/978-94-011-1978-8",
+      "authors": [],
       "citations": 0,
-      "venue": "CIRP Annals",
-      "published": 2026,
-      "source": "crossref",
-      "domain_trend": {
-        "trend": "近场光学正突破光学衍射极限向原子级分辨率迈进，散射式s-SNOM实现1nm尺度表征，驱动纳米光子学与量子材料研究革命性融合。"
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "近场光学领域专著，聚焦扫描近场光学显微镜(SNOM)和近场投影光学显微镜(NPOM)等技术，实现纳米尺度光学成像突破。",
+        "research思路": "针对传统光学显微镜受限于衍射极限的问题，探索利用倏逝波和近场探测实现亚波长分辨率的光学成像方法。",
+        "experiment": "采用SNOM/NSOM进行近场扫描探测，结合NPOM近场投影技术，通过探针-样品近距离耦合实现纳米级光学分辨率。",
+        "innovation": "NPOM作为近场光学显微镜的新方法，为纳米尺度光学成像提供了不同于传统远场显微的新途径。",
+        "related_work": "包括Synge的近场成像思想、D. W. Pohl的SNOM先驱工作、Eric Betzig的开创性研究及多模态近场探测技术。",
+        "impact": "推动纳米光学显微技术的发展，为生物成像、材料表征和纳米光子学等领域提供了重要的表征工具和方法论。"
       },
-      "analysis": {
-        "summary": "核心贡献一句话概括",
-        "research思路": "科学/技术问题解析",
-        "experiment": "关键方法技术描述",
-        "innovation": "突破性创新点",
-        "related_work": "领域重要关联工作",
-        "impact": "领域发展意义评估"
+      "domain_trend": {
+        "trend": "近场光学通过NPOM等新型显微技术突破衍射极限，实现纳米尺度倏逝波探测，正成为纳米光子学与生物医学交叉融合的核心驱动力。"
       }
     },
     {
-      "title": "Near-field scanning optical microscopy - ScienceDirect.com",
-      "abstract": "Near-field scanning optical microscopy (NSOM) is a new scanned probe microscopy technique capable of combining high spatial resolution (10–100 nm) and",
+      "title": "Near-field scanning optical microscopy studies of electronic and ...",
+      "abstract": "This review focuses on the application of NSOM to the characterization of electronic and photonic materials and devices, with particular emphasis on defects.",
       "source": "tavily",
-      "url": "https://www.sciencedirect.com/science/article/pii/S1359028696800623",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0927796X00000310",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "NSOM通过将扫描探针技术与光学检测结合，实现了突破光学衍射极限的10-100nm空间分辨率，为纳米尺度光学成像提供了新范式。",
-        "research思路": "解决传统远场光学显微镜受衍射极限限制、无法观测纳米尺度细节的问题，通过突破光学分辨率极限实现纳米级光学表征。",
-        "experiment": "采用近场扫描探针技术，通过亚波长孔径或尖端的探针收集近场光学信号，结合扫描控制实现高分辨率成像。",
-        "innovation": "首次将空间分辨率从光学衍射极限（~200nm）提升至10-100nm范围，实现光学显微镜的纳米尺度突破。",
-        "related_work": "SNOM/SNOM技术的早期发展、扫描隧道显微镜(STM)、原子力显微镜(AFM)、以及后续的超分辨显微技术如STED、PALM等。",
-        "impact": "开创了纳米光学成像的重要分支，奠定了近场光学的基础，推动了纳米光子学、生物学、材料科学等领域的发展。"
-      }
-    },
-    {
-      "title": "Scattering near-field optical microscopy at 1-nm resolution using ...",
-      "abstract": "Scattering-type scanning near-field optical microscopy (s-SNOM) allows for the observation of the optical response of material surfaces with",
-      "source": "tavily",
-      "url": "https://www.science.org/doi/10.1126/sciadv.adu1415",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "该研究实现了散射式近场光学显微镜(s-SNOM)的1纳米空间分辨率突破，为纳米尺度光学表征提供了超高分辨率探测手段。",
-        "research思路": "解决传统光学显微镜受衍射极限限制无法突破百纳米分辨率的难题，通过近场倏逝波探测实现纳米级光学成像。",
-        "experiment": "采用散射式扫描近场光学显微镜架构，结合金属尖端作为光学探针，利用尖端-样品耦合效应实现亚波长尺度光学信号采集。",
-        "innovation": "实现1nm量级的空间分辨率，相比传统近场光学显微镜（如SNOM）提升一个数量级，达到可与电子显微镜相当的分辨率水平。",
-        "related_work": "s-SNOM技术在纳米光子学、表面等离子体激元、二维材料等领域有广泛应用，相关重要工作包括石墨烯等离激元成像研究。",
-        "impact": "该成果极大拓展了近场光学显微镜的应用边界，为纳米光学、量子材料、生物表面科学等研究提供了强有力的表征工具。"
+        "summary": "系统综述了近场扫描光学显微镜(NSOM)在电子与光子材料及器件表征中的应用，重点阐明其在缺陷检测方面的独特优势与最新进展。",
+        "research思路": "针对电子与光子器件中缺陷对性能影响的关键问题，探索NSOM高空间分辨率光学表征能力在微观缺陷识别、定位及机理分析中的应用潜力。",
+        "experiment": "采用近场光学探针技术实现突破衍射极限的空间分辨率，结合扫描模式对样品表面进行光学成像与光谱分析，获取纳米尺度下的局域光学响应特征。",
+        "innovation": "将NSOM从传统显微成像拓展至电子/光子材料缺陷表征领域，建立空间分辨率与光学灵敏度相结合的多维表征方法，为器件失效分析提供新途径。",
+        "related_work": "包括近场光学理论发展、NSOM仪器改进、光子晶体缺陷表征、量子点发光特性研究、半导体材料表征等相关领域的重要工作。",
+        "impact": "为电子与光子材料的高分辨率表征提供了重要工具，推动了纳米光学检测技术的发展，对光电器件可靠性研究和质量控制具有重要指导意义。"
       }
     }
   ]

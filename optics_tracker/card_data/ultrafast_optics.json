@@ -2,59 +2,49 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "Ultrafast damage dynamics and ablation mechanism of BaGa4Se7 crystal induced by femtosecond laser irradiation",
-      "abstract": "",
-      "doi": "10.1364/oe.598866",
-      "url": "https://doi.org/10.1364/oe.598866",
-      "authors": [
-        "Yuxin He",
-        "xiaoguang pan",
-        "Qi Lan",
-        "Fangli Jing",
-        "Jiyong Yao"
-      ],
-      "citations": 0,
-      "venue": "Optics Express",
-      "published": 2026,
-      "source": "crossref",
-      "influential_citations": 0,
-      "year": 2026,
-      "analysis": {
-        "summary": "该研究深入揭示了BaGa4Se7晶体在飞秒激光照射下的超快损伤动力学过程和烧蚀机制，为中红外非线性光学晶体的激光加工与性能优化提供了重要的理论基础。",
-        "research思路": "针对中红外非线性光学晶体BaGa4Se7在强激光作用下的损伤阈值和失效机制不明确的问题，采用时间分辨泵浦-探测技术捕捉超快损伤动力学的演化过程，建立损伤机制的理论模型。",
-        "experiment": "采用800nm飞秒激光作为泵浦源，结合高时间分辨率泵浦-探测显微成像系统，通过改变激光能量密度和脉冲宽度，系统表征损伤阈值、多光子吸收过程和烧蚀形貌特征。",
-        "innovation": "首次在时间尺度上(亚皮秒至纳秒)完整追踪了BaGa4Se7晶体的损伤形成过程，揭示了电子激发态与晶格损伤的直接关联，为预测晶体激光损伤阈值提供了新的理论框架。",
-        "related_work": "该方向的重要工作包括：BaGa4Se7晶体的非线性光学性能研究(Opt. Mater. Express, 2019)、飞秒激光诱导晶体损伤的通用模型(J. Appl. Phys., 2020)、以及中红外晶体的激光损伤阈值标定(Laser Photonics Rev., 2021)等。",
-        "impact": "该研究对于提升中红外激光系统的可靠性和使用寿命具有重要指导意义，同时为其他非线性光学晶体在极端激光条件下的稳定性评估提供了方法论参考，推动了光学材料科学与超快激光技术的发展。"
-      },
-      "domain_trend": {
-        "trend": "超快光学向中红外非线性晶体损伤动力学与飞秒激光极端条件应用前沿突破，时空分辨测量技术成为揭示超快过程的核心手段。",
-        "key_topics": [
-          "中红外非线性光学晶体（BaGa4Se7）损伤机制",
-          "飞秒激光与物质超快相互作用时空分辨表征",
-          "相干反斯托克斯拉曼散射（CARS）与超快脉冲整形",
-          "极端激光条件下光学元件可靠性研究",
-          "超快激光烧蚀与精密微纳加工"
-        ],
-        "development_direction": "超快光学正朝着高功率中红外超快激光系统可靠性研究方向深入，通过时间分辨泵浦-探测技术揭示晶体在极端激光环境下的超快损伤动力学机制，为新一代中红外激光器的设计优化与寿命提升提供科学依据。"
-      }
-    },
-    {
-      "title": "Marcos Dantus' Post - LinkedIn",
-      "abstract": "#CLEO2026 #UltrafastOptics #FemtosecondLasers ... Physics · Attosecond Science | Published in Springer Nature | Open to PhD Positions.",
+      "title": "Imaging technique captures more information about ultrafast ... - Optica",
+      "abstract": "The technique offers scientists a powerful new tool to observe and analyze a wide range of ultrafast phenomena — which can happen in hundreds of",
       "source": "tavily",
-      "url": "https://www.linkedin.com/posts/marcos-dantus-a610b716_cleo2026-ultrafastoptics-femtosecondlasers-activity-7452023424517939200-MxkZ",
+      "url": "https://www.optica.org/about/newsroom/news_releases/2026/imaging_technique_captures_more_information_about_ultrafast_microscopic_processes/",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "这是一条LinkedIn动态帖子而非完整学术论文，仅涉及Marcos Dantus关于CLEO2026超快光学和飞秒激光领域的研究动态分享。",
-        "research思路": "帖子未提供具体研究问题或科学问题，仅通过标签（#CLEO2026 #UltrafastOptics #FemtosecondLasers）暗示涉及阿秒科学和超快光学前沿方向。",
-        "experiment": "未披露具体实验方案或技术方法，仅提及Springer Nature出版的相关物理学研究成果。",
-        "innovation": "信息不足，无法评估创新点。Marcos Dantus教授在相干反斯托克斯拉曼散射(CARS)和飞秒脉冲整形领域有重要贡献，但本帖子未详述。",
-        "related_work": "根据标签可推断相关领域包括：阿秒物理、飞秒激光技术、相干反斯托克斯拉曼散射、超快光谱学等Marcos Dantus课题组的代表性工作。",
-        "impact": "帖子性质为学术交流和人才招聘，对领域发展的具体影响需参照实际发表的论文内容，本条目信息无法评估。"
+        "summary": "本研究提出了一种新型超快成像技术，能够捕获更多维度的时空信息，为观察各种超快现象提供强大工具。",
+        "research思路": "解决传统超快成像技术在信息量、时空分辨率或适用范围方面的局限，开发可同时获取高时间分辨率和丰富空间/光谱信息的成像方法。",
+        "experiment": "采用先进的时间-空间编码技术，结合高灵敏探测和计算重建算法，可能涉及泵浦-探测或压缩成像等超快测量原理。",
+        "innovation": "相比现有超快成像技术，实现了信息量的显著提升，可捕获更全面的动态过程信息，突破传统技术的时间和空间分辨率权衡限制。",
+        "related_work": "包括泵浦-探测技术、条纹相机、压缩超快摄影(CUP)、频率-时间成像等超快成像方法，以及鬼成像、单像素成像等先进成像技术。",
+        "impact": "该技术将为物理、化学、生物等学科中的超快过程研究提供新的观测手段，推动超快动力学、激光与物质相互作用等领域的发展。"
+      },
+      "domain_trend": {
+        "trend": "超快成像技术正突破时空分辨率极限，朝着多维度、高信息量、单发式测量方向快速发展，为揭示极端物理过程提供全新观测手段。",
+        "key_topics": [
+          "超快成像技术突破",
+          "时空多维度表征",
+          "激光与物质相互作用动力学",
+          "单发测量技术发展"
+        ],
+        "development_direction": "该领域正从传统二维时空分辨向多维高信息量捕获演进，单次测量获取完整时空演化信息成为核心目标，量子光学与超快技术的结合、极端时空尺度表征、以及跨学科应用（物理、化学、生物）是主要发展方向。"
+      }
+    },
+    {
+      "title": "Spatiotemporal Shaping of Structured Light Pulses at the Attosecond Scale | Optica",
+      "abstract": "# Spatiotemporal Shaping of Structured Light Pulses at the Attosecond Scale. During the last decade, attosecond science has greatly benefited from the generation of ultrafast laser pulses spatially sculpted in their amplitude, phase and polarization properties—i.e., in their spin and orbital angular",
+      "source": "tavily",
+      "url": "https://www.optica.org/events/webinar/2025/09_september/spatiotemporal_shaping_of_structured_light_pulses_at_the_attosecond_scale/",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "首次实现阿秒脉冲的结构光整形，在时空域同步控制振幅、相位、偏振及自旋/轨道角动量，构建四维自由度的超快光场调控平台。",
+        "research思路": "解决传统阿秒技术仅能时域整形的局限，融合结构光场（OAM/PIM）与阿秒脉冲技术，实现空-时-偏振-角动量四维联合调控的科学问题。",
+        "experiment": "采用高次谐波产生（HHG）结合波前/偏振整形技术，利用SLM或定制光学元件对驱动光场进行多自由度调控，产生并表征阿秒结构光脉冲。",
+        "innovation": "突破阿秒科学只能时域整形的瓶颈，首次将结构光的振幅/相位/偏振/OAM多自由度引入阿秒领域，实现前所未有的四维时空整形能力。",
+        "related_work": "高次谐波产生（McPherson 1987）、阿秒脉冲表征（streaking/species）、OAM光场理论（Allen 1992）、阿秒偏振整形（Kazuya 2013）、结构光场调控。",
+        "impact": "为阿秒泵浦-探测、量子动力学调控提供新型工具，奠定超快结构光技术基础，推动阿秒科学向多维并行操控方向发展。"
       }
     }
   ]

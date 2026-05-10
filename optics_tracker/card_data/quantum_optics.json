@@ -2,51 +2,30 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "APEDCET2026 Instruction Booklet | PDF | Vector Space - Scribd",
-      "abstract": "... optical fiber, Principles of fiber communication (qualitative treatment only), Advantages of fiber optic communication. Lasers and Holography: Lasers",
+      "title": "[PDF] Structured liquid-based reconfigurable all-liquid optical fibers",
+      "abstract": "To overcome these impediments, here we show reconfigurable all-liquid optical fibers (RAOFs) produced by structured liquid, tuned by the",
       "source": "tavily",
-      "url": "https://www.scribd.com/document/997957920/APEDCET2026-Instruction-Booklet",
+      "url": "https://scholars.cityu.edu.hk/files/425933198/418288928.pdf",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "这是一份考试指南文件（非正式学术论文），内容涉及光纤通信基础、激光原理和全息术等光学基础知识。",
-        "research思路": "APEDCET2026作为考试说明文件，旨在界定考核范围而非开展原创研究，涉及光纤通信优势和激光全息等基础知识点的覆盖。",
-        "experiment": "文档为大纲性质，未包含实验方案；涉及光纤通信的定性描述、激光产生原理及全息记录基础技术的理论介绍。",
-        "innovation": "作为考试指导文件，不涉及研究创新；内容为光学基础知识的标准化归纳，聚焦光纤通信优于传统通信的技术优势阐述。",
-        "related_work": "光纤通信领域重要工作包括：低损耗光纤研发、波分复用技术、光纤非线性光学效应研究；激光领域涉及各种激光器类型及全息存储技术。",
-        "impact": "该文档作为教育评估材料，对光学基础知识普及有教学指导意义，但不具备学术研究价值，无法推动领域技术进步。",
-        "warning": "注意：提供的内容为考试指南/说明书，非ArXiv学术论文。信息不足以支撑深度学术分析，建议提供完整论文PDF或链接。"
-      }
-    },
-    {
-      "title": "US20020145607A1 - Integrated system for quickly ... - Google Patents",
-      "abstract": "The optical fiber can include partial reflectors located at each end thereof so that for each laser pulse entering the fiber a train of pulses will exit the",
-      "source": "tavily",
-      "url": "https://patents.google.com/patent/US20020145607A1/en",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "本专利描述了一种集成系统，利用光纤两端的部分反射器将单个激光脉冲转换为脉冲序列输出，实现快速脉冲产生。",
-        "research思路": "解决如何在紧凑集成系统中高效产生短脉冲序列的问题，通过光纤内多次反射实现脉冲分裂与时序控制。",
-        "experiment": "采用光纤技术，在光纤两端设置部分反射器构成法布里-珀罗腔结构，使输入的单个激光脉冲经多次反射产生脉冲串。",
-        "innovation": "相比传统分立元件系统，该集成化设计简化了光路结构，利用光纤特性实现自触发式脉冲序列产生，降低系统复杂度。",
-        "related_work": "该技术可能关联到OCT（光学相干断层扫描）系统、光纤激光器、脉冲激光技术等相关领域的重要研究。",
-        "impact": "该技术可用于需要脉冲序列的光学测量与传感系统，对光学检测、医学成像等应用领域具有潜在应用价值。"
+        "summary": "利用结构化液体技术制备可重构全液体光学纤维，实现液态波导的动态调控与功能重构。",
+        "research思路": "针对传统固体光纤的刚性结构难以重构、液体波导稳定性不足等问题，提出以结构化液体作为光纤核心材料，实现光学传输的可编程调控。",
+        "experiment": "采用微流控技术构建液体芯层与包层结构，通过表面张力固定液-液界面，使用可调谐液体组成实现光传输特性的动态调控。",
+        "innovation": "首次实现全液体体系的光纤结构化，与现有固态光纤和传统液体波导相比，兼具可重构性与柔性特征，且可实时调节光学参数。",
+        "related_work": "包括液芯光纤技术、微流控光学器件、液体波导、弹性体光纤及可变形光学传感器等研究。",
+        "impact": "为柔性光子学、可调谐光电器件和生物兼容光学系统开辟新路径，推动液相光学器件向实用化方向发展。"
       },
       "domain_trend": {
-        "trend": "光通信与光纤传感领域正加速向集成化、智能化方向发展，脉冲产生与序列控制技术成为快速响应的关键突破口，推动医疗成像与传感系统的小型化革新。",
+        "trend": "结构化全液体光纤实现可重构光学调控，开辟柔性光子学与生物兼容光电器件融合新范式。",
         "key_topics": [
-          "光纤集成化技术",
-          "脉冲序列产生与控制",
-          "高速光学测量系统",
-          "光学传感与成像融合",
-          "系统小型化与自触发机制"
+          "全液体光纤结构化设计",
+          "可重构光学纤维调控",
+          "柔性光子学与生物兼容光学系统"
         ],
-        "development_direction": "从分立元件向高度集成的光纤系统演进，利用光纤本身特性（如部分反射）实现自触发式脉冲序列产生，降低系统复杂度并提升响应速度。重点发展方向包括：1）光子集成技术用于光通信与传感模块；2）多功能光纤器件开发；3）医疗成像与工业检测的实时光学测量系统；4）智能传感网络中的快速脉冲响应技术。未来趋势将聚焦于光电融合、边缘计算集成以及跨领域（生物医学、环境监测）应用拓展。"
+        "development_direction": "液相光学器件正从被动波导向主动可重构体系演进，通过结构化液体技术实现动态光场调控，未来将深度融合柔性电子与生物医学工程，推动智能可穿戴光子学与体内光学传感的实用化突破。"
       }
     }
   ]

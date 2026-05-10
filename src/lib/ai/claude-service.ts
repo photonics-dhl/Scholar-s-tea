@@ -65,6 +65,13 @@ export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeRespons
       }),
       agent: _agent,
     } as any);
+    
+    // Debug: log first user message content type
+    const firstUserMsg = messages.find(m => m.role === 'user');
+    if (firstUserMsg) {
+      console.log('[claude-service] First user msg content type:', typeof firstUserMsg.content, 
+        Array.isArray(firstUserMsg.content) ? `array[${firstUserMsg.content.length}]` : 'string');
+    }
 
     if (!response.ok) {
       const errorText = await response.text();

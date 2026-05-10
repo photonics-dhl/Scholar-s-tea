@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MessageList } from '@/components/features/tea-party/MessageList';
 import { MessageInput } from '@/components/features/tea-party/MessageInput';
@@ -71,7 +71,7 @@ export default function TeaPartyRoomPage() {
   const [showUsers, setShowUsers] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { socket, isConnected, onlineUsers, typingUsers, joinRoom: joinSocketRoom, leaveRoom: leaveSocketRoom, sendMessage, sendTyping } = useTeaPartySocket(roomId);
+  const { socket, isConnected, isJoined, connectionError, socketError, onlineUsers, typingUsers, joinRoom: joinSocketRoom, leaveRoom: leaveSocketRoom, sendMessage, sendTyping } = useTeaPartySocket(roomId);
   const { messages, addMessage, setMessages } = useTeaPartyMessages();
 
   // Fetch room details
@@ -173,6 +173,26 @@ export default function TeaPartyRoomPage() {
     );
   }
 
+  if (connectionError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] px-4">
+        <div className="h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
+          <MessageSquare className="h-8 w-8 text-destructive/60" />
+        </div>
+        <h2 className="text-xl font-semibold mb-2">连接失败</h2>
+        <p className="text-muted-foreground mb-6 text-center max-w-md">{connectionError}</p>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => router.push('/tea-party')}>
+            返回房间列表
+          </Button>
+          <Button onClick={() => window.location.reload()}>
+            重试连接
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (error || !room) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
@@ -222,6 +242,12 @@ export default function TeaPartyRoomPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto bg-dot-pattern">
+          {socketError && (
+            <div className="mx-4 mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2">
+              <span className="font-medium">发送失败:</span>
+              {socketError}
+            </div>
+          )}
           <MessageList
             messages={messages}
             typingUsers={typingUsers}
@@ -235,7 +261,7 @@ export default function TeaPartyRoomPage() {
           <MessageInput
             onSend={handleSendMessage}
             onTyping={handleTyping}
-            disabled={!isConnected}
+            disabled={!isConnected || !isJoined}
           />
         </div>
       </div>

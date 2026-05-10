@@ -23,13 +23,10 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Stop PM2 first
+run('pm2 stop scholars-tea')
 
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Try starting directly without PM2
+run('timeout 10 npm start -- -p 3002 || true', timeout=15)
 
 client.close()

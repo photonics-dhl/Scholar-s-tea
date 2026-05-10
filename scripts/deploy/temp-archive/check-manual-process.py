@@ -8,28 +8,27 @@ client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
-WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
-
 def run(cmd, timeout=30):
-    full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
-    stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
+    stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8', errors='replace').strip()
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
     if out:
         print(out[:3000])
     if err:
-        print('ERR:', err[:3000])
-    print('RC:', rc)
+        print('ERR:', err[:2000])
+    print('RC:', rc, '\n')
+    return rc
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Check for manual npm start processes
+run('ps aux | grep "next start" | grep -v grep')
+run('ps aux | grep "npm start" | grep -v grep')
 
-# Also check if .env exists
-run('ls -la .env')
+# Check port 3002
+run('netstat -tlnp 2>/dev/null | grep 3002 || lsof -i :3002 2>/dev/null || echo "No netstat/lsof"')
 
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Check the manual log file
+run('tail -n 20 ~/logs/nextjs.log 2>/dev/null || echo "No manual log"')
 
 client.close()

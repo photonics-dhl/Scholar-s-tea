@@ -8,11 +8,22 @@ const getSocketUrl = () => {
   if (process.env.NEXT_PUBLIC_SOCKET_URL) {
     return process.env.NEXT_PUBLIC_SOCKET_URL;
   }
-  // In production on 10.72.212.33, socket runs on port 3001
   if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    const port = hostname === '10.72.212.33' ? '3001' : '3001';
-    return `${protocol}//${hostname}:${port}`;
+    const { protocol, hostname, port: locationPort } = window.location;
+    // For localhost development
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `${protocol}//${hostname}:3001`;
+    }
+    // For internal network (direct IP access), socket runs on port 3001
+    if (hostname === '10.72.212.33') {
+      return `${protocol}//${hostname}:3001`;
+    }
+    // For external access (ngrok, domain, etc.), assume socket is on same origin
+    // or user must set NEXT_PUBLIC_SOCKET_URL env var
+    if (locationPort) {
+      return `${protocol}//${hostname}:${locationPort}`;
+    }
+    return `${protocol}//${hostname}`;
   }
   return 'http://localhost:3001';
 };
@@ -55,9 +66,11 @@ async function fetchSocketToken(): Promise<string | null> {
 export function useTeaPartySocket(roomId: string) {
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
+  const [socketError, setSocketError] = useState<string | null>(null);
   const roomIdRef = useRef(roomId);
   roomIdRef.current = roomId;
 
@@ -88,21 +101,31 @@ export function useTeaPartySocket(roomId: string) {
         console.log('Socket connected');
         setIsConnected(true);
         setConnectionError(null);
+        setIsJoined(false);
         // Auto-join room on connect/reconnect
         if (roomIdRef.current && socketRef.current) {
           socketRef.current.emit('room:join', { roomId: roomIdRef.current });
         }
       });
 
-      socket.on('disconnect', () => {
-        console.log('Socket disconnected');
-        setIsConnected(false);
-      });
-
       socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error.message);
         setIsConnected(false);
+        setIsJoined(false);
         setConnectionError(error.message || '连接失败');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Socket disconnected');
+        setIsConnected(false);
+        setIsJoined(false);
+      });
+
+      socket.on('message:error', (error: { code: string; message: string }) => {
+        console.error('Message error:', error);
+        setSocketError(error.message || '发送消息失败');
+        // Auto-clear error after 5 seconds
+        setTimeout(() => setSocketError(null), 5000);
       });
 
       socket.on('room:error', (error: { code: string; message: string }) => {
@@ -112,6 +135,7 @@ export function useTeaPartySocket(roomId: string) {
 
       socket.on('room:joined', (data: { roomId: string; users: OnlineUser[] }) => {
         setOnlineUsers(data.users || []);
+        setIsJoined(true);
       });
 
       socket.on('room:user_joined', (data: OnlineUser) => {
@@ -126,6 +150,7 @@ export function useTeaPartySocket(roomId: string) {
       });
 
       socket.on('user:typing', (data: TypingUser) => {
+      setSocketError(null); // Clear error on any activity
         setTypingUsers((prev) => {
           const filtered = prev.filter((u) => u.userId !== data.userId);
           if (data.isTyping) {
@@ -180,7 +205,9 @@ export function useTeaPartySocket(roomId: string) {
   return {
     socket: socketRef.current,
     isConnected,
+    isJoined,
     connectionError,
+    socketError,
     onlineUsers,
     typingUsers,
     joinRoom,

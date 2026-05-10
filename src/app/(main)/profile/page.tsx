@@ -86,9 +86,9 @@ export default function ProfilePage() {
   const initials = user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'
 
   const stats = [
-    { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: '-', href: '/disciplines' },
-    { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: '-', href: '/disciplines' },
-    { icon: <Users className="h-5 w-5" />, label: '加入的课题组', value: '-', href: '/groups' },
+    { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: '查看', href: '/disciplines' },
+    { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: '查看', href: '/disciplines' },
+    { icon: <Users className="h-5 w-5" />, label: '加入的课题组', value: '查看', href: '/groups' },
   ]
 
   return (
@@ -115,10 +115,10 @@ export default function ProfilePage() {
                 </div>
               </div>
               <Button variant="outline" className="border-journal-border/30" asChild>
-                <a href="/settings">
+                <Link href="/settings">
                   <Settings className="h-4 w-4 mr-2" />
                   设置
-                </a>
+                </Link>
               </Button>
             </div>
           </CardContent>

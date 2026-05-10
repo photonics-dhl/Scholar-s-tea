@@ -23,13 +23,13 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Test require with proper quoting
+run("node -e 'try { console.log(require.resolve(\"./.next/server/pages/_error.js\")) } catch(e) { console.error(e.message) }'")
 
-# Also check if .env exists
-run('ls -la .env')
+# Check _error.js.nft.json
+run('cat .next/server/pages/_error.js.nft.json')
 
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Check if the file is readable
+run('node -e "const fs=require(\"fs\"); console.log(fs.existsSync(\".next/server/pages/_error.js\"))"')
 
 client.close()

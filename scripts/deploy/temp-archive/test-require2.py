@@ -23,13 +23,10 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Try to actually require the module
+run("node -e 'try { require(\"./.next/server/pages/_error.js\"); console.log(\"OK\") } catch(e) { console.error(\"REQUIRE ERROR:\", e.message); console.error(e.stack) }'")
 
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Also check the head of _error.js to understand its structure
+run('head -30 .next/server/pages/_error.js')
 
 client.close()

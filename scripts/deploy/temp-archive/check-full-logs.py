@@ -18,18 +18,15 @@ def run(cmd, timeout=30):
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
     if out:
-        print(out[:3000])
+        print(out[:5000])
     if err:
-        print('ERR:', err[:3000])
+        print('ERR:', err[:2000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Get the full error log
+run('cat ~/.pm2/logs/scholars-tea-error-0.log | tail -100')
 
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Also try to require _error.js directly to see if it loads
+run('node -e "require(\"./.next/server/pages/_error.js\")"')
 
 client.close()

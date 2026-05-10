@@ -8,12 +8,11 @@ client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
-WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
+SYMLINK = "/data/home/zju321/scholars-tea"
 
 def run(cmd, timeout=30):
-    full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
-    stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
+    stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8', errors='replace').strip()
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
@@ -23,13 +22,10 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Check out log
+run('cat ~/.pm2/logs/scholars-tea-out-0.log | tail -30')
 
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Try running next start directly from symlink
+run('cd {} && timeout 10 npm start -- -p 3002 || true'.format(SYMLINK), timeout=15)
 
 client.close()

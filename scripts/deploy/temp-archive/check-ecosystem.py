@@ -8,12 +8,11 @@ client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
-WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
+SYMLINK = "/data/home/zju321/scholars-tea"
 
 def run(cmd, timeout=30):
-    full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
-    stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
+    stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8', errors='replace').strip()
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
@@ -21,15 +20,17 @@ def run(cmd, timeout=30):
         print(out[:3000])
     if err:
         print('ERR:', err[:3000])
-    print('RC:', rc)
+    print('RC:', rc, '\n')
+    return rc
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Read ecosystem.config.js from symlink path
+run('cat {}/ecosystem.config.js'.format(SYMLINK))
 
-# Also check if .env exists
-run('ls -la .env')
+# Check actual log files in .pm2
+run('ls -la /data/home/zju321/.pm2/logs/')
+run('find /data/home/zju321/.pm2 -name "*.log" -type f')
 
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Check actual PM2 log directory
+run('cat /data/home/zju321/.pm2/pm2.log | tail -n 30')
 
 client.close()

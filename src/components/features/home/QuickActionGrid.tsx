@@ -126,10 +126,10 @@ const actions: ActionItem[] = [
     zone: 'tool',
   },
   {
-    href: '/disciplines',
+    href: '/knowledge',
     icon: Database,
     title: '知识库',
-    desc: '学术资源汇聚',
+    desc: '学术知识文档',
     color: 'text-journal-primary',
     bgGradient: 'from-journal-primary/10 to-journal-primary/5',
     zone: 'scholarly',

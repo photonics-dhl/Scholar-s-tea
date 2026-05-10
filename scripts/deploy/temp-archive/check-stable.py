@@ -1,5 +1,6 @@
 import paramiko
 import sys
+import time
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
@@ -8,28 +9,23 @@ client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
-WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
-
 def run(cmd, timeout=30):
-    full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
-    stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
+    stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8', errors='replace').strip()
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
     if out:
-        print(out[:3000])
+        print(out[:2000])
     if err:
-        print('ERR:', err[:3000])
+        print('ERR:', err[:2000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+print('=== Wait 10 seconds ===')
+time.sleep(10)
 
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+run('pm2 status')
+run('curl -s -o /dev/null -w "%{http_code}" http://localhost:3002')
+run('pm2 logs scholars-tea --lines 10 --nostream')
 
 client.close()

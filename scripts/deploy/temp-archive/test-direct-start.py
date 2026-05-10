@@ -1,5 +1,6 @@
 import paramiko
 import sys
+import time
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
@@ -8,12 +9,11 @@ client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 client.connect('10.72.212.33', username='zju321', pkey=key, timeout=15)
 
-WORK_DIR = "/data/home/zju321/321/DHL/Scholar's_Tea"
+SYMLINK = "/data/home/zju321/scholars-tea"
 
 def run(cmd, timeout=30):
-    full_cmd = 'cd "{}" && {}'.format(WORK_DIR, cmd)
     print('>>>', cmd)
-    stdin, stdout, stderr = client.exec_command(full_cmd, timeout=timeout)
+    stdin, stdout, stderr = client.exec_command(cmd, timeout=timeout)
     out = stdout.read().decode('utf-8', errors='replace').strip()
     err = stderr.read().decode('utf-8', errors='replace').strip()
     rc = stdout.channel.recv_exit_status()
@@ -22,14 +22,22 @@ def run(cmd, timeout=30):
     if err:
         print('ERR:', err[:3000])
     print('RC:', rc)
+    return rc
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Stop PM2
+run('pm2 stop all')
 
-# Also check if .env exists
-run('ls -la .env')
+# Kill any existing next processes
+run('pkill -f "next start" 2>/dev/null || true')
+run('fuser -k 3002/tcp 2>/dev/null || true')
+time.sleep(2)
 
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Start directly from symlink
+run('cd {} && nohup npm start -- -p 3002 > ~/logs/nextjs.log 2>&1 &'.format(SYMLINK), timeout=5)
+time.sleep(5)
+
+# Check if running
+run('curl -s -o /dev/null -w "%{http_code}" http://localhost:3002')
+run('ps aux | grep "next" | grep -v grep')
 
 client.close()

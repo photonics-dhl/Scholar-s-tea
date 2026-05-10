@@ -1,5 +1,6 @@
 import paramiko
 import sys
+import time
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
@@ -22,14 +23,22 @@ def run(cmd, timeout=30):
     if err:
         print('ERR:', err[:3000])
     print('RC:', rc)
+    return rc
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
+# Stop PM2 managed instance
+run('pm2 stop scholars-tea')
 
-# Also check if .env exists
-run('ls -la .env')
+# Kill any existing next processes
+run('pkill -f "next start" 2>/dev/null || true')
+time.sleep(2)
 
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+# Start directly with nohup
+run('nohup npm start -- -p 3002 > ~/logs/nextjs.log 2>&1 &', timeout=5)
+time.sleep(5)
 
+# Verify
+run('curl -s -o /dev/null -w "%{http_code}" http://localhost:3002')
+run('ps aux | grep "next start" | grep -v grep')
+
+print('=== Direct Start Complete ===')
 client.close()

@@ -23,13 +23,8 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
-
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+run('ps aux | grep "next" | grep -v grep')
+run('curl -s -o /dev/null -w "%{http_code}" http://localhost:3002')
+run('cat ~/logs/nextjs.log | tail -20')
 
 client.close()

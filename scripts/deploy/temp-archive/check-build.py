@@ -23,13 +23,9 @@ def run(cmd, timeout=30):
         print('ERR:', err[:3000])
     print('RC:', rc)
 
-# Check PM2 logs for the last crash
-run('pm2 logs scholars-tea --lines 50 --nostream')
-
-# Also check if .env exists
-run('ls -la .env')
-
-# Try to start manually to see the error
-run('node -e "console.log(process.version)"')
+run('ls -la .next/server/')
+run('ls -la .next/server/pages/ 2>/dev/null || echo no pages dir')
+run('ls -la .next/server/app/ 2>/dev/null | head -20')
+run('cat .next/build-manifest.json 2>/dev/null | head -50')
 
 client.close()

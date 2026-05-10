@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils/cn';
-import { FileText, Image, Download } from 'lucide-react';
+import { FileText, Image as ImageIcon, Download } from 'lucide-react';
+import { ImageLightbox } from './ImageLightbox';
 
 interface Message {
   id: string;
@@ -94,20 +96,32 @@ export function MessageItem({ message, isOwn, isGrouped, isLastInGroup }: Messag
 }
 
 function MessageBubble({ message, isOwn }: { message: Message; isOwn?: boolean }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   if (message.type === 'IMAGE') {
     return (
-      <div className={cn(
-        'rounded-xl overflow-hidden shadow-sm max-w-[240px] cursor-pointer',
-        isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'
-      )}>
-        <img 
-          src={message.content} 
-          alt="图片" 
-          className="max-w-full h-auto object-cover"
-          loading="lazy"
-          onClick={() => window.open(message.content, '_blank')}
+      <>
+        <div className={cn(
+          'relative rounded-xl overflow-hidden shadow-sm max-w-[240px] cursor-pointer group',
+          isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'
+        )}>
+          <img
+            src={message.content}
+            alt="图片"
+            className="max-w-full h-auto object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+            loading="lazy"
+            onClick={() => setLightboxOpen(true)}
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center pointer-events-none">
+            <ImageIcon className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+          </div>
+        </div>
+        <ImageLightbox
+          src={message.content}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
         />
-      </div>
+      </>
     );
   }
 
@@ -134,17 +148,37 @@ function MessageBubble({ message, isOwn }: { message: Message; isOwn?: boolean }
     const fileUrl = parts[1] || message.content;
     const fileSize = parts[2] || '';
 
+    const handleDownload = async (e: React.MouseEvent) => {
+      e.preventDefault();
+      try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) throw new Error('下载失败');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch {
+        // Fallback: open in new tab
+        window.open(fileUrl, '_blank');
+      }
+    };
+
     return (
       <div className={cn(
         'rounded-xl px-4 py-3 shadow-sm max-w-[260px] cursor-pointer group',
-        isOwn 
-          ? 'bg-[#95EC69] text-gray-900 rounded-tr-sm' 
+        isOwn
+          ? 'bg-[#95EC69] text-gray-900 rounded-tr-sm'
           : 'bg-white border border-gray-200 text-gray-900 rounded-tl-sm'
       )}>
-        <a 
-          href={fileUrl} 
-          target="_blank" 
-          rel="noopener noreferrer"
+        <a
+          href={fileUrl}
+          download={fileName}
+          onClick={handleDownload}
           className="flex items-center gap-3"
         >
           <div className={cn(

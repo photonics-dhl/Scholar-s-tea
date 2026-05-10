@@ -39,6 +39,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Block dangerous file types for FILE uploads
+    const blockedExts = ['.exe', '.bat', '.cmd', '.sh', '.dll', '.msi', '.scr', '.vbs', '.js', '.jar', '.php', '.py'];
+    const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    if (type === 'FILE' && blockedExts.includes(fileExt)) {
+      return NextResponse.json(
+        { success: false, error: { message: `不支持的文件类型：${fileExt}` } },
+        { status: 400 }
+      );
+    }
+
     // Generate unique filename
     const ext = file.name.split('.').pop() || 'bin';
     const uuid = randomUUID();

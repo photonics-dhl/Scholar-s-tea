@@ -3,11 +3,19 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { AgentMode } from '@/lib/ai/agent-modes'
 
+export interface ChatAttachment {
+  type: 'image' | 'file'
+  url: string
+  name: string
+  size?: string
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: number
+  attachments?: ChatAttachment[]
   ragContext?: Array<{
     id: string
     title: string
@@ -156,7 +164,12 @@ export function useChat(initialMode: AgentMode = 'general') {
 
   const sendMessage = useCallback(
     async (content: string, options?: Record<string, unknown>) => {
-      if (!content.trim() || loading) return
+      const attachments: ChatAttachment[] | undefined =
+        options && Array.isArray((options as Record<string, unknown>).attachments)
+          ? (options as Record<string, unknown>).attachments as ChatAttachment[]
+          : undefined
+
+      if ((!content.trim() && !attachments?.length) || loading) return
 
       // Ensure we have a session
       let activeSessionId = currentSessionId
@@ -169,6 +182,7 @@ export function useChat(initialMode: AgentMode = 'general') {
         role: 'user',
         content: content.trim(),
         timestamp: Date.now(),
+        attachments,
       }
 
       const updatedMessages = [...messages, userMessage]
@@ -187,7 +201,7 @@ export function useChat(initialMode: AgentMode = 'general') {
                 updatedAt: Date.now(),
                 title:
                   s.title === '新对话'
-                    ? getInitials(content.trim())
+                    ? getInitials(content.trim() || (attachments?.[0]?.name ?? '附件'))
                     : s.title,
               }
             : s
@@ -197,14 +211,26 @@ export function useChat(initialMode: AgentMode = 'general') {
       try {
         abortRef.current = new AbortController()
 
+        // Build API messages: inject attachment descriptions into user content
+        const apiMessages = updatedMessages.map((m) => {
+          let apiContent = m.content
+          if (m.role === 'user' && m.attachments && m.attachments.length > 0) {
+            const attachmentDesc = m.attachments.map((att) => {
+              if (att.type === 'image') {
+                return `\n\n[用户上传了图片：${att.name}]\n图片链接：${att.url}`
+              }
+              return `\n\n[用户上传了文件：${att.name}]\n文件链接：${att.url}`
+            }).join('')
+            apiContent = apiContent + attachmentDesc
+          }
+          return { role: m.role, content: apiContent }
+        })
+
         const res = await fetch('/api/v1/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: updatedMessages.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            messages: apiMessages,
             ...options,
             useRag: true,
           }),

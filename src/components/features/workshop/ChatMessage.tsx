@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Bot, AlertCircle, Lightbulb } from 'lucide-react'
+import { User, Bot, AlertCircle, Lightbulb, FileText, Download } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { StreamText } from './StreamText'
 import { CitationCard } from './CitationCard'
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown'
+import { ImageLightbox } from '@/components/features/tea-party/ImageLightbox'
 import type { ChatMessage } from '@/hooks/useChat'
 
 interface ChatMessageProps {
@@ -98,25 +99,36 @@ export function ChatMessageItem({
           isUser ? 'text-right' : 'text-left'
         )}
       >
-        <div
-          className={cn(
-            'rounded-2xl px-4 py-3 inline-block text-left shadow-sm transition-shadow duration-200 hover:shadow-md',
-            isUser
-              ? 'bg-gradient-to-br from-tea-primary to-tea-mint text-white rounded-tr-md'
-              : isAssistant
-                ? 'bg-white border border-border/60 text-foreground rounded-tl-md'
-                : 'bg-destructive/10 text-destructive border border-destructive/20 rounded-tl-md'
-          )}
-        >
-          {showStream ? (
-            <StreamText content={displayContent} speed={5} />
-          ) : isAssistant ? (
-            <SimpleMarkdown content={displayContent} />
-          ) : (
-            <div className="text-sm whitespace-pre-wrap leading-relaxed">
-              {displayContent}
+        <div className="space-y-2">
+          {/* Attachments (only for user messages) */}
+          {isUser && message.attachments && message.attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-end">
+              {message.attachments.map((att, i) => (
+                <AttachmentPreview key={`${att.url}-${i}`} attachment={att} />
+              ))}
             </div>
           )}
+
+          <div
+            className={cn(
+              'rounded-2xl px-4 py-3 inline-block text-left shadow-sm transition-shadow duration-200 hover:shadow-md',
+              isUser
+                ? 'bg-gradient-to-br from-tea-primary to-tea-mint text-white rounded-tr-md'
+                : isAssistant
+                  ? 'bg-white border border-border/60 text-foreground rounded-tl-md'
+                  : 'bg-destructive/10 text-destructive border border-destructive/20 rounded-tl-md'
+            )}
+          >
+            {showStream ? (
+              <StreamText content={displayContent} speed={5} />
+            ) : isAssistant ? (
+              <SimpleMarkdown content={displayContent} />
+            ) : (
+              <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                {displayContent}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Think Block (collapsible reasoning) */}
@@ -144,6 +156,70 @@ export function ChatMessageItem({
         )}
       </div>
     </div>
+  )
+}
+
+/** 附件预览组件 */
+function AttachmentPreview({ attachment }: { attachment: import('@/hooks/useChat').ChatAttachment }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  if (attachment.type === 'image') {
+    return (
+      <>
+        <button
+          onClick={() => setLightboxOpen(true)}
+          className="relative rounded-lg overflow-hidden border border-white/20 shadow-sm group"
+        >
+          <img
+            src={attachment.url}
+            alt={attachment.name}
+            className="w-20 h-20 object-cover"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+        </button>
+        <ImageLightbox
+          src={attachment.url}
+          alt={attachment.name}
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />
+      </>
+    )
+  }
+
+  // File attachment
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      const response = await fetch(attachment.url)
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = attachment.name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+    } catch {
+      window.open(attachment.url, '_blank')
+    }
+  }
+
+  return (
+    <a
+      href={attachment.url}
+      download={attachment.name}
+      onClick={handleDownload}
+      className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 hover:bg-white/20 transition-colors"
+    >
+      <FileText className="h-4 w-4 flex-shrink-0" />
+      <div className="min-w-0">
+        <p className="text-xs font-medium truncate max-w-[120px]">{attachment.name}</p>
+        {attachment.size && <p className="text-[10px] opacity-70">{attachment.size}</p>}
+      </div>
+      <Download className="h-3 w-3 flex-shrink-0 opacity-70" />
+    </a>
   )
 }
 

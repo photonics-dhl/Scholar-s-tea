@@ -39,6 +39,8 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
   const [showEmoji, setShowEmoji] = useState(false);
   const [showSticker, setShowSticker] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -112,20 +114,71 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
     setShowSticker(false);
   };
 
+  // Block dangerous file types
+  const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.sh', '.dll', '.msi', '.scr', '.vbs', '.js', '.jar'];
+  const isFileBlocked = (filename: string): boolean => {
+    const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase();
+    return BLOCKED_EXTENSIONS.includes(ext);
+  };
+
   const handleFileUpload = async (file: File, type: 'IMAGE' | 'FILE') => {
     if (!file) return;
+
+    // Client-side validation
+    if (isFileBlocked(file.name)) {
+      setUploadError(`不支持的文件类型：${file.name.slice(file.name.lastIndexOf('.'))}`);
+      return;
+    }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadError(`文件大小超过 10MB 限制 (${formatFileSize(file.size)})`);
+      return;
+    }
+
     setUploading(true);
+    setUploadProgress(0);
+    setUploadError(null);
+
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', type);
 
-      const res = await fetch('/api/v1/upload', {
-        method: 'POST',
-        body: formData,
+      // Use XMLHttpRequest for progress tracking
+      const data = await new Promise<{ success: boolean; data?: { url: string }; error?: { message: string } }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/v1/upload');
+
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            setUploadProgress(percent);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch {
+              reject(new Error('响应解析失败'));
+            }
+          } else {
+            try {
+              const err = JSON.parse(xhr.responseText);
+              reject(new Error(err.error?.message || `上传失败 (${xhr.status})`));
+            } catch {
+              reject(new Error(`上传失败 (${xhr.status})`));
+            }
+          }
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('网络错误，请重试')));
+        xhr.addEventListener('abort', () => reject(new Error('上传已取消')));
+        xhr.send(formData);
       });
 
-      const data = await res.json();
       if (data.success && data.data?.url) {
         if (type === 'IMAGE') {
           onSend(data.data.url, 'IMAGE');
@@ -134,13 +187,15 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
           onSend(fileInfo, 'FILE');
         }
       } else {
-        alert(data.error?.message || '上传失败');
+        throw new Error(data.error?.message || '上传失败');
       }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : '上传失败，请重试';
+      setUploadError(msg);
       console.error('Upload failed:', err);
-      alert('上传失败，请重试');
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -301,7 +356,15 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
         </label>
 
         {uploading && (
-          <span className="text-xs text-muted-foreground ml-1">上传中...</span>
+          <div className="flex items-center gap-2 ml-1">
+            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-tea-primary rounded-full transition-all duration-200"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">{uploadProgress}%</span>
+          </div>
         )}
       </div>
 
@@ -343,8 +406,23 @@ export function MessageInput({ onSend, onTyping, disabled }: MessageInputProps) 
           <Send className="size-4 transition-transform duration-200 group-active:translate-x-0.5" />
         </Button>
       </div>
+      {/* Error message */}
+      {uploadError && (
+        <div className="px-3 pb-2">
+          <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/5 rounded-lg px-3 py-2">
+            <span>{uploadError}</span>
+            <button
+              onClick={() => setUploadError(null)}
+              className="ml-auto text-destructive/70 hover:text-destructive underline"
+            >
+              重试
+            </button>
+          </div>
+        </div>
+      )}
+
       <p className="text-[11px] text-muted-foreground px-3 pb-2 font-sans">
-        {content.length}/500
+        {content.length}/500 · 支持 JPG/PNG/GIF/WebP · 文件最大 10MB
       </p>
     </div>
   );

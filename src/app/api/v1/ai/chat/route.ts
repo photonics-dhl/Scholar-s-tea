@@ -35,10 +35,7 @@ async function getImageBase64(imageUrl: string): Promise<string | null> {
       pathname = imageUrl
     }
 
-    if (!pathname.startsWith('/uploads/')) {
-      console.log('[vision] URL not in /uploads/:', pathname)
-      return null
-    }
+    if (!pathname.startsWith('/uploads/')) return null
 
     const filename = pathname.replace('/uploads/', '')
     if (filename.includes('..') || filename.includes('/') || !filename) return null
@@ -57,10 +54,8 @@ async function getImageBase64(imageUrl: string): Promise<string | null> {
     }
     const mimeType = mimeMap[ext] || 'image/png'
 
-    console.log('[vision] Converted image to base64:', filename, 'size:', buffer.length, 'mime:', mimeType)
     return `data:${mimeType};base64,${base64}`
-  } catch (err) {
-    console.error('[vision] Failed to convert image:', err)
+  } catch {
     return null
   }
 }
@@ -69,11 +64,9 @@ async function buildVisionMessages(
   messages: ChatMessage[],
   attachments: ChatAttachment[] | undefined
 ): Promise<ChatMessage[]> {
-  console.log('[vision] buildVisionMessages called, attachments:', attachments?.length || 0)
   if (!attachments || attachments.length === 0) return messages
 
   const imageAttachments = attachments.filter((a) => a.type === 'image')
-  console.log('[vision] image attachments:', imageAttachments.length)
   if (imageAttachments.length === 0) return messages
 
   // Find last user message and convert to vision format
@@ -88,15 +81,12 @@ async function buildVisionMessages(
   }
 
   for (const att of imageAttachments) {
-    console.log('[vision] Processing image:', att.url)
     const base64 = await getImageBase64(att.url)
     if (base64) {
-      console.log('[vision] Added base64 image, length:', base64.length)
       content.push({ type: 'image_url', image_url: { url: base64 } })
     }
   }
 
-  console.log('[vision] Final content parts:', content.length)
   return messages.map((m, i) => (i === lastUserIndex ? { ...m, content } : m))
 }
 

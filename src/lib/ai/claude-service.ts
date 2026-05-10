@@ -116,6 +116,8 @@ export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeRespons
       ...messages
     ]);
     
+    console.log('[claude-service] API request messages:', JSON.stringify(apiMessages, null, 2).slice(0, 2000));
+    
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -510,6 +512,8 @@ export async function chatWithAIStream(
       { role: 'system', content: systemPrompt || SYSTEM_PROMPT },
       ...messages
     ]);
+    
+    console.log('[claude-service] Stream API request messages:', JSON.stringify(apiMessages, null, 2).slice(0, 2000));
     
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',

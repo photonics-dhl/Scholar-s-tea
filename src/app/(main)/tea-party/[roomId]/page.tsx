@@ -241,9 +241,9 @@ export default function TeaPartyRoomPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-dot-pattern">
+        <div className="flex-1 flex flex-col overflow-hidden bg-dot-pattern">
           {socketError && (
-            <div className="mx-4 mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2">
+            <div className="mx-4 mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2 flex-shrink-0">
               <span className="font-medium">发送失败:</span>
               {socketError}
             </div>

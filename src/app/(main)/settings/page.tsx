@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, User, Mail, Bell, Shield, Palette, Save, Loader2 } from 'lucide-react'
+import { Settings, User, Mail, Bell, Shield, Save, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,15 +12,26 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils/cn'
 
+interface UserProfile {
+  id: string
+  email: string
+  name: string | null
+  bio: string | null
+  avatar: string | null
+}
+
 export default function SettingsPage() {
   const { data: session, status, update } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [fetchingProfile, setFetchingProfile] = useState(true)
 
   const [formData, setFormData] = useState({
-    name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    name: '',
+    email: '',
     bio: '',
     notifications: {
       email: true,
@@ -33,7 +44,39 @@ export default function SettingsPage() {
     },
   })
 
-  if (status === 'loading') {
+  // Fetch full profile on mount
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.id) {
+      fetch('/api/v1/user/profile')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            setProfile(data.data)
+            setFormData((prev) => ({
+              ...prev,
+              name: data.data.name || '',
+              email: data.data.email || '',
+              bio: data.data.bio || '',
+            }))
+          }
+        })
+        .catch((err) => console.error('Failed to fetch profile:', err))
+        .finally(() => setFetchingProfile(false))
+    }
+  }, [status, session])
+
+  // Sync with session changes
+  useEffect(() => {
+    if (session?.user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: session.user.name || prev.name || '',
+        email: session.user.email || prev.email || '',
+      }))
+    }
+  }, [session])
+
+  if (status === 'loading' || fetchingProfile) {
     return (
       <div className="container mx-auto px-4 py-12 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -48,11 +91,36 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    setLoading(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    setError(null)
+    try {
+      const res = await fetch('/api/v1/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name.trim() || undefined,
+          bio: formData.bio.trim() || null,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!data.success) {
+        throw new Error(data.error?.message || '保存失败')
+      }
+
+      // Update NextAuth session
+      await update({
+        name: data.data.name,
+        bio: data.data.bio,
+      })
+
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '保存失败')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const initials = session.user.name?.charAt(0).toUpperCase() || session.user.email?.charAt(0).toUpperCase() || 'U'
@@ -98,7 +166,7 @@ export default function SettingsPage() {
                   <AvatarFallback className="text-2xl bg-primary/10 text-primary">{initials}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" disabled>
                     更换头像
                   </Button>
                   <p className="text-xs text-muted-foreground mt-1">支持 JPG、PNG 格式，最大 2MB</p>
@@ -148,7 +216,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>通知设置</CardTitle>
-              <CardDescription>选择你希望接收的通知类型</CardDescription>
+              <CardDescription>选择你希望接收的通知类型（当前为演示状态）</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
@@ -207,7 +275,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>隐私设置</CardTitle>
-              <CardDescription>控制你的资料可见性</CardDescription>
+              <CardDescription>控制你的资料可见性（当前为演示状态）</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
@@ -245,6 +313,13 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Error */}
+      {error && (
+        <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Save Button */}
       <div className="mt-8 flex justify-end">

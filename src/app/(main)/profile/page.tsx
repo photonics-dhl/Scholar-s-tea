@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   User,
   Mail,
@@ -43,24 +43,46 @@ function StatCard({ icon, label, value, href }: StatCardProps) {
 
   if (href) {
     return (
-      <a href={href} className="block">
+      <Link href={href} className="block">
         {content}
-      </a>
+      </Link>
     )
   }
 
   return content
 }
 
+interface UserStats {
+  posts: number
+  comments: number
+  groups: number
+}
+
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [stats, setStats] = useState<UserStats>({ posts: 0, comments: 0, groups: 0 })
+  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/signin')
     }
   }, [status, router])
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetch('/api/v1/user/stats')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            setStats(data.data)
+          }
+        })
+        .catch((err) => console.error('Failed to fetch stats:', err))
+        .finally(() => setStatsLoading(false))
+    }
+  }, [status])
 
   if (status === 'loading') {
     return (
@@ -86,10 +108,10 @@ export default function ProfilePage() {
   const user = session.user
   const initials = user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'
 
-  const stats = [
-    { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: '查看', href: '/disciplines' },
-    { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: '查看', href: '/disciplines' },
-    { icon: <Users className="h-5 w-5" />, label: '加入的课题组', value: '查看', href: '/groups' },
+  const statItems = [
+    { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: statsLoading ? '...' : stats.posts, href: '/disciplines' },
+    { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: statsLoading ? '...' : stats.comments, href: '/disciplines' },
+    { icon: <Users className="h-5 w-5" />, label: '加入的课题组', value: statsLoading ? '...' : stats.groups, href: '/groups' },
   ]
 
   return (
@@ -114,6 +136,9 @@ export default function ProfilePage() {
                   <Mail className="h-4 w-4" />
                   <span className="text-sm">{user.email}</span>
                 </div>
+                {user.bio && (
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{user.bio}</p>
+                )}
               </div>
               <Button variant="outline" className="border-journal-border/30" asChild>
                 <Link href="/settings">
@@ -127,7 +152,7 @@ export default function ProfilePage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {stats.map((stat) => (
+          {statItems.map((stat) => (
             <StatCard key={stat.label} {...stat} />
           ))}
         </div>
@@ -147,7 +172,7 @@ export default function ProfilePage() {
               { label: '思想工坊', href: '/workshop', desc: '与 AI 助手讨论学术问题' },
               { label: '茶话会', href: '/tea-party', desc: '加入实时学术交流' },
             ].map((item) => (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 className={cn(
@@ -162,7 +187,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-journal-primary transition-colors" />
-              </a>
+              </Link>
             ))}
           </CardContent>
         </Card>

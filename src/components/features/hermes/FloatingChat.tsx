@@ -11,7 +11,7 @@ import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvatar';
 import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
 
-const HIDDEN_PATHS = ['/admin'];
+const HIDDEN_PATHS = ['/admin', '/profile', '/settings'];
 const AVATAR_SIZE = 96;
 const PANEL_W = 400;
 const PANEL_H = 560;
@@ -41,12 +41,9 @@ function clamp(val: number, min: number, max: number) {
 
 function getDefaultPosition() {
   if (typeof window === 'undefined') return { x: 0, y: 0 };
-  const isMobile = window.innerWidth < 768;
   return {
     x: window.innerWidth - MARGIN - AVATAR_SIZE,
-    y: isMobile
-      ? window.innerHeight - MARGIN - AVATAR_SIZE - 80 // bottom-right on mobile
-      : Math.round(window.innerHeight / 2 - AVATAR_SIZE / 2), // mid-right on desktop
+    y: window.innerHeight - MARGIN - AVATAR_SIZE - 80, // bottom-right to avoid UI overlap
   };
 }
 

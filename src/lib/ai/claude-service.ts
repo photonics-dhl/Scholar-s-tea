@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
+import nodeFetch from 'node-fetch';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 // Proxy support for server-side fetch
 let _fetch: typeof fetch = fetch;
@@ -6,15 +8,9 @@ let _agent: any = undefined;
 if (typeof window === 'undefined') {
   const proxyUrl = process.env.http_proxy || process.env.https_proxy || process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
   if (proxyUrl) {
-    try {
-      const nodeFetch = require('node-fetch');
-      const { HttpsProxyAgent } = require('https-proxy-agent');
-      _fetch = nodeFetch.default || nodeFetch;
-      _agent = new HttpsProxyAgent(proxyUrl);
-    } catch {
-      // Fallback to native fetch
-    }
-  }
+    _fetch = (nodeFetch as any).default || nodeFetch;
+    _agent = new HttpsProxyAgent(proxyUrl);
+}
 }
 
 interface ChatMessage {

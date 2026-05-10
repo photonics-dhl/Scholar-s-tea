@@ -332,11 +332,113 @@ class ArxivSearcher:
         return papers
 
     def get_quality_papers(self, category_id: str, top_n: int = 5) -> List[Dict]:
-        """获取质量最高的论文"""
-        papers = self.search_by_category(category_id, max_results=50, days_back=90)
+        """获取质量最高的论文 - P2 高影响力boost策略
 
-        # 按发表日期排序
-        papers.sort(key=lambda x: x.get("published", ""), reverse=True)
+        双查询合并：
+        - Query1: sortBy=relevance → 召回高影响力论文
+        - Query2: sortBy=submittedDate → 召回最新论文
+        - 合并后按: 高影响力论文优先 + 新论文加权
+        """
+        import concurrent.futures
+
+        def _search_once(sort_by: str) -> List[Dict]:
+            """单次查询（复用 search_by_category 的解析逻辑）"""
+            cat = self.classifier.categories.get(category_id, {})
+            keywords = cat.get("keywords", [])
+            exclude = cat.get("exclude", [])
+            if not keywords:
+                return []
+
+            cat_queries = [f"cat:{c}" for c in self.ARXIV_PHYSICS_CATEGORIES]
+            cat_query = " OR ".join(cat_queries)
+            keyword_queries = []
+            for kw in keywords[:5]:
+                if " " in kw or "-" in kw:
+                    kw_escaped = kw.replace('"', '\\"')
+                    keyword_queries.append(f'all:"{kw_escaped}"')
+                else:
+                    keyword_queries.append(f"all:{kw}")
+            keyword_query = " OR ".join(keyword_queries)
+            query = f"({cat_query}) AND ({keyword_query})"
+
+            params = {
+                "search_query": query,
+                "start": 0,
+                "max_results": 30,
+                "sortBy": sort_by,
+                "sortOrder": "descending"
+            }
+            headers = {
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+            }
+            try:
+                response = requests.get(
+                    self.ARXIV_API, params=params, timeout=60, proxies={}, headers=headers
+                )
+                if response.status_code != 200 or response.content.startswith(b"<!") or response.content.startswith(b"<html"):
+                    return []
+            except:
+                return []
+
+            from xml.etree import ElementTree as ET
+            try:
+                root = ET.fromstring(response.content)
+            except:
+                return []
+
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=90)
+            papers = []
+            for entry in root.findall("atom:entry", ns):
+                published_str = entry.find("atom:published", ns).text if entry.find("atom:published", ns) is not None else None
+                if published_str:
+                    try:
+                        published = datetime.fromisoformat(published_str.replace("Z", "+00:00"))
+                        if published < cutoff_date:
+                            continue
+                    except:
+                        pass
+
+                title = entry.find("atom:title", ns).text.replace("\n", " ").strip() if entry.find("atom:title", ns) is not None else ""
+                abstract = entry.find("atom:summary", ns).text.replace("\n", " ").strip() if entry.find("atom:summary", ns) is not None else ""
+                excluded = any(ex.lower() in (title + abstract).lower() for ex in exclude)
+                if excluded:
+                    continue
+
+                arxiv_id = entry.find("atom:id", ns).text.split("/")[-1] if entry.find("atom:id", ns) is not None else ""
+                papers.append({
+                    "title": title,
+                    "abstract": abstract,
+                    "arxiv_id": arxiv_id,
+                    "published": entry.find("atom:published", ns).text[:10] if entry.find("atom:published", ns) is not None else "",
+                    "url": entry.find("atom:id", ns).text if entry.find("atom:id", ns) is not None else "",
+                    "authors": [a.find("atom:name", ns).text for a in entry.findall("atom:author", ns) if a.find("atom:name", ns) is not None][:3],
+                    "citations": 0,
+                    "venue": "arXiv",
+                    "_sort_by": sort_by,  # 标记来源
+                })
+            return papers
+
+        # 并行双查询：relevance + date
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            f1 = executor.submit(_search_once, "relevance")
+            f2 = executor.submit(_search_once, "submittedDate")
+            relevance_papers = f1.result()
+            date_papers = f2.result()
+
+        # 合并去重（arxiv_id 唯一）
+        seen = {}
+        for p in relevance_papers:
+            seen[p["arxiv_id"]] = p
+        for p in date_papers:
+            if p["arxiv_id"] not in seen:
+                seen[p["arxiv_id"]] = p
+
+        papers = list(seen.values())
+
+        # P2 boost: relevance 来源论文加权（排在前面）
+        # sort key: _sort_by="relevance" → 0（优先），_sort_by="submittedDate" → 1
+        papers.sort(key=lambda x: (x.get("_sort_by", "") != "relevance", x.get("published", "")), reverse=True)
 
         return papers[:top_n]
 
@@ -1375,29 +1477,56 @@ class TavilySearcher:
     def search_papers(self, category_keywords: List[str], max_results: int = 3) -> List[Dict]:
         """搜索领域相关最新论文/预印本（用于补充 ArXiv/PubMed）
 
-        增强版查询策略：
-        - 用前5个核心关键词构造复合查询
-        - 加入 "Nature Photonics", "Optica", "Science" 等高影响力期刊限定
-        - 覆盖 Ultrafast Science, Advanced Photonics 等专业期刊的最新进展
-        - 近期论文优先（2024/2025）
+        P1 重构：多路并行 AND 查询策略
+        - 每个关键词独立 AND 期刊加权（避免宽松 OR 召回噪声）
+        - 期刊优先级：Nature Photonics > Optica > Advanced Photonics > Science/PR > 通用
+        - 多路并发查询，结果合并去重
         """
         if not category_keywords:
             return []
 
-        # 核心关键词（取前5个）
-        kw_part = " OR ".join(f'"{kw}"' for kw in category_keywords[:5])
-        # 期刊增强词（扩大高影响力论文召回）
-        journal_terms = [
-            "Nature Photonics", "Optica", "Optics Express", "Science", "Physical Review",
-            "Advanced Photonics", "Light Science", "Photonics Research",
-            "IEEE", "Proceedings", "Nature Communications",
-            "2024", "2025"  # 近期优先
-        ]
-        journal_part = " OR ".join(f'"{j}"' for j in journal_terms[:4])
+        import concurrent.futures
 
-        query = f"({kw_part}) AND ({journal_part}) physics optics"
-        results = self.search_topic(query, max_results=max(max_results, 5))
-        return results
+        # 期刊优先级（按影响力降序）
+        journal_tiers = [
+            # Tier 1: 光学顶刊（必须包含关键词）
+            ["Nature Photonics", "Advanced Photonics", "Optica"],
+            # Tier 2: 综述顶刊 + Science/PR 系列
+            ["Science", "Physical Review X", "Nature Communications", "Light Science"],
+            # Tier 3: 光学主力期刊
+            ["Optics Express", "Photonics Research", "IEEE Journal", "Proceedings"],
+        ]
+
+        def _query_tier(tier: List[str], kw: str) -> List[Dict]:
+            """单个关键词 + 单个期刊层的查询"""
+            journal_part = " OR ".join(f'"{j}"' for j in tier)
+            query = f'"{kw}" AND ({journal_part})'
+            return self.search_topic(query, max_results=max(max_results, 3))
+
+        all_results = []
+        seen_urls = set()
+
+        # 为每个关键词 × 每个期刊层并发查询
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = []
+            for kw in category_keywords[:5]:  # 最多5个关键词
+                for tier in journal_tiers:
+                    futures.append(executor.submit(_query_tier, tier, kw))
+
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    results = future.result()
+                    for r in results:
+                        url = r.get("url", "")
+                        if url and url not in seen_urls:
+                            seen_urls.add(url)
+                            all_results.append(r)
+                except Exception:
+                    pass
+
+        # 按 title 长度降序（长标题 = 更可能是正式论文）
+        all_results.sort(key=lambda x: len(x.get("title", "")), reverse=True)
+        return all_results[:max_results * 3]
 
     def get_domain_summary(self, category_id: str, papers: List[Dict]) -> str:
         """根据领域论文生成AI总结（使用 Tavily 搜索补充）"""
@@ -1487,6 +1616,22 @@ class CrossrefSearcher:
                 title_parts = item.get("title", [])
                 title = title_parts[0] if title_parts else ""
                 if not title:
+                    continue
+
+                # ===== P0-1: 标题质量过滤 =====
+                # 过滤垃圾元数据标题（非正式论文标题）
+                title_lower = title.lower()
+                garbage_title_patterns = [
+                    "issue publication information", "author index", "table of contents",
+                    "front matter", "back matter", "editorial", " Erratum",
+                    "corrigendum", "retraction", "comment on", "reply to",
+                    "conference proceedings", "meeting abstracts", "annual meeting",
+                    "special issue", "guest editorial", "in memory",
+                ]
+                if any(p in title_lower for p in garbage_title_patterns):
+                    continue
+                # 过滤过短标题（通常是网页片段或元数据）
+                if len(title) < 25:
                     continue
 
                 abstract = ""
@@ -2846,24 +2991,56 @@ def main():
                     url = r.get("url", "")
                     title = r.get("title", "")
 
-                    # ===== 关键修复：过滤非正式出版物的噪声 URL =====
-                    # 这些 URL 不是论文，而是会议摘要、学科门户、Wikipedia 等
+                    # ===== P0-2: 扩展 skip_patterns 覆盖更多非论文URL =====
+                    # 这些 URL 不是正式论文，而是会议摘要、学科门户、新闻等
                     skip_patterns = [
-                        "wikipedia.org", "youtube.com", "spie.org/Publications/Proceedings",
-                        "event/", "contribution/", "abstract.cfm", "subjects/",
-                        "nature.com/subjects", "semanticscholar.org", "researchgate.net",
-                        "opg.optica.org/abstract", "optica-opn.org/home/articles",
-                        "catalog.nlm.nih.gov/discovery", "pubmed.ncbi.nlm.nih.gov",
-                        "proceedings", "conference", "session/", "material/0/0.pdf",
+                        # 百科/视频/社交
+                        "wikipedia.org", "youtube.com", "twitter.com", "x.com",
+                        "facebook.com", "linkedin.com", "researchgate.net",
+                        "academia.edu", "scholar.google.com/citations",
+                        # 会议/课程/活动
+                        "event/", "conference", "session/", "contribution/",
+                        "abstract.cfm", "subjects/", "program/", "schedule/",
+                        # 会议论文集（SPIE等）
+                        "spie.org/Publications/Proceedings", "procedings", "proc.",
+                        # 期刊门户/导航页（非具体论文）
+                        "nature.com/subjects", "opg.optica.org/abstract",
+                        "optica-opn.org/home/articles", "catalog.nlm.nih.gov/discovery",
+                        "pubmed.ncbi.nlm.nih.gov", "aps.org/prresearch/subjects",
+                        "mdpi.com/journal/", "iopscience.iop.org", "eurekamag.com",
+                        "worldscientific.com/doi", "commsphys", "photonics",
+                        "inspirehep.net", "indico.ictp",
+                        # 预印本平台（非正式）
+                        "preprints.opticaopen.org", "biorxiv.org", "medrxiv.org",
+                        "chemrxiv.org", "arxiv.org/abs/",  # 只跳过 abstract 页，abs/ok
+                        # 元数据/索引页
                         "oldcitypublishing.com", "ufn.ru", "jlps.gr.jp", "martinos.org",
-                        "worldscientific.com/doi", "iopscience.iop.org", "eurekamag.com",
-                        "indico.ictp", "inspirehep.net", "commsphys", "photonics",
-                        "aps.org/prresearch/subjects", "mdpi.com", "preprints.opticaopen.org",
+                        "material/0/0.pdf",
+                        # 新闻/科普
+                        "news.", "press release", "eurekaalert", "phys.org",
+                        "sciencedaily.com", "nanowerk.com", "photonics.com",
+                        # 商业/产品页
+                        "linkedin.com/company", "amazon.com", "ebay.com",
+                        # 机构主页
+                        "charles.ac.uk", "stanford.edu/~", "mit.edu/~",
                     ]
                     if any(p in url.lower() for p in skip_patterns):
                         continue
-                    # 过滤空标题或过短标题（通常是网页标题而非论文标题）
-                    if not title or len(title) < 20:
+                    # ===== P0-2: 标题质量过滤 =====
+                    # 过滤垃圾标题（非正式论文标题）
+                    title_lower = title.lower()
+                    garbage_in_title = [
+                        "issue publication information", "author index",
+                        "table of contents", "front matter", "back matter",
+                        "editorial", "erratum", "corrigendum", "retraction",
+                        "special issue", "guest editorial", "in memory",
+                        "conference report", "meeting abstract", "annual meeting",
+                        "press release", "news:", "announcement",
+                    ]
+                    if any(p in title_lower for p in garbage_in_title):
+                        continue
+                    # 过滤过短标题（通常是网页片段或元数据）
+                    if not title or len(title) < 25:
                         continue
 
                     papers.append({

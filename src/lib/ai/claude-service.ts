@@ -19,9 +19,22 @@ export interface VisionContent {
   image_url?: { url: string };
 }
 
+/** Anthropic-format image block for MiniMax compatibility */
+export interface AnthropicImageContent {
+  type: 'image';
+  source: {
+    type: 'base64' | 'url';
+    media_type?: string;
+    data?: string;
+    url?: string;
+  };
+}
+
+export type MessageContent = string | Array<VisionContent | AnthropicImageContent>;
+
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
-  content: string | VisionContent[];
+  content: MessageContent;
 }
 
 interface ClaudeResponse {
@@ -39,6 +52,56 @@ const SYSTEM_PROMPT = `你是一位博学的研究助手，专注于学术讨论
 
 请用中文回答，保持专业且友好的语气。如果不确定某些事情，请如实说明。`;
 
+/**
+ * Convert OpenAI-format content blocks to Anthropic format for MiniMax compatibility.
+ * MiniMax's /chat/completions endpoint accepts Anthropic-style image blocks.
+ */
+function convertToAnthropicFormat(messages: ChatMessage[]): Array<{ role: string; content: any }> {
+  return messages.map((m) => {
+    if (typeof m.content === 'string') {
+      return { role: m.role, content: m.content };
+    }
+
+    // Convert array content
+    const converted = m.content.map((block) => {
+      if (block.type === 'text') {
+        return { type: 'text', text: block.text || '' };
+      }
+      if (block.type === 'image_url' && block.image_url) {
+        const url = block.image_url.url;
+        if (url.startsWith('data:')) {
+          // Parse data URI: data:<media_type>;base64,<data>
+          const header = url.split(',')[0];
+          const b64data = url.split(',')[1];
+          let mediaType = 'image/png';
+          if (header.includes(':') && header.includes(';')) {
+            mediaType = header.split(':')[1].split(';')[0];
+          }
+          return {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: mediaType,
+              data: b64data,
+            },
+          };
+        }
+        // URL-based image
+        return {
+          type: 'image',
+          source: {
+            type: 'url',
+            url,
+          },
+        };
+      }
+      return block;
+    });
+
+    return { role: m.role, content: converted };
+  });
+}
+
 export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeResponse> {
   const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
   const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
@@ -48,6 +111,11 @@ export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeRespons
   }
 
   try {
+    const apiMessages = convertToAnthropicFormat([
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...messages
+    ]);
+    
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -56,22 +124,12 @@ export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeRespons
       },
       body: JSON.stringify({
         model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...messages
-        ],
+        messages: apiMessages,
         max_tokens: 2048,
         temperature: 0.7,
       }),
       agent: _agent,
-    } as any);
-    
-    // Debug: log first user message content type
-    const firstUserMsg = messages.find(m => m.role === 'user');
-    if (firstUserMsg) {
-      console.log('[claude-service] First user msg content type:', typeof firstUserMsg.content, 
-        Array.isArray(firstUserMsg.content) ? `array[${firstUserMsg.content.length}]` : 'string');
-    }
+    } as any)
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -448,6 +506,11 @@ export async function chatWithAIStream(
   }
 
   try {
+    const apiMessages = convertToAnthropicFormat([
+      { role: 'system', content: systemPrompt || SYSTEM_PROMPT },
+      ...messages
+    ]);
+    
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -456,10 +519,7 @@ export async function chatWithAIStream(
       },
       body: JSON.stringify({
         model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: systemPrompt || SYSTEM_PROMPT },
-          ...messages
-        ],
+        messages: apiMessages,
         max_tokens: 4096,
         temperature: 0.7,
         stream: true,

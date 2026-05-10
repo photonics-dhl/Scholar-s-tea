@@ -13,9 +13,15 @@ if (typeof window === 'undefined') {
 }
 }
 
-interface ChatMessage {
+export interface VisionContent {
+  type: 'text' | 'image_url';
+  text?: string;
+  image_url?: { url: string };
+}
+
+export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
-  content: string;
+  content: string | VisionContent[];
 }
 
 interface ClaudeResponse {
@@ -52,7 +58,7 @@ export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeRespons
         model: 'MiniMax-M2.7',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          ...messages.map(m => ({ role: m.role, content: m.content }))
+          ...messages
         ],
         max_tokens: 2048,
         temperature: 0.7,
@@ -98,12 +104,17 @@ export async function chatWithContext(
       ).join('\n')}`
     : '';
 
-  const enhancedMessages = messages.map(m => ({
-    ...m,
-    content: m.content + (m.role === 'user' ? `${contextPrompt}${papersPrompt}` : '')
-  }));
+  const enhancedMessages = messages.map(m => {
+    if (m.role === 'user' && typeof m.content === 'string') {
+      return {
+        ...m,
+        content: m.content + `${contextPrompt}${papersPrompt}`
+      }
+    }
+    return m
+  })
 
-  return chatWithAI(enhancedMessages);
+  return chatWithAI(enhancedMessages)
 }
 
 export async function analyzePaper(content: string): Promise<{
@@ -440,7 +451,7 @@ export async function chatWithAIStream(
         model: 'MiniMax-M2.7',
         messages: [
           { role: 'system', content: systemPrompt || SYSTEM_PROMPT },
-          ...messages.map(m => ({ role: m.role, content: m.content }))
+          ...messages
         ],
         max_tokens: 4096,
         temperature: 0.7,

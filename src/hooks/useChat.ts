@@ -211,26 +211,18 @@ export function useChat(initialMode: AgentMode = 'general') {
       try {
         abortRef.current = new AbortController()
 
-        // Build API messages: inject attachment descriptions into user content
-        const apiMessages = updatedMessages.map((m) => {
-          let apiContent = m.content
-          if (m.role === 'user' && m.attachments && m.attachments.length > 0) {
-            const attachmentDesc = m.attachments.map((att) => {
-              if (att.type === 'image') {
-                return `\n\n[用户上传了图片：${att.name}]\n图片链接：${att.url}`
-              }
-              return `\n\n[用户上传了文件：${att.name}]\n文件链接：${att.url}`
-            }).join('')
-            apiContent = apiContent + attachmentDesc
-          }
-          return { role: m.role, content: apiContent }
-        })
+        // Build API messages (attachments sent as separate field for vision support)
+        const apiMessages = updatedMessages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        }))
 
         const res = await fetch('/api/v1/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: apiMessages,
+            attachments: userMessage.attachments,
             ...options,
             useRag: true,
           }),

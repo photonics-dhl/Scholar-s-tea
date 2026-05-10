@@ -12,12 +12,82 @@ import {
   peerReview,
   generatePaper,
 } from '@/lib/ai/claude-service'
+import type { ChatMessage, VisionContent } from '@/lib/ai/claude-service'
 import { getContextForQuery } from '@/lib/ai/rag-service'
 import { agentModes, type AgentMode } from '@/lib/ai/agent-modes'
+import { readFileSync } from 'fs'
+import path from 'path'
 
-interface ChatMessage {
-  role: 'user' | 'assistant' | 'system'
-  content: string
+interface ChatAttachment {
+  type: 'image' | 'file'
+  url: string
+  name: string
+  size?: string
+}
+
+async function getImageBase64(imageUrl: string): Promise<string | null> {
+  try {
+    let pathname: string
+    try {
+      const url = new URL(imageUrl)
+      pathname = url.pathname
+    } catch {
+      pathname = imageUrl
+    }
+
+    if (!pathname.startsWith('/uploads/')) return null
+
+    const filename = pathname.replace('/uploads/', '')
+    if (filename.includes('..') || filename.includes('/') || !filename) return null
+
+    const filePath = path.join(process.cwd(), 'public', 'uploads', filename)
+    const buffer = readFileSync(filePath)
+    const base64 = buffer.toString('base64')
+
+    const ext = path.extname(filename).toLowerCase()
+    const mimeMap: Record<string, string> = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+    }
+    const mimeType = mimeMap[ext] || 'image/png'
+
+    return `data:${mimeType};base64,${base64}`
+  } catch {
+    return null
+  }
+}
+
+async function buildVisionMessages(
+  messages: ChatMessage[],
+  attachments: ChatAttachment[] | undefined
+): Promise<ChatMessage[]> {
+  if (!attachments || attachments.length === 0) return messages
+
+  const imageAttachments = attachments.filter((a) => a.type === 'image')
+  if (imageAttachments.length === 0) return messages
+
+  // Find last user message and convert to vision format
+  const lastUserIndex = messages.map((m) => m.role).lastIndexOf('user')
+  if (lastUserIndex < 0) return messages
+
+  const content: VisionContent[] = []
+
+  const originalContent = messages[lastUserIndex].content
+  if (typeof originalContent === 'string' && originalContent.trim()) {
+    content.push({ type: 'text', text: originalContent.trim() })
+  }
+
+  for (const att of imageAttachments) {
+    const base64 = await getImageBase64(att.url)
+    if (base64) {
+      content.push({ type: 'image_url', image_url: { url: base64 } })
+    }
+  }
+
+  return messages.map((m, i) => (i === lastUserIndex ? { ...m, content } : m))
 }
 
 function getSystemPrompt(mode?: AgentMode): string {
@@ -39,6 +109,7 @@ export async function POST(request: NextRequest) {
       useRag,
       mode,
       stream: useStream,
+      attachments,
     } = body as {
       messages?: ChatMessage[]
       action?: 'analyze' | 'suggest' | 'grant' | 'survey' | 'peer_review' | 'paper_generation'
@@ -54,6 +125,7 @@ export async function POST(request: NextRequest) {
       useRag?: boolean
       mode?: AgentMode
       stream?: boolean
+      attachments?: ChatAttachment[]
     }
 
     // Handle special actions
@@ -174,7 +246,7 @@ export async function POST(request: NextRequest) {
 
     if (useRag && messages.length > 0) {
       const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')
-      if (lastUserMessage) {
+      if (lastUserMessage && typeof lastUserMessage.content === 'string') {
         const { context: ragContextText, sources } = await getContextForQuery(
           lastUserMessage.content
         )
@@ -193,10 +265,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Convert image attachments to vision format
+    const visionMessages = await buildVisionMessages(enhancedMessages, attachments)
+
     // Streaming response
     if (useStream) {
       const systemPrompt = getSystemPrompt(mode)
-      const streamResult = await chatWithAIStream(enhancedMessages, systemPrompt)
+      const streamResult = await chatWithAIStream(visionMessages, systemPrompt)
 
       if ('error' in streamResult) {
         return NextResponse.json(
@@ -247,8 +322,8 @@ export async function POST(request: NextRequest) {
     // Non-streaming response
     const systemPrompt = getSystemPrompt(mode)
     const result = context
-      ? await chatWithContext(enhancedMessages, context)
-      : await chatWithAI(enhancedMessages)
+      ? await chatWithContext(visionMessages, context)
+      : await chatWithAI(visionMessages)
 
     if (result.error) {
       return NextResponse.json(

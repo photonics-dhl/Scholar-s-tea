@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Bot, AlertCircle, Lightbulb, FileText, Download } from 'lucide-react'
+import { User, Bot, AlertCircle, Lightbulb, FileText, Download, Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { StreamText } from './StreamText'
 import { CitationCard } from './CitationCard'
@@ -52,6 +52,7 @@ export function ChatMessageItem({
   const isUser = message.role === 'user'
   const isAssistant = message.role === 'assistant'
   const isSystem = message.role === 'system'
+  const [copied, setCopied] = useState(false)
 
   const showStream = isStreaming && isAssistant && streamingContent
 
@@ -63,6 +64,26 @@ export function ChatMessageItem({
   const displayContent = showStream
     ? extractThinkBlocks(streamingContent).cleanContent
     : cleanContent
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displayContent)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback: create temporary textarea
+      const textarea = document.createElement('textarea')
+      textarea.value = displayContent
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   return (
     <div
@@ -119,15 +140,36 @@ export function ChatMessageItem({
                   : 'bg-destructive/10 text-destructive border border-destructive/20 rounded-tl-md'
             )}
           >
-            {showStream ? (
-              <StreamText content={displayContent} speed={5} />
-            ) : isAssistant ? (
-              <SimpleMarkdown content={displayContent} />
-            ) : (
-              <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                {displayContent}
-              </div>
-            )}
+            <div className="relative group/message">
+              {isAssistant && !showStream && (
+                <button
+                  onClick={handleCopy}
+                  className="absolute -top-2 -right-2 opacity-0 group-hover/message:opacity-100 transition-opacity z-10 flex items-center gap-1 rounded-md bg-muted border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/80 shadow-sm"
+                  title="复制内容"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-3 w-3 text-green-500" />
+                      <span className="text-green-500">已复制</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      <span>复制</span>
+                    </>
+                  )}
+                </button>
+              )}
+              {showStream ? (
+                <StreamText content={displayContent} speed={5} />
+              ) : isAssistant ? (
+                <SimpleMarkdown content={displayContent} />
+              ) : (
+                <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                  {displayContent}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

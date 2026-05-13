@@ -374,20 +374,71 @@ npx prisma db seed
 
 ## 11. Deploy
 
-### Environment
+> ⚠️ **CRITICAL ARCHITECTURE RULE**: The live application and Hermes backend run on a **REMOTE Linux server** (`10.72.212.33`, user `zju321`). Local Windows path `z:\321\DHL\Scholar's_Tea` is a **RaiDrive SFTP mount** pointing to `/data/home/zju321/321/DHL/Scholar's_Tea` on the server. Editing local files edits remote files directly, but **build and restart must happen on the server** (via SSH).
 
-- **OS**: CentOS 7 (`10.72.212.33`).
-- **Node.js**: 20 LTS.
-- **No Docker, no CI/CD** — fully manual deploy + PM2.
+### File System Mapping
 
-### Steps
+| Side | Path | Notes |
+|------|------|-------|
+| **Local (Windows)** | `z:\321\DHL\Scholar's_Tea` | RaiDrive SFTP mount of remote home dir |
+| **Remote (Linux)** | `/data/home/zju321/321/DHL/Scholar's_Tea` | Actual files. Symbolic link `~/scholars` → here |
+| **PM2 cwd** | `/data/home/zju321/scholars` | Via symlink |
 
-1. Pull latest on server (`git pull`).
-2. `npm install` (root + `cd server && npm install`).
-3. `npx prisma generate` (migrate if schema changed).
-4. `npm run build`.
-5. `cd server && npm run build`.
-6. `pm2 restart ecosystem.config.js` or `pm2 restart scholars-tea scholars-tea-socket`.
+**Write behavior**: Local edits write through to remote immediately.  
+**Read behavior**: RaiDrive caches directory listings; remote-created files may not appear locally for a few minutes.
+
+### SSH Access
+
+```bash
+# Use the SSH config alias (key: id_ed25519_dirac)
+ssh ZJU-MSE-HPC
+
+# Do NOT rely on bare IP; the alias is required for correct key auth.
+```
+
+### Deploy Steps (Code → Running)
+
+Because local edits hit the remote filesystem directly, the deploy flow is:
+
+```bash
+# 1. Edit files locally (via z:\ drive) — they are already on the server
+
+# 2. SSH to server and build
+ssh ZJU-MSE-HPC
+cd ~/scholars
+
+# 3. Install deps if package.json changed
+npm install
+cd server && npm install && cd ..
+
+# 4. Regenerate Prisma client if schema changed
+npx prisma generate
+
+# 5. Build Next.js (production)
+npm run build
+
+# 6. Build socket server
+cd server && npm run build && cd ..
+
+# 7. Restart PM2 processes
+pm2 restart ecosystem.config.js
+# or individually:
+pm2 restart scholars-tea
+pm2 restart scholars-tea-socket
+```
+
+### Hermes Gateway Restart
+
+The Hermes Python gateway (`hermes gateway run`) is **not** managed by PM2. Restart manually if config changed:
+
+```bash
+ssh ZJU-MSE-HPC
+# Find PID
+ps aux | grep 'hermes gateway run'
+# Kill and restart
+kill <PID>
+hermes gateway run > ~/hermes-home/logs/gateway.log 2>&1 &
+```
 
 ### PM2 Config (`ecosystem.config.js`)
 
@@ -414,9 +465,20 @@ S3_BUCKET="scholars-tea"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
-### Auto-sync
+### Auto-sync (Server → GitHub)
 
-- `scripts/auto-sync.sh` runs every 30 minutes via cron to commit and push server-side changes to the `develop` branch.
+- `scripts/auto-sync.sh` runs every 30 minutes via cron to commit and push **server-side** changes to the `develop` branch.
+- This is a **backup mechanism**, not the primary deploy flow. Do not rely on it for code delivery.
+
+### Two Gateway Processes (Do Not Confuse)
+
+```
+PID 30537  hermes gateway run          ← Scholar's Tea Hermes (MiniMax)
+           Config: ~/scholars/hermes-home/config.yaml
+
+PID 10274  openclaw-gateway            ← Separate project (OpenClaw)
+           Config: ~/.openclaw/openclaw.json
+```
 
 ---
 

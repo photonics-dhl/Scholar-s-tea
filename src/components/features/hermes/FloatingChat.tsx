@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal, Shield, MessageCircle, ChevronDown } from 'lucide-react';
+import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal, Shield, MessageCircle, ChevronDown, ImagePlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 import { useSession } from 'next-auth/react';
-import { useHermesChat, type HermesPersonality } from '@/hooks/useHermesChat';
+import { useHermesChat, type HermesPersonality, compressImageToBase64 } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvatar';
 import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
@@ -206,8 +206,10 @@ export function FloatingChat() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [imageData, setImageData] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { messages, isLoading, toolStatus, mode, setMode, personality, setPersonality, sendMessage, clearMessages } = useHermesChat();
 
   // ===== 拖拽状态 =====
@@ -429,10 +431,40 @@ export function FloatingChat() {
   }, [messages]);
 
   const handleSend = () => {
-    if (!input.trim() || isLoading) return;
-    sendMessage(input.trim());
+    if ((!input.trim() && !imageData) || isLoading) return;
+    sendMessage(input.trim(), imageData || undefined);
     setInput('');
+    setImageData(null);
   };
+
+  const handleImageSelect = async (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    try {
+      const base64 = await compressImageToBase64(file);
+      setImageData(base64);
+    } catch (err) {
+      console.error('[Hermes] Image compression failed:', err);
+    }
+  };
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) handleImageSelect(file);
+        break;
+      }
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const imageFile = files.find(f => f.type.startsWith('image/'));
+    if (imageFile) handleImageSelect(imageFile);
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -478,7 +510,7 @@ export function FloatingChat() {
             isDragging && 'cursor-grabbing',
             !isDragging && 'cursor-grab'
           )}
-          title="学者熊猫 Hermes（按住拖拽，双击菜单）"
+          title="学者小狗 Hermes（按住拖拽，双击菜单）"
           role="button"
           tabIndex={0}
         >
@@ -686,6 +718,13 @@ export function FloatingChat() {
                     : 'bg-white border border-gray-200/80 text-gray-800 rounded-tl-sm shadow-sm'
                 )}
               >
+                {message.imageData && (
+                  <img
+                    src={message.imageData}
+                    alt="Uploaded"
+                    className="max-w-full max-h-[180px] rounded-lg mb-2 object-contain"
+                  />
+                )}
                 {message.role === 'assistant' ? (
                   <SimpleMarkdown content={message.content} className="select-text" />
                 ) : (
@@ -728,12 +767,52 @@ export function FloatingChat() {
 
         {/* Input */}
         <div className="px-3 py-3 bg-white border-t border-gray-100 flex-shrink-0">
+          {/* 图片预览 */}
+          {imageData && (
+            <div className="relative inline-block mb-2">
+              <img
+                src={imageData}
+                alt="Preview"
+                className="h-16 w-16 rounded-lg object-cover border border-gray-200"
+              />
+              <button
+                onClick={() => setImageData(null)}
+                className="absolute -top-1.5 -right-1.5 bg-gray-800 text-white rounded-full p-0.5 hover:bg-gray-700"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImageSelect(file);
+                e.target.value = '';
+              }}
+            />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading || !!imageData}
+              className="size-10 rounded-full flex-shrink-0 text-gray-400 hover:text-tea-primary hover:bg-tea-primary/10"
+              title="上传图片"
+            >
+              <ImagePlus className="w-4 h-4" />
+            </Button>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="问点什么..."
+              onPaste={handlePaste}
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              placeholder={imageData ? '描述图片或补充问题...' : '问点什么...'}
               rows={1}
               className={cn(
                 'flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm',
@@ -750,7 +829,7 @@ export function FloatingChat() {
             <Button
               size="icon"
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && !imageData) || isLoading}
               className="size-10 rounded-full flex-shrink-0 bg-tea-primary hover:bg-tea-primary/90"
             >
               <Send className="w-4 h-4" />

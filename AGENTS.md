@@ -60,7 +60,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 |-------|------|------|
 | API | Next.js API Routes | `src/app/api/v1/`, domain-subdirs |
 | Realtime | Node.js + Socket.io v4 | `server/`, port 3001, separate process |
-| Database | PostgreSQL 9.2.24 + pgvector | Unix socket in production |
+| Database | PostgreSQL 9.2.24 + pgvector | Production instance; schema targets PostgreSQL 16+ |
 | ORM | Prisma | 5.14.x (root) / 5.22.x (server) |
 | Cache | Redis | Optional, used for sessions / queues |
 | Storage | MinIO | S3-compatible object storage |
@@ -78,6 +78,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
   - `convo-*` — Dialog system (blue `#6BA3D6`, blush `#E8A0A0`).
 - CSS variables defined in `src/styles/globals.css` with dark-mode overrides.
 - Use **semantic tokens only**; no hardcoded hex colors in components.
+- Extensive Hermes avatar animations are defined in `tailwind.config.ts` (e.g., `hermes-float`, `hermes-breathe`, `hermes-dance`).
 
 ---
 
@@ -110,24 +111,24 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   ├── knowledge/
 │   │   │   ├── posts/
 │   │   │   ├── publications/
+│   │   │   ├── public-stats/
 │   │   │   ├── tea-party/
 │   │   │   ├── top-questions/
 │   │   │   ├── upload/
 │   │   │   └── user/
-│   │   ├── admin/           # Admin panel
 │   │   ├── layout.tsx       # Root layout (fonts, Live2D script, FloatingChat)
 │   │   └── page.tsx         # Landing page
 │   ├── components/
 │   │   ├── ui/              # shadcn base components — NO business logic
 │   │   ├── features/        # Business components
+│   │   │   ├── editor/
 │   │   │   ├── groups/
 │   │   │   ├── hermes/
 │   │   │   ├── home/
 │   │   │   ├── posts/
 │   │   │   ├── search/
 │   │   │   ├── tea-party/
-│   │   │   ├── workshop/
-│   │   │   └── editor/
+│   │   │   └── workshop/
 │   │   ├── forms/           # Form-specific components
 │   │   ├── layout/          # Layout shells
 │   │   └── providers/       # Global providers (NextAuth, QueryClient, etc.)
@@ -135,7 +136,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   ├── db/prisma.ts     # Prisma singleton — ALL DB ops go here
 │   │   ├── auth/            # NextAuth config, providers, password utils
 │   │   ├── ai/              # Claude wrapper, RAG service, prompts, citation detector
-│   │   │   ├── skills/      # AI skill engine (types, engine, paper-generation)
+│   │   │   ├── skills/      # AI skill engine (types, engine, index, paper-generation)
 │   │   ├── socket/          # Socket.io client utilities
 │   │   └── utils/           # cn(), sanitize, helpers
 │   ├── services/            # Client-side business logic
@@ -154,11 +155,13 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── schema.prisma        # 569 lines, ~30 models
 │   └── seed.ts
 ├── scripts/
-│   ├── start/               # start-nextjs.sh, full-restart.sh, …
+│   ├── admin/               # make-admin.ts
+│   ├── build/               # build-start.sh, clean-rebuild.sh, fix-prisma.sh
+│   ├── check/               # Health check scripts (app, nextjs, prisma, routes, server)
 │   ├── deploy/              # Python/Shell deploy helpers
-│   ├── check/               # Health check scripts
-│   ├── build/               # build-start.sh, clean-rebuild.sh
-│   ├── test/                # Ad-hoc test scripts (no formal framework yet)
+│   ├── start/               # start-nextjs.sh, full-restart.sh, restart-next.sh
+│   ├── sync/                # Claude sync scripts (local/server bidirectional)
+│   ├── test/                # Ad-hoc test scripts (no formal framework)
 │   └── auto-sync.sh         # Auto commit+push every 30 min to `develop`
 ├── docs/
 │   ├── DEPLOYMENT.md        # Full deploy guide (Chinese)
@@ -174,6 +177,9 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── live2d/              # Live2D model assets
 │   └── uploads/             # User uploads
 ├── ecosystem.config.js      # PM2 config (Next.js port 3002, socket port 3001)
+├── next.config.js           # reactStrictMode, image remotePatterns, webpack undici external
+├── postcss.config.js        # tailwindcss + autoprefixer
+├── tailwind.config.ts       # Design tokens, animations, fontFamily
 ├── package.json             # Root Next.js dependencies
 └── .env.example             # Required env template
 ```
@@ -284,7 +290,8 @@ pm2 logs scholars-tea-socket
 
 ⚠️ **No formal test framework is configured.**
 
-- `tests/` contains ad-hoc scripts and screenshots, but no Jest / Vitest / Playwright / Cypress setup.
+- No Jest, Vitest, Playwright, or Cypress configs exist in the repo.
+- `tests/` contains ad-hoc scripts and screenshots, but no formal test suite.
 - `scripts/test/` has diagnostic scripts (`ai-api-test.mjs`, `paper-quality-test.mjs`, `test-prisma.js`) for manual API and integration checks.
 - If you add tests: start with **Vitest + React Testing Library** for unit tests and **Playwright** for E2E.
 
@@ -353,6 +360,8 @@ npx prisma db seed
 - `src/lib/ai/agent-modes.ts` — Hermes personality / mode definitions.
 - `src/lib/ai/skills/engine.ts` — AI skill engine for structured tool use.
 - `src/lib/ai/skills/paper-generation.ts` — Paper generation skill implementation.
+- `src/lib/ai/skills/types.ts` — Skill type definitions.
+- `src/lib/ai/skills/index.ts` — Skill module exports.
 
 ### RAG Storage
 
@@ -542,7 +551,7 @@ PID 10274  openclaw-gateway            ← Separate project (OpenClaw)
 ## 15. Limits & Notes
 
 - **Node.js**: 20 LTS required in production.
-- **PostgreSQL**: 9.2.24 (schema notes mention 16+ as a future goal).
+- **PostgreSQL**: 9.2.24 (schema comments mention 16+ as a future goal).
 - **Socket server**: `server/src/modules`, `plugins`, `services` are currently empty — all logic lives in `handlers/` + `middleware/`.
 - **Tests**: None yet. Add Vitest + React Testing Library when needed.
 - **CI/CD**: None. Rely on `scripts/auto-sync.sh` + manual PM2 restart.

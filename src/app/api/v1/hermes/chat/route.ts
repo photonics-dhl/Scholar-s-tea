@@ -4,6 +4,35 @@ import { authOptions } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 
 const HERMES_API_URL = process.env.HERMES_API_URL || 'http://127.0.0.1:8642/v1/chat/completions'
+const API_SERVER_KEY = process.env.API_SERVER_KEY || 'hk-e4f9a45f3106ee1396164e6dae60137f9f08c0805d75b137404097cc4bdbedac'
+const ZCHAT_API_KEY = process.env.ZCHAT_API_KEY
+const ZCHAT_BASE_URL = process.env.ZCHAT_BASE_URL || 'https://api.zchat.tech/v1'
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY
+const DEEPSEEK_BASE_URL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com'
+const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY
+const MINIMAX_VLM_URL = process.env.MINIMAX_VLM_URL || 'https://api.minimax.chat/v1/coding_plan/vlm'
+const PROXY_URL = process.env.HTTP_PROXY || process.env.HTTPS_PROXY || 'http://127.0.0.1:7890'
+
+/** 获取代理 dispatcher（服务器需要代理才能访问外网） */
+async function getProxyDispatcher() {
+  try {
+    const { ProxyAgent } = await import('undici')
+    return new ProxyAgent(PROXY_URL)
+  } catch {
+    return undefined
+  }
+}
+
+/** 多模态消息内容项 */
+type ContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } }
+
+/** API 消息格式（支持多模态） */
+interface ApiMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: string | ContentPart[]
+}
 
 // Hermes 人格提示词映射（与 hermes-home/config.yaml personalities 对齐）
 const PERSONALITY_PROMPTS: Record<string, string> = {
@@ -72,6 +101,8 @@ const PERSONALITY_PROMPTS: Record<string, string> = {
 // execute_code / todo 调用意愿低；memory 由后端自动注入，无需显式调用。
 const TOOL_USAGE_PROMPT = `
 
+【公式输出规范】当回答中涉及数学公式、希腊字母或特殊符号时，请直接使用 UTF-8 字符（如 α β γ δ ε θ λ μ ν π ρ σ τ φ χ ψ ω Σ Π ∫ ∂ ∇ √ ² ³ ⁴ ½ ¼ ¾ ± ∞ ≈ ≠ ≤ ≥ → ↔ ⇒ ⇔ ∈ ∉ ⊂ ∪ ∩ ∀ ∃ ∴ ∵ 等）直接在文本中表达。绝对禁止使用 LaTeX 格式（如 \\( ... \\)、\\[ ... \\]、$...$、$$...$$ 或 \\nu、\\sigma 等命令）。确保公式对人类直接可读，无需任何渲染引擎。
+
 【可用工具】你拥有以下工具，当用户需求匹配时必须直接调用，禁止先询问"是否需要我帮你..."：
 
 1. skills_list / skill_view / skill_manage — 最可靠
@@ -133,6 +164,124 @@ function getSystemPrompt(personality: string | undefined, mode: string | undefin
 
   const base = PERSONALITY_PROMPTS[personality || 'kawaii'] || PERSONALITY_PROMPTS.kawaii
   return base + TOOL_USAGE_PROMPT
+}
+
+/** 检查消息是否包含图片 */
+function hasImageContent(content: string | ContentPart[]): boolean {
+  if (typeof content === 'string') return false
+  return content.some((part) => part.type === 'image_url')
+}
+
+/** 提取消息中的纯文本 */
+function extractTextContent(content: string | ContentPart[]): string {
+  if (typeof content === 'string') return content
+  return content
+    .filter((part): part is { type: 'text'; text: string } => part.type === 'text')
+    .map((part) => part.text)
+    .join('\n')
+}
+
+/** 提取消息中的图片 URL（base64 data URL） */
+function extractImageUrl(content: string | ContentPart[]): string | undefined {
+  if (typeof content === 'string') return undefined
+  const imgPart = content.find((part) => part.type === 'image_url')
+  return imgPart?.image_url?.url
+}
+
+/** 调用 MiniMax VLM API（图片描述） */
+async function callMinimaxVLM(prompt: string, imageUrl: string): Promise<string> {
+  if (!MINIMAX_API_KEY) {
+    throw new Error('MINIMAX_API_KEY not configured')
+  }
+  const dispatcher = await getProxyDispatcher()
+  const res = await fetch(MINIMAX_VLM_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${MINIMAX_API_KEY}`,
+    },
+    body: JSON.stringify({ prompt, image_url: imageUrl }),
+    ...(dispatcher ? { dispatcher } : {}),
+  } as RequestInit)
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`MiniMax VLM HTTP ${res.status}: ${text}`)
+  }
+
+  const data = await res.json()
+  const content = data?.content
+  const statusCode = data?.base_resp?.status_code
+  const statusMsg = data?.base_resp?.status_msg
+
+  if (statusCode !== 0 && statusCode !== undefined) {
+    throw new Error(`MiniMax VLM error ${statusCode}: ${statusMsg}`)
+  }
+  if (!content || typeof content !== 'string') {
+    throw new Error('MiniMax VLM returned empty content')
+  }
+  return content
+}
+
+/** 调用 ZCHAT Vision API（图片识别） */
+async function callZchatVision(
+  messages: ApiMessage[],
+  maxTokens = 2048,
+  useStream = true
+): Promise<Response> {
+  if (!ZCHAT_API_KEY) {
+    throw new Error('ZCHAT_API_KEY not configured')
+  }
+  const body = {
+    model: 'gpt-5',
+    messages,
+    stream: useStream,
+    max_tokens: maxTokens,
+    temperature: 0.7,
+  }
+  const dispatcher = await getProxyDispatcher()
+  return fetch(`${ZCHAT_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${ZCHAT_API_KEY}`,
+    },
+    body: JSON.stringify(body),
+    ...(dispatcher ? { dispatcher } : {}),
+  } as RequestInit)
+}
+
+/** 调用 DeepSeek API（兜底 fallback） */
+async function callDeepseek(
+  messages: ApiMessage[],
+  maxTokens = 2048,
+  useStream = true
+): Promise<Response> {
+  if (!DEEPSEEK_API_KEY) {
+    throw new Error('DEEPSEEK_API_KEY not configured')
+  }
+  // DeepSeek 不支持多模态，如果有图片需要提取文本并提示
+  const textOnlyMessages = messages.map((m) => ({
+    role: m.role,
+    content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
+  }))
+  const body = {
+    model: 'deepseek-chat',
+    messages: textOnlyMessages,
+    stream: useStream,
+    max_tokens: maxTokens,
+    temperature: 0.7,
+  }
+  const dispatcher = await getProxyDispatcher()
+  return fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+    },
+    body: JSON.stringify(body),
+    ...(dispatcher ? { dispatcher } : {}),
+  } as RequestInit)
 }
 
 async function getCommunityStats(): Promise<string> {
@@ -315,7 +464,13 @@ ${activeDisciplines.map((d, i) => `${i + 1}. ${d.name} — ${d._count?.posts ?? 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { messages, stream = false, sessionId, mode, personality } = body
+    const { messages, stream = false, sessionId, mode, personality } = body as {
+      messages: ApiMessage[]
+      stream?: boolean
+      sessionId?: string
+      mode?: string
+      personality?: string
+    }
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -341,13 +496,16 @@ export async function POST(request: NextRequest) {
       systemPrompt = `${systemPrompt}\n\n${stats}`
     }
 
+    // 检测是否包含图片
+    const lastMessage = messages[messages.length - 1]
+    const isVisionRequest = lastMessage && lastMessage.role === 'user' && hasImageContent(lastMessage.content)
+
     // Build messages with system prompt
-    let enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
+    let enrichedMessages: ApiMessage[] = messages.some((m) => m.role === 'system')
       ? messages
       : [{ role: 'system', content: systemPrompt }, ...messages]
 
     // 内存优化：限制发送给模型的消息数量
-    // 保留 system prompt + 最近 24 条消息，避免过长历史导致 token 爆炸
     const MAX_HISTORY_MESSAGES = 24
     if (enrichedMessages.length > MAX_HISTORY_MESSAGES + 1) {
       const systemMsg = enrichedMessages[0]
@@ -355,48 +513,193 @@ export async function POST(request: NextRequest) {
       enrichedMessages = [systemMsg, ...recent]
     }
 
-    // 截断单条过长消息，避免单个消息占用过多 token
+    // 截断单条过长消息（仅文本部分）
     const MAX_CONTENT_LENGTH = 6000
-    enrichedMessages = enrichedMessages.map((m: { role: string; content: string }) => ({
-      ...m,
-      content: m.content.length > MAX_CONTENT_LENGTH
-        ? m.content.slice(0, MAX_CONTENT_LENGTH) + '\n...[内容过长，已截断]'
-        : m.content,
-    }))
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    // Note: X-Hermes-Session-Id requires API_SERVER_KEY on Hermes API Server.
-    // Disabled to avoid 403. Session memory is not available without the key.
-    // if (sessionId) {
-    //   headers['X-Hermes-Session-Id'] = sessionId
-    // }
-
-    const apiBody = {
-      model: 'hermes-agent',
-      messages: enrichedMessages,
-      stream,
-      max_tokens: 2048,
-      temperature: 0.7,
-    }
-
-    const userId = session?.user?.id || 'anonymous'
-    console.log(`[Hermes] uid=${userId} mode=${mode || 'default'} stream=${stream} msgs=${enrichedMessages.length}`)
-
-    const response = await fetch(HERMES_API_URL, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(apiBody),
+    enrichedMessages = enrichedMessages.map((m) => {
+      if (typeof m.content === 'string') {
+        return {
+          ...m,
+          content: m.content.length > MAX_CONTENT_LENGTH
+            ? m.content.slice(0, MAX_CONTENT_LENGTH) + '\n...[内容过长，已截断]'
+            : m.content,
+        }
+      }
+      // 多模态消息：截断文本部分
+      return {
+        ...m,
+        content: m.content.map((part) => {
+          if (part.type === 'text' && part.text.length > MAX_CONTENT_LENGTH) {
+            return { type: 'text' as const, text: part.text.slice(0, MAX_CONTENT_LENGTH) + '\n...[内容过长，已截断]' }
+          }
+          return part
+        }),
+      }
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('[Hermes] API Server error:', response.status, errorText)
+    const userId = session?.user?.id || 'anonymous'
+    console.log(`[Hermes] uid=${userId} mode=${mode || 'default'} stream=${stream} vision=${isVisionRequest} msgs=${enrichedMessages.length}`)
+
+    let response: Response | null = null
+
+    if (isVisionRequest) {
+      const imageUrl = extractImageUrl(lastMessage.content)
+      const userText = extractTextContent(lastMessage.content)
+      let imageDescription: string | null = null
+
+      // Step 1: MiniMax VLM 获取图片描述
+      if (imageUrl) {
+        try {
+          imageDescription = await callMinimaxVLM(userText || '请描述这张图片', imageUrl)
+          console.log('[Hermes] MiniMax VLM description succeeded')
+        } catch (vlmErr) {
+          console.warn('[Hermes] MiniMax VLM failed:', vlmErr)
+        }
+      }
+
+      if (imageDescription) {
+        // Step 2: 用图片描述走 Hermes Gateway（文本模型）
+        const visionSystemPrompt = `${systemPrompt}
+
+【系统提示】用户上传了一张图片，图片描述如下：
+${imageDescription}
+请基于以上图片描述回答用户的问题。`
+
+        const textMessages = enrichedMessages.map((m, idx) => {
+          if (idx === enrichedMessages.length - 1 && m.role === 'user') {
+            return {
+              role: m.role,
+              content: `【用户上传了图片】\n图片描述：${imageDescription}\n\n用户问题：${userText || '请描述这张图片'}`,
+            }
+          }
+          return {
+            role: m.role,
+            content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
+          }
+        })
+
+        // 确保 system prompt 包含图片描述
+        if (textMessages[0]?.role === 'system') {
+          textMessages[0] = { role: 'system', content: visionSystemPrompt }
+        } else {
+          textMessages.unshift({ role: 'system', content: visionSystemPrompt })
+        }
+
+        const apiBody = {
+          model: 'hermes-agent',
+          messages: textMessages,
+          stream,
+          max_tokens: 2048,
+          temperature: 0.7,
+        }
+
+        try {
+          const gatewayRes = await fetch(HERMES_API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${API_SERVER_KEY}`,
+              ...(sessionId ? { 'X-Hermes-Session-Id': sessionId } : {}),
+            },
+            body: JSON.stringify(apiBody),
+          })
+
+          if (gatewayRes.ok) {
+            response = gatewayRes
+            console.log('[Hermes] Using MiniMax VLM → Hermes Gateway')
+          } else {
+            const errText = await gatewayRes.text()
+            console.warn('[Hermes] Hermes Gateway failed after VLM:', gatewayRes.status, errText)
+            // 继续走兜底逻辑
+          }
+        } catch (gatewayErr) {
+          console.warn('[Hermes] VLM+Gateway failed, falling back to ZCHAT:', gatewayErr)
+        }
+      }
+
+      // Step 3: ZCHAT vision（兜底 1：VLM 失败 或 Gateway 失败）
+      if (!response) {
+        try {
+          const zchatRes = await callZchatVision(enrichedMessages, 2048, stream)
+          if (zchatRes.ok) {
+            response = zchatRes
+            console.log('[Hermes] Using ZCHAT vision (gpt-5)')
+          } else {
+            const errText = await zchatRes.text()
+            console.warn('[Hermes] ZCHAT vision failed:', zchatRes.status, errText)
+            throw new Error(`ZCHAT vision error: ${zchatRes.status}`)
+          }
+        } catch (zchatErr) {
+          console.warn('[Hermes] ZCHAT fallback to DeepSeek:', zchatErr)
+
+          // Step 4: DeepSeek（兜底 2：纯文本）
+          try {
+            const dsRes = await callDeepseek(enrichedMessages, 2048, stream)
+            if (dsRes.ok) {
+              response = dsRes
+              console.log('[Hermes] Using DeepSeek fallback')
+            } else {
+              const errText = await dsRes.text()
+              console.error('[Hermes] DeepSeek fallback failed:', dsRes.status, errText)
+              return NextResponse.json(
+                { success: false, error: { message: `Vision service error: ${dsRes.status}` } },
+                { status: 502 }
+              )
+            }
+          } catch (deepseekErr) {
+            console.error('[Hermes] All vision providers failed:', deepseekErr)
+            return NextResponse.json(
+              { success: false, error: { message: '图片识别服务暂不可用，请稍后重试' } },
+              { status: 502 }
+            )
+          }
+        }
+      }
+    } else {
+      // 纯文本请求：走 Hermes Gateway（MiniMax-M2.7）
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_SERVER_KEY}`,
+      }
+
+      // 传递会话 ID 以维持跨刷新会话记忆
+      if (sessionId) {
+        headers['X-Hermes-Session-Id'] = sessionId
+      }
+
+      // 纯文本消息：确保 content 是 string
+      const textMessages = enrichedMessages.map((m) => ({
+        role: m.role,
+        content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
+      }))
+
+      const apiBody = {
+        model: 'hermes-agent',
+        messages: textMessages,
+        stream,
+        max_tokens: 2048,
+        temperature: 0.7,
+      }
+
+      response = await fetch(HERMES_API_URL, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(apiBody),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[Hermes] API Server error:', response.status, errorText)
+        return NextResponse.json(
+          { success: false, error: { message: `AI service error: ${response.status}` } },
+          { status: response.status }
+        )
+      }
+    }
+
+    if (!response) {
       return NextResponse.json(
-        { success: false, error: { message: `AI service error: ${response.status}` } },
-        { status: response.status }
+        { success: false, error: { message: 'No response from any provider' } },
+        { status: 502 }
       )
     }
 

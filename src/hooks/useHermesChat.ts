@@ -2,9 +2,17 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 
+/** 单条消息内容：纯文本或多模态（OpenAI 格式） */
+export type MessageContent = string | Array<
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } }
+>;
+
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  /** UI 展示用的图片 base64（不在 API 历史中保留原图） */
+  imageData?: string;
 }
 
 /** 内存优化：最大保留消息数（含系统欢迎消息） */
@@ -13,6 +21,10 @@ const MAX_MESSAGES = 32;
 const SSE_THROTTLE_MS = 80;
 /** 单条消息最大字符数，超出截断 */
 const MAX_MESSAGE_CHARS = 8000;
+/** 图片最大尺寸（像素） */
+const MAX_IMAGE_DIM = 1024;
+/** 图片压缩质量 */
+const IMAGE_QUALITY = 0.8;
 
 export type HermesMode = 'kawaii' | 'community_manager';
 export type HermesPersonality =
@@ -45,6 +57,39 @@ const WELCOME_MESSAGES: Record<HermesMode, Record<HermesPersonality, string>> = 
   },
 };
 
+/** 将图片文件压缩并转为 base64 */
+export async function compressImageToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > MAX_IMAGE_DIM || height > MAX_IMAGE_DIM) {
+        const ratio = Math.min(MAX_IMAGE_DIM / width, MAX_IMAGE_DIM / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      const base64 = canvas.toDataURL('image/jpeg', IMAGE_QUALITY);
+      resolve(base64);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load image'));
+    };
+    img.src = url;
+  });
+}
+
 /** 截断过长消息，保留首尾关键信息 */
 function truncateMessage(content: string, maxLen: number): string {
   if (content.length <= maxLen) return content;
@@ -58,6 +103,21 @@ function trimMessages(msgs: ChatMessage[], maxCount: number): ChatMessage[] {
   if (msgs.length <= maxCount) return msgs;
   // 始终保留第一条（欢迎消息）和最近 maxCount-1 条
   return [msgs[0], ...msgs.slice(-(maxCount - 1))];
+}
+
+/** 将 ChatMessage 转为 API 多模态格式 */
+function toApiMessage(msg: ChatMessage): { role: 'user' | 'assistant' | 'system'; content: MessageContent } {
+  // 只有用户消息且带图片时才用多模态格式
+  if (msg.role === 'user' && msg.imageData) {
+    return {
+      role: 'user',
+      content: [
+        { type: 'text', text: msg.content },
+        { type: 'image_url', image_url: { url: msg.imageData } },
+      ],
+    };
+  }
+  return { role: msg.role, content: msg.content };
 }
 
 export function useHermesChat(
@@ -107,7 +167,6 @@ export function useHermesChat(
   }, [mode]);
 
   // 根据用户消息内容，高置信度场景下自动添加工具调用提示
-  // 实测表明 MiniMax-M2.7 在明确收到 "Use X tool" 时调用率更高
   const enhanceMessageWithToolHint = (content: string): string => {
     const trimmed = content.trim();
     // 如果用户已经明确要求使用工具，不再添加前缀
@@ -133,14 +192,14 @@ export function useHermesChat(
   };
 
   const sendMessage = useCallback(
-    async (content: string) => {
-      if (!content.trim() || isLoading) return;
+    async (content: string, imageData?: string) => {
+      if ((!content.trim() && !imageData) || isLoading) return;
 
-      const originalContent = content.trim();
-      const enhancedContent = enhanceMessageWithToolHint(originalContent);
-      const userMessage: ChatMessage = { role: 'user', content: originalContent };
+      const originalContent = content.trim() || (imageData ? '请描述这张图片' : '');
+      const enhancedContent = imageData ? originalContent : enhanceMessageWithToolHint(originalContent);
+      const userMessage: ChatMessage = { role: 'user', content: originalContent, imageData };
       // 发送给 API 的是增强后的内容，但 UI 仍显示原始内容
-      const apiMessage: ChatMessage = { role: 'user', content: enhancedContent };
+      const apiMessage: ChatMessage = { role: 'user', content: enhancedContent, imageData };
 
       // 先截断过长消息，再添加到状态
       const safeUserMsg = { ...userMessage, content: truncateMessage(userMessage.content, MAX_MESSAGE_CHARS) };
@@ -168,6 +227,7 @@ export function useHermesChat(
       }
 
       // 准备发送给 API 的消息历史（同样截断）
+      // 图片消息仅保留最近一条的多模态格式，其余历史消息转为纯文本
       const historyForApi = trimMessages(
         [...messages.map(m => ({ ...m, content: truncateMessage(m.content, MAX_MESSAGE_CHARS) })), safeApiMsg],
         MAX_MESSAGES
@@ -183,10 +243,7 @@ export function useHermesChat(
           credentials: 'same-origin',
           signal: abortController.signal,
           body: JSON.stringify({
-            messages: historyForApi.map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
+            messages: historyForApi.map(toApiMessage),
             stream: true,
             sessionId: sessionIdRef.current,
             mode: mode === 'community_manager' ? 'community_manager' : undefined,

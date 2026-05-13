@@ -65,11 +65,42 @@ export function useHermesChat(
     sessionIdRef.current = `web-${Date.now()}`;
   }, [mode]);
 
+  // 根据用户消息内容，高置信度场景下自动添加工具调用提示
+  // 实测表明 MiniMax-M2.7 在明确收到 "Use X tool" 时调用率更高
+  const enhanceMessageWithToolHint = (content: string): string => {
+    const trimmed = content.trim();
+    // 如果用户已经明确要求使用工具，不再添加前缀
+    if (/use\s+(the\s+)?\w+\s+tool/i.test(trimmed)) return trimmed;
+
+    // 搜索类意图
+    if (/^(搜索|查一下?|找一下?|搜一下?|查询|查找|有没有|什么是|什么是|最新|最近|当前|today|latest|recent|search for|look up|find|what is|what are)/i.test(trimmed)) {
+      return `请使用 web_search 工具搜索以下内容：${trimmed}`;
+    }
+    // 访问网页类意图
+    if (/^(打开|访问|查看|去|browse|visit|go to|check|look at)\s+/i.test(trimmed) && /https?:\/\//.test(trimmed)) {
+      return `请使用 browser_navigate 工具访问以下网页：${trimmed}`;
+    }
+    // 代码执行类意图
+    if (/^(运行|执行|计算|写个?代码|run|execute|calculate|compute|write code|code:)/i.test(trimmed)) {
+      return `请使用 execute_code 工具执行以下请求：${trimmed}`;
+    }
+    // 任务规划类意图
+    if (/^(规划|列出|创建任务|todo|plan|create a list|make a plan)/i.test(trimmed)) {
+      return `请使用 todo 工具处理以下请求：${trimmed}`;
+    }
+    return trimmed;
+  };
+
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim() || isLoading) return;
 
-      const userMessage: ChatMessage = { role: 'user', content: content.trim() };
+      const originalContent = content.trim();
+      const enhancedContent = enhanceMessageWithToolHint(originalContent);
+      const userMessage: ChatMessage = { role: 'user', content: originalContent };
+      // 发送给 API 的是增强后的内容，但 UI 仍显示原始内容
+      const apiMessage: ChatMessage = { role: 'user', content: enhancedContent };
+
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
 
@@ -82,7 +113,7 @@ export function useHermesChat(
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
           body: JSON.stringify({
-            messages: [...messages, userMessage].map((m) => ({
+            messages: [...messages, apiMessage].map((m) => ({
               role: m.role,
               content: m.content,
             })),

@@ -73,15 +73,15 @@ const PERSONALITY_PROMPTS: Record<string, string> = {
 const TOOL_USAGE_PROMPT = `
 
 【可用工具】你拥有以下工具，当用户需求匹配时必须直接调用，禁止先询问"是否需要我帮你..."：
-- web_search / web_extract：联网搜索最新信息、论文、新闻、验证事实
-- browser_navigate 等：访问网页、提取页面内容、查看 arXiv/论坛/博客
-- skills_list / skill_view / skill_manage：查看和调用已安装技能（含 arxiv 搜索、文献管理等）
-- execute_code：在沙箱中运行 Python 代码（计算、数据处理）
+
+- browser_navigate / browser_click 等：访问网页、提取页面内容、查看 arXiv/论坛/博客
+- skills_list / skill_view / skill_manage：查看和调用已安装技能（107个，含 Tavily 搜索、arXiv、文献管理等）
+- execute_code：在沙箱中运行 Python 代码（计算、数据处理、调用 Tavily API 搜索）
 - todo：创建研究任务清单
 - 记忆已自动启用：后端自动保存用户偏好，跨会话保持
 
 【调用规则】
-1. 用户询问"最近/最新/当前..."或要求查找信息 → 立即调用 web_search
+1. 用户要求查找信息/搜索/最新进展 → 优先调用 skills_list 查找搜索类技能，或用 execute_code 运行 Python 调用 Tavily API 搜索
 2. 用户要求访问具体网站或页面内容 → 立即调用 browser_navigate
 3. 用户要求运行代码或计算 → 立即调用 execute_code
 4. 用户询问你有什么能力 → 立即调用 skills_list

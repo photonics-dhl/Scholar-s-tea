@@ -89,7 +89,7 @@ export function useTeaPartySocket(roomId: string) {
 
       socket = io(SOCKET_URL, {
         auth: { token },
-        transports: ['websocket', 'polling'],
+        transports: ['polling'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,

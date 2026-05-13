@@ -397,7 +397,7 @@ export async function peerReview(
   }
 }
 
-// ===== AI 论文生成 =====
+// ===== AI 论文生成（基于 Skill 引擎）=====
 
 import {
   PAPER_GENERATION_SYSTEM_PROMPT,
@@ -409,86 +409,253 @@ import {
   type PaperGenerationStage,
 } from './paper-generation-prompts'
 
+import {
+  executeSkillStage,
+  registerSkill,
+  paperGenerationSkill,
+} from './skills'
+import {
+  preparePaperEnhancement,
+  type CitationVerificationResult,
+} from './paper-enhancement'
+
+// 注册论文生成 Skill（模块加载时自动注册）
+registerSkill(paperGenerationSkill)
+
 export async function generatePaper(
   stage: PaperGenerationStage,
   params: {
-    topic: string;
-    content?: string;
-    background?: string;
-    section?: string;
-    wordCount?: number;
-    dataDescription?: string;
-    analysisGoal?: string;
-    format?: 'latex' | 'markdown' | 'plain';
+    topic: string
+    content?: string
+    background?: string
+    section?: string
+    wordCount?: number
+    dataDescription?: string
+    analysisGoal?: string
+    format?: 'latex' | 'markdown' | 'plain'
+    discipline?: string
+    enableRAG?: boolean
+    enableCitationVerify?: boolean
+  }
+): Promise<ClaudeResponse & { citations?: CitationVerificationResult }> {
+  let ragPrefix = ''
+  let verifyFn: ((text: string) => Promise<CitationVerificationResult>) | null = null
+
+  // Step 1: RAG 增强（如果启用）
+  if (params.enableRAG !== false) {
+    try {
+      const enhancement = await preparePaperEnhancement(params.topic, {
+        discipline: params.discipline,
+      })
+      ragPrefix = enhancement.ragPrefix
+      verifyFn = enhancement.verify
+    } catch (err) {
+      console.warn('RAG enhancement failed for paper generation:', err)
+    }
+  }
+
+  // Step 2: 使用 Skill 引擎执行单阶段
+  const result = await executeSkillStage(
+    'paper-generation',
+    stage,
+    {
+      topic: params.topic,
+      content: params.content,
+      background: params.background ? `${ragPrefix}${params.background}` : ragPrefix || undefined,
+      section: params.section,
+      wordCount: params.wordCount,
+      dataDescription: params.dataDescription,
+      analysisGoal: params.analysisGoal,
+      format: params.format,
+      _ragPrefix: ragPrefix, // 传递给后续阶段
+    },
+    { topic: params.topic, stageOutputs: {}, metadata: {} },
+    { useVision: false }
+  )
+
+  // Step 3: 引用验证（如果启用且生成成功）
+  if (params.enableCitationVerify !== false && !result.error && result.content && verifyFn) {
+    try {
+      const citationResult = await verifyFn(result.content)
+      return {
+        content: citationResult.verifiedText,
+        citations: citationResult,
+      }
+    } catch (err) {
+      console.warn('Citation verification failed:', err)
+    }
+  }
+
+  return result
+}
+
+// ===== ZCHAT 多模态聊天（图片识别）=====
+
+const ZCHAT_DEFAULT_MODEL = process.env.ZCHAT_VISION_MODEL || 'claude-sonnet-4-5'
+const ZCHAT_DEFAULT_BASE_URL = 'https://api.zchat.tech/v1'
+
+/**
+ * Check if messages contain vision/image content
+ */
+export function hasVisionContent(messages: ChatMessage[]): boolean {
+  return messages.some((m) => {
+    if (typeof m.content === 'string') return false
+    return m.content.some(
+      (block) => block.type === 'image_url' || block.type === 'image'
+    )
+  })
+}
+
+/**
+ * Convert Anthropic-format image blocks back to OpenAI format for ZCHAT.
+ * ZCHAT uses standard OpenAI format with image_url content blocks.
+ */
+function normalizeToOpenAIVision(messages: ChatMessage[]): ChatMessage[] {
+  return messages.map((m) => {
+    if (typeof m.content === 'string') return m
+    const content = m.content.map((block) => {
+      if (block.type === 'image' && 'source' in block) {
+        const src = (block as AnthropicImageContent).source
+        if (src.type === 'base64' && src.data && src.media_type) {
+          return {
+            type: 'image_url' as const,
+            image_url: {
+              url: `data:${src.media_type};base64,${src.data}`,
+            },
+          }
+        }
+        if (src.type === 'url' && src.url) {
+          return {
+            type: 'image_url' as const,
+            image_url: { url: src.url },
+          }
+        }
+      }
+      return block
+    })
+    return { ...m, content }
+  })
+}
+
+export async function chatWithZCHAT(
+  messages: ChatMessage[],
+  options?: {
+    systemPrompt?: string
+    maxTokens?: number
+    temperature?: number
+    model?: string
   }
 ): Promise<ClaudeResponse> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
+  const apiKey = process.env.ZCHAT_API_KEY
+  const baseUrl = process.env.ZCHAT_BASE_URL || ZCHAT_DEFAULT_BASE_URL
 
   if (!apiKey) {
-    return { content: '', error: 'AI 服务未配置' };
-  }
-
-  let prompt: string;
-  switch (stage) {
-    case 'proposal':
-      prompt = buildProposalPrompt(params.topic, params.background);
-      break;
-    case 'structure':
-      prompt = buildStructurePrompt(params.topic, params.content);
-      break;
-    case 'writing':
-      prompt = buildWritingPrompt(
-        params.section || '引言',
-        params.topic,
-        params.content,
-        params.wordCount
-      );
-      break;
-    case 'data':
-      prompt = buildDataAnalysisPrompt(
-        params.dataDescription || '',
-        params.analysisGoal || ''
-      );
-      break;
-    case 'formatting':
-      prompt = buildFormattingPrompt(
-        params.content || '',
-        params.format || 'markdown'
-      );
-      break;
-    default:
-      return { content: '', error: '未知的论文生成阶段' };
+    return { content: '', error: 'ZCHAT 服务未配置，请在 .env 中设置 ZCHAT_API_KEY' }
   }
 
   try {
+    const openaiMessages = normalizeToOpenAIVision([
+      { role: 'system', content: options?.systemPrompt || SYSTEM_PROMPT },
+      ...messages,
+    ])
+
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: PAPER_GENERATION_SYSTEM_PROMPT },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 4096,
-        temperature: 0.6,
+        model: options?.model || ZCHAT_DEFAULT_MODEL,
+        messages: openaiMessages,
+        max_tokens: options?.maxTokens || 4096,
+        temperature: options?.temperature ?? 0.7,
       }),
       agent: _agent,
-    } as any);
+    } as any)
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return { content: '', error: `AI 服务错误: ${response.status}` };
+      const errorText = await response.text()
+      console.error('ZCHAT API error:', response.status, errorText)
+      return { content: '', error: `ZCHAT 服务错误: ${response.status}` }
     }
 
-    const data = await response.json();
-    return { content: data.choices?.[0]?.message?.content || '' };
+    const data = await response.json()
+    return { content: data.choices?.[0]?.message?.content || '' }
   } catch (error) {
-    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
+    console.error('ZCHAT chat error:', error)
+    return { content: '', error: error instanceof Error ? error.message : 'ZCHAT 未知错误' }
+  }
+}
+
+export async function chatWithZCHATStream(
+  messages: ChatMessage[],
+  options?: {
+    systemPrompt?: string
+    maxTokens?: number
+    temperature?: number
+    model?: string
+  }
+): Promise<ReadableStream | { error: string }> {
+  const apiKey = process.env.ZCHAT_API_KEY
+  const baseUrl = process.env.ZCHAT_BASE_URL || ZCHAT_DEFAULT_BASE_URL
+
+  if (!apiKey) {
+    return { error: 'ZCHAT 服务未配置，请在 .env 中设置 ZCHAT_API_KEY' }
+  }
+
+  try {
+    const openaiMessages = normalizeToOpenAIVision([
+      { role: 'system', content: options?.systemPrompt || SYSTEM_PROMPT },
+      ...messages,
+    ])
+
+    const response = await _fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: options?.model || ZCHAT_DEFAULT_MODEL,
+        messages: openaiMessages,
+        max_tokens: options?.maxTokens || 4096,
+        temperature: options?.temperature ?? 0.7,
+        stream: true,
+      }),
+      agent: _agent,
+    } as any)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('ZCHAT stream API error:', response.status, errorText)
+      return { error: `ZCHAT 服务错误: ${response.status}` }
+    }
+
+    if (!response.body) {
+      return { error: 'ZCHAT 响应为空' }
+    }
+
+    if (
+      typeof window === 'undefined' &&
+      response.body &&
+      typeof (response.body as any).getReader !== 'function'
+    ) {
+      const { ReadableStream } = require('stream/web')
+      const nodeStream = response.body as unknown as import('stream').Readable
+      return new ReadableStream({
+        start(controller: ReadableStreamDefaultController) {
+          nodeStream.on('data', (chunk) => controller.enqueue(chunk))
+          nodeStream.on('end', () => controller.close())
+          nodeStream.on('error', (err) => controller.error(err))
+        },
+      })
+    }
+
+    return response.body
+  } catch (error) {
+    console.error('ZCHAT stream error:', error)
+    return { error: error instanceof Error ? error.message : 'ZCHAT 未知错误' }
   }
 }
 

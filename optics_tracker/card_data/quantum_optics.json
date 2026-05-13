@@ -2,30 +2,42 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "[PDF] Structured liquid-based reconfigurable all-liquid optical fibers",
-      "abstract": "To overcome these impediments, here we show reconfigurable all-liquid optical fibers (RAOFs) produced by structured liquid, tuned by the",
+      "title": "New fiber-optic sensing method reads strain and displacement through electrical signals | EurekAlert!",
+      "abstract": "A service of the American Association for the Advancement of Science. Electrical-domain interference in polymer optical fibers offers a simpler route to fast sensing without conventional optical-spectrum analysis. Graphical overview of electrical-domain fiber-optic sensing. Light transmitted through",
       "source": "tavily",
-      "url": "https://scholars.cityu.edu.hk/files/425933198/418288928.pdf",
+      "url": "https://www.eurekalert.org/news-releases/1127421",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "利用结构化液体技术制备可重构全液体光学纤维，实现液态波导的动态调控与功能重构。",
-        "research思路": "针对传统固体光纤的刚性结构难以重构、液体波导稳定性不足等问题，提出以结构化液体作为光纤核心材料，实现光学传输的可编程调控。",
-        "experiment": "采用微流控技术构建液体芯层与包层结构，通过表面张力固定液-液界面，使用可调谐液体组成实现光传输特性的动态调控。",
-        "innovation": "首次实现全液体体系的光纤结构化，与现有固态光纤和传统液体波导相比，兼具可重构性与柔性特征，且可实时调节光学参数。",
-        "related_work": "包括液芯光纤技术、微流控光学器件、液体波导、弹性体光纤及可变形光学传感器等研究。",
-        "impact": "为柔性光子学、可调谐光电器件和生物兼容光学系统开辟新路径，推动液相光学器件向实用化方向发展。"
+        "summary": "提出一种基于聚合物光纤电域干涉的新型传感方法，通过电信号直接读取应变和位移，实现快速简化的光纤传感测量。",
+        "research思路": "解决传统光纤传感依赖复杂光学频谱分析导致测量速度慢、系统复杂的问题，探索通过电域信号处理简化测量流程的新途径。",
+        "experiment": "采用聚合物光纤作为传感介质，利用电域干涉效应替代传统光域分析，通过电信号处理实现应变和位移的实时读取。",
+        "innovation": "首次将干涉信号检测从光学域转换至电学域，无需光谱分析仪器即可实现快速传感，大幅简化测量系统复杂度。",
+        "related_work": "传统光纤布拉格光栅(FBG)传感、Michelson干涉仪传感技术、聚合物光纤传感器的电域表征方法等。",
+        "impact": "该方法降低了光纤传感系统的技术门槛和成本，为需要快速、简捷应变监测的工业检测和结构健康监测应用提供了新方案。"
       },
       "domain_trend": {
-        "trend": "结构化全液体光纤实现可重构光学调控，开辟柔性光子学与生物兼容光电器件融合新范式。",
-        "key_topics": [
-          "全液体光纤结构化设计",
-          "可重构光学纤维调控",
-          "柔性光子学与生物兼容光学系统"
-        ],
-        "development_direction": "液相光学器件正从被动波导向主动可重构体系演进，通过结构化液体技术实现动态光场调控，未来将深度融合柔性电子与生物医学工程，推动智能可穿戴光子学与体内光学传感的实用化突破。"
+        "trend": "光纤传感正从专用传感网络向通信基础设施融合迁移，电域检测技术革新简化系统复杂度，分布式多参数感知成为工业化应用突破口。"
+      }
+    },
+    {
+      "title": "Seamless integration of distributed acoustic sensing and passive ...",
+      "abstract": "Explore Benefits of Distributed Fiber Optic Sensing for Optical Network Service Providers. J. Lightwave Technol. 41, 3758–3766 (2023)",
+      "source": "tavily",
+      "url": "https://www.nature.com/articles/s44172-026-00662-z",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "提出将分布式声学传感(DAS)技术与现有光纤通信网络无缝集成的方案，探索光网络服务提供商利用现有基础设施开展传感服务的商业价值与技术可行性。",
+        "research思路": "针对光网络基础设施利用率不足的问题，研究如何利用已部署光纤同时承载通信与传感功能，解决成本敏感型DAS部署中基础设施复用与信号串扰的关键技术挑战。",
+        "experiment": "基于相干OTDR架构搭建DAS系统，在实际城域光纤网络中验证振动检测性能；建立成本效益分析模型，量化基础设施复用带来的经济收益。",
+        "innovation": "首次系统评估通信光纤承载DAS功能的技术-经济双维度可行性；提出低插入损耗的传感-通信共存方案，突破了传统DAS需要专用传感光纤的限制。",
+        "related_work": "DAS技术方面参考Taylor et al. (2019)关于Φ-OTDR的综述；光网络融合传感方面关注Zhu et al.关于传感辅助通信网络监控的工作；商业模型参考ICT基础设施共享研究。",
+        "impact": "为电信运营商开辟了新的增值服务方向，推动DAS从专用传感网络向通信基础设施融合迁移，对智慧城市感知网络和下一代光网络架构设计具有重要参考价值。"
       }
     }
   ]

@@ -2,49 +2,70 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "Imaging technique captures more information about ultrafast ... - Optica",
-      "abstract": "The technique offers scientists a powerful new tool to observe and analyze a wide range of ultrafast phenomena — which can happen in hundreds of",
-      "source": "tavily",
-      "url": "https://www.optica.org/about/newsroom/news_releases/2026/imaging_technique_captures_more_information_about_ultrafast_microscopic_processes/",
-      "authors": [],
+      "title": "Active Control of Topological Exceptional Points in Non-Hermitian Metasurfaces",
+      "abstract": "Active control and ultrafast switching of non-Hermitian photonic systems are essential for next-generation reconfigurable optical technologies. Here, we demonstrate dynamic temporal manipulation of EPs in the terahertz (THz) regime using optically excited germanium (Ge) as an active medium. By exploiting pump-probe delay as a continuous tuning parameter, we achieve sub-picosecond eigenmode switching (~0.5 ps) and realize a complete time-resolved EP encirclement within ~2 ps, enabling direct observation of topological phase accumulation. At EP, the metasurface exhibits highly asymmetric transmission for circularly polarized light, characteristic of chiral mode response. Furthermore, we observe ultrafast eigenmode switching and topological phase evolution within ~1 ps, achieving >99% cross-polarization modulation depth. The measured results show strong agreement with theoretical modeling, with a high Petermann factor of approximately 10^3, confirming the effectiveness of the design. Our work establishes pump-probe delay time as a dynamical control parameter for EP topology, introducing a new regime of ultrafast non-Hermitian photonics for high-speed switching, enhanced sensitivity, and tunable polarization control in the THz domain.",
+      "arxiv_id": "2605.07702v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07702v1",
+      "authors": [
+        "Parul Sharma",
+        "Sobhan Subhra Mishra",
+        "Yash Gupta"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "本研究提出了一种新型超快成像技术，能够捕获更多维度的时空信息，为观察各种超快现象提供强大工具。",
-        "research思路": "解决传统超快成像技术在信息量、时空分辨率或适用范围方面的局限，开发可同时获取高时间分辨率和丰富空间/光谱信息的成像方法。",
-        "experiment": "采用先进的时间-空间编码技术，结合高灵敏探测和计算重建算法，可能涉及泵浦-探测或压缩成像等超快测量原理。",
-        "innovation": "相比现有超快成像技术，实现了信息量的显著提升，可捕获更全面的动态过程信息，突破传统技术的时间和空间分辨率权衡限制。",
-        "related_work": "包括泵浦-探测技术、条纹相机、压缩超快摄影(CUP)、频率-时间成像等超快成像方法，以及鬼成像、单像素成像等先进成像技术。",
-        "impact": "该技术将为物理、化学、生物等学科中的超快过程研究提供新的观测手段，推动超快动力学、激光与物质相互作用等领域的发展。"
+        "summary": "在THz频段利用光学泵浦Ge有源介质实现非厄米超表面EP的主动控制，完成亚皮秒本征模切换和~2ps EP环绕观测，实现>99%交叉偏振调制深度。",
+        "research思路": "解决非厄米光子系统缺乏主动实时控制手段的问题，通过泵浦-探针延迟作为连续调谐参数，在THz频段实现EP动态操控和拓扑相积累的直接观测。",
+        "experiment": "采用光学泵浦的Ge作为有源介质设计非厄米超表面，结合时间分辨泵浦-探针技术，以延迟时间为连续参数进行EP追踪，测量圆偏振光传输特性和本征模切换动力学。",
+        "innovation": "首次实现~0.5 ps亚皮秒本征模切换；~2 ps内完成完整时间分辨EP环绕；获得>99%交叉偏振调制深度；验证高Petermann因子(~10^3)的非厄米效应。",
+        "related_work": "包括非厄米光学和PT对称破缺理论、EP物理与拓扑性质研究、超表面/超材料设计、THz光子技术、以及基于Si、Ge等半导体有源介质的光控研究。",
+        "impact": "为可重构非厄米光子器件提供新范式，将EP工程从静态推向动态实时控制，对下一代高速光通信、传感和计算技术具有重要应用潜力。"
       },
       "domain_trend": {
-        "trend": "超快成像技术正突破时空分辨率极限，朝着多维度、高信息量、单发式测量方向快速发展，为揭示极端物理过程提供全新观测手段。",
-        "key_topics": [
-          "超快成像技术突破",
-          "时空多维度表征",
-          "激光与物质相互作用动力学",
-          "单发测量技术发展"
-        ],
-        "development_direction": "该领域正从传统二维时空分辨向多维高信息量捕获演进，单次测量获取完整时空演化信息成为核心目标，量子光学与超快技术的结合、极端时空尺度表征、以及跨学科应用（物理、化学、生物）是主要发展方向。"
+        "trend": "超快光学正迈向'主动控制时代'——非厄米拓扑调控实现亚皮秒动态切换、可编程多波长激光器融合光子计算、超分辨探测突破阿秒极限，三者共塑实时可重构超快系统新范式。"
       }
     },
     {
-      "title": "Spatiotemporal Shaping of Structured Light Pulses at the Attosecond Scale | Optica",
-      "abstract": "# Spatiotemporal Shaping of Structured Light Pulses at the Attosecond Scale. During the last decade, attosecond science has greatly benefited from the generation of ultrafast laser pulses spatially sculpted in their amplitude, phase and polarization properties—i.e., in their spin and orbital angular",
+      "title": "Engineering Multi-wavelength Emission in All-Fiber Laser Mode-Locked Through Nonlinear Polarization Rotation",
+      "abstract": "The increasing demand for multi-wavelength optical sources to support dense wavelength-division multiplexing (DWDM) channels has driven the development of compact and reconfigurable multi-wavelength fiber lasers. Here, we demonstrate a continuously tunable and deterministically switchable multi-wavelength erbium-doped fiber laser based on nonlinear polarization rotation (NPR) in a compact all-fiber ring cavity. By controlling the intracavity birefringence, NPR acts as a reconfigurable comb filter that enables flexible wavelength selection without modifying the cavity architecture. The laser supports stable spectral states ranging from single- to seven-wavelength mode-locking, enabling reversible wavelength switching and activation/suppression of individual channels. The selectable spectral states can be mapped to binary bit operations, where each wavelength channel represents a controllable logical state. The behavior arises from the interplay between NPR-induced birefringent comb filtering and nonlinear phase modulation, providing a simple and compact platform for reconfigurable multi-channel ultrafast sources for DWDM and photonic signal processing.",
+      "arxiv_id": "2604.10198v1",
+      "published": "2026-04-11",
+      "url": "http://arxiv.org/abs/2604.10198v1",
+      "authors": [
+        "Subrata Manna",
+        "Amala Jose",
+        "K. Nithyanandan"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "首次实现基于NPR的可编程1-7波长切换全光纤锁模激光器，创新性地将多波长状态映射为二进制逻辑操作。",
+        "research思路": "针对DWDM系统对紧凑可重构多波长光源的需求，探索利用NPR双折射效应构建可重构梳状滤波器实现灵活波长选择的技术路径。",
+        "experiment": "采用紧凑全光纤环形腔结构，通过精准控制腔内双折射元件(N/4波片+偏振控制器)调节NPR效应，构建可重构梳状滤波器实现多波长选择。",
+        "innovation": "突破传统多波长激光器波长固定或需重构腔体的限制，首次实现通过纯偏振态控制实现1-7波长连续可调、可逆切换及单独通道独立控制。",
+        "related_work": "NPR锁模技术( Hofer 1992)、多波长掺铒光纤激光器( Bellemare 2000)、梳状滤波器技术( Girault 2019)及可调谐光纤激光器( Mokhtar 2003)。",
+        "impact": "为DWDM系统提供紧凑可重构光源解决方案，开创性地将物理层多波长状态与数字逻辑映射，为光子计算和智能光网络提供新范式。"
+      }
+    },
+    {
+      "title": "Super-resolution femtosecond electron diffraction reveals electronic and nuclear dynamics at conical intersections | Nature Communications",
+      "abstract": "We overcome this by combining the enhanced temporal resolution of mega-electron-volt ultrafast electron diffraction with a super-resolution real-space inversion algorithm, enabling visualization of nuclear and electronic motions at conical intersections with sub-angstrom resolution, surpassing the d",
       "source": "tavily",
-      "url": "https://www.optica.org/events/webinar/2025/09_september/spatiotemporal_shaping_of_structured_light_pulses_at_the_attosecond_scale/",
+      "url": "https://www.nature.com/articles/s41467-025-61975-9",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "首次实现阿秒脉冲的结构光整形，在时空域同步控制振幅、相位、偏振及自旋/轨道角动量，构建四维自由度的超快光场调控平台。",
-        "research思路": "解决传统阿秒技术仅能时域整形的局限，融合结构光场（OAM/PIM）与阿秒脉冲技术，实现空-时-偏振-角动量四维联合调控的科学问题。",
-        "experiment": "采用高次谐波产生（HHG）结合波前/偏振整形技术，利用SLM或定制光学元件对驱动光场进行多自由度调控，产生并表征阿秒结构光脉冲。",
-        "innovation": "突破阿秒科学只能时域整形的瓶颈，首次将结构光的振幅/相位/偏振/OAM多自由度引入阿秒领域，实现前所未有的四维时空整形能力。",
-        "related_work": "高次谐波产生（McPherson 1987）、阿秒脉冲表征（streaking/species）、OAM光场理论（Allen 1992）、阿秒偏振整形（Kazuya 2013）、结构光场调控。",
-        "impact": "为阿秒泵浦-探测、量子动力学调控提供新型工具，奠定超快结构光技术基础，推动阿秒科学向多维并行操控方向发展。"
+        "summary": "利用兆电子伏特超快电子衍射结合超分辨率实空间反演算法，实现亚埃级分辨率可视化锥形交叉点处电子和核的超快动力学过程。",
+        "research思路": "解决锥形交叉点处快速非绝热分子动力学过程难以同时追踪电子与核运动的问题，为理解光化学反应中电子态演化提供直接实验依据。",
+        "experiment": "采用兆电子伏特超快电子衍射技术获得高时间分辨率，结合新开发的超分辨率实空间反演算法重构分子结构演化的三维动态图像。",
+        "innovation": "首次在亚埃级空间分辨率和飞秒级时间分辨率下直接观测锥形交叉点处的核与电子耦合运动，突破传统衍射技术分辨率极限。",
+        "related_work": "超快电子衍射技术发展、锥形交叉理论及实验研究、分子动力学非绝热过程的超快光谱探测等领域的相关工作。",
+        "impact": "为光化学反应、 photosynthesis等涉及锥形交叉的分子动力学过程提供新的实验观测手段，推动超快化学和量子动力学领域的发展。"
       }
     }
   ]

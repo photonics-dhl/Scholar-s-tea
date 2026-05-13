@@ -2,21 +2,74 @@
   "domain_name": "超材料与纳米光学",
   "papers": [
     {
-      "title": "Reconstruction of the Near-Field Electric Field by SNOM Measurement",
-      "abstract": "Scanning near-field optical microscope (SNOM) with nanoscale spatial resolution has been a powerful tool in studying the plasmonic properties of nano",
-      "source": "tavily",
-      "url": "https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.3c02833",
-      "authors": [],
+      "title": "Static SERS with near-minus-one-epsilon substrate",
+      "abstract": "A mechanism for additional enhancement of SERS in the nanoparticle-on-mirror scheme is proposed. This new mechanism is based on the use of a substrate made of material with a near-minus-one permittivity. The setup involves a plasmonic nanoparticle in the form of an oblate ellipsoid positioned above the substrate and a Raman-active molecule located between them. In the conventional nanoparticle-on-mirror scheme, the plasmonic dipole resonance frequency coincides with the Stokes frequency of the Raman-active molecule. Consequently, due to the Purcell effect, the molecule's near fields mostly excites a dipole mode in nanoparticle. This dipole moment is many times greater than the dipole moment of the molecule by itself. If the real part of substrate permittivity is near minus one, the image of the nanoparticle dipole moment in the mirror-substrate is a dipole moment pointed in the same direction but approximately $ 1/{\\rm{Im}} \\varepsilon_{_{\\rm{ENZ}}}$ times larger in magnitude. The simultaneous radiation of these two dipoles additionally increases the SERS intensity in $ 10^4$ times.",
+      "arxiv_id": "2605.07480v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07480v1",
+      "authors": [
+        "Alexey P. Vinogradov",
+        "Evgeny S. Andrianov"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "利用扫描近场光学显微镜（SNOM）技术实现纳米尺度近场电场的重建，为等离子体纳米结构的光学表征提供了高分辨率测量方案。",
-        "research思路": "解决近场光学探测中空间分辨率受限的问题，通过SNOM技术直接测量纳米尺度的近场电场分布，用于研究等离子体纳米结构的 plasmonic 特性。",
-        "experiment": "采用扫描近场光学显微镜（SNOM）作为核心测量工具，通过探针在纳米尺度扫描获取近场光学信号，重建电场分布的二维或三维分布。",
-        "innovation": "提出利用SNOM实现近场电场的完整重建方法，相比传统远场测量具有纳米级空间分辨率，能够揭示局部场增强和等离子体耦合等微观特征。",
-        "related_work": "SNOM技术在近场光学领域的经典应用、等离子体共振的纳米光学表征、近场光学显微镜在表面增强光谱中的应用、以及金属纳米结构的等离激元研究。",
-        "impact": "该工作推动了纳米尺度光学表征技术的发展，为等离子体光学、纳米光子学器件设计提供了重要的实验验证手段，对生物传感、光伏等领域具有应用价值。"
+        "summary": "提出利用近介电常数（ENZ）基底实现纳米粒子-镜子配置中SERS信号增强的新机制，通过镜像偶极矩放大效应使拉曼增强因子达到1/Im(ε_ENZ)量级。",
+        "research思路": "针对传统纳米粒子-镜子SERS方案中增强因子受限于偶极共振的问题，提出利用ENZ材料使基底介电常数实部接近-1，从而实现镜像偶极矩的近50倍放大效应。",
+        "experiment": "采用椭球形等离子体纳米粒子悬于ENZ基底上方，拉曼分子嵌入纳米粒子与基底间隙中，通过数值模拟计算Purcell因子和拉曼增强因子分布。",
+        "innovation": "首次将ENZ材料引入SERS领域，提出基于镜像偶极矩放大而非传统近场增强的全新物理机制，可在不改变纳米结构的情况下实现信号增强。",
+        "related_work": "Gersten-Nitzan拉曼增强理论（1980）、Van Duyne的SERS开创性工作、ENZ材料在光子器件中的应用研究、以及纳米粒子-镜子结构的plasmonic共振研究。",
+        "impact": "为超灵敏分子检测提供了新的设计思路，ENZ基底方案可与现有纳米结构集成，推动痕量分析和生物传感领域的发展。"
+      },
+      "domain_trend": {
+        "trend": "ENZ基底镜像偶极矩机制开辟SERS新范式，实现无纳米结构改造的信号放大，为超灵敏分子检测提供集成化新路径"
+      }
+    },
+    {
+      "title": "High-Q Fano resonance in all-dielectric metasurfaces for molecular fingerprint detection",
+      "abstract": "We present and numerically investigate a high-quality factor (high-Q) meta-atom with Fano resonance. Numerical simulations indicate that the designed meta-atom has a single sharp Fano resonance in the 1350-1750 1/cm range. Moreover, the frequency of the single resonance can be tuned in this frequency range by scaling the meta-atom. We exploit these properties to design a pixelated metasurface for spectrometer-less molecular fingerprint retrieval. The proposed meta-atom with an average quality factor of 2000 makes it possible to decrease the scaling step of metapixels without introducing any resonance overlap between the metapixels leading to higher precision in label-free and non-destructive identification of the molecular fingerprints.",
+      "arxiv_id": "2605.07713v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07713v1",
+      "authors": [
+        "S. Hadi Badri",
+        "M. M. Gilarlue",
+        "Sanam Saeidnahaei"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出一种平均Q因子达2000的全介电超原子Fano共振设计，通过结构缩放实现1350-1750 cm⁻¹范围频率调谐，成功实现无光谱仪的像素化分子指纹检测。",
+        "research思路": "解决传统光谱仪体积庞大、成本高昂的分子指纹检测局限，利用高Q Fano共振超表面实现片上集成化、高灵敏度的中红外分子特征识别。",
+        "experiment": "采用数值模拟方法设计全介电超原子结构，在中红外波段实现单一线尖锐Fano共振，通过改变超原子几何尺寸实现共振频率的精确调控与覆盖。",
+        "innovation": "实现平均Q因子2000的Fano共振设计，突破传统超表面Q因子受限问题；提出无共振重叠的像素化超表面方案，提高分子指纹检索精度。",
+        "related_work": "Fano共振超表面研究、高Q因子全介电纳米天线、分子指纹中红外光谱检测、无光谱仪传感技术、片上集成光子传感器件等相关领域进展。",
+        "impact": "为紧凑型、高灵敏度分子传感芯片奠定基础，推动中红外光子学从实验室走向实际应用，在生物医疗、环境监测、食品安全等领域具有重要应用前景。"
+      }
+    },
+    {
+      "title": "Boundary-dominated optomechanics in silicon metamaterial membranes",
+      "abstract": "Stimulated Brillouin scattering in integrated photonic waveguides enables coherent coupling between optical photons and gigahertz acoustic phonons, providing a powerful mechanism for on-chip microwave photonics and opto-acoustic signal processing. Despite theoretical predictions of ultra-strong Brillouin interactions arising from enhanced light-sound coupling at device boundaries, most state-of-the-art integrated demonstrations remain governed by bulk photoelastic effects. This limitation stems from trade-offs between optical loss, interaction with waveguide boundaries and accessible phonon frequencies associated with the use of transverse-electric optical modes coupled to horizontally breathing mechanical modes. Here we demonstrate a new approach based on transverse-magnetic optical modes coupled to vertically breathing mechanical modes in suspended silicon membranes engineered with subwavelength metamaterial claddings. In this geometry, the interaction is dominated by the moving-boundary effect occurring at smooth top and bottom interfaces, while the phonon frequency is set primarily by the membrane thickness rather than its width. We observe forward Brillouin interactions at a record frequency of 12 GHz with a gain of 7200 W$^{-1}$ m$^{-1}$ and a mechanical quality factor of 620, yielding the highest Brillouin gain-to-quality-factor ratio reported in silicon waveguides. The devices exhibit net Brillouin amplification in millimeter-scale waveguides with pump powers below 15 mW, establishing a scalable platform for high-frequency integrated opto-acoustic signal processing.",
+      "arxiv_id": "2605.07567v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07567v1",
+      "authors": [
+        "David González-Andrade",
+        "Paula Nuño Ruano",
+        "Jianhao Zhang"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "通过横向磁光模式耦合垂直呼吸机械模式结合亚波长超材料包层，在悬浮硅膜中实现边界主导的布里渊散射，突破传统横向电模式受限于体光弹效应的瓶颈。",
+        "research思路": "针对集成波导中理论预测的边界增强布里渊效应未能体现的问题，放弃传统横向电-水平呼吸模式组合，采用横向磁-垂直呼吸模式几何，从根本上解决光学损耗与声子频率的权衡问题。",
+        "experiment": "设计悬浮硅薄膜结构集成亚波长超材料包层，选择TM偏振光模式与垂直呼吸机械模式耦合，利用边界运动效应增强光-声相互作用，通过片上集成平台验证受激布里渊散射性能。",
+        "innovation": "突破体光弹效应主导的局限，首次实现边界效应主导的布里渊相互作用；采用TM模式替代TE模式消除水平边界约束；亚波长包层设计同时控制光学与声学模式分布。",
+        "related_work": "受激布里渊散射集成化研究、微纳光机械谐振器、硅基光子学中的光-声耦合、超材料光学器件、片上微波光子学等领域的重要进展。",
+        "impact": "为片上微波光子学和声光信号处理提供新型器件架构；开辟通过边界工程设计增强布里渊相互作用的新方向；对集成光子学与量子声学的融合发展具有推动作用。"
       }
     }
   ]

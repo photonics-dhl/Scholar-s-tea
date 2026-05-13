@@ -2,42 +2,72 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Near Field Optics | Springer Nature Link",
-      "abstract": "# Near Field Optics. Part of the book series:. This is a preview of subscription content, log in via an institution. ## About this book. ### Scanning Near-Field Optical Microscopy/Near-Field Scanning Optical Microscopy. ### Near-field projection optical microscope (NPOM) as a new approach to nanosca",
-      "source": "tavily",
-      "url": "https://link.springer.com/book/10.1007/978-94-011-1978-8",
-      "authors": [],
+      "title": "Near-field thermal transport in periodic photonic structures",
+      "abstract": "",
+      "doi": "10.1103/b23m-yhws",
+      "url": "https://doi.org/10.1103/b23m-yhws",
+      "authors": [
+        "Anonymous"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "Physical Review Applied",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "近场光学领域专著，聚焦扫描近场光学显微镜(SNOM)和近场投影光学显微镜(NPOM)等技术，实现纳米尺度光学成像突破。",
-        "research思路": "针对传统光学显微镜受限于衍射极限的问题，探索利用倏逝波和近场探测实现亚波长分辨率的光学成像方法。",
-        "experiment": "采用SNOM/NSOM进行近场扫描探测，结合NPOM近场投影技术，通过探针-样品近距离耦合实现纳米级光学分辨率。",
-        "innovation": "NPOM作为近场光学显微镜的新方法，为纳米尺度光学成像提供了不同于传统远场显微的新途径。",
-        "related_work": "包括Synge的近场成像思想、D. W. Pohl的SNOM先驱工作、Eric Betzig的开创性研究及多模态近场探测技术。",
-        "impact": "推动纳米光学显微技术的发展，为生物成像、材料表征和纳米光子学等领域提供了重要的表征工具和方法论。"
+        "summary": "核心科学贡献的一句话总结",
+        "research思路": "解决的科学/技术问题",
+        "experiment": "研究方法与技术路线",
+        "innovation": "相比前人的突破点",
+        "related_work": "领域重要关联研究",
+        "impact": "对学科发展的意义评估"
       },
       "domain_trend": {
-        "trend": "近场光学通过NPOM等新型显微技术突破衍射极限，实现纳米尺度倏逝波探测，正成为纳米光子学与生物医学交叉融合的核心驱动力。"
+        "trend": "近场光学正突破热-耦合动力学瓶颈，从被动测量迈向量子界面主动热管理，探索周期性结构与实时探测的融合路径。"
       }
     },
     {
-      "title": "Near-field scanning optical microscopy studies of electronic and ...",
-      "abstract": "This review focuses on the application of NSOM to the characterization of electronic and photonic materials and devices, with particular emphasis on defects.",
-      "source": "tavily",
-      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0927796X00000310",
-      "authors": [],
+      "title": "Limits of Stable Near-Field Probing in Nanophotonic Traps",
+      "abstract": "Near-fields around nanophotonic structures and waveguides can be used to optically interface particles ranging from atoms and molecules to microscopic biological and synthetic particles. Due to the strong, non-linear dependence of the near-field coupling strength on the particles' position, a change of the spread of the particles' position will change their mean coupling strength. When the particles are trapped, this position spread depends on their temperature, generally leading to temperature-dependent coupling. Here, we experimentally demonstrate that this effect renders optical probing of trapped particles with near fields an inherently transient process. Specifically, we trap cold atoms in a two-color dipole trap surrounding an optical nanofiber and probe them with the evanescent field of guided, resonant light. The scattering of this probe light heats up the atoms, leading to a decrease of the coupling strength as well as loss of atoms. We observe both effects via a concurrent decrease of the absorption signal. In addition, we demonstrate that the coupling strength can be recovered by cooling the atoms back to their initial temperature. Our findings are relevant for numerous situations where stable coupling of trapped particles to a nanophotonic structure is required.",
+      "arxiv_id": "2605.07798v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07798v1",
+      "authors": [
+        "Johannes Piotrowski",
+        "Constanze Bach",
+        "Nicolás Vera Paz"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "系统综述了近场扫描光学显微镜(NSOM)在电子与光子材料及器件表征中的应用，重点阐明其在缺陷检测方面的独特优势与最新进展。",
-        "research思路": "针对电子与光子器件中缺陷对性能影响的关键问题，探索NSOM高空间分辨率光学表征能力在微观缺陷识别、定位及机理分析中的应用潜力。",
-        "experiment": "采用近场光学探针技术实现突破衍射极限的空间分辨率，结合扫描模式对样品表面进行光学成像与光谱分析，获取纳米尺度下的局域光学响应特征。",
-        "innovation": "将NSOM从传统显微成像拓展至电子/光子材料缺陷表征领域，建立空间分辨率与光学灵敏度相结合的多维表征方法，为器件失效分析提供新途径。",
-        "related_work": "包括近场光学理论发展、NSOM仪器改进、光子晶体缺陷表征、量子点发光特性研究、半导体材料表征等相关领域的重要工作。",
-        "impact": "为电子与光子材料的高分辨率表征提供了重要工具，推动了纳米光学检测技术的发展，对光电器件可靠性研究和质量控制具有重要指导意义。"
+        "summary": "实验证明近场耦合强度与粒子温度的相互依赖使纳米光子陷阱中的光学探测成为本质上的瞬态过程，探针光散射加热导致耦合强度持续下降。",
+        "research思路": "针对近场探测中耦合强度与粒子位置分布的非线性依赖问题，通过冷原子-纳米光纤系统验证温度升高如何引发耦合-加热的正反馈循环，揭示近场探测的根本限制。",
+        "experiment": "在光纳米纤维周围构建双色偶极子陷阱捕获冷原子，利用引导共振光的倏逝场进行探测，通过监测原子损失和耦合强度变化来量化探针加热效应。",
+        "innovation": "首次实验揭示了近场探测中温度-耦合强度的正反馈机制，定量展示探针光散射加热如何导致耦合强度下降和原子损失，为近场探测建立了稳定性的基本限制。",
+        "related_work": "包括纳米光纤原子陷阱（Javey group、NVCTION）、倏逝场耦合研究（Vuckovic group）、光力加热机制、以及表面原子探针等近场接口技术。",
+        "impact": "为纳米光子接口的设计提供了温度依赖耦合的基本约束，提示需要开发低加热探测方案或主动热管理策略，对量子接口和生物传感器发展具有重要指导意义。"
+      }
+    },
+    {
+      "title": "svPITE: A Python package for the state-vector-based probabilistic imaginary-time evolution algorithm",
+      "abstract": "We present a Python package for ground-state preparation based on the probabilistic imaginary-time evolution algorithm, with particular focus on its state-vector-based implementation. A standard shot-based simulation is also supported, and results can be benchmarked against exact diagonalisation via a dedicated wrapper. The package enables efficient tuning of initial parameters, facilitating systematic exploration and optimisation of the method's performance. Starting from the prepared ground state, the strong interoperability with other packages further enables real-time evolution and the computation of spectral functions, such as the spin-spin dynamical structure factor.",
+      "arxiv_id": "2605.07559v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07559v1",
+      "authors": [
+        "Pascal Sievers",
+        "Satoshi Ejima"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "svPITE是一个基于概率虚时间演化的基态制备Python包，首次实现了状态矢量形式(state-vector)的算法实现，支持精确对角化基准测试并可计算谱函数。",
+        "research思路": "解决量子多体系统基态制备的计算问题，通过概率虚时间演化(PITE)算法从初始波函数向系统基态投影，并特别关注全态矢量模拟而非经典噪声模拟。",
+        "experiment": "核心方法基于虚时间演化的概率抽样实现：系统性地调优初始参数进行性能优化，通过专用封装器对比精确对角化结果进行基准测试，并利用互操作性计算自旋-自旋动力学结构因子等谱函数。",
+        "innovation": "首次将PITE算法以状态矢量形式实现（而非标准shot-based模拟），支持全量子态的直接模拟；内置基准测试模块和参数高效调优框架；与实时演化模块深度集成可计算动力学谱函数。",
+        "related_work": "该领域的重要工作包括：变分量子本征求解器(VQE)、量子退火(QA)、张量网络方法用于基态求解、基于密度矩阵的重规范化群(DMRG)、以及量子相位估计(QPE)等标准基态制备算法。",
+        "impact": "为量子基态制备领域提供了首个统一的状态矢量+shot模拟的PITE开源实现，降低了准入门槛；其模块化设计和互操作性使其成为连接基态制备与动力学模拟的桥梁，对量子模拟算法发展具有重要推动作用。"
       }
     }
   ]

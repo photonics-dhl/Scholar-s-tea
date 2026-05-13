@@ -24,6 +24,15 @@ root@10.72.212.33: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,pas
 ## 根因分析
 服务器上 `~/.ssh/authorized_keys` 属于 `zju321` 用户，但尝试用 `root@10.72.212.33` 连接。
 
+## 核心规则（永不可忘）
+1. **服务器连接必须使用私钥**：`C:/Users/Mac/.ssh/id_ed25519_scholars_tea`
+   - 命令：`ssh -i "C:/Users/Mac/.ssh/id_ed25519_scholars_tea" zju321@10.72.212.33`
+   - 永远不要用密码连接，服务器只接受密钥认证
+2. **服务开发和运行都在服务器上**：10.72.212.33 (CentOS 7)
+   - 本地 Windows 只是开发副本，不是运行环境
+   - 任何服务状态、配置文件、进程检查都必须在服务器上执行
+   - 绝对禁止在本地判断服务器路径是否存在
+
 ## 解决方案
 使用正确的用户名连接：
 ```bash

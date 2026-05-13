@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils/cn'
 
 import { useChat } from '@/hooks/useChat'
+import { useHermesCapabilities } from '@/hooks/useHermesCapabilities'
 import { getAgentMode, type AgentMode, agentModes } from '@/lib/ai/agent-modes'
 
 import { AgentSidebar } from '@/components/features/workshop/AgentSidebar'
@@ -42,6 +43,8 @@ export default function WorkshopClient() {
     sendMessage,
     stopGeneration,
   } = useChat(initialMode)
+
+  const { capabilities: hermesCaps } = useHermesCapabilities()
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -131,11 +134,37 @@ export default function WorkshopClient() {
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Sparkles className={cn('h-4 w-4', activeMode.color)} />
-            <span className="text-sm font-medium hidden sm:inline">
-              思想工坊
-            </span>
+          <div className="flex items-center gap-3">
+            {/* Hermes Capability Badges */}
+            {hermesCaps?.raw && hermesCaps.raw.length > 0 && (
+              <div className="hidden md:flex items-center gap-1.5">
+                {hermesCaps.raw.map((tool) => (
+                  <span
+                    key={tool}
+                    className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-tea-primary/10 text-tea-primary border border-tea-primary/20"
+                    title={`Hermes 工具: ${tool}`}
+                  >
+                    {tool === 'web' && '搜索'}
+                    {tool === 'browser' && '浏览'}
+                    {tool === 'code_execution' && '代码'}
+                    {tool === 'vision' && '视觉'}
+                    {tool === 'image_gen' && '绘图'}
+                    {tool === 'skills' && '技能'}
+                    {tool === 'todo' && '待办'}
+                    {tool === 'memory' && '记忆'}
+                    {tool === 'session_search' && '回溯'}
+                    {tool === 'clarify' && '澄清'}
+                    {!['web','browser','code_execution','vision','image_gen','skills','todo','memory','session_search','clarify'].includes(tool) && tool}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Sparkles className={cn('h-4 w-4', activeMode.color)} />
+              <span className="text-sm font-medium hidden sm:inline">
+                思想工坊
+              </span>
+            </div>
           </div>
         </header>
 

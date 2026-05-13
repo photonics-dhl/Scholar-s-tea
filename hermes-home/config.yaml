@@ -229,6 +229,14 @@ network:
   force_ipv4: false
 personalities: {}
 platform_toolsets:
+  api_server:
+  - web
+  - browser
+  - code_execution
+  - vision
+  - skills
+  - todo
+  - memory
   cli:
   - hermes-cli
   discord:

@@ -197,11 +197,12 @@ class ArxivSearcher:
     ]
 
     def search_by_category(self, category_id: str, max_results: int = 30, days_back: int = 90) -> List[Dict]:
-        """按领域搜索论文 - 使用ArXiv分类+关键词双重过滤
+        """按领域搜索论文 - ArXiv分类+关键词双重过滤
 
-        添加重试机制应对429限流
+        重试策略：429硬封禁立即返回，429软限速/502-504/超时指数退避，3次全失败返回空列表。
         """
         import time
+        from xml.etree import ElementTree as ET
 
         cat = self.classifier.categories.get(category_id, {})
         keywords = cat.get("keywords", [])
@@ -210,12 +211,9 @@ class ArxivSearcher:
         if not keywords:
             return []
 
-        # 构建 ArXiv 分类查询
+        # 构建 ArXiv 查询
         cat_queries = [f"cat:{c}" for c in self.ARXIV_PHYSICS_CATEGORIES]
         cat_query = " OR ".join(cat_queries)
-
-        # 构建关键词查询（取前5个核心关键词，用 OR 连接扩大召回）
-        # 多词短语用引号包起来做精确匹配，避免 near field 被拆成 near OR field
         keyword_queries = []
         for kw in keywords[:5]:
             if " " in kw or "-" in kw:
@@ -224,9 +222,6 @@ class ArxivSearcher:
             else:
                 keyword_queries.append(f"all:{kw}")
         keyword_query = " OR ".join(keyword_queries)
-
-        # 组合：必须在光学分类中 AND 包含关键词
-        # 注：排除词不在query中（会超长），改在结果返回后post-filter过滤（line ~283）
         query = f"({cat_query}) AND ({keyword_query})"
 
         params = {
@@ -236,94 +231,100 @@ class ArxivSearcher:
             "sortBy": "submittedDate",
             "sortOrder": "descending"
         }
-
-        # 重试机制：最多3次，429时指数退避等待
-        # ArXiv 按 IP 限流，减少突发请求 + 伪装 User-Agent 可降低 429 触发率
         headers = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
+
+        response_content: bytes = b""
         for attempt in range(3):
             try:
-                # ArXiv 公共 API 必须直连，走代理会导致 429 rate limit（坑 13）
-                response = requests.get(self.ARXIV_API, params=params, timeout=60, proxies={}, headers=headers)
+                resp = requests.get(self.ARXIV_API, params=params, timeout=60, proxies={}, headers=headers)
 
-                # 429 Too Many Requests - 指数退避等待后重试
-                if response.status_code == 429:
-                    # 检查是否是 "Rate exceeded" 硬封禁（无需等待，直接跳过）
-                    if b"Rate exceeded" in response.content:
-                        print(f"  ERROR: ArXiv IP rate exceeded for {category_id} — hard block, skipping (attempt {attempt+1}/3)")
-                        return []  # 硬封禁不重试，避免空等
-                    wait_time = (2 ** attempt) * 10  # 10, 20, 40秒指数退避
-                    print(f"  WARNING: ArXiv rate limited for {category_id}, waiting {wait_time}s (attempt {attempt+1}/3)...")
-                    time.sleep(wait_time)
+                if resp.status_code == 429:
+                    if b"Rate exceeded" in resp.content:
+                        print(f"  ERROR: ArXiv hard rate limit for {category_id} — skipping")
+                        return []
+                    wait = (2 ** attempt) * 10
+                    print(f"  WARNING: ArXiv 429 for {category_id}, waiting {wait}s (attempt {attempt+1}/3)...")
+                    time.sleep(wait)
                     continue
 
-                content = response.content
-                if response.status_code == 200 and not (
-                    content.startswith(b"<!") or content.startswith(b"<html")
-                ):
-                    break  # 成功，跳出重试循环
+                if resp.status_code == 200:
+                    content = resp.content
+                    if not (content.startswith(b"<!") or content.startswith(b"<html>")):
+                        response_content = content
+                        break
 
-                # 502/503/504 等服务器错误，或者返回了 HTML → 重试
                 if attempt < 2:
-                    wait_time = (2 ** attempt) * 5
-                    print(f"  WARNING: ArXiv HTTP {response.status_code} for {category_id}, retrying in {wait_time}s...")
-                    time.sleep(wait_time)
+                    wait = (2 ** attempt) * 5
+                    print(f"  WARNING: ArXiv HTTP {resp.status_code} for {category_id}, retrying in {wait}s...")
+                    time.sleep(wait)
                     continue
 
-                # 最后一次尝试也失败
-                print(f"  ERROR: ArXiv search failed for {category_id}: HTTP {response.status_code}")
+                print(f"  ERROR: ArXiv search failed for {category_id}: HTTP {resp.status_code}")
                 return []
 
-            except Exception as e:
-                if attempt == 2:  # 最后一次尝试也失败
-                    print(f"  ERROR: ArXiv search failed for {category_id}: {e}")
+            except requests.exceptions.Timeout:
+                print(f"  WARNING: ArXiv timeout for {category_id} (attempt {attempt+1}/3)")
+                if attempt == 2:
+                    print(f"  ERROR: ArXiv timeout exhausted for {category_id}")
                     return []
                 time.sleep(2 ** attempt)
-        # All 3 attempts exhausted - return empty to avoid crash on next ET.fromstring
-        print(f"  ERROR: ArXiv search exhausted all retries for {category_id}")
-        return []
-
-        # 检查响应是否为有效 XML（429 时 ArXiv 可能返回 HTML）
-        content = response.content
-        if content.startswith(b"<!") or content.startswith(b"<html"):
-            print(f"  WARNING: ArXiv returned HTML (rate limit?), skipping {category_id}")
+            except Exception as e:
+                print(f"  WARNING: ArXiv exception for {category_id}: {type(e).__name__}: {e} (attempt {attempt+1}/3)")
+                if attempt == 2:
+                    print(f"  ERROR: ArXiv exception exhausted for {category_id}")
+                    return []
+                time.sleep(2 ** attempt)
+        else:
+            # 循环正常结束（3次全失败）但没有 return
+            print(f"  ERROR: ArXiv search exhausted all retries for {category_id}")
             return []
 
-        from xml.etree import ElementTree as ET
-        root = ET.fromstring(content)
-        ns = {"atom": "http://www.w3.org/2005/Atom"}
+        # 解析 XML
+        try:
+            root = ET.fromstring(response_content)
+        except ET.ParseError as e:
+            print(f"  ERROR: ArXiv XML parse failed for {category_id}: {e}")
+            return []
 
+        ns = {"atom": "http://www.w3.org/2005/Atom"}
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
         papers = []
 
         for entry in root.findall("atom:entry", ns):
-            # 解析发布日期
-            published_str = entry.find("atom:published", ns).text if entry.find("atom:published", ns) is not None else None
-            if published_str:
+            published_str = entry.find("atom:published", ns)
+            if published_str is not None and published_str.text:
                 try:
-                    published = datetime.fromisoformat(published_str.replace("Z", "+00:00"))
+                    published = datetime.fromisoformat(published_str.text.replace("Z", "+00:00"))
                     if published < cutoff_date:
                         continue
-                except:
+                except (ValueError, AttributeError):
                     pass
 
-            # 解析标题和摘要
-            title = entry.find("atom:title", ns).text.replace("\n", " ").strip() if entry.find("atom:title", ns) is not None else ""
-            abstract = entry.find("atom:summary", ns).text.replace("\n", " ").strip() if entry.find("atom:summary", ns) is not None else ""
+            title_el = entry.find("atom:title", ns)
+            title = title_el.text.replace("\n", " ").strip() if title_el is not None and title_el.text else ""
+            abstract_el = entry.find("atom:summary", ns)
+            abstract = abstract_el.text.replace("\n", " ").strip() if abstract_el is not None and abstract_el.text else ""
 
-            # 排除检查
-            excluded = any(ex.lower() in (title + abstract).lower() for ex in exclude)
-            if excluded:
+            if not title:
                 continue
+
+            if any(ex.lower() in (title + abstract).lower() for ex in exclude):
+                continue
+
+            id_el = entry.find("atom:id", ns)
+            arxiv_url = id_el.text if id_el is not None and id_el.text else ""
+            arxiv_id = arxiv_url.split("/")[-1] if arxiv_url else ""
 
             paper = {
                 "title": title,
                 "abstract": abstract,
-                "arxiv_id": entry.find("atom:id", ns).text.split("/")[-1] if entry.find("atom:id", ns) is not None else "",
-                "published": entry.find("atom:published", ns).text[:10] if entry.find("atom:published", ns) is not None else "",
-                "url": entry.find("atom:id", ns).text if entry.find("atom:id", ns) is not None else "",
-                "authors": [a.find("atom:name", ns).text for a in entry.findall("atom:author", ns) if a.find("atom:name", ns) is not None][:3],
+                "arxiv_id": arxiv_id,
+                "published": (published_str.text[:10] if published_str is not None and published_str.text else ""),
+                "url": arxiv_url,
+                "authors": [a.find("atom:name", ns).text for a in entry.findall("atom:author", ns)
+                           if a.find("atom:name", ns) is not None and a.find("atom:name", ns).text][:3],
                 "citations": 0,
                 "venue": "arXiv"
             }
@@ -332,114 +333,13 @@ class ArxivSearcher:
         return papers
 
     def get_quality_papers(self, category_id: str, top_n: int = 5) -> List[Dict]:
-        """获取质量最高的论文 - P2 高影响力boost策略
+        """获取质量最高的论文
 
-        双查询合并：
-        - Query1: sortBy=relevance → 召回高影响力论文
-        - Query2: sortBy=submittedDate → 召回最新论文
-        - 合并后按: 高影响力论文优先 + 新论文加权
+        单次查询 + 扩大候选池（top_n*4），确保有足够候选供后续分析
+        ArXiv 按 date 排序保证新论文优先，高影响力由 Phase2 S2 补充引用数后加权
         """
-        import concurrent.futures
-
-        def _search_once(sort_by: str) -> List[Dict]:
-            """单次查询（复用 search_by_category 的解析逻辑）"""
-            cat = self.classifier.categories.get(category_id, {})
-            keywords = cat.get("keywords", [])
-            exclude = cat.get("exclude", [])
-            if not keywords:
-                return []
-
-            cat_queries = [f"cat:{c}" for c in self.ARXIV_PHYSICS_CATEGORIES]
-            cat_query = " OR ".join(cat_queries)
-            keyword_queries = []
-            for kw in keywords[:5]:
-                if " " in kw or "-" in kw:
-                    kw_escaped = kw.replace('"', '\\"')
-                    keyword_queries.append(f'all:"{kw_escaped}"')
-                else:
-                    keyword_queries.append(f"all:{kw}")
-            keyword_query = " OR ".join(keyword_queries)
-            query = f"({cat_query}) AND ({keyword_query})"
-
-            params = {
-                "search_query": query,
-                "start": 0,
-                "max_results": 30,
-                "sortBy": sort_by,
-                "sortOrder": "descending"
-            }
-            headers = {
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
-            }
-            try:
-                response = requests.get(
-                    self.ARXIV_API, params=params, timeout=60, proxies={}, headers=headers
-                )
-                if response.status_code != 200 or response.content.startswith(b"<!") or response.content.startswith(b"<html"):
-                    return []
-            except:
-                return []
-
-            from xml.etree import ElementTree as ET
-            try:
-                root = ET.fromstring(response.content)
-            except:
-                return []
-
-            ns = {"atom": "http://www.w3.org/2005/Atom"}
-            cutoff_date = datetime.now(timezone.utc) - timedelta(days=90)
-            papers = []
-            for entry in root.findall("atom:entry", ns):
-                published_str = entry.find("atom:published", ns).text if entry.find("atom:published", ns) is not None else None
-                if published_str:
-                    try:
-                        published = datetime.fromisoformat(published_str.replace("Z", "+00:00"))
-                        if published < cutoff_date:
-                            continue
-                    except:
-                        pass
-
-                title = entry.find("atom:title", ns).text.replace("\n", " ").strip() if entry.find("atom:title", ns) is not None else ""
-                abstract = entry.find("atom:summary", ns).text.replace("\n", " ").strip() if entry.find("atom:summary", ns) is not None else ""
-                excluded = any(ex.lower() in (title + abstract).lower() for ex in exclude)
-                if excluded:
-                    continue
-
-                arxiv_id = entry.find("atom:id", ns).text.split("/")[-1] if entry.find("atom:id", ns) is not None else ""
-                papers.append({
-                    "title": title,
-                    "abstract": abstract,
-                    "arxiv_id": arxiv_id,
-                    "published": entry.find("atom:published", ns).text[:10] if entry.find("atom:published", ns) is not None else "",
-                    "url": entry.find("atom:id", ns).text if entry.find("atom:id", ns) is not None else "",
-                    "authors": [a.find("atom:name", ns).text for a in entry.findall("atom:author", ns) if a.find("atom:name", ns) is not None][:3],
-                    "citations": 0,
-                    "venue": "arXiv",
-                    "_sort_by": sort_by,  # 标记来源
-                })
-            return papers
-
-        # 并行双查询：relevance + date
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-            f1 = executor.submit(_search_once, "relevance")
-            f2 = executor.submit(_search_once, "submittedDate")
-            relevance_papers = f1.result()
-            date_papers = f2.result()
-
-        # 合并去重（arxiv_id 唯一）
-        seen = {}
-        for p in relevance_papers:
-            seen[p["arxiv_id"]] = p
-        for p in date_papers:
-            if p["arxiv_id"] not in seen:
-                seen[p["arxiv_id"]] = p
-
-        papers = list(seen.values())
-
-        # P2 boost: relevance 来源论文加权（排在前面）
-        # sort key: _sort_by="relevance" → 0（优先），_sort_by="submittedDate" → 1
-        papers.sort(key=lambda x: (x.get("_sort_by", "") != "relevance", x.get("published", "")), reverse=True)
-
+        papers = self.search_by_category(category_id, max_results=top_n * 4, days_back=90)
+        papers.sort(key=lambda x: x.get("published", ""), reverse=True)
         return papers[:top_n]
 
 
@@ -1213,8 +1113,9 @@ ArXiv ID：{arxiv_id}
         if trend_match:
             return {"trend": trend_match.group(1)}
 
+        # 解析失败时返回安全默认值，不暴露思考过程或 raw content
         print(f"  WARNING: Parse trend result failed, content: {content[:100]}...")
-        return {"trend": content[:50] if len(content) > 50 else content}
+        return {"trend": "该领域暂无趋势分析"}
 
     # 基于分析结果的领域趋势提示词
     DOMAIN_TREND_FROM_ANALYSIS_PROMPT = """你是一位光学领域顶级学术研究员。请分析以下论文的6维度学术评价，生成领域发展趋势概括。
@@ -1497,32 +1398,28 @@ class TavilySearcher:
             ["Optics Express", "Photonics Research", "IEEE Journal", "Proceedings"],
         ]
 
-        def _query_tier(tier: List[str], kw: str) -> List[Dict]:
-            """单个关键词 + 单个期刊层的查询"""
-            journal_part = " OR ".join(f'"{j}"' for j in tier)
-            query = f'"{kw}" AND ({journal_part})'
-            return self.search_topic(query, max_results=max(max_results, 3))
+        # P1 安全版：顺序查询，每域最多 3 次 Tavily 调用（Tier 并发，关键词串行）
+        # 避免: 15并发(5关键词×3层) × 4workers = 60+ 并发 Tavily 请求导致 429
+        journal_tiers = [
+            ["Nature Photonics", "Advanced Photonics", "Optica"],
+            ["Science", "Physical Review X", "Nature Communications"],
+            ["Optics Express", "Photonics Research", "IEEE Journal"],
+        ]
 
         all_results = []
         seen_urls = set()
 
-        # 为每个关键词 × 每个期刊层并发查询
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-            futures = []
-            for kw in category_keywords[:5]:  # 最多5个关键词
-                for tier in journal_tiers:
-                    futures.append(executor.submit(_query_tier, tier, kw))
-
-            for future in concurrent.futures.as_completed(futures):
-                try:
-                    results = future.result()
-                    for r in results:
-                        url = r.get("url", "")
-                        if url and url not in seen_urls:
-                            seen_urls.add(url)
-                            all_results.append(r)
-                except Exception:
-                    pass
+        for tier in journal_tiers:
+            # 同层期刊 OR 查询（1次 Tavily 调用覆盖整层）
+            journal_part = " OR ".join(f'"{j}"' for j in tier)
+            kw_part = " OR ".join(f'"{kw}"' for kw in category_keywords[:3])  # 最多3个关键词
+            query = f"({kw_part}) AND ({journal_part})"
+            results = self.search_topic(query, max_results=max(max_results, 3))
+            for r in results:
+                url = r.get("url", "")
+                if url and url not in seen_urls:
+                    seen_urls.add(url)
+                    all_results.append(r)
 
         # 按 title 长度降序（长标题 = 更可能是正式论文）
         all_results.sort(key=lambda x: len(x.get("title", "")), reverse=True)
@@ -2512,11 +2409,32 @@ class FeishuCardSender:
                 "text_size": "small"
             })
 
-            # arXiv链接（紧凑）
-            if arxiv_url:
+            # 论文原始链接（ArXiv/DOI/Web）
+            if arxiv_id:
+                # ArXiv 论文 → 优先原始链接，回退到 Enrich 后的 S2 URL
+                paper_url = paper.get("url", "")
+                is_s2_url = "semanticscholar" in paper_url
+                display_url = paper_url if paper_url and not is_s2_url else f"https://arxiv.org/abs/{arxiv_id}"
                 elements.append({
                     "tag": "markdown",
-                    "content": f"<a href='{arxiv_url}'>🔗 arXiv:{arxiv_id}</a>",
+                    "content": f"<a href='{display_url}'>🔗 {arxiv_id}</a>",
+                    "margin": "0px 0px 4px 0px",
+                    "text_size": "small"
+                })
+            elif paper.get("doi"):
+                # DOI 论文 → DOI 链接
+                doi = paper.get("doi", "")
+                elements.append({
+                    "tag": "markdown",
+                    "content": f"<a href='https://doi.org/{doi}'>🔗 DOI链接</a>",
+                    "margin": "0px 0px 4px 0px",
+                    "text_size": "small"
+                })
+            elif paper.get("url") and "semanticscholar" not in paper.get("url", ""):
+                # 其他有 URL 的论文 → 原始链接
+                elements.append({
+                    "tag": "markdown",
+                    "content": f"<a href='{paper['url']}'>🔗 来源链接</a>",
                     "margin": "0px 0px 4px 0px",
                     "text_size": "small"
                 })

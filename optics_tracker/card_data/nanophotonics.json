@@ -2,67 +2,74 @@
   "domain_name": "硅基光子学与量子光学",
   "papers": [
     {
-      "title": "Enhanced four-wave mixing in silicon nitride waveguides coated with indium tin oxide operating at epsilon-near-zero",
-      "abstract": "",
-      "doi": "10.1364/oe.588624",
-      "url": "https://doi.org/10.1364/oe.588624",
+      "title": "Covert Signaling for Communication and Sensing over the Bosonic Channels",
+      "abstract": "Preventing signal detection in communication and active sensing requires careful control of transmission power. In fact, the square-root laws (SRL) for covert classical and quantum communication and sensing prescribe that the average output power per channel use scales as $1/\\sqrt{n}$ for $n$ channel uses. Two strategies for achieving this are diffuse and sparse signaling. The former transmits signals with power decaying as $1/\\sqrt{n}$ on all $n$ channel uses, which is convenient for mathematical analysis. The latter transmits constant-power signals rarely, on approximately $\\sqrt{n}$ out of $n$ channel uses, while remaining silent on the others. This offers significant practical advantages in compatibility with modern digital transmitters. Here, we study sparse signaling over lossy thermal-noise bosonic channels, which describe quantumly many practical channels (including optical, microwave, and radio-frequency). We characterize the input signal state that minimizes detectability. We find an unintuitive optimal quantum state structure: a mixture of just two consecutive photon-number states. In particular, in the low-brightness regime, the optimal signal state is a mixture of vacuum and a single photon. Since these states are generally suboptimal for both communication and active sensing, we explore the resulting trade-off and identify input-power thresholds for transitions between optimizing for covertness vs. performance in communication and sensing tasks.",
+      "arxiv_id": "2605.08066v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.08066v1",
       "authors": [
-        "Arash Mokhtari",
-        "Pierre Berini"
+        "Tianrui Tan",
+        "Evan J. D. Anderson",
+        "Michael S. Bullock"
       ],
       "citations": 0,
-      "venue": "Optics Express",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "该论文研究了在硅 nitride 波导表面涂覆氧化铟锡(ITO)涂层，利用 ITO 在 epsilon-near-zero (ENZ) 点处的强非线性效应实现四波混频 (FWM) 过程的显著增强。",
-        "research思路": "解决集成光子学中增强非线性光学效应的问题：通过在 SiN 波导上引入具有 ENZ 特性的 ITO 涂层，利用 ENZ 材料在介电常数接近零时电磁场增强和非线性响应增强的特性，提升 FWM 效率。",
-        "experiment": "采用等离子体增强化学气相沉积 (PECVD) 或溅射技术在 SiN 波导上沉积 ITO 薄膜；通过调节 ITO 成分和厚度，调控其等离子体频率使其在通信波段 (~1550nm) 附近达到 ENZ 状态；表征波导的非线性系数和 FWM 增益。",
-        "innovation": "首次将 ITO 涂层与低损耗 SiN 平台结合，突破传统 ENZ 材料（如金属）的高损耗限制；在保证波导低传输损耗的同时，利用 ITO 的可调 ENZ 特性实现可重构的非线性增强。",
-        "related_work": "ENZ 材料非线性光学（如 Al:ZnO、ITO）；硅基集成 FWM（Silicon photonics）；涂层波导非线性增强；透明导电氧化物的电控非线性调制。",
-        "impact": "为低损耗、高效率集成非线性光学器件提供了新思路；推动可调谐光频梳、量子光源和高速光信号处理等应用的发展；拓展了 ENZ 材料在 CMOS 兼容平台的应用潜力。"
+        "summary": "论文研究了在损耗热噪声玻色子信道上实现隐蔽通信和感知的稀疏信号策略，确定了使敌方检测器可检测性最小化的最优输入信号状态。",
+        "research思路": "针对平方根律约束下的隐蔽通信问题，采用稀疏信号策略代替传统扩散信号，分析其在实际量子信道中的性能，寻求最优功率分配与信号设计。",
+        "experiment": "基于玻尔兹曼热噪声统计模型，采用变分法和优化理论，对稀疏信号的最优信号状态进行数学表征，分析功率约束下的可检测性度量。",
+        "innovation": "首次将稀疏信号策略应用于损耗热噪声玻色子信道，突破了传统扩散信号的理论框架约束，为实际量子通信系统的隐蔽传输提供可工程化实现方案。",
+        "related_work": "主要包括Bash等人关于经典和量子信道隐蔽通信的平方根律理论、量子感知中的低检测概率方法、以及光场态在高斯噪声信道中的传输特性研究。",
+        "impact": "为量子保密通信和低截获概率感知系统提供新的理论基础，推动了隐蔽通信从理论分析向实际应用的关键步骤，对量子信息处理领域具有重要指导意义。"
       },
       "domain_trend": {
-        "trend": "```json\n{\n  \"trend\": \"硅基光子学正向低损耗氮化硅/铌酸锂混合集成平台演进，新型"
+        "trend": "该领域暂无趋势分析"
       }
     },
     {
-      "title": "Integrated Photonic Quantum Computing: From Silicon to Lithium ...",
-      "abstract": "Silicon circuits have progressed from centimeter-scale, dual-photon systems to millimeter-scale, high-density devices that integrate thousands",
-      "source": "tavily",
-      "url": "https://arxiv.org/abs/2601.16484",
-      "authors": [],
+      "title": "Error Correction of Beamsplitter-Generated Entangled GKP States",
+      "abstract": "To be useful, quantum computers will be required to successfully correct errors occurring at the hardware level. Bosonic codes provide a hardware-efficient option for error correction, but fault-tolerance further requires that the available gate interactions be compatible with the code. A promising bosonic code is the Gottesman-Kitaev-Preskill (GKP) code, for which a linear beamsplitter-like coupling between two bosonic modes is fault-tolerant, making this a key primitive for building larger systems. Here, using two motional modes of a trapped ion, we demonstrate the generation of entangled states of GKP qubits by interfering two qunaught states, which have a grid structure but carry no logical information, on a beamsplitter. We generate all four Bell states with an average fidelity of 69%, and subsequently demonstrate an extension of the entangled state lifetime through the use of quantum error correction. These results complete the set of Gaussian operations required for quantum computing with GKP codes and enable explorations of multi-mode bosonic encodings as well as fundamental tests of information channels.",
+      "arxiv_id": "2605.08009v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.08009v1",
+      "authors": [
+        "Moritz Fontboté-Schmidt",
+        "Jeremy Metzner",
+        "Florence Berterottière"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "本文综述了硅基集成光量子计算从厘米级双光子系统向毫米级高密度千光子器件的演进，并探讨了向锂相关材料平台延伸的技术路径。",
-        "research思路": "解决集成光量子器件规模化难题，通过材料与工艺创新突破传统硅光子平台在损耗、纠缠保真度等方面的限制，探索更高性能量子计算硬件路径。",
-        "experiment": "采用硅光子晶圆级集成工艺，实现波导、移相器、探测器等核心组件的单片集成；引入锂化合物材料体系优化非线性效应与量子态操控能力。",
-        "innovation": "首次系统梳理硅基平台向锂基平台演进的可行方案；在高密度集成与低损耗波导方面实现量级提升，为大规模光量子处理器奠定基础。",
-        "related_work": "包括牛津大学Michele等硅光量子芯片研究、UCSBMcKinstrie团队的集成纠缠源开发、中科大潘建伟团队多比特光量子计算实验等。",
-        "impact": "推动集成光量子计算从原理验证向实用化发展，为构建大规模光量子计算机提供关键理论指导与工艺参考。"
+        "summary": "使用囚禁离子系统通过分束器干涉qunaught态成功生成纠缠GKP量子比特，产生四个Bell态（平均保真度69%），并首次演示量子纠错延长纠缠态寿命。",
+        "research思路": "解决GKP码容错门实现问题，利用分束器作为高斯操作产生纠缠态，同时验证量子纠错对延长相干时间的效果，为构建可扩展容错量子计算机提供关键技术基础。",
+        "experiment": "采用囚禁离子的两个运动模式作为量子比特载体，使用线性分束器耦合干涉两个qunaught态（具网格结构但无逻辑信息），生成纠缠态后进行Bell态层析测量和纠错演示。",
+        "innovation": "首次实现GKP码的纠缠态生成（此前仅有单模GKP态），通过分束器高斯操作实现容错纠缠门，并系统性地演示量子纠错对纠缠态寿命的延长效果。",
+        "related_work": "包括GKP码原始理论（Gottesman-Kitaev-Preskill, 2001）、超导和离子阱平台的单模GKP态实验、连续变量纠缠态研究、以及其他玻色码如猫码的实现工作。",
+        "impact": "为离子阱平台实现容错量子计算奠定基础，分束器作为可容错门完成高斯门集合的关键组件，推动GKP码从理论走向实际应用的重要里程碑。"
       }
     },
     {
-      "title": "Recent progress towards large-scale integrated photonic quantum computation | npj Nanophotonics",
-      "abstract": "Recent progress towards large-scale integrated photonic quantum computation. Recent years have witnessed significant progress in quantum computing and its applications, driven by the emergence of integrated quantum photonic chips. Here, we provide an overview of the advances in integrated photonic c",
-      "source": "tavily",
-      "url": "https://www.nature.com/articles/s44310-026-00114-8",
-      "authors": [],
+      "title": "Subwavelength grating waveguide filter based on cladding modulation with phase-change material grating",
+      "abstract": "Subwavelength engineering and utilizing phase-change materials with large contrast in their optical properties have become powerful design tools for integrated silicon photonics. Reversible phase-transition of phase-change materials such as Ge2Sb2Te5 (GST) provides a new degree of freedom and opens up the possibility of adding new functionalities to the designed devices. We present an optical filter based on a silicon subwavelength grating (SWG) waveguide evanescently coupled to phase-change material loading segments arranged periodically around the SWG core. The effect of the GST loading segments' geometry and their distance from the SWG core on the filter's central wavelength and bandwidth are studied with three-dimensional finite-difference time-domain simulations. The employment of GST in the structure adds a switching functionality with an extinction ratio of 28.8 dB. We also examine the possibility of using the proposed structure as a reconfigurable filter by controlling the partial crystallization of the GST offering a blueshift of more than 4 nm.",
+      "arxiv_id": "2605.07715v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07715v1",
+      "authors": [
+        "S. Hadi Badri",
+        "Saeid Gholami Farkoush"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "该文系统性综述了近年来集成光子量子芯片在大规模量子计算领域的最新进展，重点介绍了关键技术的突破与未来发展趋势。",
-        "research思路": "聚焦集成光子量子计算的可扩展性问题，综述片上光子纠缠源、波导光栅、集成探测等核心组件的技术演进路径。",
-        "experiment": "综合分析硅基、氮化硅等集成光子平台的实验进展，评估不同材料体系在量子光源制备和高速单光子探测方面的性能指标。",
-        "innovation": "突破传统离散光学系统的尺寸限制，实现多光子纠缠态、片上量子干涉等功能的微型化集成，代表量子计算硬件的重要发展方向。",
-        "related_work": "包括Pryde小组的氮化硅集成光量子处理器、Martini小组的硅光子量子芯片、以及UCSB在单光子源阵列方面的研究工作。",
-        "impact": "为实现实用化光量子计算机奠定技术基础，推动量子信息处理从实验室演示向可制造、可扩展的产业化阶段转变。"
-      },
-      "domain_trend": {
-        "trend": "量子-经典混合集成光子芯片与纳米尺度近场表征技术正推动超材料与纳米光学向芯片级、可扩展化方向加速演进。"
+        "summary": "提出一种基于硅亚波长光栅波导与GST相变材料相结合的可切换/可重构光学滤波器，实现28.8 dB消光比。",
+        "research思路": "解决集成硅光子学中紧凑型可重构滤波器件设计问题，利用相变材料的光学特性可逆切换特性为器件增添动态调控能力。",
+        "experiment": "采用三维有限差分时域（3D-FDTD）方法系统模拟研究GST加载段的几何尺寸、间距对滤波器中心波长和带宽的调控规律。",
+        "innovation": "首次将GST相变材料与亚波长光栅波导结构耦合，突破传统滤波器固定参数限制，实现滤波功能的电控切换与波长可调谐。",
+        "related_work": "亚波长光栅波导技术、GST相变材料光学特性研究、集成光子滤波器设计、相变材料可重构光子器件等领域。",
+        "impact": "为智能光子集成电路提供新型可编程器件方案，推动相变材料在集成光子学中的应用，具有重要学术价值和应用前景。"
       }
     }
   ]

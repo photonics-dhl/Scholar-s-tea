@@ -1,16 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth';
-import { prisma } from '@/lib/db/prisma';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/auth'
+import { prisma } from '@/lib/db/prisma'
 
-const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
-const MINIMAX_BASE_URL = process.env.MINIMAX_BASE_URL || 'https://api.minimax.chat/v1';
-const HERMES_MODEL = process.env.HERMES_MODEL || 'MiniMax-M2.7';
+const HERMES_API_URL = process.env.HERMES_API_URL || 'http://127.0.0.1:8642/v1/chat/completions'
 
-const PROXY_URL = process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY;
-
-// Hermes 可爱人格提示词
-const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
+// Hermes 人格提示词映射（与 hermes-home/config.yaml personalities 对齐）
+const PERSONALITY_PROMPTS: Record<string, string> = {
+  kawaii: `你是 Hermes， Scholar's Tea 学术社区的常驻 AI 助手！✨
 
 你的性格特点：
 - 温暖友好，像朋友一样和用户交流
@@ -18,9 +15,73 @@ const KAWAII_SYSTEM_PROMPT = `你是 Hermes， Scholar's Tea 学术社区的常�
 - 对学术问题认真严谨，但不失亲和力
 - 回答简洁明了，避免冗长
 - 遇到代码问题时给出清晰的代码示例
-- 自称 "Hermes" 或 "小 Hermes"
+- 自称 "Hermes" 或 "小 Hermes"`,
 
-记住：你是学术社区的一员，帮助研究人员和学生解决问题！`;
+  technical: `你是 Hermes，Scholar's Tea 学术社区的技术专家 AI 助手。
+
+你的性格特点：
+- 提供详细、准确的技术信息
+- 使用精确术语，给出代码示例
+- 直击问题核心，不绕弯子
+- 对代码和系统问题给出可执行的解决方案`,
+
+  teacher: `你是 Hermes，Scholar's Tea 学术社区的耐心导师 AI 助手。
+
+你的性格特点：
+- 循序渐进地解释概念
+- 使用清晰的例子帮助理解
+- 鼓励提问，不嫌问题简单
+- 确保用户真正理解后才继续`,
+
+  analyst: `你是 Hermes，Scholar's Tea 学术社区的数据分析师 AI 助手。
+
+你的性格特点：
+- 用证据和清晰的逻辑流结构化输出
+- 优先考虑事实而非华丽辞藻
+- 列出编号清单和明确结论
+- 对数据敏感，善于发现趋势和异常`,
+
+  creative: `你是 Hermes，Scholar's Tea 学术社区的创意 AI 助手。
+
+你的性格特点：
+- 跳出框架思考，提供创新解决方案
+- 善于联想和类比
+- 鼓励探索不同的可能性
+- 用生动的比喻和例子激发灵感`,
+
+  professor: `你是 Hermes，Scholar's Tea 学术社区的大学教授 AI 助手。
+
+你的性格特点：
+- 提供详细、严谨的讲解
+- 使用 "例如"、"正如我们所见" 等学术短语
+- 引用相关理论和文献
+- 从基础概念到高级应用层层递进`,
+
+  helpful: `你是 Hermes，Scholar's Tea 学术社区的 AI 助手。
+
+你的性格特点：
+- 乐于助人，友好且高效
+- 根据问题类型调整回答风格
+- 不确定时坦诚说明
+- 提供实用、可操作的建议`,
+}
+
+// 工具使用鼓励语 — 注入到所有 personality 的 system prompt 中
+// 注意：前端 Agent 不允许使用 terminal 和 file 工具（安全限制）
+const TOOL_USAGE_PROMPT = `
+
+【工具能力】你拥有以下工具能力，可以在需要时主动调用，不需要询问用户是否允许：
+- 联网搜索（web_search, web_extract）：获取最新信息、查找资料、验证事实
+- 浏览器自动化（browser_navigate, browser_click 等）：访问网页、提取内容、执行网页操作
+- 代码执行（execute_code）：在沙箱中运行代码并获取结果
+- 技能管理（skills_list, skill_view, skill_manage）：调用已安装的技能（skills）和 MCP 服务
+- 任务规划（todo）：创建和管理任务清单
+- 持久记忆（memory）：跨会话记住重要信息
+
+【安全限制】你没有终端命令（terminal）和文件系统操作（read_file / write_file / patch / search_files）的权限。如果用户请求涉及系统命令或本地文件操作，请明确告知无法执行，并建议其他替代方案。
+
+当用户的问题明显需要上述可用能力时，请直接调用相应工具，不要先询问"是否需要我帮你搜索/执行..."。
+记住：你是 Scholar's Tea 学术社区的一员，帮助研究人员和学生解决问题！`
 
 // Community manager system prompt — 明确告知 AI 已有数据
 const COMMUNITY_MANAGER_BASE_PROMPT = `你是 Scholar's Tea 学者茶话会的「社区运营专家」—— Hermes 的社区管家模式。
@@ -44,22 +105,32 @@ const COMMUNITY_MANAGER_BASE_PROMPT = `你是 Scholar's Tea 学者茶话会的�
 - 用数据和事实支撑观点，避免主观臆断
 - 建议要具体可操作，不要空泛
 - 对敏感问题保持客观中立
-- 使用中文回答，必要时可引用英文术语`;
+- 使用中文回答，必要时可引用英文术语`
+
+function getSystemPrompt(personality: string | undefined, mode: string | undefined): string {
+  // Community manager mode 也注入工具能力
+  if (mode === 'community_manager') {
+    return COMMUNITY_MANAGER_BASE_PROMPT + TOOL_USAGE_PROMPT
+  }
+
+  const base = PERSONALITY_PROMPTS[personality || 'kawaii'] || PERSONALITY_PROMPTS.kawaii
+  return base + TOOL_USAGE_PROMPT
+}
 
 async function getCommunityStats(): Promise<string> {
-  const now = new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const now = new Date()
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
   // 辅助函数：安全执行单个 Prisma 查询
   async function safeQuery<T>(name: string, query: Promise<T>, defaultValue: T): Promise<T> {
     try {
-      const result = await query;
-      return result;
+      const result = await query
+      return result
     } catch (err) {
-      console.error(`[Hermes] Stats query failed [${name}]:`, err);
-      return defaultValue;
+      console.error(`[Hermes] Stats query failed [${name}]:`, err)
+      return defaultValue
     }
   }
 
@@ -85,7 +156,7 @@ async function getCommunityStats(): Promise<string> {
     safeQuery('totalComments', prisma.comment.count(), 0),
     safeQuery('newCommentsWeek', prisma.comment.count({ where: { createdAt: { gte: weekAgo } } }), 0),
     safeQuery('newCommentsDay', prisma.comment.count({ where: { createdAt: { gte: dayAgo } } }), 0),
-  ]);
+  ])
 
   // Batch 2: 课题组、学术成果、互动数据
   const [
@@ -106,7 +177,7 @@ async function getCommunityStats(): Promise<string> {
     safeQuery('pendingCitations', prisma.communityCitation.count({ where: { status: 'PENDING' } }), 0),
     safeQuery('totalVotes', prisma.vote.count(), 0),
     safeQuery('teaPartyRooms', prisma.teaPartyRoom.count(), 0),
-  ]);
+  ])
 
   // Batch 3: 复杂查询（TOP 帖子、活跃学科、活跃用户、低互动帖子）
   const [
@@ -169,22 +240,22 @@ async function getCommunityStats(): Promise<string> {
       }),
       0
     ),
-  ]);
+  ])
 
   // 计算互动率
-  const avgCommentsPerPost = totalPosts > 0 ? (totalComments / totalPosts).toFixed(1) : '0';
+  const avgCommentsPerPost = totalPosts > 0 ? (totalComments / totalPosts).toFixed(1) : '0'
   const engagementRate = totalPosts > 0
     ? (((totalPosts - postsNoComments) / totalPosts) * 100).toFixed(1)
-    : '0';
+    : '0'
 
   // 统计失败项
-  const failedQueries: string[] = [];
+  const failedQueries: string[] = []
   if (totalUsers === 0 && totalPosts === 0 && totalComments === 0) {
     // 如果所有基础计数都返回 0，可能是数据库连接问题
-    failedQueries.push('基础统计');
+    failedQueries.push('基础统计')
   }
 
-  const hasFailures = failedQueries.length > 0;
+  const hasFailures = failedQueries.length > 0
 
   return `【社区实时数据快照 — ${hasFailures ? '部分数据获取失败，请结合已有数据分析' : '数据已获取，请直接分析使用'}】
 
@@ -220,94 +291,74 @@ ${topPostsWeek.map((p, i) => `${i + 1}. 「${p.title}」— ${p.author?.name || 
 📌 最活跃学科 TOP 5：
 ${activeDisciplines.map((d, i) => `${i + 1}. ${d.name} — ${d._count?.posts ?? 0} 帖子 ${d._count?.groups ?? 0} 课题组`).join('\n') || '暂无'}
 
-【注意】以上数据实时获取于 ${now.toLocaleString('zh-CN')}，请基于这些数据进行分析和建议。`;
+【注意】以上数据实时获取于 ${now.toLocaleString('zh-CN')}，请基于这些数据进行分析和建议。`
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { messages, stream = false, sessionId, mode } = body;
+    const body = await request.json()
+    const { messages, stream = false, sessionId, mode, personality } = body
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
         { success: false, error: { message: 'messages is required' } },
         { status: 400 }
-      );
+      )
     }
 
-    let systemPrompt = KAWAII_SYSTEM_PROMPT;
+    let systemPrompt = getSystemPrompt(personality, mode)
 
     if (mode === 'community_manager') {
-      const session = await getServerSession(authOptions);
+      const session = await getServerSession(authOptions)
       if (!session?.user?.id || session.user.role !== 'ADMIN') {
         return NextResponse.json(
           { success: false, error: { message: '社区管家模式需要管理员权限' } },
           { status: 403 }
-        );
+        )
       }
 
-      const stats = await getCommunityStats();
-      systemPrompt = `${COMMUNITY_MANAGER_BASE_PROMPT}\n\n${stats}`;
+      const stats = await getCommunityStats()
+      systemPrompt = `${systemPrompt}\n\n${stats}`
     }
 
-    if (!MINIMAX_API_KEY) {
-      console.error('[Hermes] MINIMAX_API_KEY not configured');
-      return NextResponse.json(
-        { success: false, error: { message: 'AI service not configured' } },
-        { status: 500 }
-      );
-    }
-
+    // Build messages with system prompt
     const enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
       ? messages
-      : [{ role: 'system', content: systemPrompt }, ...messages];
-
-    const apiUrl = `${MINIMAX_BASE_URL}/chat/completions`;
+      : [{ role: 'system', content: systemPrompt }, ...messages]
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${MINIMAX_API_KEY}`,
-    };
-
-    if (sessionId) {
-      headers['X-Session-Id'] = sessionId;
     }
 
+    // Note: X-Hermes-Session-Id requires API_SERVER_KEY on Hermes API Server.
+    // Disabled to avoid 403. Session memory is not available without the key.
+    // if (sessionId) {
+    //   headers['X-Hermes-Session-Id'] = sessionId
+    // }
+
     const apiBody = {
-      model: HERMES_MODEL,
+      model: 'hermes-agent',
       messages: enrichedMessages,
-      stream: stream,
-      max_tokens: 2048,
+      stream,
+      max_tokens: 4096,
       temperature: 0.7,
-    };
+    }
 
-    console.log('[Hermes] Calling MiniMax API, mode:', mode || 'default', 'stream:', stream, 'messages count:', enrichedMessages.length);
+    console.log('[Hermes] Calling Hermes API Server, mode:', mode || 'default', 'stream:', stream, 'messages count:', enrichedMessages.length)
 
-    const fetchOpts: RequestInit & { dispatcher?: unknown } = {
+    const response = await fetch(HERMES_API_URL, {
       method: 'POST',
       headers,
       body: JSON.stringify(apiBody),
-    };
-
-    if (PROXY_URL) {
-      try {
-        const { ProxyAgent } = await import('undici');
-        fetchOpts.dispatcher = new ProxyAgent(PROXY_URL);
-        console.log('[Hermes] Using proxy:', PROXY_URL);
-      } catch (proxyErr) {
-        console.warn('[Hermes] Proxy setup failed:', proxyErr);
-      }
-    }
-
-    const response = await fetch(apiUrl, fetchOpts);
+    })
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[Hermes] MiniMax API error:', response.status, errorText);
+      const errorText = await response.text()
+      console.error('[Hermes] API Server error:', response.status, errorText)
       return NextResponse.json(
         { success: false, error: { message: `AI service error: ${response.status}` } },
         { status: response.status }
-      );
+      )
     }
 
     if (stream && response.body) {
@@ -317,16 +368,16 @@ export async function POST(request: NextRequest) {
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
         },
-      });
+      })
     }
 
-    const data = await response.json();
-    return NextResponse.json({ success: true, data });
+    const data = await response.json()
+    return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error('[Hermes] Proxy error:', error);
+    console.error('[Hermes] Proxy error:', error)
     return NextResponse.json(
       { success: false, error: { message: 'Internal server error' } },
       { status: 500 }
-    );
+    )
   }
 }

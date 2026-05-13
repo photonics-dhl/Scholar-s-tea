@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal, Shield, MessageCircle } from 'lucide-react';
+import { Send, Minimize2, Trash2, User, Sparkles, GripHorizontal, Shield, MessageCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 import { useSession } from 'next-auth/react';
-import { useHermesChat } from '@/hooks/useHermesChat';
+import { useHermesChat, type HermesPersonality } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
 import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvatar';
 import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
@@ -208,7 +208,7 @@ export function FloatingChat() {
   const [input, setInput] = useState('');
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, isLoading, mode, setMode, sendMessage, clearMessages } = useHermesChat();
+  const { messages, isLoading, mode, setMode, personality, setPersonality, sendMessage, clearMessages } = useHermesChat();
 
   // ===== 拖拽状态 =====
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -581,6 +581,24 @@ export function FloatingChat() {
                       ? '社区运营助手'
                       : '你的常驻 AI 助手'}
                 </p>
+                {/* Personality selector */}
+                <div className="relative mt-0.5">
+                  <select
+                    value={personality}
+                    onChange={(e) => setPersonality(e.target.value as HermesPersonality)}
+                    className="appearance-none bg-white/20 hover:bg-white/30 text-white text-[10px] rounded px-1.5 py-0.5 pr-4 cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/50 transition-colors"
+                    title="切换人格"
+                  >
+                    <option value="kawaii" className="text-gray-800">✨ 可爱</option>
+                    <option value="technical" className="text-gray-800">⚙️ 技术</option>
+                    <option value="teacher" className="text-gray-800">📚 导师</option>
+                    <option value="analyst" className="text-gray-800">📊 分析</option>
+                    <option value="creative" className="text-gray-800">💡 创意</option>
+                    <option value="professor" className="text-gray-800">🎓 教授</option>
+                    <option value="helpful" className="text-gray-800">🤝 通用</option>
+                  </select>
+                  <ChevronDown className="absolute right-0.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-white/80 pointer-events-none" />
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-1">

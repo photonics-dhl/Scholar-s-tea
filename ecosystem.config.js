@@ -4,7 +4,7 @@ module.exports = {
       name: 'scholars-tea',
       script: 'node_modules/next/dist/bin/next',
       args: 'start -p 3002',
-      cwd: '/data/home/zju321/scholars-tea',
+      cwd: '/data/home/zju321/scholars',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
@@ -28,7 +28,7 @@ module.exports = {
     {
       name: 'scholars-tea-socket',
       script: 'server/dist/index.js',
-      cwd: '/data/home/zju321/scholars-tea',
+      cwd: '/data/home/zju321/scholars',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,

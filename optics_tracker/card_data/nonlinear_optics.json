@@ -2,42 +2,72 @@
   "domain_name": "非线性光学",
   "papers": [
     {
-      "title": "Near Field Optics - an overview | ScienceDirect Topics",
-      "abstract": "# Near Field Optics. Near field optics refers to the behavior of light propagating near a surface, allowing for the selective excitation of fluorescence and high-resolution enhancement of techniques like Raman microscopy, surpassing the resolution limits of conventional optics. This area, which is t",
-      "source": "tavily",
-      "url": "https://www.sciencedirect.com/topics/physics-and-astronomy/near-field-optics",
-      "authors": [],
+      "title": "Four-Wave Mixing by Structured Light in  Diamond-Type Atomic System",
+      "abstract": "",
+      "doi": "10.1364/optcon.585031",
+      "url": "https://doi.org/10.1364/optcon.585031",
+      "authors": [
+        "Afaf Alsulaimi",
+        "Andreas Lyras"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "Optics Continuum",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "综述近场光学原理及其在突破传统光学衍射极限、实现高分辨率荧光激发和拉曼显微镜增强方面的应用。",
-        "research思路": "解决传统光学因衍射极限导致的分辨率限制问题，通过研究光与物质在纳米尺度的近场相互作用，实现亚波长尺度的光学探测和成像。",
-        "experiment": "采用近场扫描光学显微镜（SNOM）、尖端增强拉曼光谱（TERS）等技术，利用纳米孔径探针或尖锐金属尖端实现近场光学耦合和信号增强。",
-        "innovation": "首次系统阐述近场光学如何选择性激发荧光并增强拉曼信号，为超越衍射极限的高分辨率光学显微镜提供了理论基础和技术路径。",
-        "related_work": "SNOM的早期发展、TERS技术的完善、金属纳米结构SERS效应研究、以及固体浸没透镜等超分辨率成像方法。",
-        "impact": "为纳米光学和生物光子学提供了关键技术支撑，推动了高分辨率成像、单分子检测和纳米级光谱分析等领域的发展。"
+        "summary": "核心贡献一句话概括",
+        "research思路": "解决的科学/技术问题",
+        "experiment": "关键方法与技术方案",
+        "innovation": "相比已有工作的突破",
+        "related_work": "领域重要关联工作",
+        "impact": "对领域发展的意义与影响"
+      },
+      "domain_trend": {
+        "trend": "量子优化突破固定哈密顿量约束、硬件无关量子通信兴起、非线性光学与量子信息深度融合指向新方向"
       }
     },
     {
-      "title": "Nonlinear optics in materials: integral transformation of optical four-wave mixing spectra | Journal of Materials Science: Materials in Electronics | Springer Nature Link",
-      "abstract": "# Nonlinear optics in materials: integral transformation of optical four-wave mixing spectra. We analyze the estimation of the third-order susceptibility χ(3) of nonlinear optical (NLO) materials by means of a Hilbert transformation applied to their optical four-wave mixing spectra. In this case, th",
-      "source": "tavily",
-      "url": "https://link.springer.com/article/10.1023/A:1026195507972",
-      "authors": [],
+      "title": "Breaking QAOA's Fixed Target Hamiltonian Barrier: A Fully Connected Quantum Boltzmann Machine via Bilevel Optimization",
+      "abstract": "To overcome the limitations of classical partially connected Boltzmann machines and mainstream quantum Boltzmann machines (QBMs), this work extends the conventional circuit of the quantum approximate optimization algorithm (QAOA) to a bilevel optimization architecture and proposes a fully connected QBM. The inner-loop training simulates positive phase energy minimization based on the computational process of the conventional QAOA circuit, whereas the outer-loop training simulates negative phase contrastive divergence learning by optimizing the structural parameters of the target Hamiltonian. It is found that, first, the model exhibits superior performance using only a single layer (p=1) in the QAOA circuit, with an average probability of 0.9559 in measuring the target quantum state under noiseless conditions. Second, the model exhibits notable noise robustness. Under the typical noise level of current mainstream commercial quantum computing devices, the average probability of measuring the target quantum state reaches 0.6047; when the noise rises to a more stringent level with doubled intensity, this probability remains at 0.3859. In both scenarios, the target quantum state maintains the highest measurement probability among all detected states, with a value several times higher than that of the second-ranked state. This indicates that the model retains strong robustness even when noise meets or exceeds the upper limit of current mainstream commercial quantum computing devices. Third, under a block-by-block learning strategy with p=1 and only 10 measurement shots, the model consistently generates the target \"qubit\" grid image regardless of noise interference, demonstrating strong robustness in image generation.",
+      "arxiv_id": "2605.07473v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07473v1",
+      "authors": [
+        "Jun Liu"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "研究通过Hilbert变换分析光学四波混合光谱，实现对非线性光学材料三阶非线性极化率χ(3)的有效估算。",
-        "research思路": "解决NLO材料三阶非线性光学特性的快速精准表征问题，利用Hilbert变换建立光谱信号与χ(3)的数学关联。",
-        "experiment": "采用光学四波混合（FWM）光谱测量技术获取样品非线性响应信号，结合Hilbert积分变换处理数据提取χ(3)参数。",
-        "innovation": "首次将Hilbert变换应用于四波混合光谱分析，建立实部与虚部的Kramers-Kronig关系，实现χ(3)的完整表征。",
-        "related_work": "Kramers-Kronig变换方法在非线性光学中的应用、四波混合光谱技术、χ(3)测量方法（Z-scan、THG等）",
-        "impact": "为NLO材料表征提供新的数学工具，简化χ(3)测量流程，有助于新型光电材料与光子器件的研发筛选。"
-      },
-      "domain_trend": {
-        "trend": "非线性光学正加速向纳米尺度演进，通过Hilbert变换等数学工具革新材料表征方法，结合近场光学突破衍射极限，推动超分辨成像与生物光子学深度融合。"
+        "summary": "提出双层优化的全连接量子玻尔兹曼机架构，突破QAOA固定目标哈密顿量限制，实现单层p=1下0.9559的高测量概率。",
+        "research思路": "解决经典和主流量子玻尔兹曼机连接性受限的问题，通过双层优化架构分别处理正向相位能量最小化和负向相位对比散度学习。",
+        "experiment": "采用QAOA电路进行内层训练模拟正向相位，外层通过优化目标哈密顿量结构参数实现对比散度学习，在 noiseless 和含噪条件下验证模型性能。",
+        "innovation": "首次将QAOA扩展为双层优化架构实现全连接QBM；单层（p=1）即可达到0.9559高概率；展现出对当前主流商业量子设备噪声的强鲁棒性。",
+        "related_work": "经典玻尔兹曼机、主流量子玻尔兹曼机（QBM）、量子近似优化算法（QAOA）、对比散度（CD）学习方法。",
+        "impact": "为量子机器学习提供了新架构选择，双层优化框架可推广至其他量子优化问题，同时其噪声鲁棒性对近中期量子硬件实用化具有重要参考价值。"
+      }
+    },
+    {
+      "title": "Hardware-Free Polarization Stabilization for Measurement-Device-Independent Quantum Key Distribution via Correlated Twirling",
+      "abstract": "Measurement-Device-Independent Quantum Key Distribution (MDI-QKD) provides unconditional security against detector vulnerabilities, but its practical deployment is severely hindered by asymmetric channel turbulence. Fluctuations in optical fibers induce arbitrary polarization drift, degrading Hong-Ou-Mandel interference and forcing extensive calibration downtime. In this work, we propose a hardware-free polarization stabilization technique utilizing a Correlated Twirling protocol based on a unitary 2-design. By applying a synchronized, public twirling supermap, Alice and Bob mathematically transform deterministic, asymmetric geometric rotations into an isotropic Pauli depolarizing channel. Executed entirely as a virtual post-processing step during classical sifting, this protocol mathematically suppresses intrinsic channel noise by a factor of 2/3. We demonstrate through exact quantum state simulations that this induced symmetry neutralizes catastrophic axis-dependent failures, extending the Y-bias tolerance from 0.68 to 0.84 radians. Furthermore, the protocol passively extends the absolute angular misalignment tolerance for the 11% security threshold from $38.7^\\circ$ to $47.9^\\circ$, sustaining secure key distillation over extended fiber distances in highly turbulent regimes where standard architectures fail. Inherently compatible with decoy-state weak coherent pulses, this algorithmic approach provides a highly scalable, resource-efficient framework for robust long-distance quantum networks.",
+      "arxiv_id": "2605.07229v1",
+      "published": "2026-05-08",
+      "url": "http://arxiv.org/abs/2605.07229v1",
+      "authors": [
+        "Papon Pewkhom",
+        "Nattee Jeennugool",
+        "Norshamsuri Ali"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出基于幺正2-设计的关联旋转协议实现硬件无关偏振稳定，将MDI-QKD中非对称几何旋转转换为各向同性退极化信道，消除偏振漂移导致的干涉失败。",
+        "research思路": "针对光纤信道偏振漂移导致Hong-Ou-Mandel干涉可见度下降、需频繁校准的技术瓶颈，采用纯数学后处理方法替代传统硬件偏振控制。",
+        "experiment": "通过精确量子态模拟验证关联旋转协议效果，在经典密钥筛选阶段执行同步公开twirling超映射，实现确定性信道保真度提升。",
+        "innovation": "首次提出硬件无关的偏振稳定方案，将信道内在噪声压低2/3，并通过虚拟后处理数学消除轴依赖性失效，无需部署偏振控制器件。",
+        "related_work": "MDI-QKD基础协议(Lo et al., 2012)、偏振编码QKD系统、实际信道补偿技术如偏振控制器与主动反馈 stabilisation方案。",
+        "impact": "该工作为MDI-QKD实用化扫除了光纤信道偏振不稳定这一主要障碍，硬件无关方案降低了系统复杂度与成本，推动城域量子网络部署进程。"
       }
     }
   ]

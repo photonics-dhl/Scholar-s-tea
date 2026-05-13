@@ -1,12 +1,3 @@
 {
-  "tasks": [
-    {
-      "id": "d9a7098a",
-      "cron": "30 10 10 5 *",
-      "prompt": "MiniMax API key即将到期（约6小时后）。请提醒用户将Hermes主力模型从MiniMax-M2.7切换为Kimi的kimi-k2.6。需要：1) 修改Hermes config.yaml的model.default为kimi-k2.6，provider改为kimi-coding；2) 修改~/.hermes/.env设置HERMES_MODEL=kimi-k2.6；3) 重启Hermes gateway。",
-      "createdAt": 1777905800445,
-      "createdBySessionId": "eeb4d42f-815b-4b6b-938a-beda7a760410",
-      "createdByPid": 17084
-    }
-  ]
+  "tasks": []
 }

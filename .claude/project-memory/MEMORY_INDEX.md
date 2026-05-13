@@ -30,18 +30,17 @@
 
 ## 快速参考
 
-### Token 优化策略（WASM 引擎已全面替代，2026-05-06）
-- **规范**: `.claude/rules/token-optimization.md`
-- **部署记录**: `.claude/project-memory/token-optimization-deployment.md`（含完整验证与修复记录）
-- **核心目标**: Cache Hit ≥ 92%, Burn Rate <$8/hr
-- **已部署工具**: token-savior (lean), entroly-wasm (Rust/WASM), monitor.ps1
-- **MCP 配置**:
-  - 项目 `.mcp.json`: 11 servers（含 token-savior + entroly-wasm）✅
-  - Kimi 全局 `~/.kimi/mcp.json`: 12 servers（含 token-savior + entroly-wasm）✅
-- **Kimi 压缩配置**: `compaction_trigger_ratio=0.80`, `reserved_context_size=40000` ✅
-- **entroly-wasm 三个项目接入**: Scholar's Tea, Self_Learning, Dirac ✅
-- **压缩率实测**: Scholar's Tea 88.7%, Self_Learning 93.7%, Dirac 76.0%
-- **已知限制**: 无。Rust engine 通过 WASM 包成功运行。
+### Token 优化策略（纯行为化，2026-05-06 修订）
+- **规范**: `.kimi/rules/token-optimization.md`
+- **核心原则**: 源头减量，精准读取，不增代理
+- **已废弃**: ~~token-savior~~, ~~entroly-wasm~~, ~~mcp-compressor~~ — 增加 IPC 层导致 MCP 堵塞与进程崩溃
+- **当前策略**:
+  - Grep 优先，ReadFile 带 `line_offset`/`n_lines`
+  - 强制并行工具调用
+  - 子代理隔离冗长输出
+  - Kimi 自动压缩: `compaction_trigger_ratio=0.80`, `reserved_context_size=40000` ✅
+- **已接入项目**: Scholar's Tea, Self_Learning, Dirac
+- **已知限制**: 无中间件依赖，纯工具调用行为规范
 
 ### 错误记录
 | 文件 | 问题类型 | 状态 |

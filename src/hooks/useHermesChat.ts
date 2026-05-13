@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
+
+/** 内存优化：最大保留消息数（含系统欢迎消息） */
+const MAX_MESSAGES = 32;
+/** SSE 节流间隔：每 N ms 更新一次 UI，减少 React 重渲染 */
+const SSE_THROTTLE_MS = 80;
+/** 单条消息最大字符数，超出截断 */
+const MAX_MESSAGE_CHARS = 8000;
 
 export type HermesMode = 'kawaii' | 'community_manager';
 export type HermesPersonality =
@@ -38,6 +45,21 @@ const WELCOME_MESSAGES: Record<HermesMode, Record<HermesPersonality, string>> = 
   },
 };
 
+/** 截断过长消息，保留首尾关键信息 */
+function truncateMessage(content: string, maxLen: number): string {
+  if (content.length <= maxLen) return content;
+  const headLen = Math.floor(maxLen * 0.6);
+  const tailLen = maxLen - headLen - 12;
+  return content.slice(0, headLen) + '\n...[内容过长，已截断]...\n' + content.slice(-tailLen);
+}
+
+/** 限制消息历史长度，保留最近 N 条 */
+function trimMessages(msgs: ChatMessage[], maxCount: number): ChatMessage[] {
+  if (msgs.length <= maxCount) return msgs;
+  // 始终保留第一条（欢迎消息）和最近 maxCount-1 条
+  return [msgs[0], ...msgs.slice(-(maxCount - 1))];
+}
+
 export function useHermesChat(
   initialMode: HermesMode = 'kawaii',
   initialPersonality: HermesPersonality = 'kawaii'
@@ -48,12 +70,30 @@ export function useHermesChat(
     { role: 'assistant', content: WELCOME_MESSAGES[initialMode][initialPersonality] },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [toolStatus, setToolStatus] = useState<string | null>(null);
   const sessionIdRef = useRef<string>(`web-${Date.now()}`);
   const abortRef = useRef<AbortController | null>(null);
+  // SSE 节流：用 ref 累积内容，定时批量更新
+  const sseBufferRef = useRef('');
+  const sseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingContentRef = useRef('');
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (sseTimerRef.current) {
+        clearTimeout(sseTimerRef.current);
+      }
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+    };
+  }, []);
 
   const setMode = useCallback((newMode: HermesMode) => {
     setModeState(newMode);
     setMessages([{ role: 'assistant', content: WELCOME_MESSAGES[newMode][personality] }]);
+    setToolStatus(null);
     sessionIdRef.current = `web-${Date.now()}`;
   }, [personality]);
 
@@ -62,6 +102,7 @@ export function useHermesChat(
     setMessages([
       { role: 'assistant', content: WELCOME_MESSAGES[mode][newPersonality] },
     ]);
+    setToolStatus(null);
     sessionIdRef.current = `web-${Date.now()}`;
   }, [mode]);
 
@@ -72,9 +113,9 @@ export function useHermesChat(
     // 如果用户已经明确要求使用工具，不再添加前缀
     if (/use\s+(the\s+)?\w+\s+tool/i.test(trimmed)) return trimmed;
 
-    // 搜索类意图
-    if (/^(搜索|查一下?|找一下?|搜一下?|查询|查找|有没有|什么是|什么是|最新|最近|当前|today|latest|recent|search for|look up|find|what is|what are)/i.test(trimmed)) {
-      return `请使用 web_search 工具搜索以下内容：${trimmed}`;
+    // 搜索类意图 → 优先用 skills_list 查找搜索技能（更可靠）
+    if (/^(搜索|查一下?|找一下?|搜一下?|查询|查找|有没有|什么是|最新|最近|当前|today|latest|recent|search for|look up|find|what is|what are)/i.test(trimmed)) {
+      return `请使用 skills_list 查看可用的搜索技能，然后使用合适的技能来查找：${trimmed}`;
     }
     // 访问网页类意图
     if (/^(打开|访问|查看|去|browse|visit|go to|check|look at)\s+/i.test(trimmed) && /https?:\/\//.test(trimmed)) {
@@ -101,19 +142,48 @@ export function useHermesChat(
       // 发送给 API 的是增强后的内容，但 UI 仍显示原始内容
       const apiMessage: ChatMessage = { role: 'user', content: enhancedContent };
 
-      setMessages((prev) => [...prev, userMessage]);
+      // 先截断过长消息，再添加到状态
+      const safeUserMsg = { ...userMessage, content: truncateMessage(userMessage.content, MAX_MESSAGE_CHARS) };
+      const safeApiMsg = { ...apiMessage, content: truncateMessage(apiMessage.content, MAX_MESSAGE_CHARS) };
+
+      setMessages((prev) => {
+        const next: ChatMessage[] = [...prev, safeUserMsg];
+        return trimMessages(next, MAX_MESSAGES);
+      });
       setIsLoading(true);
+      setToolStatus(null);
 
       // Add placeholder for assistant response
-      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+      setMessages((prev) => {
+        const next: ChatMessage[] = [...prev, { role: 'assistant', content: '' }];
+        return trimMessages(next, MAX_MESSAGES);
+      });
+
+      // 清理上一次的 SSE 缓冲区
+      sseBufferRef.current = '';
+      pendingContentRef.current = '';
+      if (sseTimerRef.current) {
+        clearTimeout(sseTimerRef.current);
+        sseTimerRef.current = null;
+      }
+
+      // 准备发送给 API 的消息历史（同样截断）
+      const historyForApi = trimMessages(
+        [...messages.map(m => ({ ...m, content: truncateMessage(m.content, MAX_MESSAGE_CHARS) })), safeApiMsg],
+        MAX_MESSAGES
+      );
 
       try {
+        const abortController = new AbortController();
+        abortRef.current = abortController;
+
         const response = await fetch('/api/v1/hermes/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
+          signal: abortController.signal,
           body: JSON.stringify({
-            messages: [...messages, apiMessage].map((m) => ({
+            messages: historyForApi.map((m) => ({
               role: m.role,
               content: m.content,
             })),
@@ -128,12 +198,31 @@ export function useHermesChat(
           if (response.status === 403) {
             throw new Error('需要管理员权限才能使用社区管家模式');
           }
-          throw new Error('Request failed');
+          throw new Error(`请求失败 (${response.status})`);
         }
 
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let fullContent = '';
+
+        // 节流更新函数
+        const flushSSE = () => {
+          if (sseTimerRef.current) {
+            clearTimeout(sseTimerRef.current);
+            sseTimerRef.current = null;
+          }
+          const contentToRender = pendingContentRef.current;
+          if (contentToRender) {
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              newMessages[newMessages.length - 1] = {
+                role: 'assistant',
+                content: contentToRender,
+              };
+              return newMessages;
+            });
+          }
+        };
 
         if (reader) {
           while (true) {
@@ -144,9 +233,14 @@ export function useHermesChat(
             const lines = chunk.split('\n');
 
             for (const line of lines) {
-              // Handle custom SSE events from Hermes backend (e.g. hermes.tool.progress)
-              // We silently ignore them since user doesn't need to see tool calls
+              // 解析 event 行，提取工具调用状态
               if (line.startsWith('event:')) {
+                const eventName = line.slice(6).trim();
+                if (eventName === 'hermes.tool.progress' || eventName === 'hermes.tool.start') {
+                  setToolStatus('正在执行工具...');
+                } else if (eventName === 'hermes.tool.complete' || eventName === 'hermes.tool.end') {
+                  setToolStatus(null);
+                }
                 continue;
               }
               if (line.startsWith('data: ')) {
@@ -154,17 +248,22 @@ export function useHermesChat(
                 if (data === '[DONE]') continue;
                 try {
                   const parsed = JSON.parse(data);
+                  // 处理工具调用状态的 data payload
+                  if (parsed.tool?.name) {
+                    setToolStatus(`正在使用 ${parsed.tool.name}...`);
+                    continue;
+                  }
                   const delta = parsed.choices?.[0]?.delta?.content;
                   if (delta) {
                     fullContent += delta;
-                    setMessages((prev) => {
-                      const newMessages = [...prev];
-                      newMessages[newMessages.length - 1] = {
-                        role: 'assistant',
-                        content: fullContent,
-                      };
-                      return newMessages;
-                    });
+                    pendingContentRef.current = fullContent;
+                    // 节流：不立即 setState，而是设置定时器
+                    if (!sseTimerRef.current) {
+                      sseTimerRef.current = setTimeout(() => {
+                        sseTimerRef.current = null;
+                        flushSSE();
+                      }, SSE_THROTTLE_MS);
+                    }
                   }
                 } catch {
                   // Ignore parse errors for incomplete chunks
@@ -173,7 +272,13 @@ export function useHermesChat(
             }
           }
         }
+        // 流结束后强制刷新剩余内容
+        flushSSE();
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log('[Hermes] Request aborted');
+          return;
+        }
         console.error('Hermes chat error:', error);
         const errorMsg =
           error instanceof Error ? error.message : '抱歉，连接出现了一些问题，请稍后再试。';
@@ -187,6 +292,12 @@ export function useHermesChat(
         });
       } finally {
         setIsLoading(false);
+        setToolStatus(null);
+        if (sseTimerRef.current) {
+          clearTimeout(sseTimerRef.current);
+          sseTimerRef.current = null;
+        }
+        abortRef.current = null;
       }
     },
     [messages, isLoading, mode, personality]
@@ -194,12 +305,18 @@ export function useHermesChat(
 
   const clearMessages = useCallback(() => {
     setMessages([{ role: 'assistant', content: WELCOME_MESSAGES[mode][personality] }]);
+    setToolStatus(null);
     sessionIdRef.current = `web-${Date.now()}`;
+    if (abortRef.current) {
+      abortRef.current.abort();
+      abortRef.current = null;
+    }
   }, [mode, personality]);
 
   return {
     messages,
     isLoading,
+    toolStatus,
     mode,
     setMode,
     personality,

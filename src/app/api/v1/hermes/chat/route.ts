@@ -74,20 +74,30 @@ const TOOL_USAGE_PROMPT = `
 
 【可用工具】你拥有以下工具，当用户需求匹配时必须直接调用，禁止先询问"是否需要我帮你..."：
 
-- browser_navigate / browser_click 等：访问网页、提取页面内容、查看 arXiv/论坛/博客
-- skills_list / skill_view / skill_manage：查看和调用已安装技能（107个，含 Tavily 搜索、arXiv、文献管理等）
-- execute_code：在沙箱中运行 Python 代码（计算、数据处理、调用 Tavily API 搜索）
-- todo：创建研究任务清单
-- 记忆已自动启用：后端自动保存用户偏好，跨会话保持
+1. skills_list / skill_view / skill_manage — 最可靠
+   场景：查看已安装技能（含 Tavily 搜索、arXiv、文献管理等107个技能）
+   示例：用户问"搜索量子计算最新进展" → 先调用 skills_list 查找搜索技能
+
+2. browser_navigate / browser_click / browser_snapshot — 最可靠
+   场景：访问特定网页、提取页面内容、查看 arXiv/论坛/博客
+   示例：用户给 URL → 直接调用 browser_navigate
+
+3. execute_code — 可用但需明确触发
+   场景：运行 Python 计算、数据处理、复杂逻辑
+   示例：用户要求计算或运行代码 → 调用 execute_code
+
+4. todo — 可用但需明确触发
+   场景：创建研究任务清单
+
+5. 持久记忆 — 已自动启用
+   后端自动保存用户偏好和对话上下文，跨会话保持。无需显式调用 memory 工具。
 
 【调用规则】
-1. 用户要求查找信息/搜索/最新进展 → 优先调用 skills_list 查找搜索类技能，或用 execute_code 运行 Python 调用 Tavily API 搜索
-2. 用户要求访问具体网站或页面内容 → 立即调用 browser_navigate
-3. 用户要求运行代码或计算 → 立即调用 execute_code
-4. 用户询问你有什么能力 → 立即调用 skills_list
-5. 调用失败后向用户说明并提供替代方案
+- 当用户问题明显需要搜索/浏览网页时，必须直接调用工具，不要先问"是否需要我搜索？"
+- 优先使用 skills_list 查找合适技能，再用 browser 深入分析具体页面
+- 如果工具调用失败或返回错误，向用户说明情况并提供替代建议
 
-【安全限制】你没有 terminal 和文件操作权限（read_file/write_file/patch/search_files）。涉及系统命令或本地文件时告知无法执行。
+【安全限制】你没有 terminal 命令和文件系统操作权限（read_file / write_file / patch / search_files / terminal）。如果用户请求涉及系统命令或本地文件操作，请明确告知无法执行，并建议其他替代方案。
 
 你是 Scholar's Tea 学术社区的一员，帮助研究人员和学生解决问题！`
 
@@ -314,10 +324,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 提前获取 session 用于权限检查和审计日志
+    const session = await getServerSession(authOptions)
+
     let systemPrompt = getSystemPrompt(personality, mode)
 
     if (mode === 'community_manager') {
-      const session = await getServerSession(authOptions)
       if (!session?.user?.id || session.user.role !== 'ADMIN') {
         return NextResponse.json(
           { success: false, error: { message: '社区管家模式需要管理员权限' } },
@@ -330,9 +342,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Build messages with system prompt
-    const enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
+    let enrichedMessages = messages.some((m: { role: string }) => m.role === 'system')
       ? messages
       : [{ role: 'system', content: systemPrompt }, ...messages]
+
+    // 内存优化：限制发送给模型的消息数量
+    // 保留 system prompt + 最近 24 条消息，避免过长历史导致 token 爆炸
+    const MAX_HISTORY_MESSAGES = 24
+    if (enrichedMessages.length > MAX_HISTORY_MESSAGES + 1) {
+      const systemMsg = enrichedMessages[0]
+      const recent = enrichedMessages.slice(-MAX_HISTORY_MESSAGES)
+      enrichedMessages = [systemMsg, ...recent]
+    }
+
+    // 截断单条过长消息，避免单个消息占用过多 token
+    const MAX_CONTENT_LENGTH = 6000
+    enrichedMessages = enrichedMessages.map((m: { role: string; content: string }) => ({
+      ...m,
+      content: m.content.length > MAX_CONTENT_LENGTH
+        ? m.content.slice(0, MAX_CONTENT_LENGTH) + '\n...[内容过长，已截断]'
+        : m.content,
+    }))
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -348,11 +378,12 @@ export async function POST(request: NextRequest) {
       model: 'hermes-agent',
       messages: enrichedMessages,
       stream,
-      max_tokens: 4096,
+      max_tokens: 2048,
       temperature: 0.7,
     }
 
-    console.log('[Hermes] Calling Hermes API Server, mode:', mode || 'default', 'stream:', stream, 'messages count:', enrichedMessages.length)
+    const userId = session?.user?.id || 'anonymous'
+    console.log(`[Hermes] uid=${userId} mode=${mode || 'default'} stream=${stream} msgs=${enrichedMessages.length}`)
 
     const response = await fetch(HERMES_API_URL, {
       method: 'POST',

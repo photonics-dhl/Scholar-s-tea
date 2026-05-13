@@ -4,7 +4,7 @@ agent:
   gateway_notify_interval: 600
   gateway_timeout: 1800
   gateway_timeout_warning: 900
-  max_turns: 60
+  max_turns: 30
   personalities:
     analyst: You are a data-driven analyst. Structure output with evidence, numbered
       lists, and clear logical flow. Prioritize facts over flair.
@@ -154,7 +154,7 @@ command_allowlist:
 compression:
   enabled: true
   protect_last_n: 20
-  target_ratio: 0.2
+  target_ratio: 0.3
   threshold: 0.5
 context:
   engine: compressor
@@ -215,11 +215,11 @@ mattermost:
   channel_prompts: {}
 memory:
   flush_min_turns: 6
-  memory_char_limit: 66666
+  memory_char_limit: 20000
   memory_enabled: true
   nudge_interval: 10
   provider: holographic
-  user_char_limit: 5000
+  user_char_limit: 3000
   user_profile_enabled: true
 model:
   base_url: https://api.minimaxi.com/anthropic

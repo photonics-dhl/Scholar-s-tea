@@ -208,7 +208,7 @@ export function FloatingChat() {
   const [input, setInput] = useState('');
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, isLoading, mode, setMode, personality, setPersonality, sendMessage, clearMessages } = useHermesChat();
+  const { messages, isLoading, toolStatus, mode, setMode, personality, setPersonality, sendMessage, clearMessages } = useHermesChat();
 
   // ===== 拖拽状态 =====
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -575,11 +575,13 @@ export function FloatingChat() {
                   )}
                 </h3>
                 <p className="text-[10px] text-white/80">
-                  {isLoading
-                    ? '正在思考中...'
-                    : mode === 'community_manager'
-                      ? '社区运营助手'
-                      : '你的常驻 AI 助手'}
+                  {toolStatus
+                    ? toolStatus
+                    : isLoading
+                      ? '正在思考中...'
+                      : mode === 'community_manager'
+                        ? '社区运营助手'
+                        : '你的常驻 AI 助手'}
                 </p>
                 {/* Personality selector */}
                 <div className="relative mt-0.5">
@@ -694,7 +696,7 @@ export function FloatingChat() {
           ))}
 
           {/* Loading indicator */}
-          {isLoading && messages[messages.length - 1]?.content === '' && (
+          {isLoading && (
             <div className="flex gap-2.5">
               <div className="flex-shrink-0">
                 <HermesAvatar size={28} mood="thinking" interactive={false} />
@@ -713,7 +715,9 @@ export function FloatingChat() {
                     className="w-2 h-2 bg-tea-primary/40 rounded-full animate-bounce"
                     style={{ animationDelay: '300ms' }}
                   />
-                  <span className="ml-1 text-xs text-muted-foreground">Hermes 正在思考...</span>
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    {toolStatus || 'Hermes 正在思考...'}
+                  </span>
                 </div>
               </div>
             </div>

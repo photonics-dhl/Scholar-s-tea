@@ -48,22 +48,10 @@ export type HermesGatewayStreamResponse = ReadableStream | { error: string }
 // =============================================================================
 
 /** 构建带 skill 指令的 system prompt */
-function buildSystemPrompt(personality: string | undefined, skill: string | undefined): string {
-  // Gateway 自身已有极长的系统提示（~10K tokens），此处只补充必要指令
-  const base = `You are Scholar's Tea research assistant. Write top-tier academic content.
-Rules: IMRAD structure, topic sentences, passive voice in Methods, full names for first acronyms.
-Use [REF-N] for citations, [CITATION NEEDED] for unverified ones.
-Use UTF-8 math symbols (α β γ Σ ∫ ∂) instead of LaTeX.`
-
-  const skillPrompt = skill
-    ? `\nTask: Execute "${skill}" skill workflow.`
-    : ''
-
-  const personalityPrompt = personality
-    ? `\nPersona: ${personality}.`
-    : ''
-
-  return base + skillPrompt + personalityPrompt
+function buildSystemPrompt(_personality: string | undefined, _skill: string | undefined): string {
+  // Gateway 自身已有极长的系统提示（~10K tokens），不添加额外 system prompt
+  // 必要指令通过 user prompt 传递，避免 token 爆炸导致超时
+  return ''
 }
 
 /** 将 ChatMessage 转换为 Hermes Gateway 消息格式 */
@@ -133,10 +121,11 @@ export async function callHermesGateway(
     const normalized = normalizeMessages(messages)
     const systemPrompt = buildSystemPrompt(personality, skill)
 
-    // 确保 system prompt 存在
-    const enrichedMessages = normalized.some((m) => m.role === 'system')
-      ? normalized
-      : [{ role: 'system' as const, content: systemPrompt }, ...normalized]
+    // 只在 system prompt 非空时添加，避免 Gateway 已有长系统提示的情况下 token 爆炸
+    const enrichedMessages =
+      normalized.some((m) => m.role === 'system') || !systemPrompt
+        ? normalized
+        : [{ role: 'system' as const, content: systemPrompt }, ...normalized]
 
     // 内存优化：限制历史消息数
     const MAX_HISTORY = 24

@@ -49,38 +49,18 @@ export type HermesGatewayStreamResponse = ReadableStream | { error: string }
 
 /** 构建带 skill 指令的 system prompt */
 function buildSystemPrompt(personality: string | undefined, skill: string | undefined): string {
-  const base = `你是 Scholar's Tea 学术社区的 AI 研究助手，专注于高质量学术写作、论文审稿和科研规划。
-
-【核心能力】
-- 精准识别研究空白和创新机会
-- 设计严谨的实验方案和技术路线
-- 撰写符合顶会/顶刊标准的学术文本
-- 提供可操作的审稿意见和改进建议
-- 辅助科研项目申请和基金规划
-
-【写作风格】
-1. 遵循 IMRAD 结构：Introduction → Methods → Results → Discussion
-2. 每段必须有主题句 + 支撑论据 + 过渡句
-3. 方法部分被动语态，其余部分主动语态优先
-4. 首次出现缩写必须全称
-5. 所有结论必须有数据或引用支撑
-6. 使用 UTF-8 字符表达数学公式（α β γ δ ε θ λ μ ν π ρ σ τ φ χ ψ ω Σ Π ∫ ∂ ∇ √ ² ³ 等），禁止使用 LaTeX 命令格式
-
-【引用规范】
-- 关键论点标注引用占位符 [REF-N]
-- 经典方法引用原始文献
-- 近期工作引用近3-5年顶会/顶刊
-- 无法验证的引用标注 [CITATION NEEDED]
-- 每个主要章节至少3-5个引用占位符
-
-【公式输出规范】绝对禁止使用 LaTeX 格式（如 \\( ... \\)、\\[ ... \\]、$...$、$$...$$ 或 \\nu、\\sigma 等命令）。直接使用 UTF-8 字符在文本中表达。`
+  // Gateway 自身已有极长的系统提示（~10K tokens），此处只补充必要指令
+  const base = `You are Scholar's Tea research assistant. Write top-tier academic content.
+Rules: IMRAD structure, topic sentences, passive voice in Methods, full names for first acronyms.
+Use [REF-N] for citations, [CITATION NEEDED] for unverified ones.
+Use UTF-8 math symbols (α β γ Σ ∫ ∂) instead of LaTeX.`
 
   const skillPrompt = skill
-    ? `\n\n【当前任务】你正在执行 "${skill}" skill。请严格按照该 skill 的工作流和检查清单执行。`
+    ? `\nTask: Execute "${skill}" skill workflow.`
     : ''
 
   const personalityPrompt = personality
-    ? `\n\n【当前人格】${personality}。请以该人格的风格和专长领域回答问题。`
+    ? `\nPersona: ${personality}.`
     : ''
 
   return base + skillPrompt + personalityPrompt
@@ -346,25 +326,15 @@ export async function generatePaperViaHermes(
     formatting: '排版交付：转换为 LaTeX / Markdown / 纯文本',
   }
 
-  const stagePrompt = `【论文生成任务】当前阶段：${stage} — ${stageDescriptions[stage]}
+  const stagePrompt = `【Paper Generation — Stage: ${stage}】${stageDescriptions[stage]}
 
-研究主题：${topic}
-${background ? `研究背景：${background}\n` : ''}
-${section ? `目标章节：${section}\n` : ''}
-${wordCount ? `目标字数：${wordCount}字\n` : ''}
-${content ? `已有内容/上下文：\n${content.slice(0, 2000)}\n` : ''}
+Topic: ${topic}
+${background ? `Background: ${background}\n` : ''}
+${section ? `Section: ${section}\n` : ''}
+${wordCount ? `Target length: ~${wordCount} words\n` : ''}
+${content ? `Context:\n${content.slice(0, 1000)}\n` : ''}
 
-请按照 research-paper-writing skill 的规范执行：
-1. 先进行文献调研（如有必要，使用 arXiv 搜索）
-2. 基于真实文献构建论证框架
-3. 生成符合顶刊标准的学术文本
-4. 标注引用占位符 [REF-N]
-5. 自检：每个段落是否有主题句？论证是否充分？引用是否真实？
-
-注意：
-- 引用的文献必须是你已知或能通过搜索验证的真实文献
-- 不要编造不存在的论文标题或作者
-- 如果不确定某个引用，使用 [CITATION NEEDED] 标记`
+Generate top-tier academic text with [REF-N] citations. Use [CITATION NEEDED] for unverified claims. Avoid fabricating references.`
 
   const messages: ChatMessage[] = [{ role: 'user', content: stagePrompt }]
 
@@ -372,8 +342,8 @@ ${content ? `已有内容/上下文：\n${content.slice(0, 2000)}\n` : ''}
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'professor',
-      timeout: 120000,
-      maxTokens: 4096,
+      timeout: 45000,
+      maxTokens: 2048,
       temperature: 0.6,
     })
     if ('error' in result) {
@@ -385,8 +355,8 @@ ${content ? `已有内容/上下文：\n${content.slice(0, 2000)}\n` : ''}
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'professor',
-    timeout: 120000,
-    maxTokens: 4096,
+    timeout: 45000,
+    maxTokens: 2048,
     temperature: 0.6,
   })
 
@@ -445,8 +415,8 @@ ${paperContent.slice(0, 12000)}
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'analyst',
-      timeout: 120000,
-      maxTokens: 4096,
+      timeout: 45000,
+      maxTokens: 2048,
       temperature: 0.5,
     })
     if ('error' in result) {
@@ -458,8 +428,8 @@ ${paperContent.slice(0, 12000)}
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'analyst',
-    timeout: 120000,
-    maxTokens: 4096,
+    timeout: 45000,
+    maxTokens: 2048,
     temperature: 0.5,
   })
 
@@ -515,8 +485,8 @@ ${context ? `背景信息：\n${context}\n` : ''}
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'professor',
-      timeout: 120000,
-      maxTokens: 4096,
+      timeout: 45000,
+      maxTokens: 2048,
       temperature: 0.7,
     })
     if ('error' in result) {
@@ -528,8 +498,8 @@ ${context ? `背景信息：\n${context}\n` : ''}
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'professor',
-    timeout: 120000,
-    maxTokens: 4096,
+    timeout: 45000,
+    maxTokens: 2048,
     temperature: 0.7,
   })
 

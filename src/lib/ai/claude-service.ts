@@ -694,16 +694,20 @@ export async function generatePaperWithHermes(
   })
 
   if (result.error) {
-    return { content: '', error: result.error }
+    // 抛出异常让上层 catch 触发 fallback 到本地路径
+    throw new Error(result.error)
   }
 
   if (result.stream) {
     // 流式模式下无法做引用验证，返回原始流
     // 前端需要在流结束后再次调用验证接口
-    return { content: '', error: 'STREAM_NOT_SUPPORTED_FOR_VERIFY' }
+    throw new Error('STREAM_NOT_SUPPORTED_FOR_VERIFY')
   }
 
   const content = result.content || ''
+  if (!content) {
+    throw new Error('Hermes Gateway returned empty content')
+  }
 
   // 引用验证
   try {
@@ -718,6 +722,7 @@ export async function generatePaperWithHermes(
     }
   } catch (err) {
     console.warn('[generatePaperWithHermes] Citation verification failed:', err)
+    // 引用验证失败仍返回原始内容
     return { content }
   }
 }

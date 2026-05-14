@@ -11,6 +11,9 @@ import {
   surveyGeneration,
   peerReview,
   generatePaper,
+  generatePaperWithHermes,
+  peerReviewWithHermes,
+  grantApplicationWithHermes,
 } from '@/lib/ai/claude-service'
 import type { ChatMessage, VisionContent } from '@/lib/ai/claude-service'
 import { getContextForQuery } from '@/lib/ai/rag-service'
@@ -136,6 +139,7 @@ export async function POST(request: NextRequest) {
       mode?: AgentMode
       stream?: boolean
       attachments?: ChatAttachment[]
+      useHermes?: boolean
     }
 
     // Handle special actions
@@ -161,10 +165,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'grant') {
-      const result = await grantApplication(
-        body.topic || messages?.[messages.length - 1]?.content || '',
-        body.context
-      )
+      const topic = body.topic || messages?.[messages.length - 1]?.content || ''
+      const result = body.useHermes
+        ? await grantApplicationWithHermes(topic, body.context)
+        : await grantApplication(topic, body.context)
       if (result.error) {
         return NextResponse.json(
           { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },
@@ -197,10 +201,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'peer_review') {
-      const result = await peerReview(
-        body.content || messages?.[messages.length - 1]?.content || '',
-        body.focus
-      )
+      const content = body.content || messages?.[messages.length - 1]?.content || ''
+      const result = body.useHermes
+        ? await peerReviewWithHermes(content, body.focus)
+        : await peerReview(content, body.focus)
       if (result.error) {
         return NextResponse.json(
           { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },
@@ -215,25 +219,48 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'paper_generation') {
-      const result = await generatePaper(body.stage || 'proposal', {
-        topic: body.topic || messages?.[messages.length - 1]?.content || '',
-        content: body.content,
-        background: body.background,
-        section: body.section,
-        wordCount: body.wordCount,
-        dataDescription: body.dataDescription,
-        analysisGoal: body.analysisGoal,
-        format: body.format,
-      })
+      const topic = body.topic || messages?.[messages.length - 1]?.content || ''
+      const stage = body.stage || 'proposal'
+
+      let result
+      if (body.useHermes) {
+        result = await generatePaperWithHermes(stage, {
+          topic,
+          content: body.content,
+          background: body.background,
+          section: body.section,
+          wordCount: body.wordCount,
+          format: body.format,
+        })
+      } else {
+        result = await generatePaper(stage, {
+          topic,
+          content: body.content,
+          background: body.background,
+          section: body.section,
+          wordCount: body.wordCount,
+          dataDescription: body.dataDescription,
+          analysisGoal: body.analysisGoal,
+          format: body.format,
+        })
+      }
+
       if (result.error) {
         return NextResponse.json(
           { success: false, data: null, error: { code: 'AI_ERROR', message: result.error } },
           { status: 500 }
         )
       }
+
+      // Hermes 增强版会返回引用验证结果
+      const responseData: Record<string, unknown> = { content: result.content }
+      if ('citations' in result && result.citations) {
+        responseData.citations = result.citations
+      }
+
       return NextResponse.json({
         success: true,
-        data: { content: result.content },
+        data: responseData,
         meta: null,
       })
     }

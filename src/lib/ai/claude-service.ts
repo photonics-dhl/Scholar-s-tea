@@ -659,6 +659,97 @@ export async function chatWithZCHATStream(
   }
 }
 
+// ===== Workshop Hermes 增强模式（P0）=====
+
+import {
+  generatePaperViaHermes,
+  peerReviewViaHermes,
+  grantApplicationViaHermes,
+} from './hermes-gateway-adapter'
+import { verifyAndReport } from './citation-verifier'
+
+/** 论文生成 — Hermes 增强版（含真实引用验证） */
+export async function generatePaperWithHermes(
+  stage: string,
+  params: {
+    topic: string
+    content?: string
+    background?: string
+    section?: string
+    wordCount?: number
+    dataDescription?: string
+    analysisGoal?: string
+    format?: 'latex' | 'markdown' | 'plain'
+    stream?: boolean
+  }
+): Promise<ClaudeResponse & { citations?: { verified: number; unverified: number; score: number } }> {
+  const result = await generatePaperViaHermes({
+    topic: params.topic,
+    stage: stage as any,
+    background: params.background,
+    section: params.section,
+    wordCount: params.wordCount,
+    content: params.content,
+    stream: params.stream,
+  })
+
+  if (result.error) {
+    return { content: '', error: result.error }
+  }
+
+  if (result.stream) {
+    // 流式模式下无法做引用验证，返回原始流
+    // 前端需要在流结束后再次调用验证接口
+    return { content: '', error: 'STREAM_NOT_SUPPORTED_FOR_VERIFY' }
+  }
+
+  const content = result.content || ''
+
+  // 引用验证
+  try {
+    const report = await verifyAndReport(content, params.topic)
+    return {
+      content: report.verifiedText,
+      citations: {
+        verified: report.confirmedCount,
+        unverified: report.unverifiedCount,
+        score: report.credibilityScore,
+      },
+    }
+  } catch (err) {
+    console.warn('[generatePaperWithHermes] Citation verification failed:', err)
+    return { content }
+  }
+}
+
+/** AI 审稿 — Hermes 增强版 */
+export async function peerReviewWithHermes(
+  paperContent: string,
+  focus?: string
+): Promise<ClaudeResponse> {
+  const result = await peerReviewViaHermes(paperContent, focus)
+
+  if (result.error) {
+    return { content: '', error: result.error }
+  }
+
+  return { content: result.content || '' }
+}
+
+/** 基金申请 — Hermes 增强版 */
+export async function grantApplicationWithHermes(
+  topic: string,
+  context?: string
+): Promise<ClaudeResponse> {
+  const result = await grantApplicationViaHermes(topic, context)
+
+  if (result.error) {
+    return { content: '', error: result.error }
+  }
+
+  return { content: result.content || '' }
+}
+
 // ===== 流式聊天 =====
 
 export async function chatWithAIStream(

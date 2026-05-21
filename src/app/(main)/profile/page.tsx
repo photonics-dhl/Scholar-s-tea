@@ -108,6 +108,29 @@ export default function ProfilePage() {
   const user = session.user
   const initials = user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'
 
+  // Academic profile from session (enriched by NextAuth callback)
+  const academicProfile = (user as any).academicProfile as
+    | {
+        institution?: string
+        position?: string
+        educationLevel?: string
+        researchField?: string[]
+        interests?: string[]
+        skills?: string[]
+        bioDetail?: string
+      }
+    | undefined
+
+  const hasAcademicProfile = academicProfile && (
+    academicProfile.institution ||
+    academicProfile.position ||
+    academicProfile.educationLevel ||
+    (academicProfile.researchField && academicProfile.researchField.length > 0) ||
+    (academicProfile.interests && academicProfile.interests.length > 0) ||
+    (academicProfile.skills && academicProfile.skills.length > 0) ||
+    academicProfile.bioDetail
+  )
+
   const statItems = [
     { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: statsLoading ? '...' : stats.posts, href: '/disciplines' },
     { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: statsLoading ? '...' : stats.comments, href: '/disciplines' },
@@ -157,6 +180,95 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* Academic Profile */}
+        {hasAcademicProfile && (
+          <Card className="border-journal-border/30">
+            <CardHeader>
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-journal-primary" />
+                学术画像
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {academicProfile?.institution && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">所在机构</p>
+                    <p className="text-sm font-medium">{academicProfile.institution}</p>
+                  </div>
+                )}
+                {academicProfile?.position && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">职位/身份</p>
+                    <p className="text-sm font-medium">{academicProfile.position}</p>
+                  </div>
+                )}
+                {academicProfile?.educationLevel && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">最高学历</p>
+                    <p className="text-sm font-medium">{academicProfile.educationLevel}</p>
+                  </div>
+                )}
+              </div>
+
+              {academicProfile?.researchField && academicProfile.researchField.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1.5">研究领域</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {academicProfile.researchField.map((field) => (
+                      <span
+                        key={field}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-journal-primary/10 text-journal-primary"
+                      >
+                        {field}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {academicProfile?.interests && academicProfile.interests.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1.5">感兴趣的方向</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {academicProfile.interests.map((interest) => (
+                      <span
+                        key={interest}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-tea-primary/10 text-tea-primary"
+                      >
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {academicProfile?.skills && academicProfile.skills.length > 0 && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1.5">专业技能</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {academicProfile.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-convo-blue/10 text-convo-blue"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {academicProfile?.bioDetail && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">详细学术简介</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{academicProfile.bioDetail}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Quick Actions */}
         <Card className="border-journal-border/30">
           <CardHeader>
@@ -169,7 +281,7 @@ export default function ProfilePage() {
             {[
               { label: '浏览学科社区', href: '/disciplines', desc: '探索不同学科领域的讨论' },
               { label: '发现课题组', href: '/groups', desc: '找到适合你的研究团队' },
-              { label: '思想工坊', href: '/workshop', desc: '与 AI 助手讨论学术问题' },
+              { label: 'AI Workshop', href: '/workshop', desc: '与 AI 助手讨论学术问题' },
               { label: '茶话会', href: '/tea-party', desc: '加入实时学术交流' },
             ].map((item) => (
               <Link

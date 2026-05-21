@@ -20,7 +20,7 @@ import {
 const navItems = [
   { href: '/disciplines', label: '学科', icon: GraduationCap, zone: 'scholarly' as const },
   { href: '/groups', label: '课题组', icon: Users, zone: 'scholarly' as const },
-  { href: '/workshop', label: '思想工坊', icon: Sparkles, zone: 'social' as const },
+  { href: '/workshop', label: 'AI Workshop', icon: Sparkles, zone: 'social' as const },
   { href: '/tea-party', label: '茶话会', icon: MessageCircle, zone: 'social' as const },
   { href: '/top-questions', label: 'TOP10', icon: Trophy, zone: 'scholarly' as const },
 ];

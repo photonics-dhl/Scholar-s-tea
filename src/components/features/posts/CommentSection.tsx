@@ -115,12 +115,12 @@ function ReplyCard({
           </div>
 
           {/* 引用回复 */}
-          <p className="text-[13px] text-muted-foreground mb-1">
+          <p className="text-[13px] text-muted-foreground mb-1 select-text">
             回复 <span className="text-tea-primary font-medium">@{parentAuthorName}</span>
           </p>
 
           {/* Content */}
-          <p className="text-sm text-foreground leading-relaxed">{comment.content}</p>
+          <p className="text-sm text-foreground leading-relaxed select-text">{comment.content}</p>
 
           {/* Actions — 小红书风格 */}
           <div className="flex items-center gap-3 mt-1.5">
@@ -244,7 +244,7 @@ function CommentCard({
 
         {/* Content */}
         <div className="px-4 py-3">
-          <p className="text-[15px] text-foreground leading-relaxed">{comment.content}</p>
+          <p className="text-[15px] text-foreground leading-relaxed select-text">{comment.content}</p>
         </div>
 
         {/* Actions Bar - 小红书风格底部操作栏 */}

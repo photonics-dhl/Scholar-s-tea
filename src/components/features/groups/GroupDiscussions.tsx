@@ -95,12 +95,12 @@ export function GroupDiscussions({ groupId, slug }: { groupId: string; slug: str
                         </Badge>
                       )}
                     </div>
-                    <h3 className="font-medium line-clamp-1">{post.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
+                    <h3 className="font-medium line-clamp-1 select-text">{post.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-1 mt-1 select-text">
                       {stripHtml(post.content)}
                     </p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
-                      <span>{post.author.name || '匿名用户'}</span>
+                      <span className="select-text">{post.author.name || '匿名用户'}</span>
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-3 w-3" />
                         {post._count.comments}

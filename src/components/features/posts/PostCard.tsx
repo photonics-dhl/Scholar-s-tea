@@ -132,13 +132,13 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
         </div>
 
         {/* 标题 */}
-        <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-2 group-hover:text-tea-primary transition-colors">
+        <h3 className="font-semibold text-sm md:text-base line-clamp-2 mb-2 group-hover:text-tea-primary transition-colors select-text">
           {post.title}
         </h3>
 
         {/* 内容预览 */}
         {post.content && (
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed select-text">
             {post.content.replace(/<[^>]*>/g, '').slice(0, 150)}
           </p>
         )}
@@ -151,7 +151,7 @@ export function PostCard({ post, href, className, onVote, voting }: PostCardProp
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <span className="text-xs text-muted-foreground truncate max-w-[100px]">
+            <span className="text-xs text-muted-foreground truncate max-w-[100px] select-text">
               {post.author.name || '匿名用户'}
             </span>
           </div>

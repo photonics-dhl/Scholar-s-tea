@@ -207,7 +207,7 @@ function MessageBubble({ message, isOwn }: { message: Message; isOwn?: boolean }
           : 'bg-white text-gray-900 border border-gray-200/80 rounded-2xl rounded-tl-sm'
       )}
     >
-      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+      <p className="text-sm leading-relaxed whitespace-pre-wrap select-text">
         {message.content}
       </p>
     </div>

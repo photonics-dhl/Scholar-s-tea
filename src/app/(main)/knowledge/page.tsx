@@ -147,7 +147,7 @@ export default function KnowledgePage() {
             <div className="flex-1">
               <p className="font-medium text-sm">AI 驱动的知识检索</p>
               <p className="text-xs text-muted-foreground">
-                在思想工坊中使用 AI 助手，可以基于知识库进行智能问答和文献分析
+                在AI Workshop中使用 AI 助手，可以基于知识库进行智能问答和文献分析
               </p>
             </div>
             <Link href="/workshop?mode=research">

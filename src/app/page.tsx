@@ -394,7 +394,7 @@ export default function HomePage() {
               <Link href="/groups" className="hover:text-foreground transition-colors">课题组</Link>
               <Link href="/top-questions" className="hover:text-foreground transition-colors">TOP10</Link>
               <Link href="/tea-party" className="hover:text-foreground transition-colors">茶话会</Link>
-              <Link href="/workshop" className="hover:text-foreground transition-colors">思想工坊</Link>
+              <Link href="/workshop" className="hover:text-foreground transition-colors">AI Workshop</Link>
             </div>
           </div>
         </div>

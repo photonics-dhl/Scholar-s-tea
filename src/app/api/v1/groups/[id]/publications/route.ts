@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGroupPublications, createPublication } from '@/services/groups';
 import { getGroupById } from '@/services/groups';
+import { syncPublicationToKnowledgeBase } from '@/lib/ai/rag-service';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -92,6 +93,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const publication = await createPublication(id, body);
+
+    // Fire-and-forget: sync publication to knowledge base for RAG
+    syncPublicationToKnowledgeBase(publication.id);
 
     return NextResponse.json(
       {

@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
           bio: user.bio,
           avatar: user.avatar,
           role: user.role,
+          academicProfile: user.academicProfile,
         };
       },
     }),
@@ -67,11 +68,15 @@ export const authOptions: NextAuthOptions = {
         token.bio = user.bio;
         token.avatar = user.avatar;
         token.role = user.role;
+        token.academicProfile = (user as any).academicProfile;
       }
       // Handle session update from client
       if (trigger === 'update' && session) {
         if (session.name !== undefined) token.name = session.name;
         if (session.bio !== undefined) token.bio = session.bio;
+        if ((session as any).academicProfile !== undefined) {
+          token.academicProfile = (session as any).academicProfile;
+        }
       }
       return token;
     },
@@ -82,6 +87,7 @@ export const authOptions: NextAuthOptions = {
         session.user.bio = token.bio as string | null;
         session.user.avatar = token.avatar as string | null;
         session.user.role = token.role ?? 'USER';
+        (session.user as any).academicProfile = token.academicProfile;
       }
       return session;
     },

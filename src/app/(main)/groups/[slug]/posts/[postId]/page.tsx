@@ -299,7 +299,7 @@ export default function GroupPostDetailPage() {
           <div className="flex-1 p-6 pl-3">
             <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-a:text-tea-primary prose-a:no-underline hover:prose-a:underline">
               <div
-                className="prose-content"
+                className="prose-content select-text"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
               />
             </div>

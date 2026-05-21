@@ -63,7 +63,7 @@ const actions: ActionItem[] = [
   {
     href: '/workshop',
     icon: Sparkles,
-    title: '思想工坊',
+    title: 'AI Workshop',
     desc: 'AI 学术助手',
     color: 'text-convo-blue',
     bgGradient: 'from-convo-blue/10 to-convo-blue/5',

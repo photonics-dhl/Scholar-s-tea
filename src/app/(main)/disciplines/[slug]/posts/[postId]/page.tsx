@@ -283,7 +283,7 @@ export default function PostDetailPage() {
           {/* Content */}
           <div className="flex-1 prose prose-sm max-w-none">
             <div
-              className="prose-content"
+              className="prose-content select-text"
               // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(post.content),

@@ -3,10 +3,21 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { z } from 'zod'
+import type { Prisma } from '@prisma/client'
 
 const updateProfileSchema = z.object({
   name: z.string().min(1).max(50).optional(),
   bio: z.string().max(500).optional().nullable(),
+  academicProfile: z.object({
+    researchField: z.array(z.string()).optional(),
+    educationLevel: z.string().optional(),
+    institution: z.string().optional(),
+    position: z.string().optional(),
+    interests: z.array(z.string()).optional(),
+    skills: z.array(z.string()).optional(),
+    publications: z.array(z.string()).optional(),
+    bioDetail: z.string().optional(),
+  }).optional().nullable(),
 })
 
 // GET /api/v1/user/profile - Get current user profile
@@ -29,6 +40,7 @@ export async function GET() {
         bio: true,
         avatar: true,
         role: true,
+        academicProfile: true,
         createdAt: true,
       },
     })
@@ -71,11 +83,12 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const { name, bio } = result.data
+    const { name, bio, academicProfile } = result.data
 
-    const updateData: { name?: string; bio?: string | null } = {}
+    const updateData: { name?: string; bio?: string | null; academicProfile?: Prisma.InputJsonValue } = {}
     if (name !== undefined) updateData.name = name
     if (bio !== undefined) updateData.bio = bio
+    if (academicProfile !== undefined) updateData.academicProfile = academicProfile as Prisma.InputJsonValue
 
     const user = await prisma.user.update({
       where: { id: session.user.id },
@@ -87,6 +100,7 @@ export async function PUT(request: NextRequest) {
         bio: true,
         avatar: true,
         role: true,
+        academicProfile: true,
         updatedAt: true,
       },
     })

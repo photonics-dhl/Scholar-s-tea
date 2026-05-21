@@ -11,6 +11,7 @@ const ALLOWED_TAGS = new Set([
   'a', 'img',
   'table', 'thead', 'tbody', 'tr', 'td', 'th',
   'div', 'span', 'hr',
+  'details', 'summary',
 ])
 
 const ALLOWED_ATTRS: Record<string, Set<string>> = {

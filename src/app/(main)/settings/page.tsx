@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, User, Mail, Bell, Shield, Save, Loader2 } from 'lucide-react'
+import { Settings, User, Mail, Bell, Shield, Save, Loader2, GraduationCap, BookOpen, FlaskConical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,6 +33,16 @@ export default function SettingsPage() {
     name: '',
     email: '',
     bio: '',
+    academicProfile: {
+      researchField: [] as string[],
+      educationLevel: '',
+      institution: '',
+      position: '',
+      interests: [] as string[],
+      skills: [] as string[],
+      publications: [] as string[],
+      bioDetail: '',
+    },
     notifications: {
       email: true,
       push: false,
@@ -57,6 +67,7 @@ export default function SettingsPage() {
               name: data.data.name || '',
               email: data.data.email || '',
               bio: data.data.bio || '',
+              academicProfile: data.data.academicProfile || prev.academicProfile,
             }))
           }
         })
@@ -99,6 +110,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: formData.name.trim() || undefined,
           bio: formData.bio.trim() || null,
+          academicProfile: formData.academicProfile,
         }),
       })
 
@@ -112,6 +124,7 @@ export default function SettingsPage() {
       await update({
         name: data.data.name,
         bio: data.data.bio,
+        academicProfile: data.data.academicProfile,
       })
 
       setSaved(true)
@@ -136,10 +149,14 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-4 max-w-lg">
           <TabsTrigger value="profile">
             <User className="h-4 w-4 mr-2" />
             个人资料
+          </TabsTrigger>
+          <TabsTrigger value="academic">
+            <GraduationCap className="h-4 w-4 mr-2" />
+            学术画像
           </TabsTrigger>
           <TabsTrigger value="notifications">
             <Bell className="h-4 w-4 mr-2" />
@@ -270,6 +287,139 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
+        {/* Academic Profile Tab */}
+        <TabsContent value="academic">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-primary" />
+                学术画像
+              </CardTitle>
+              <CardDescription>完善你的学术背景，帮助 AI 更好地为你提供个性化服务</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Institution */}
+              <div className="space-y-2">
+                <Label htmlFor="institution">
+                  <FlaskConical className="h-4 w-4 inline mr-1" />
+                  所在机构
+                </Label>
+                <Input
+                  id="institution"
+                  value={formData.academicProfile.institution}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      academicProfile: { ...prev.academicProfile, institution: e.target.value },
+                    }))
+                  }
+                  placeholder="例如：浙江大学"
+                />
+              </div>
+
+              {/* Position */}
+              <div className="space-y-2">
+                <Label htmlFor="position">职位/身份</Label>
+                <Input
+                  id="position"
+                  value={formData.academicProfile.position}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      academicProfile: { ...prev.academicProfile, position: e.target.value },
+                    }))
+                  }
+                  placeholder="例如：博士研究生 / 副教授 / 研究员"
+                />
+              </div>
+
+              {/* Education Level */}
+              <div className="space-y-2">
+                <Label htmlFor="educationLevel">最高学历</Label>
+                <select
+                  id="educationLevel"
+                  value={formData.academicProfile.educationLevel}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      academicProfile: { ...prev.academicProfile, educationLevel: e.target.value },
+                    }))
+                  }
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                >
+                  <option value="">请选择</option>
+                  <option value="本科">本科</option>
+                  <option value="硕士">硕士</option>
+                  <option value="博士">博士</option>
+                  <option value="博士后">博士后</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+
+              {/* Research Fields */}
+              <TagInput
+                label="研究领域"
+                icon={<BookOpen className="h-4 w-4" />}
+                placeholder="输入后按回车添加，例如：光学、材料科学"
+                tags={formData.academicProfile.researchField}
+                onChange={(tags) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    academicProfile: { ...prev.academicProfile, researchField: tags },
+                  }))
+                }
+              />
+
+              {/* Interests */}
+              <TagInput
+                label="感兴趣的方向"
+                placeholder="输入后按回车添加"
+                tags={formData.academicProfile.interests}
+                onChange={(tags) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    academicProfile: { ...prev.academicProfile, interests: tags },
+                  }))
+                }
+              />
+
+              {/* Skills */}
+              <TagInput
+                label="专业技能"
+                placeholder="输入后按回车添加，例如：Python、COMSOL、LaTeX"
+                tags={formData.academicProfile.skills}
+                onChange={(tags) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    academicProfile: { ...prev.academicProfile, skills: tags },
+                  }))
+                }
+              />
+
+              {/* Bio Detail */}
+              <div className="space-y-2">
+                <Label htmlFor="bioDetail">详细学术简介</Label>
+                <textarea
+                  id="bioDetail"
+                  value={formData.academicProfile.bioDetail}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      academicProfile: { ...prev.academicProfile, bioDetail: e.target.value },
+                    }))
+                  }
+                  placeholder="描述你的研究经历、擅长方向、合作意向等..."
+                  className="w-full min-h-[120px] px-3 py-2 text-sm rounded-md border border-input bg-background"
+                  maxLength={2000}
+                />
+                <p className="text-xs text-muted-foreground text-right">
+                  {formData.academicProfile.bioDetail.length}/2000
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Privacy Tab */}
         <TabsContent value="privacy">
           <Card>
@@ -331,6 +481,73 @@ export default function SettingsPage() {
           )}
           {saved ? '已保存' : loading ? '保存中...' : '保存设置'}
         </Button>
+      </div>
+    </div>
+  )
+}
+
+function TagInput({
+  label,
+  icon,
+  placeholder,
+  tags,
+  onChange,
+}: {
+  label: string
+  icon?: React.ReactNode
+  placeholder?: string
+  tags: string[]
+  onChange: (tags: string[]) => void
+}) {
+  const [input, setInput] = useState('')
+
+  const addTag = () => {
+    const trimmed = input.trim()
+    if (trimmed && !tags.includes(trimmed)) {
+      onChange([...tags, trimmed])
+      setInput('')
+    }
+  }
+
+  const removeTag = (tag: string) => {
+    onChange(tags.filter((t) => t !== tag))
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label className="flex items-center gap-1">
+        {icon}
+        {label}
+      </Label>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm bg-primary/10 text-primary"
+          >
+            {tag}
+            <button
+              type="button"
+              onClick={() => removeTag(tag)}
+              className="hover:text-destructive transition-colors"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              addTag()
+            }
+          }}
+          onBlur={addTag}
+          placeholder={placeholder}
+          className="flex-1 min-w-[200px]"
+        />
       </div>
     </div>
   )

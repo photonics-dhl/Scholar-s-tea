@@ -66,7 +66,16 @@ settings.local.json
 
 # Kimi CLI local sessions and overrides
 .kimi/sessions/
+.claude/sessions/
 .kimi/*.local.toml
 
 # Playwright MCP snapshots
 .playwright-mcp/
+
+# Git conflict backups
+*.orig
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

@@ -1,0 +1,2 @@
+-- Baseline migration: schema was already in sync with the database.
+-- This empty migration establishes the starting point for Prisma Migrate.

@@ -2,7 +2,7 @@
 
 ## 概述
 
-Scholar's Tea（学者茶话会）是一个高校学术交流社区平台，支持课题组管理、学科社区、实时茶话会（Tea Party）和 AI 思想工坊。
+Scholar's Tea（学者茶话会）是一个高校学术交流社区平台，支持课题组管理、学科社区、实时茶话会（Tea Party）和 AI AI Workshop。
 
 ---
 
@@ -314,8 +314,8 @@ pm2 stop scholars-tea
 dropdb -h /data/home/zju321/pgdata/run -U dbuser scholars_tea
 createdb -h /data/home/zju321/pgdata/run -U dbuser scholars_tea
 
-# 同步 schema
-npx prisma db push
+# 同步 schema（首次部署或重建数据库）
+npx prisma migrate deploy
 
 # 重启应用
 pm2 start ecosystem.config.js
@@ -346,7 +346,7 @@ pm2 start ecosystem.config.js
 - 文字聊天
 - 聊天记录
 
-### 5. 思想工坊 (AI Workshop)
+### 5. AI Workshop (AI Workshop)
 - 学术 AI 对话
 - 论文辅助
 - RAG 知识库

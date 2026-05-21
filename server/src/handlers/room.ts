@@ -5,7 +5,12 @@ type QueryFunction = (text: string, params?: any[]) => Promise<any>;
 
 export function registerRoomHandlers(io: Server, query: QueryFunction) {
   io.on('connection', (socket: Socket) => {
-    console.log(`User connected: ${socket.data.user.id}`);
+    if (process.env.LOG_LEVEL === 'debug') {
+      console.log(`User connected: ${socket.data.user.id}`);
+    }
+
+    // Track joined rooms for this socket connection
+    const joinedRooms = new Set<string>();
 
     // Join room
     socket.on('room:join', async ({ roomId }: { roomId: string }) => {
@@ -41,6 +46,7 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
 
         // Join socket room
         await socket.join(roomId);
+        joinedRooms.add(roomId);
 
         // Get room details
         const roomDetail = {
@@ -106,6 +112,7 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
     socket.on('room:leave', async ({ roomId }: { roomId: string }) => {
       try {
         await socket.leave(roomId);
+        joinedRooms.delete(roomId);
 
         // Remove participant
         await query(
@@ -143,9 +150,54 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
       }
     });
 
-    // Disconnect
+    // Disconnect — clean up all participant records for this socket
     socket.on('disconnect', async () => {
-      console.log(`User disconnected: ${socket.data.user.id}`);
+      const userId = socket.data.user?.id;
+      if (!userId) return;
+
+      if (process.env.LOG_LEVEL === 'debug') {
+        console.log(`User disconnected: ${userId}`);
+      }
+
+      for (const roomId of joinedRooms) {
+        try {
+          // Remove participant
+          await query(
+            'DELETE FROM "TeaPartyRoomParticipant" WHERE "roomId" = $1 AND "userId" = $2',
+            [roomId, userId]
+          );
+
+          // Notify others
+          socket.to(roomId).emit('room:user_left', {
+            userId,
+            roomId,
+          });
+
+          // Create system message
+          const systemMsgResult = await query(
+            `INSERT INTO "Message" ("id", "roomId", "userId", "content", "type", "createdAt")
+             VALUES ($1, $2, $3, $4, $5, NOW())
+             RETURNING *`,
+            [randomUUID(), roomId, userId, `${socket.data.user?.name || '用户'} 离开了房间`, 'SYSTEM']
+          );
+
+          // Broadcast system message
+          io.to(roomId).emit('message:received', {
+            message: {
+              ...systemMsgResult.rows[0],
+              user: {
+                id: userId,
+                name: socket.data.user?.name,
+                avatar: null,
+              },
+            },
+          });
+        } catch (error) {
+          console.error('disconnect cleanup error:', error);
+        }
+      }
+
+      joinedRooms.clear();
     });
   });
 }

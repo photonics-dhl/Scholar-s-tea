@@ -4,9 +4,11 @@
 
 ---
 
-## 0. First Step — Read the Skill
+## 0. First Step — Read the Skill & Restore Context
 
-- **每次对话和任务开始前必须首先阅读此技能**：`.kimi/skills/superpowers-karpathy/SKILL.md`。融合 superpowers 工作流框架与 Karpathy 编码准则，确保在采取任何行动之前正确调用相关技能并遵循高质量编码原则。
+1. **每次对话和任务开始前必须首先阅读此技能**：`.kimi/skills/superpowers-karpathy/SKILL.md`。融合 superpowers 工作流框架与 Karpathy 编码准则，确保在采取任何行动之前正确调用相关技能并遵循高质量编码原则。
+2. **恢复跨会话上下文**：读取 `.claude/HANDOFF.md`，了解当前任务状态（目标、已完成、阻塞项、下一动作）。如 HANDOFF.md 为空，向用户说明并请求确认任务方向。
+3. **读取自动化规则**：读取 `.claude/rules/handoff-automation.md`，确认 /clear 时的 handoff 流程。
 
 ---
 
@@ -20,7 +22,7 @@
 | Disciplines | `/disciplines` | Hierarchical: discipline → sub-discipline → research direction |
 | Top10 | `/top-questions` | Monthly community votes on hot questions |
 | Tea Party | `/tea-party` | Socket.io real-time chat rooms |
-| AI Workshop | `/workshop` | Claude API academic assistant with RAG knowledge base |
+| AI Workshop | `/workshop` | ZAI GLM-5.1 academic assistant with RAG knowledge base |
 | Knowledge | `/knowledge` | RAG vector-store documents |
 | Profile / Settings | `/profile`, `/settings` | User profiles and preferences |
 
@@ -64,9 +66,10 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 | ORM | Prisma | 5.14.x (root) / 5.22.x (server) |
 | Cache | Redis | Optional, used for sessions / queues |
 | Storage | MinIO | S3-compatible object storage |
-| AI | Claude API (primary) | `claude-sonnet-4-20250514` via env `CLAUDE_API_KEY` |
+| AI (primary) | ZAI (智谱 AI) | `glm-5.1` via env `ZAI_API_KEY` |
 | AI (alt) | MiniMax API | `HERMES_MODEL=MiniMax-M2.7` via `MINIMAX_API_KEY` |
 | AI (vision) | ZCHAT API | Multimodal: `gpt-5`, `claude-sonnet-4-5`, etc. via `ZCHAT_API_KEY` |
+| AI (legacy) | Claude (Anthropic) | `CLAUDE_API_KEY` reserved; `claude-service.ts` wraps ZAI internally |
 | Process Manager | PM2 | `ecosystem.config.js` |
 
 ### Design System
@@ -100,7 +103,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   └── settings/
 │   │   ├── api/v1/          # REST API routes (domain subdirs)
 │   │   │   ├── admin/
-│   │   │   ├── ai/
+│   │   │   ├── ai/          # chat, extract-pdf, generate-image, knowledge, memory
 │   │   │   ├── auth/
 │   │   │   ├── citations/
 │   │   │   ├── comments/
@@ -115,11 +118,12 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   ├── tea-party/
 │   │   │   ├── top-questions/
 │   │   │   ├── upload/
-│   │   │   └── user/
+│   │   │   ├── user/
+│   │   │   └── workshop/
 │   │   ├── layout.tsx       # Root layout (fonts, Live2D script, FloatingChat)
 │   │   └── page.tsx         # Landing page
 │   ├── components/
-│   │   ├── ui/              # shadcn base components — NO business logic
+│   │   ├── ui/              # shadcn base components — NO business logic (~18 components)
 │   │   ├── features/        # Business components
 │   │   │   ├── editor/
 │   │   │   ├── groups/
@@ -135,7 +139,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── lib/
 │   │   ├── db/prisma.ts     # Prisma singleton — ALL DB ops go here
 │   │   ├── auth/            # NextAuth config, providers, password utils
-│   │   ├── ai/              # Claude wrapper, RAG service, prompts, citation detector
+│   │   ├── ai/              # ZAI wrapper, RAG service, prompts, citation detector
 │   │   │   ├── skills/      # AI skill engine (types, engine, index, paper-generation)
 │   │   ├── socket/          # Socket.io client utilities
 │   │   └── utils/           # cn(), sanitize, helpers
@@ -152,17 +156,18 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── dist/                # Compiled output (`tsc`)
 │   └── package.json
 ├── prisma/
-│   ├── schema.prisma        # 569 lines, ~30 models
+│   ├── schema.prisma        # 608 lines, ~30 models
 │   └── seed.ts
 ├── scripts/
 │   ├── admin/               # make-admin.ts
-│   ├── build/               # build-start.sh, clean-rebuild.sh, fix-prisma.sh
+│   ├── build/               # build-start.sh, clean-rebuild.sh, fix-prisma.sh, simple-start.sh
 │   ├── check/               # Health check scripts (app, nextjs, prisma, routes, server)
 │   ├── deploy/              # Python/Shell deploy helpers
 │   ├── start/               # start-nextjs.sh, full-restart.sh, restart-next.sh
 │   ├── sync/                # Claude sync scripts (local/server bidirectional)
-│   ├── test/                # Ad-hoc test scripts (no formal framework)
+│   ├── test/                # Ad-hoc diagnostic scripts (no formal test framework)
 │   └── auto-sync.sh         # Auto commit+push every 30 min to `develop`
+├── tests/                   # Ad-hoc Playwright/manual test scripts + screenshots
 ├── docs/
 │   ├── DEPLOYMENT.md        # Full deploy guide (Chinese)
 │   ├── SERVER_DEPLOYMENT.md # Server env, Singularity, Nginx, Feishu bot
@@ -178,10 +183,11 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   └── uploads/             # User uploads
 ├── ecosystem.config.js      # PM2 config (Next.js port 3002, socket port 3001)
 ├── next.config.js           # reactStrictMode, image remotePatterns, webpack undici external
+├── playwright.config.js     # Minimal Playwright config for ad-hoc tests/ scripts
 ├── postcss.config.js        # tailwindcss + autoprefixer
 ├── tailwind.config.ts       # Design tokens, animations, fontFamily
 ├── package.json             # Root Next.js dependencies
-└── .env.example             # Required env template
+└── .env.example             # Required env template (incomplete — see Section 11)
 ```
 
 **Key paths to remember:**
@@ -210,8 +216,9 @@ npm run format       # Prettier: src/**/*.{ts,tsx,md}
 ### Database
 
 ```bash
-npx prisma migrate dev      # Dev migration
-npx prisma db push          # Quick schema push (prototype / dev)
+npx prisma migrate dev      # Dev migration (interactive)
+npx prisma migrate deploy   # Production migration (non-interactive)
+npx prisma db push          # Quick schema push (prototype / dev only)
 npx prisma generate         # Regenerate Client
 npx prisma studio           # GUI
 npm run db:seed             # Seed (tsx prisma/seed.ts)
@@ -288,12 +295,14 @@ pm2 logs scholars-tea-socket
 
 ## 6. Testing
 
-⚠️ **No formal test framework is configured.**
+### Testing
 
-- No Jest, Vitest, Playwright, or Cypress configs exist in the repo.
-- `tests/` contains ad-hoc scripts and screenshots, but no formal test suite.
-- `scripts/test/` has diagnostic scripts (`ai-api-test.mjs`, `paper-quality-test.mjs`, `test-prisma.js`) for manual API and integration checks.
-- If you add tests: start with **Vitest + React Testing Library** for unit tests and **Playwright** for E2E.
+- **Unit tests**: **Vitest** + **React Testing Library** 已配置（`vitest.config.ts`）。
+  - 运行: `npm run test`
+  - 现有覆盖: `latex-to-utf8`, `peer-review-prompts`, `grant-application-prompts`
+- **Ad-hoc scripts**: `tests/` 和 `scripts/test/` 保留手动诊断脚本（Playwright、API 测试等）。
+- **E2E**: 尚未配置正式框架。如需添加，使用 **Playwright**。
+- 生产部署不运行测试；CI/CD 尚未建立。
 
 ---
 
@@ -306,7 +315,7 @@ pm2 logs scholars-tea-socket
 
 ### Core Models
 
-The schema (`prisma/schema.prisma`, 569 lines) includes:
+The schema (`prisma/schema.prisma`, 608 lines) includes:
 
 - **Auth**: `User`, `Account`, `Session`, `VerificationToken`
 - **Org hierarchy**: `Institution`, `College`, `Department`
@@ -317,6 +326,7 @@ The schema (`prisma/schema.prisma`, 569 lines) includes:
 - **Chat**: `TeaPartyRoom`, `TeaPartyRoomParticipant`, `Message`
 - **RAG**: `KnowledgeDocument`, `ResearchMemory`
 - **Admin**: `TopQuestion`, `QuestionVote`
+- **Workshop**: `WorkshopSession`, `WorkshopMessage`
 
 ### Migrations
 
@@ -343,25 +353,57 @@ npx prisma db seed
 
 ### Providers
 
-| Provider | Env Key | Use Case |
-|----------|---------|----------|
-| MiniMax | `MINIMAX_API_KEY` | Primary academic assistant (Workshop), Hermes agent, paper enhancement |
-| ZCHAT | `ZCHAT_API_KEY` | Fallback multimodal (images + text), vision models |
-| Claude (Anthropic) | `CLAUDE_API_KEY` | Reserved for future use (not currently wired) |
+| Provider | Env Key | Use Case | Default Model |
+|----------|---------|----------|---------------|
+| **ZAI (智谱 AI)** | `ZAI_API_KEY` | **Primary** — Workshop chat, paper generation FastPath, vision, RAG, image generation | `glm-5.1` (754B MoE, 200K ctx) |
+| MiniMax | `MINIMAX_API_KEY` | Hermes Gateway backend only (paper generation via skill routing) | `MiniMax-M2.7` |
+| ZCHAT | `ZCHAT_API_KEY` | Fallback multimodal (images + text), vision models | `claude-sonnet-4-5` |
+| Claude (Anthropic) | `CLAUDE_API_KEY` | Reserved for future use (not currently wired) | — |
+
+> **Note**: ZAI GLM-5.1 是 2026-05 升级后的主力模型，支持 Thinking Mode、Tool Calling、Structured JSON Output。`claude-service.ts` 文件名是历史遗留，内部已迁移到 ZAI 调用（通过 `chatWithZAI` / `chatWithZAIStream` / `callZAIVision`）。MiniMax 仅作为 Hermes Gateway 的后端 provider。
+
+### Dual-Path Paper Generation（论文生成双路径）
+
+论文生成 (`paper_generation` action) 有两条调用路径，**默认走 Hermes Path**：
+
+| 路径 | 入口 | System Prompt 注入 | 适用场景 |
+|------|------|-------------------|----------|
+| **Hermes Path** | `generatePaperViaHermes()` | 显式发送 `PAPER_GENERATION_SYSTEM_PROMPT` 作为 `system` message | 正常流程（默认） |
+| **FastPath** | `generatePaper()` → `executeSkillStage()` | 通过 `skill.systemPrompt` 注入 | Hermes 超时 fallback |
+
+**⚠️ 关键注意事项**：
+- `callHermesGateway` / `callHermesGatewayStream` 的 `buildSystemPrompt()` 仅输出极简指令（`[Skill Mode: X]` + personality tag），**不包含** `PAPER_GENERATION_SYSTEM_PROMPT` 中的原创性铁律、写作风格、引用规范等完整约束。
+- 因此 `generatePaperViaHermes` 必须在调用前**显式将 `PAPER_GENERATION_SYSTEM_PROMPT` 放入 messages[0]（system 角色）**，否则 AI 会退化为"整理/排版"模式，导致 verbatim copying。
+- `callHermesGateway` 检测到 messages 中已存在 `system` 角色时，**不会**追加 `buildSystemPrompt()` 的输出（避免覆盖）。
+
+### Formatting 阶段的 LaTeX 特例
+
+System Prompt 全局规定"数学公式必须使用 UTF-8 Unicode 符号，禁止 LaTeX"，但 formatting 阶段需要输出 LaTeX/Markdown 格式（含 `$...$` / `$$...$$`）。
+
+解决方案：`generatePaperViaHermes` 在 formatting 阶段的 user message 末尾追加：
+```
+【格式特例】本阶段允许使用 LaTeX 语法输出数学公式。
+```
 
 ### Key Files
 
-- `src/lib/ai/claude-service.ts` — **MiniMax API wrapper** (legacy filename), stream handling, error recovery. Currently hardcodes `model: 'MiniMax-M2.7'`.
-- `src/lib/ai/rag-service.ts` — Vector similarity search over `KnowledgeDocument` and `ResearchMemory`.
-- `src/lib/ai/paper-enhancement.ts` — Paper quality scoring and improvement suggestions.
-- `src/lib/ai/paper-generation-prompts.ts` — Prompt templates for academic writing.
-- `src/lib/ai/peer-review-prompts.ts` — Peer review prompt templates.
-- `src/lib/ai/citation-detector.ts` — Detects and verifies real-world citations in posts/comments.
-- `src/lib/ai/agent-modes.ts` — Hermes personality / mode definitions.
-- `src/lib/ai/skills/engine.ts` — AI skill engine for structured tool use.
-- `src/lib/ai/skills/paper-generation.ts` — Paper generation skill implementation.
-- `src/lib/ai/skills/types.ts` — Skill type definitions.
-- `src/lib/ai/skills/index.ts` — Skill module exports.
+- `src/lib/ai/zai-service.ts` — **ZAI (GLM-5.1) API wrapper**，OpenAI-compatible protocol，支持 streaming、vision (`GLM-4.6V`)、image generation。
+- `src/lib/ai/claude-service.ts` — Legacy filename，实际已迁移到 ZAI 调用。保留 `stripThinkBlocks`、重试逻辑、`ChatMessage` 类型定义。
+- `src/lib/ai/hermes-gateway-adapter.ts` — Hermes Gateway 适配器。核心：`generatePaperViaHermes`、`peerReviewViaHermes`、`surveyGenerationViaHermes`。⚠️ **必须显式注入 System Prompt**（见上文 Dual-Path 说明）。
+- `src/lib/ai/paper-generation-prompts.ts` — 五阶段 Prompt 模板（proposal/structure/writing/data/formatting），含 `PAPER_GENERATION_SYSTEM_PROMPT`、Few-shot 示例、原创性铁律。
+- `src/lib/ai/peer-review-prompts.ts` — 审稿 Prompt 模板（7 维度评分 + 结构化输出）。
+- `src/lib/ai/grant-application-prompts.ts` — 基金申请 Prompt 模板。
+- `src/lib/ai/paper-enhancement.ts` — RAG 增强 + 引用验证。外部检索优先（Semantic Scholar/arXiv），社区论文库回退。
+- `src/lib/ai/rag-service.ts` — 向量相似度搜索（`KnowledgeDocument`、`ResearchMemory`）。
+- `src/lib/ai/external-paper-search.ts` — 外部学术数据库检索（Semantic Scholar、arXiv、Tavily）。
+- `src/lib/ai/citation-detector.ts` / `citation-verifier.ts` — 引用检测与验证。
+- `src/lib/ai/quality-review.ts` — 论文质量评审逻辑。
+- `src/lib/ai/latex-to-utf8.ts` — LaTeX 公式转 UTF-8 Unicode 符号工具。
+- `src/lib/ai/stream-think-filter.ts` — Streaming 响应中的 think block 过滤。
+- `src/lib/ai/skills/engine.ts` — Skill 执行引擎（FastPath）。
+- `src/lib/ai/skills/paper-generation.ts` — Skill 注册与参数定义。
+- `src/lib/ai/agent-modes.ts` — Workshop 多 Agent 模式定义与行为配置。
+- `hermes-home/hermes-agent/skills/research/research-paper-writing/SKILL.md` — Hermes Gateway 侧 skill 定义（107+ skills 之一）。
 
 ### RAG Storage
 
@@ -373,7 +415,7 @@ npx prisma db seed
 ## 10. Realtime (Socket.io)
 
 - **Separate process**: `server/src/index.ts` runs on port `3001`.
-- **CORS**: allows `localhost:3000`, `localhost:3002`, `10.72.212.33:3002`, `10.72.212.33:3005`, `scholars-tea.428312321.xyz`.
+- **CORS**: allows `localhost:3000`, `localhost:3002`, `10.72.212.33:3002`, `10.72.212.33:3005`, `scholars-tea.428312321.xyz`, `https://scholars-tea.428312321.xyz`.
 - **Handlers**:
   - `room.ts` — room creation, joining, leaving, participant management.
   - `message.ts` — message broadcasting, history, typing indicators.
@@ -458,20 +500,39 @@ hermes gateway run > ~/hermes-home/logs/gateway.log 2>&1 &
 
 ### Required Environment Variables
 
+> ⚠️ `.env.example` is **incomplete** — it does not list `ZAI_API_KEY`, but the application requires it at runtime (see `src/lib/ai/zai-service.ts`). Always verify `ecosystem.config.js` `forwardVars` array against actual code usage.
+
 ```env
 DATABASE_URL="postgresql://..."
 REDIS_URL="redis://..."
 NEXTAUTH_SECRET="..."
 NEXTAUTH_URL="http://localhost:3002"
 SOCKET_SERVER_URL="http://localhost:3001"
+
+# Primary AI (ZAI / 智谱 AI)
+ZAI_API_KEY="..."
+
+# Legacy / reserved
 CLAUDE_API_KEY="sk-..."
+
+# Hermes Gateway backend
 MINIMAX_API_KEY="..."
+MINIMAX_BASE_URL="https://api.minimaxi.com/anthropic"
+
+# Multimodal fallback
 ZCHAT_API_KEY="..."
+ZCHAT_BASE_URL="https://api.zchat.tech/v1"
+
+# Object storage
 S3_ENDPOINT="http://localhost:9000"
 S3_ACCESS_KEY="minioadmin"
 S3_SECRET_KEY="minioadmin"
 S3_BUCKET="scholars-tea"
+S3_PUBLIC_URL="..."
+
+# App
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_SOCKET_URL="http://localhost:3001"
 ```
 
 ### Auto-sync (Server → GitHub)
@@ -506,7 +567,7 @@ PID 10274  openclaw-gateway            ← Separate project (OpenClaw)
 
 ### Secrets
 - `.env` is never committed (listed in `.gitignore`).
-- API keys (Claude, MiniMax, ZCHAT, S3) are **env-only**; no hardcoding allowed.
+- API keys (ZAI, MiniMax, ZCHAT, S3) are **env-only**; no hardcoding allowed.
 - Verify no secrets leak before committing config changes.
 
 ---
@@ -553,10 +614,11 @@ PID 10274  openclaw-gateway            ← Separate project (OpenClaw)
 - **Node.js**: 20 LTS required in production.
 - **PostgreSQL**: 9.2.24 (schema comments mention 16+ as a future goal).
 - **Socket server**: `server/src/modules`, `plugins`, `services` are currently empty — all logic lives in `handlers/` + `middleware/`.
-- **Tests**: None yet. Add Vitest + React Testing Library when needed.
+- **Tests**: Vitest + React Testing Library configured. 30 tests passing. Playwright config exists for ad-hoc manual scripts. No CI suite yet.
 - **CI/CD**: None. Rely on `scripts/auto-sync.sh` + manual PM2 restart.
-- **Hermes agent**: Not part of the Next.js build; it runs as a standalone Python/Node process using the config in `hermes/config.yaml`.
+- **Hermes agent**: Not part of the Next.js build; it runs as a standalone Python/Node process using the config in `hermes-home/config.yaml`.
+- **ZAI_API_KEY**: Required at runtime but missing from `.env.example`; always check `ecosystem.config.js` `forwardVars` and actual code usage when adding new environment variables.
 
 ---
 
-> Updated: 2026-05-13
+> Updated: 2026-05-21

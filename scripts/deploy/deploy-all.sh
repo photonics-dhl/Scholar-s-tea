@@ -3,8 +3,8 @@ set -e
 
 cd /data/home/zju321/321/DHL/Scholar's_Tea
 
-echo "=== Prisma DB Push ==="
-npx prisma db push --accept-data-loss
+echo "=== Prisma Migrate Deploy ==="
+npx prisma migrate deploy
 
 echo "=== Prisma Generate ==="
 npx prisma generate

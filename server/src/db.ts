@@ -8,11 +8,15 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
+const isDebugLog = process.env.LOG_LEVEL === 'debug';
+
 export const query = async (text: string, params?: any[]) => {
   const start = Date.now();
   const res = await pool.query(text, params);
   const duration = Date.now() - start;
-  console.log('Executed query', { text: text.substring(0, 50), duration, rows: res.rowCount });
+  if (isDebugLog) {
+    console.log('Executed query', { text: text.substring(0, 50), duration, rows: res.rowCount });
+  }
   return res;
 };
 

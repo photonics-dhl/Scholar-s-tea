@@ -83,9 +83,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "./.claude/hooks/session-end-hook.sh",
-            "timeout": 60,
+            "type": "prompt",
+            "prompt": "【Session 即将结束】执行 /clear 或退出前，必须完成以下检查清单（见 .claude/rules/clear-protocol.md）：\n1. 更新 .claude/HANDOFF.md 的「当前任务状态」表格（目标、已完成、关键决策、阻塞项、相关文件、下一动作）\n2. 如有阶段性成果 → 写入 .claude/sessions/YYYY-MM-DD_主题.md\n3. 如有新踩坑/约束 → 追加 .claude/rules/ 或 CLAUDE.md\n4. 确认以上完成后，才能执行 /clear。\n\n如果用户没有要求 /clear，只是正常结束会话，也建议主动更新 HANDOFF.md。",
             "once": false
           }
         ]
@@ -95,9 +94,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "echo 【Scholar's Tea】三层记忆写入规则: 工具Bug→memory | SOP→skills | 项目特定→CLAUDE.md | Verification: API→lint+typecheck | 前端→lint+typecheck | DB→prisma validate",
-            "timeout": 5,
+            "type": "prompt",
+            "prompt": "【Scholar's Tea Session 启动】\n\n1. 首先读取 .claude/HANDOFF.md 恢复当前任务状态\n2. 读取 AGENTS.md 获取项目全貌（技术栈、结构、规范）\n3. 如需命令/路由速查 → .claude/rules/commands.md / routes.md\n4. 轮数>20 / 时长>30min / Input>5M 时，执行 /clear 前必须先完成 .claude/rules/clear-protocol.md 的 checklist\n\n记忆写入规则：\n- 工具Bug/workaround → memory 工具\n- 跨项目SOP → .claude/skills/\n- 项目事实/踩坑 → .claude/rules/ 或 CLAUDE.md\n\n验证 Gates：API/前端→npm run lint + typecheck | DB→npx prisma validate",
             "once": false
           }
         ]

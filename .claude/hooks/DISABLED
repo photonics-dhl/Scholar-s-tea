@@ -1,0 +1,14 @@
+# Hooks Disabled
+
+All bash-based hooks have been removed.
+
+Reason: Windows PowerShell incompatibility + more overhead than savings.
+Token optimization is now purely behavioral (see .kimi/rules/token-optimization.md).
+
+Previous hooks:
+- post-write-hook.sh — credential scanning + file validation
+- pre-command-hook.sh — package management security check
+- pre-commit-hook.sh — git commit credential exposure check
+- session-end-hook.sh — session summary + cleanup
+
+These are preserved in git history if needed for reference.

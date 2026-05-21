@@ -1,19 +1,20 @@
-# 测试要求
+# Testing
 
-| 层级 | 工具 | 覆盖率目标 |
-|------|------|------------|
-| 单元测试 | Vitest / Jest | ≥ 70% |
-| 集成测试 | Vitest + Testcontainers | 核心流程 |
-| E2E 测试 | Playwright | 用户关键路径 |
+> Current state: **No formal test framework** is configured in this project.
 
-## 常用测试命令
+## Manual Testing
 
-```bash
-npm test          # 运行所有测试
-npm run test:e2e  # E2E 测试
-```
+- Ad-hoc scripts in `scripts/test/` for API and integration checks.
+- Example: `ai-api-test.mjs`, `paper-quality-test.mjs`, `test-prisma.js`.
 
-## 数据库测试
+## Future Addition
 
-- 使用 Testcontainers 启动真实 PostgreSQL
-- 不使用内存模拟，确保集成测试真实
+If tests are added, prefer **Vitest + React Testing Library** for unit tests and **Playwright** for E2E.
+
+## Verification Gates (Current)
+
+| Task Type | Check |
+|-----------|-------|
+| API / Frontend | `npm run lint` + `npm run typecheck` |
+| Database | `npx prisma validate` |
+| AI / RAG | Output format check, no credential leaks |

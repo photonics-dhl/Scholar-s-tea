@@ -25,49 +25,15 @@ jobs:
           script: |
             set -e
             cd ~/scholars
-
-            echo "=== [1/4] Environment Check ==="
+            echo "[1/4] Environment Check"
             node -v
             pm2 list
-
-            echo "=== [2/4] Build Socket Server ==="
-            cd server
+            echo "[2/4] Build Socket Server"
+            cd server && npm run build && cd ..
+            echo "[3/4] Build Next.js"
             npm run build
-            cd ..
-
-            echo "=== [3/4] Build Next.js ==="
-            npm run build
-
-            echo "=== [4/4] Restart PM2 ==="
+            echo "[4/4] Restart PM2"
             pm2 restart ecosystem.config.js
             pm2 save
-
-            echo "=== Deploy Complete ==="
+            echo "Deploy Complete"
             pm2 list
-
-      - name: Notify Feishu
-        if: always()
-        env:
-          FEISHU_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-        run: |
-          if [ -z "$FEISHU_URL" ]; then
-            echo "Feishu webhook not configured, skipping notification"
-            exit 0
-          fi
-
-          if [ "${{ job.status }}" = "success" ]; then
-            MSG="✅ Scholar's Tea 部署成功
-分支: develop
-提交: ${{ github.sha }}
-作者: ${{ github.actor }}"
-          else
-            MSG="❌ Scholar's Tea 部署失败
-分支: develop
-提交: ${{ github.sha }}
-作者: ${{ github.actor }}
-请检查 GitHub Actions 日志: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          fi
-
-          curl -X POST "$FEISHU_URL" \
-            -H "Content-Type: application/json" \
-            -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"$MSG\"}}"

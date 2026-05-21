@@ -12,6 +12,7 @@
  */
 
 import type { PaperRef } from './paper-enhancement'
+import { fetchWithProxyAndTimeout } from '@/lib/utils/fetch-with-proxy'
 
 // =============================================================================
 // 配置
@@ -20,6 +21,7 @@ import type { PaperRef } from './paper-enhancement'
 const SEMANTIC_SCHOLAR_API = 'https://api.semanticscholar.org/graph/v1/paper/search'
 const S2_API_KEY = process.env.SEMANTIC_SCHOLAR_API_KEY || ''
 const VERIFY_TIMEOUT = 15000 // 单次搜索超时
+const MAX_CITATIONS_TO_VERIFY = 20 // 最大验证引用数，防止长文本产生无限API调用
 
 // =============================================================================
 // 类型定义
@@ -90,14 +92,11 @@ async function searchSemanticScholar(
       headers['x-api-key'] = S2_API_KEY
     }
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), VERIFY_TIMEOUT)
-
-    const response = await fetch(`${SEMANTIC_SCHOLAR_API}?${params.toString()}`, {
-      headers,
-      signal: controller.signal,
-    })
-    clearTimeout(timeoutId)
+    const response = await fetchWithProxyAndTimeout(
+      `${SEMANTIC_SCHOLAR_API}?${params.toString()}`,
+      { headers },
+      VERIFY_TIMEOUT
+    )
 
     if (!response.ok) {
       console.warn('[CitationVerifier] S2 API error:', response.status)
@@ -174,9 +173,10 @@ async function getPaperById(paperId: string): Promise<SemanticScholarPaper | nul
       headers['x-api-key'] = S2_API_KEY
     }
 
-    const response = await fetch(
+    const response = await fetchWithProxyAndTimeout(
       `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=title,authors,year,venue,citationCount,abstract`,
-      { headers }
+      { headers },
+      VERIFY_TIMEOUT
     )
 
     if (!response.ok) return null
@@ -294,8 +294,8 @@ export async function verifyCitationsRealTime(
   text: string,
   topic?: string
 ): Promise<CitationVerificationReport> {
-  const refPlaceholders = extractRefPlaceholders(text)
-  const freeTextCitations = extractFreeTextCitations(text)
+  const refPlaceholders = extractRefPlaceholders(text).slice(0, MAX_CITATIONS_TO_VERIFY)
+  const freeTextCitations = extractFreeTextCitations(text).slice(0, MAX_CITATIONS_TO_VERIFY)
 
   const citations: CitationMatch[] = []
 
@@ -352,8 +352,10 @@ export async function verifyCitationsRealTime(
     })
   }
 
-  // 处理自由文本引用
+  // 处理自由文本引用（限制总数，防止无限API调用）
+  let processedCount = refPlaceholders.length
   for (const freeRef of freeTextCitations) {
+    if (processedCount >= MAX_CITATIONS_TO_VERIFY) break
     // 跳过已经处理过的
     if (citations.some((c) => c.rawText === freeRef.rawText)) continue
 
@@ -375,6 +377,7 @@ export async function verifyCitationsRealTime(
       status: matchedPaper ? 'confirmed' : 'unverified',
       score: matchedPaper ? 0.8 : 0,
     })
+    processedCount++
   }
 
   // 生成验证后的文本
@@ -392,8 +395,19 @@ export async function verifyCitationsRealTime(
       const authors = paper.authors.map((a) => a.name).join(', ')
       const realCitation = `${authors}${paper.year ? ` (${paper.year})` : ''}. ${paper.title}${paper.venue ? `. ${paper.venue}` : ''}`
 
-      // 替换占位符为真实引用
+      // 替换占位符为真实引用（包含原始 REF 编号以便追溯）
       if (citation.rawText.startsWith('[REF-')) {
+        // 保留 REF 编号但附加真实引用信息
+        const refNum = citation.rawText.match(/\[REF-(\d+)\]/)?.[1]
+        if (refNum) {
+          verifiedText = verifiedText.replaceAll(
+            citation.rawText,
+            `[REF-${refNum}: ${realCitation}]`
+          )
+        } else {
+          verifiedText = verifiedText.replaceAll(citation.rawText, `[${realCitation}]`)
+        }
+      } else {
         verifiedText = verifiedText.replaceAll(citation.rawText, `[${realCitation}]`)
       }
     }
@@ -445,7 +459,16 @@ export async function verifyAndReport(
 ${report.unverifiedCount > 0
     ? `⚠️ 有 ${report.unverifiedCount} 个引用无法验证，已标记为 [CITATION NEEDED]。建议通过 Semantic Scholar 或 Google Scholar 补充真实引用。`
     : '✅ 所有引用均已通过 Semantic Scholar 验证。'
-  }`
+  }
+
+${report.citations
+    .filter((c) => c.status !== 'unverified' && c.matchedPaper)
+    .map((c) => {
+      const p = c.matchedPaper!
+      const authors = p.authors.map((a) => a.name).join(', ')
+      return `- ✓ ${c.rawText} → ${authors}${p.year ? ` (${p.year})` : ''}. ${p.title}${p.venue ? `. ${p.venue}` : ''}`
+    })
+    .join('\n')}`
 
   return { ...report, summary }
 }

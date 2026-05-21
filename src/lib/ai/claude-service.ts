@@ -1,6 +1,8 @@
+import { createThinkStrippingStream } from './stream-think-filter'
 import { prisma } from '@/lib/db/prisma';
 import nodeFetch from 'node-fetch';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { chatWithZAI, chatWithZAIStream, callZAIVision } from './zai-service';
 
 // Proxy support for server-side fetch
 let _fetch: typeof fetch = fetch;
@@ -11,6 +13,76 @@ if (typeof window === 'undefined') {
     _fetch = (nodeFetch as any).default || nodeFetch;
     _agent = new HttpsProxyAgent(proxyUrl);
 }
+}
+
+/**
+ * 清理 AI 返回的 JSON 字符串中的非法控制字符
+ * 某些模型会在响应中注入未转义的控制字符（如 \x00-\x08, \x0B, \x0C, \x0E-\x1F）
+ * 这些字符会导致 JSON.parse 抛出 "Bad control character" 错误
+ */
+function sanitizeControlChars(text: string): string {
+  // 移除 JSON 字符串中非法的未转义控制字符
+  // 保留合法字符：\t(0x09), \n(0x0A), \r(0x0D) 以及在转义序列中的字符
+  return text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+}
+
+/**
+ * 安全地解析可能包含非法控制字符的 JSON
+ */
+function safeJsonParse(text: string): any {
+  try {
+    return JSON.parse(text)
+  } catch (e) {
+    if (e instanceof SyntaxError && e.message.includes('control character')) {
+      const cleaned = sanitizeControlChars(text)
+      return JSON.parse(cleaned)
+    }
+    throw e
+  }
+}
+
+/**
+ * 移除 AI 回复中的 <think> 思考标签
+ * MiniMax-M2.7 等模型会在输出中包裹推理过程
+ */
+export function stripThinkBlocks(content: string): string {
+  if (!content) return content
+  return content.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+}
+
+/**
+ * 带重试的 fetch 包装器
+ * 对 429 (Rate Limit) 和 5xx 服务器错误自动重试，使用指数退避
+ */
+async function fetchWithRetry(
+  url: string,
+  options: any,
+  retries = 3
+): Promise<Response> {
+  let lastError: Error | null = null
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const response = await _fetch(url, options)
+      if (response.ok) return response
+      const shouldRetry = (response.status === 429 || response.status >= 500) && i < retries
+      if (!shouldRetry) return response
+      const delay = Math.min(1000 * Math.pow(2, i), 8000)
+      console.warn(`[fetchWithRetry] HTTP ${response.status}, retry ${i + 1}/${retries + 1} in ${delay}ms`)
+      await new Promise((r) => setTimeout(r, delay))
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err))
+      // 不重试用户主动取消的请求
+      if (lastError.name === 'AbortError') throw lastError
+      if (i < retries) {
+        const delay = Math.min(1000 * Math.pow(2, i), 8000)
+        console.warn(`[fetchWithRetry] Network error, retry ${i + 1}/${retries + 1} in ${delay}ms:`, lastError.message)
+        await new Promise((r) => setTimeout(r, delay))
+      } else {
+        throw lastError
+      }
+    }
+  }
+  throw lastError || new Error('fetchWithRetry: all attempts failed')
 }
 
 export interface VisionContent {
@@ -40,6 +112,8 @@ export interface ChatMessage {
 interface ClaudeResponse {
   content: string;
   error?: string;
+  /** 结构化数据（JSON 解析结果），仅当 structured=true 时可能存在 */
+  structured?: unknown;
 }
 
 const SYSTEM_PROMPT = `你是一位博学的研究助手，专注于学术讨论和研究支持。
@@ -102,46 +176,200 @@ function convertToAnthropicFormat(messages: ChatMessage[]): Array<{ role: string
   });
 }
 
-export async function chatWithAI(messages: ChatMessage[]): Promise<ClaudeResponse> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
+/** 非流式AI调用超时（毫秒） */
+const CHAT_TIMEOUT_MS = 120_000
+
+/** 流式AI调用超时（毫秒） */
+const STREAM_FETCH_TIMEOUT_MS = 5 * 60 * 1000
+
+/** Fallback 模型优先级：主模型失败后依次尝试 */
+const FALLBACK_MODELS = ['gpt-5', 'deepseek-v4-flash'] as const
+
+/** ZAI 默认模型 */
+const ZAI_DEFAULT_MODEL = 'glm-5.1'
+const ZAI_FALLBACK_MODEL = 'glm-4.7'
+const ZAI_VISION_MODEL = 'glm-4.6v'
+
+/**
+ * 内部：调用 ZAI API（OpenAI 兼容格式）
+ */
+async function _callZAI(
+  messages: ChatMessage[],
+  systemPrompt?: string,
+  maxTokens = 4096,
+  temperature = 0.7,
+  model = ZAI_DEFAULT_MODEL
+): Promise<ClaudeResponse> {
+  const result = await chatWithZAI(
+    messages.map((m) => ({ role: m.role, content: typeof m.content === 'string' ? m.content : '' })),
+    {
+      model,
+      systemPrompt: systemPrompt || SYSTEM_PROMPT,
+      maxTokens,
+      temperature,
+    }
+  )
+  return { content: stripThinkBlocks(result.content || ''), error: result.error }
+}
+
+/**
+ * 内部：调用 MiniMax-M2.7 API
+ */
+async function _callMiniMax(
+  messages: ChatMessage[],
+  systemPrompt?: string,
+  maxTokens = 2048,
+  temperature = 0.7
+): Promise<ClaudeResponse> {
+  const apiKey = process.env.MINIMAX_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.ZCHAT_API_KEY
+  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL
 
   if (!apiKey) {
-    return { content: '', error: 'AI 服务未配置' };
+    return { content: '', error: 'AI 服务未配置' }
   }
 
-  try {
-    const apiMessages = convertToAnthropicFormat([
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...messages
-    ]);
-    
-    const response = await _fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: apiMessages,
-        max_tokens: 2048,
+  // 避免重复 system 消息：如果 messages 已含 system，则不再前置追加
+  const hasSystem = messages.some((m) => m.role === 'system')
+  const apiMessages = convertToAnthropicFormat(
+    hasSystem
+      ? messages
+      : [{ role: 'system', content: systemPrompt || SYSTEM_PROMPT }, ...messages]
+  )
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS)
+
+  const response = await fetchWithRetry(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'MiniMax-M2.7',
+      messages: apiMessages,
+      max_tokens: maxTokens,
+      temperature,
+    }),
+    agent: _agent,
+    signal: controller.signal,
+  } as any)
+
+  clearTimeout(timeoutId)
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '')
+    console.error('[MiniMax] API error:', response.status, errorText)
+    return { content: '', error: `MiniMax 错误: ${response.status} ${errorText.slice(0, 200)}` }
+  }
+
+  const text = await response.text()
+  const data = safeJsonParse(text)
+  return { content: stripThinkBlocks(data.choices?.[0]?.message?.content || '') }
+}
+
+/**
+ * 主 AI 调用入口：ZAI GLM 家族为主力模型，失败时自动回退
+ * 回退链：GLM-5.1 → GLM-4.7 → MiniMax-M2.7 → ZCHAT gpt-5 → DeepSeek
+ */
+export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string): Promise<ClaudeResponse> {
+  // 如果消息包含图片，优先使用 ZAI GLM-4.6V（原生多模态），fallback 到 ZCHAT
+  const visionMessages = messages.filter((m) => typeof m.content !== 'string') as ChatMessage[]
+  const hasVision = visionMessages.some((m) =>
+    (m.content as Array<any>)?.some(
+      (block) => block.type === 'image_url' || block.type === 'image'
+    )
+  )
+  if (hasVision) {
+    // 1. 优先 ZAI GLM-4.6V
+    try {
+      const zaiVisionRes = await callZAIVision(messages, {
+        systemPrompt: systemPrompt || SYSTEM_PROMPT,
+        maxTokens: 4096,
         temperature: 0.7,
-      }),
-      agent: _agent,
-    } as any)
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI API error:', response.status, errorText);
-      return { content: '', error: `AI 服务错误: ${response.status}` };
+        stream: false,
+      })
+      if (zaiVisionRes.ok) {
+        const text = await zaiVisionRes.text()
+        const data = safeJsonParse(text)
+        const content = data.choices?.[0]?.message?.content || ''
+        if (content) {
+          console.log('[chatWithAI] Vision via ZAI GLM-4.6V succeeded')
+          return { content: stripThinkBlocks(content) }
+        }
+      }
+      const errText = await zaiVisionRes.text().catch(() => '')
+      console.warn('[chatWithAI] ZAI vision failed:', zaiVisionRes.status, errText)
+    } catch (err) {
+      console.warn('[chatWithAI] ZAI vision error:', err)
     }
+    // 2. fallback 到 ZCHAT
+    console.log('[chatWithAI] Vision fallback to ZCHAT')
+    return chatWithZCHAT(messages, { systemPrompt })
+  }
 
-    const data = await response.json();
-    return { content: data.choices?.[0]?.message?.content || '' };
-  } catch (error) {
-    console.error('AI chat error:', error);
-    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
+  // 1. 主模型：ZAI GLM-5.1
+  const primary = await _callZAI(messages, systemPrompt)
+  if (!primary.error) {
+    return primary
+  }
+
+  // 判断是否可回退
+  const errLower = primary.error.toLowerCase()
+  const isInputError = errLower.includes('invalid') || errLower.includes('bad request')
+  if (isInputError) {
+    console.error('[chatWithAI] ZAI input error, skip fallback:', primary.error)
+    return primary
+  }
+
+  console.warn('[chatWithAI] ZAI GLM-5.1 failed:', primary.error, '- starting fallback chain')
+
+  // 2. 回退 1: ZAI GLM-4.7（同家族备用）
+  const fallbackGLM = await _callZAI(messages, systemPrompt, 4096, 0.7, ZAI_FALLBACK_MODEL)
+  if (!fallbackGLM.error) {
+    console.log('[chatWithAI] Fallback to GLM-4.7 succeeded')
+    return fallbackGLM
+  }
+  console.warn('[chatWithAI] GLM-4.7 failed:', fallbackGLM.error)
+
+  // 3. 回退 2: MiniMax-M2.7
+  const fallback1 = await _callMiniMax(messages, systemPrompt)
+  if (!fallback1.error) {
+    console.log('[chatWithAI] Fallback to MiniMax-M2.7 succeeded')
+    return fallback1
+  }
+  console.warn('[chatWithAI] MiniMax failed:', fallback1.error)
+
+  // 4. 回退 3: ZCHAT gpt-5
+  const fallback2 = await chatWithZCHAT(messages, {
+    systemPrompt,
+    model: 'gpt-5',
+    maxTokens: 4096,
+    temperature: 0.7,
+  })
+  if (!fallback2.error) {
+    console.log('[chatWithAI] Fallback to gpt-5 succeeded')
+    return fallback2
+  }
+  console.warn('[chatWithAI] gpt-5 failed:', fallback2.error)
+
+  // 5. 回退 4: ZCHAT deepseek-v4-flash
+  const fallback3 = await chatWithZCHAT(messages, {
+    systemPrompt,
+    model: 'deepseek-v4-flash',
+    maxTokens: 4096,
+    temperature: 0.7,
+  })
+  if (!fallback3.error) {
+    console.log('[chatWithAI] Fallback to deepseek-v4-flash succeeded')
+    return fallback3
+  }
+  console.error('[chatWithAI] All fallback models failed:', fallback3.error)
+
+  // 返回完整回退链信息
+  return {
+    content: '',
+    error: `AI 服务全部不可用。GLM-5.1: ${primary.error}; GLM-4.7: ${fallbackGLM.error}; MiniMax: ${fallback1.error}; gpt-5: ${fallback2.error}; deepseek: ${fallback3.error}`,
   }
 }
 
@@ -198,7 +426,7 @@ export async function analyzePaper(content: string): Promise<{
   try {
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      return safeJsonParse(jsonMatch[0]);
     }
     return { summary: result.content.slice(0, 500) };
   } catch {
@@ -230,171 +458,85 @@ export async function suggestResearchDirections(
 
 // ===== 基金申请辅助 =====
 
-const GRANT_SYSTEM_PROMPT = `你是一位科研项目申请专家，熟悉国家自然科学基金、科技部重点研发计划、各省自然科学基金等各类科研项目的申请流程和评审标准。
-
-你的专长：
-- 立项依据的撰写逻辑（从宏观到微观，从问题到方案）
-- 研究内容的层次结构（科学问题 → 研究内容 → 技术路线）
-- 创新点的提炼和表达（避免空泛，要有具体支撑）
-- 研究基础与条件的展示
-- 预期成果的合理性和可考核性
-
-请用中文回答，保持专业、严谨、清晰的学术语言风格。`;
+import {
+  GRANT_APPLICATION_SYSTEM_PROMPT,
+  GRANT_APPLICATION_JSON_SYSTEM_PROMPT,
+  buildGrantApplicationJsonPrompt,
+  parseGrantApplicationJson,
+  type GrantApplicationResult,
+} from './grant-application-prompts'
 
 export async function grantApplication(
   topic: string,
-  context?: string
+  context?: string,
+  structured?: boolean
 ): Promise<ClaudeResponse> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
-
-  if (!apiKey) {
-    return { content: '', error: 'AI 服务未配置' };
+  if (structured) {
+    const prompt = buildGrantApplicationJsonPrompt(topic, context)
+    const result = await chatWithAI([{ role: 'user', content: prompt }], GRANT_APPLICATION_JSON_SYSTEM_PROMPT)
+    if (result.error) return result
+    const parsed = parseGrantApplicationJson(result.content)
+    if (parsed) {
+      return { content: result.content, structured: parsed }
+    }
+    return { content: result.content }
   }
 
   const prompt = context
-    ? `研究题目：${topic}\n\n背景信息：\n${context}\n\n请帮我撰写科研项目申请书的相关内容。`
-    : `研究题目：${topic}\n\n请帮我分析和规划这个科研项目的申请策略，包括：\n1. 立项依据的框架\n2. 研究内容的分解\n3. 技术路线的设计思路\n4. 创新点的提炼方向\n5. 预期成果的规划`;
+    ? `题目：${topic}\n背景：${context}\n请撰写项目申请相关内容。`
+    : `题目：${topic}\n请分析项目申请策略：立项依据、研究内容、技术路线、创新点、预期成果。`;
 
-  try {
-    const response = await _fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: GRANT_SYSTEM_PROMPT },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 4096,
-        temperature: 0.7,
-      }),
-      agent: _agent,
-    } as any);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { content: '', error: `AI 服务错误: ${response.status}` };
-    }
-
-    const data = await response.json();
-    return { content: data.choices?.[0]?.message?.content || '' };
-  } catch (error) {
-    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
-  }
+  // 使用 chatWithAI 获得完整 fallback 链：GLM-5.1 → MiniMax → ZCHAT → DeepSeek
+  return chatWithAI([{ role: 'user', content: prompt }], GRANT_APPLICATION_SYSTEM_PROMPT)
 }
 
 // ===== 文献综述辅助 =====
 
-const SURVEY_SYSTEM_PROMPT = `你是一位文献综述专家，擅长梳理研究脉络、比较方法论、发现研究空白。
-
-你的专长：
-- 构建综述的逻辑框架（时间线、方法论、主题分类等）
-- 识别里程碑工作和关键人物
-- 分析研究脉络的演变和分支
-- 发现研究空白和未来方向
-- 批判性比较不同方法的优缺点
-
-请用中文回答，结构清晰，逻辑严谨。`;
+const SURVEY_SYSTEM_PROMPT = `你是文献综述专家。请用中文结构化回答。`;
 
 export async function surveyGeneration(
   topic: string,
   context?: string
 ): Promise<ClaudeResponse> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
-
-  if (!apiKey) {
-    return { content: '', error: 'AI 服务未配置' };
-  }
-
   const prompt = context
-    ? `综述主题：${topic}\n\n相关信息：\n${context}\n\n请帮我梳理这个研究领域的文献综述框架。`
-    : `综述主题：${topic}\n\n请帮我生成这个研究领域的文献综述框架，包括：\n1. 研究背景与发展历史\n2. 现有方法的分类与比较\n3. 关键里程碑工作\n4. 当前挑战与开放问题\n5. 未来研究方向`;
+    ? `主题：${topic}\n背景：${context}\n请梳理文献综述框架。`
+    : `主题：${topic}\n请生成文献综述框架：背景历史、方法比较、里程碑工作、挑战问题、未来方向。`;
 
-  try {
-    const response = await _fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: SURVEY_SYSTEM_PROMPT },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 4096,
-        temperature: 0.7,
-      }),
-      agent: _agent,
-    } as any);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { content: '', error: `AI 服务错误: ${response.status}` };
-    }
-
-    const data = await response.json();
-    return { content: data.choices?.[0]?.message?.content || '' };
-  } catch (error) {
-    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
-  }
+  // 使用 chatWithAI 获得完整 fallback 链：GLM-5.1 → MiniMax → ZCHAT → DeepSeek
+  return chatWithAI([{ role: 'user', content: prompt }], SURVEY_SYSTEM_PROMPT)
 }
 
 // ===== AI 审稿 =====
 
 import {
   PEER_REVIEW_SYSTEM_PROMPT,
+  PEER_REVIEW_JSON_SYSTEM_PROMPT,
   buildPeerReviewPrompt,
+  buildPeerReviewJsonPrompt,
+  parsePeerReviewJson,
+  type PeerReviewResult,
 } from './peer-review-prompts'
 
 export async function peerReview(
   paperContent: string,
-  focus?: string
+  focus?: string,
+  structured?: boolean
 ): Promise<ClaudeResponse> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
-  const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
-
-  if (!apiKey) {
-    return { content: '', error: 'AI 服务未配置' };
+  if (structured) {
+    const prompt = buildPeerReviewJsonPrompt(paperContent, focus)
+    const result = await chatWithAI([{ role: 'user', content: prompt }], PEER_REVIEW_JSON_SYSTEM_PROMPT)
+    if (result.error) return result
+    const parsed = parsePeerReviewJson(result.content)
+    if (parsed) {
+      return { content: result.content, structured: parsed }
+    }
+    return { content: result.content }
   }
 
   const prompt = buildPeerReviewPrompt(paperContent, focus);
 
-  try {
-    const response = await _fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'system', content: PEER_REVIEW_SYSTEM_PROMPT },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 4096,
-        temperature: 0.5,
-      }),
-      agent: _agent,
-    } as any);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { content: '', error: `AI 服务错误: ${response.status}` };
-    }
-
-    const data = await response.json();
-    return { content: data.choices?.[0]?.message?.content || '' };
-  } catch (error) {
-    return { content: '', error: error instanceof Error ? error.message : '未知错误' };
-  }
+  // 使用 chatWithAI 获得完整 fallback 链：GLM-5.1 → MiniMax → ZCHAT → DeepSeek
+  return chatWithAI([{ role: 'user', content: prompt }], PEER_REVIEW_SYSTEM_PROMPT)
 }
 
 // ===== AI 论文生成（基于 Skill 引擎）=====
@@ -436,25 +578,43 @@ export async function generatePaper(
     discipline?: string
     enableRAG?: boolean
     enableCitationVerify?: boolean
+    enableExternalSearch?: boolean
+    /** 指定使用 ZCHAT (Claude Sonnet) 而非 MiniMax，提升学术写作质量 */
+    useClaudeSonnet?: boolean
+    /** base64 data URI 格式的图片数组，用于数据/图表阶段的视觉分析 */
+    images?: string[]
   }
-): Promise<ClaudeResponse & { citations?: CitationVerificationResult }> {
+): Promise<ClaudeResponse & { citations?: CitationVerificationResult; papers?: Array<{ title: string; authors: string[]; year?: number; venue?: string; url?: string }> }> {
   let ragPrefix = ''
   let verifyFn: ((text: string) => Promise<CitationVerificationResult>) | null = null
+  let retrievedPapers: Array<{ title: string; authors: string[]; year?: number; venue?: string; url?: string }> = []
 
-  // Step 1: RAG 增强（如果启用）
-  if (params.enableRAG !== false) {
+  // Step 1: 外部文献检索 + RAG 增强（默认启用）
+  if (params.enableExternalSearch !== false) {
     try {
       const enhancement = await preparePaperEnhancement(params.topic, {
         discipline: params.discipline,
+        stage,
+        useExternalSearch: true,
       })
       ragPrefix = enhancement.ragPrefix
       verifyFn = enhancement.verify
+      // 提取检索到的论文元数据供前端展示
+      retrievedPapers = enhancement.ragContext.papers.map((p) => ({
+        title: p.title,
+        authors: p.authors || [],
+        year: p.year,
+        venue: p.venue,
+        url: p.url,
+      }))
+      console.log(`[generatePaper] Retrieved ${retrievedPapers.length} external papers for "${params.topic}"`)
     } catch (err) {
-      console.warn('RAG enhancement failed for paper generation:', err)
+      console.warn('[generatePaper] External search failed, falling back:', err)
     }
   }
 
   // Step 2: 使用 Skill 引擎执行单阶段
+  const hasImages = params.images && params.images.length > 0
   const result = await executeSkillStage(
     'paper-generation',
     stage,
@@ -467,26 +627,36 @@ export async function generatePaper(
       dataDescription: params.dataDescription,
       analysisGoal: params.analysisGoal,
       format: params.format,
-      _ragPrefix: ragPrefix, // 传递给后续阶段
+      _ragPrefix: ragPrefix,
+      _images: params.images,
     },
     { topic: params.topic, stageOutputs: {}, metadata: {} },
-    { useVision: false }
+    { useVision: hasImages }
   )
 
-  // Step 3: 引用验证（如果启用且生成成功）
-  if (params.enableCitationVerify !== false && !result.error && result.content && verifyFn) {
+  // Step 3: 引用验证（默认启用）+ 真实引用替换
+  if (params.enableCitationVerify !== false && !result.error && result.content) {
     try {
-      const citationResult = await verifyFn(result.content)
+      // 优先使用基于 Semantic Scholar 的真实验证
+      const { verifyAndReport } = await import('./citation-verifier')
+      const report = await verifyAndReport(result.content, params.topic)
+      console.log(`[generatePaper] Citation verification: ${report.confirmedCount} confirmed, ${report.unverifiedCount} unverified, score ${report.credibilityScore}/100`)
+
       return {
-        content: citationResult.verifiedText,
-        citations: citationResult,
+        content: report.verifiedText,
+        citations: {
+          verifiedText: report.verifiedText,
+          citationMap: {},
+          unverified: report.citations.filter((c) => c.status === 'unverified').map((c) => c.rawText),
+        },
+        papers: retrievedPapers,
       }
     } catch (err) {
-      console.warn('Citation verification failed:', err)
+      console.warn('[generatePaper] Citation verification failed:', err)
     }
   }
 
-  return result
+  return { ...result, papers: retrievedPapers }
 }
 
 // ===== ZCHAT 多模态聊天（图片识别）=====
@@ -554,12 +724,18 @@ export async function chatWithZCHAT(
   }
 
   try {
-    const openaiMessages = normalizeToOpenAIVision([
-      { role: 'system', content: options?.systemPrompt || SYSTEM_PROMPT },
-      ...messages,
-    ])
+    // 避免重复 system 消息
+    const hasSystem = messages.some((m) => m.role === 'system')
+    const openaiMessages = normalizeToOpenAIVision(
+      hasSystem
+        ? messages
+        : [{ role: 'system', content: options?.systemPrompt || SYSTEM_PROMPT }, ...messages]
+    )
 
-    const response = await _fetch(`${baseUrl}/chat/completions`, {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), CHAT_TIMEOUT_MS)
+
+    const response = await fetchWithRetry(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -572,7 +748,10 @@ export async function chatWithZCHAT(
         temperature: options?.temperature ?? 0.7,
       }),
       agent: _agent,
+      signal: controller.signal,
     } as any)
+
+    clearTimeout(timeoutId)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -580,10 +759,14 @@ export async function chatWithZCHAT(
       return { content: '', error: `ZCHAT 服务错误: ${response.status}` }
     }
 
-    const data = await response.json()
-    return { content: data.choices?.[0]?.message?.content || '' }
+    const text = await response.text()
+    const data = safeJsonParse(text)
+    return { content: stripThinkBlocks(data.choices?.[0]?.message?.content || '') }
   } catch (error) {
     console.error('ZCHAT chat error:', error)
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { content: '', error: `ZCHAT 服务调用超时（>${CHAT_TIMEOUT_MS / 1000}秒）` }
+    }
     return { content: '', error: error instanceof Error ? error.message : 'ZCHAT 未知错误' }
   }
 }
@@ -610,6 +793,9 @@ export async function chatWithZCHATStream(
       ...messages,
     ])
 
+    const controller = new AbortController()
+    const fetchTimeoutId = setTimeout(() => controller.abort(), STREAM_FETCH_TIMEOUT_MS)
+
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -624,7 +810,10 @@ export async function chatWithZCHATStream(
         stream: true,
       }),
       agent: _agent,
+      signal: controller.signal,
     } as any)
+
+    clearTimeout(fetchTimeoutId)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -645,9 +834,37 @@ export async function chatWithZCHATStream(
       const nodeStream = response.body as unknown as import('stream').Readable
       return new ReadableStream({
         start(controller: ReadableStreamDefaultController) {
-          nodeStream.on('data', (chunk) => controller.enqueue(chunk))
-          nodeStream.on('end', () => controller.close())
-          nodeStream.on('error', (err) => controller.error(err))
+          const MAX_STREAM_MS = 5 * 60 * 1000
+          const INACTIVITY_MS = 60 * 1000
+          const startTime = Date.now()
+          let lastDataTime = Date.now()
+
+          const timeoutCheck = setInterval(() => {
+            const now = Date.now()
+            if (now - startTime > MAX_STREAM_MS) {
+              clearInterval(timeoutCheck)
+              try { controller.close() } catch { /* ignore */ }
+              return
+            }
+            if (now - lastDataTime > INACTIVITY_MS) {
+              clearInterval(timeoutCheck)
+              try { controller.close() } catch { /* ignore */ }
+              return
+            }
+          }, 5000)
+
+          nodeStream.on('data', (chunk) => {
+            lastDataTime = Date.now()
+            controller.enqueue(chunk)
+          })
+          nodeStream.on('end', () => {
+            clearInterval(timeoutCheck)
+            controller.close()
+          })
+          nodeStream.on('error', (err) => {
+            clearInterval(timeoutCheck)
+            controller.error(err)
+          })
         },
       })
     }
@@ -655,6 +872,9 @@ export async function chatWithZCHATStream(
     return response.body
   } catch (error) {
     console.error('ZCHAT stream error:', error)
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { error: `ZCHAT 流式服务调用超时（>${STREAM_FETCH_TIMEOUT_MS / 1000}秒）` }
+    }
     return { error: error instanceof Error ? error.message : 'ZCHAT 未知错误' }
   }
 }
@@ -665,6 +885,8 @@ import {
   generatePaperViaHermes,
   peerReviewViaHermes,
   grantApplicationViaHermes,
+  surveyGenerationViaHermes,
+  analyzePaperViaHermes,
 } from './hermes-gateway-adapter'
 import { verifyAndReport } from './citation-verifier'
 
@@ -682,7 +904,7 @@ export async function generatePaperWithHermes(
     format?: 'latex' | 'markdown' | 'plain'
     stream?: boolean
   }
-): Promise<ClaudeResponse & { citations?: { verified: number; unverified: number; score: number } }> {
+): Promise<ClaudeResponse & { citations?: { verified: number; unverified: number; score: number }; stream?: ReadableStream }> {
   const result = await generatePaperViaHermes({
     topic: params.topic,
     stage: stage as any,
@@ -690,30 +912,32 @@ export async function generatePaperWithHermes(
     section: params.section,
     wordCount: params.wordCount,
     content: params.content,
+    dataDescription: params.dataDescription,
+    analysisGoal: params.analysisGoal,
+    format: params.format,
     stream: params.stream,
   })
 
   if (result.error) {
-    // 抛出异常让上层 catch 触发 fallback 到本地路径
-    throw new Error(result.error)
+    // 返回 error 对象让上层 fallback 逻辑正常执行（而非 throw 导致 500）
+    return { content: '', error: result.error }
   }
 
+  // 流式模式：直接返回原始流，引用验证延后到前端或异步任务
   if (result.stream) {
-    // 流式模式下无法做引用验证，返回原始流
-    // 前端需要在流结束后再次调用验证接口
-    throw new Error('STREAM_NOT_SUPPORTED_FOR_VERIFY')
+    return { content: '', stream: result.stream }
   }
 
   const content = result.content || ''
   if (!content) {
-    throw new Error('Hermes Gateway returned empty content')
+    return { content: '', error: 'Hermes Gateway returned empty content' }
   }
 
-  // 引用验证
+  // 引用验证（仅非流模式）
   try {
     const report = await verifyAndReport(content, params.topic)
     return {
-      content: report.verifiedText,
+      content: stripThinkBlocks(report.verifiedText),
       citations: {
         verified: report.confirmedCount,
         unverified: report.unverifiedCount,
@@ -723,36 +947,71 @@ export async function generatePaperWithHermes(
   } catch (err) {
     console.warn('[generatePaperWithHermes] Citation verification failed:', err)
     // 引用验证失败仍返回原始内容
-    return { content }
+    return { content: stripThinkBlocks(content) }
   }
 }
 
 /** AI 审稿 — Hermes 增强版 */
 export async function peerReviewWithHermes(
   paperContent: string,
-  focus?: string
+  focus?: string,
+  structured?: boolean
 ): Promise<ClaudeResponse> {
-  const result = await peerReviewViaHermes(paperContent, focus)
+  const result = await peerReviewViaHermes(paperContent, focus, false, structured)
 
   if (result.error) {
     return { content: '', error: result.error }
   }
 
-  return { content: result.content || '' }
+  return {
+    content: stripThinkBlocks(result.content || ''),
+    structured: result.structured,
+  }
 }
 
 /** 基金申请 — Hermes 增强版 */
 export async function grantApplicationWithHermes(
   topic: string,
-  context?: string
+  context?: string,
+  structured?: boolean
 ): Promise<ClaudeResponse> {
-  const result = await grantApplicationViaHermes(topic, context)
+  const result = await grantApplicationViaHermes(topic, context, false, structured)
 
   if (result.error) {
     return { content: '', error: result.error }
   }
 
-  return { content: result.content || '' }
+  return {
+    content: stripThinkBlocks(result.content || ''),
+    structured: result.structured,
+  }
+}
+
+/** 文献综述 — Hermes 增强版 */
+export async function surveyWithHermes(
+  topic: string,
+  context?: string
+): Promise<ClaudeResponse> {
+  const result = await surveyGenerationViaHermes(topic, context)
+
+  if (result.error) {
+    return { content: '', error: result.error }
+  }
+
+  return { content: stripThinkBlocks(result.content || '') }
+}
+
+/** 论文分析 — Hermes 增强版 */
+export async function analyzePaperWithHermes(
+  content: string
+): Promise<ClaudeResponse> {
+  const result = await analyzePaperViaHermes(content)
+
+  if (result.error) {
+    return { content: '', error: result.error }
+  }
+
+  return { content: stripThinkBlocks(result.content || '') }
 }
 
 // ===== 流式聊天 =====
@@ -761,7 +1020,67 @@ export async function chatWithAIStream(
   messages: ChatMessage[],
   systemPrompt?: string
 ): Promise<ReadableStream | { error: string }> {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY || process.env.ZCHAT_API_KEY;
+  // 如果消息包含图片，优先使用 ZAI GLM-4.6V 流式，fallback 到 ZCHAT
+  const visionMessages = messages.filter((m) => typeof m.content !== 'string') as ChatMessage[]
+  const hasVision = visionMessages.some((m) =>
+    (m.content as Array<any>)?.some(
+      (block) => block.type === 'image_url' || block.type === 'image'
+    )
+  )
+  if (hasVision) {
+    try {
+      const zaiVisionRes = await callZAIVision(messages, {
+        systemPrompt: systemPrompt || SYSTEM_PROMPT,
+        maxTokens: 4096,
+        temperature: 0.7,
+        stream: true,
+      })
+      if (zaiVisionRes.ok && zaiVisionRes.body) {
+        console.log('[chatWithAIStream] Vision via ZAI GLM-4.6V stream')
+        let stream: ReadableStream
+        if (typeof window === 'undefined' && typeof (zaiVisionRes.body as any).getReader !== 'function') {
+          const { ReadableStream } = require('stream/web')
+          const nodeStream = zaiVisionRes.body as unknown as import('stream').Readable
+          stream = new ReadableStream({
+            start(controller: ReadableStreamDefaultController) {
+              nodeStream.on('data', (chunk) => controller.enqueue(chunk))
+              nodeStream.on('end', () => controller.close())
+              nodeStream.on('error', (err) => controller.error(err))
+            },
+          })
+        } else {
+          stream = zaiVisionRes.body
+        }
+        return stream.pipeThrough(createThinkStrippingStream())
+      }
+      console.warn('[chatWithAIStream] ZAI vision stream failed, fallback to ZCHAT')
+    } catch (err) {
+      console.warn('[chatWithAIStream] ZAI vision stream error:', err)
+    }
+    return chatWithZCHATStream(messages, { systemPrompt })
+  }
+
+  // 1. 主模型：ZAI GLM-5.1 流式
+  try {
+    const zaiStream = await chatWithZAIStream(
+      messages.map((m) => ({ role: m.role, content: typeof m.content === 'string' ? m.content : '' })),
+      {
+        model: ZAI_DEFAULT_MODEL,
+        systemPrompt: systemPrompt || SYSTEM_PROMPT,
+        maxTokens: 4096,
+        temperature: 0.7,
+      }
+    )
+    if (!('error' in zaiStream)) {
+      return zaiStream.pipeThrough(createThinkStrippingStream())
+    }
+    console.warn('[chatWithAIStream] ZAI stream failed:', zaiStream.error)
+  } catch (err) {
+    console.warn('[chatWithAIStream] ZAI stream error:', err)
+  }
+
+  // 2. Fallback: MiniMax-M2.7 流式
+  const apiKey = process.env.MINIMAX_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.ZCHAT_API_KEY;
   const baseUrl = process.env.MINIMAX_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.ZCHAT_BASE_URL;
 
   if (!apiKey) {
@@ -774,6 +1093,9 @@ export async function chatWithAIStream(
       ...messages
     ]);
     
+    const controller = new AbortController()
+    const fetchTimeoutId = setTimeout(() => controller.abort(), STREAM_FETCH_TIMEOUT_MS)
+
     const response = await _fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -788,7 +1110,10 @@ export async function chatWithAIStream(
         stream: true,
       }),
       agent: _agent,
+      signal: controller.signal,
     } as any);
+
+    clearTimeout(fetchTimeoutId)
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -799,21 +1124,54 @@ export async function chatWithAIStream(
       return { error: 'AI 响应为空' };
     }
 
-    // node-fetch returns a NodeJS.ReadableStream, need to convert for browser compat
+    let stream: ReadableStream
     if (typeof window === 'undefined' && response.body && typeof (response.body as any).getReader !== 'function') {
       const { ReadableStream } = require('stream/web');
       const nodeStream = response.body as unknown as import('stream').Readable;
-      return new ReadableStream({
+      stream = new ReadableStream({
         start(controller: ReadableStreamDefaultController) {
-          nodeStream.on('data', (chunk) => controller.enqueue(chunk));
-          nodeStream.on('end', () => controller.close());
-          nodeStream.on('error', (err) => controller.error(err));
+          const MAX_STREAM_MS = 5 * 60 * 1000;
+          const INACTIVITY_MS = 60 * 1000;
+          const startTime = Date.now();
+          let lastDataTime = Date.now();
+
+          const timeoutCheck = setInterval(() => {
+            const now = Date.now();
+            if (now - startTime > MAX_STREAM_MS) {
+              clearInterval(timeoutCheck);
+              try { controller.close(); } catch { /* ignore */ }
+              return;
+            }
+            if (now - lastDataTime > INACTIVITY_MS) {
+              clearInterval(timeoutCheck);
+              try { controller.close(); } catch { /* ignore */ }
+              return;
+            }
+          }, 5000);
+
+          nodeStream.on('data', (chunk) => {
+            lastDataTime = Date.now();
+            controller.enqueue(chunk);
+          });
+          nodeStream.on('end', () => {
+            clearInterval(timeoutCheck);
+            controller.close();
+          });
+          nodeStream.on('error', (err) => {
+            clearInterval(timeoutCheck);
+            controller.error(err);
+          });
         }
       });
+    } else {
+      stream = response.body
     }
 
-    return response.body;
+    return stream.pipeThrough(createThinkStrippingStream())
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { error: `AI 流式服务调用超时（>${STREAM_FETCH_TIMEOUT_MS / 1000}秒）` };
+    }
     return { error: error instanceof Error ? error.message : '未知错误' };
   }
 }

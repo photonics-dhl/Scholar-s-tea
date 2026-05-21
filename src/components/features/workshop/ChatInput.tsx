@@ -202,10 +202,22 @@ export function ChatInput({
       const files = e.dataTransfer.files
       if (!files || files.length === 0) return
 
-      // Determine type from first file
-      const firstFile = files[0]
-      const isImage = firstFile.type.startsWith('image/')
-      handleFileSelect(files, isImage ? 'image' : 'file')
+      // Separate images and files, then upload in batches
+      const imageFiles: File[] = []
+      const otherFiles: File[] = []
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type.startsWith('image/')) {
+          imageFiles.push(files[i])
+        } else {
+          otherFiles.push(files[i])
+        }
+      }
+      if (imageFiles.length > 0) {
+        handleFileSelect(imageFiles as unknown as FileList, 'image')
+      }
+      if (otherFiles.length > 0) {
+        handleFileSelect(otherFiles as unknown as FileList, 'file')
+      }
     },
     []
   )
@@ -219,7 +231,7 @@ export function ChatInput({
         <div className="flex flex-wrap gap-2">
           {attachments.map((att, i) => (
             <div
-              key={`${att.url}-${i}`}
+              key={`${att.type}-${att.url}-${i}`}
               className="relative group flex items-center gap-2 rounded-lg border border-tea-primary/20 bg-tea-primary/5 px-3 py-2"
             >
               {att.type === 'image' ? (
@@ -326,10 +338,11 @@ export function ChatInput({
               <ImageIcon className="h-4 w-4" />
             </Button>
 
-            {/* File upload */}
+            {/* File upload (PDF etc.) */}
             <input
               ref={fileInputRef}
               type="file"
+              accept=".pdf,.txt,.doc,.docx"
               multiple
               className="hidden"
               onChange={(e) => handleFileSelect(e.target.files, 'file')}
@@ -384,7 +397,7 @@ export function ChatInput({
       </div>
 
       <p className="text-[11px] text-muted-foreground text-center">
-        Enter 发送 · Shift+Enter 换行 · 支持拖拽上传 · 图片最大 10MB
+        Enter 发送 · Shift+Enter 换行 · 支持拖拽上传 · 图片/PDF 最大 10MB
       </p>
     </div>
   )

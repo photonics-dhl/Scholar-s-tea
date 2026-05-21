@@ -1,7 +1,7 @@
 /**
  * Scholar's Tea — 学术 Agent 模式配置
  *
- * 定义思想工坊中各 AI 助手的模式、系统提示词、欢迎界面和快捷模板。
+ * 定义AI Workshop中各 AI 助手的模式、系统提示词、欢迎界面和快捷模板。
  */
 
 import {
@@ -60,7 +60,16 @@ const basePrompt = `你是 Scholar's Tea 学者茶话会的学术 AI 助手，�
 2. 提供具体、可操作的建議，避免空泛
 3. 适当引用相关理论或方法
 4. 用清晰的结构组织回答（分点、分段）
-5. 鼓励批判性思考，提醒用户验证信息`
+5. 鼓励批判性思考，提醒用户验证信息
+
+输出格式规范：
+- 使用 Markdown 表格呈现对比数据（| 列1 | 列2 |）
+- 关键结论前使用 "> [关键] " 提示框，警告前使用 "> [注意] "，方法建议前使用 "> [建议] "
+- 也可使用标准 GitHub Alert 语法："> [!NOTE]" 信息提示、"> [!WARNING]" 警告、"> [!IMPORTANT]" 重要提醒、"> [!CAUTION]" 危险提醒（注意 > 与 [ 之间必须有空格）
+- 步骤式内容使用有序列表（1. 2. 3.）
+- 并列要点使用无序列表（- 或 *）
+- 长篇辅助内容使用折叠区块 <details><summary>摘要</summary>详情</details>
+- 数学符号使用 UTF-8 Unicode（alpha, beta, Sigma, integral, <=, ->），禁止使用 LaTeX 语法`
 
 export const agentModes: Record<AgentMode, AgentModeConfig> = {
   general: {

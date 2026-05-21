@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { chatWithZAI } from '@/lib/ai/zai-service';
 
 // POST /api/v1/citations/agent-verify - Agent verifies a citation
 export async function POST(request: NextRequest) {
@@ -154,29 +155,17 @@ ${sourceContent.slice(0, 500)}
 只返回 JSON，不要其他内容。`;
 
   try {
-    // 调用 MiniMax API（复用现有的 API 配置）
-    const response = await fetch('https://api.minimaxi.com/v1/text/chatcompletion_v2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ANTHROPIC_AUTH_TOKEN || process.env.MINIMAX_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 200,
-      }),
-    });
+    // 调用 ZAI GLM-4.7-Flash API（轻量级审核任务）
+    const result = await chatWithZAI(
+      [{ role: 'user', content: prompt }],
+      { model: 'glm-4.7-flash', maxTokens: 200, temperature: 0.3 }
+    );
 
-    if (!response.ok) {
-      throw new Error(`MiniMax API error: ${response.status}`);
+    if (result.error) {
+      throw new Error(`ZAI API error: ${result.error}`);
     }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    const content = result.content || '';
 
     // 解析 JSON 响应
     try {

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Sparkles, PanelLeft, PanelLeftClose, Bot, Loader2 } from 'lucide-react'
+import { Sparkles, PanelLeft, PanelLeftClose, Bot, Loader2, AlertCircle, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils/cn'
@@ -36,12 +36,14 @@ export default function WorkshopClient() {
     loading,
     error,
     streamingContent,
+    dbAvailable,
     createSession,
     switchSession,
     deleteSession,
     changeMode,
     sendMessage,
     stopGeneration,
+    clearMessages,
   } = useChat(initialMode)
 
   const { capabilities: hermesCaps } = useHermesCapabilities()
@@ -61,10 +63,17 @@ export default function WorkshopClient() {
     }
   }, [initialMode, mode, changeMode, modeInitialized])
 
-  // Auto-scroll to bottom
+  // Auto-scroll: only scroll when new user message is added or AI starts responding
+  // Don't scroll if user has manually scrolled up
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, streamingContent])
+    const container = messagesContainerRef.current
+    if (!container) return
+
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
+    if (isNearBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages.length, streamingContent])
 
   const handleModeChange = (newMode: AgentMode) => {
     changeMode(newMode)
@@ -87,9 +96,16 @@ export default function WorkshopClient() {
       paper_generation: 'paper_generation',
     }
 
+    const action = (options?.action as string) || actionMap[mode]
+
     sendMessage(content, {
-      action: actionMap[mode],
+      action,
       ...options,
+      // 审稿和基金模式默认启用结构化输出
+      structured:
+        options?.structured !== undefined
+          ? options.structured
+          : action === 'peer_review' || action === 'grant',
     })
   }
 
@@ -101,6 +117,7 @@ export default function WorkshopClient() {
         currentSessionId={currentSessionId}
         mode={mode}
         isOpen={sidebarOpen}
+        dbAvailable={dbAvailable}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onCreateSession={() => createSession(mode)}
         onSwitchSession={switchSession}
@@ -162,7 +179,7 @@ export default function WorkshopClient() {
             <div className="flex items-center gap-2">
               <Sparkles className={cn('h-4 w-4', activeMode.color)} />
               <span className="text-sm font-medium hidden sm:inline">
-                思想工坊
+                AI Workshop
               </span>
             </div>
           </div>
@@ -174,7 +191,7 @@ export default function WorkshopClient() {
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-5 bg-dot-pattern"
+              className="flex-1 overflow-y-auto px-4 py-5 space-y-6 bg-dot-pattern"
             >
               {messages.length === 0 && !loading && (
                 <WelcomeScreen
@@ -211,8 +228,8 @@ export default function WorkshopClient() {
                       <Bot className="size-4 text-convo-blue-foreground" />
                     </div>
                     <div className="flex-1 max-w-[85%]">
-                      <div className="bg-gradient-to-br from-convo-blue to-convo-blue/80 text-convo-blue-foreground rounded-2xl rounded-tl-md px-4 py-3 inline-block shadow-sm">
-                        <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                      <div className="bg-gradient-to-br from-convo-blue to-convo-blue/80 text-convo-blue-foreground rounded-2xl rounded-tl-md px-4 py-3 inline-block shadow-sm select-text">
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed select-text">
                           {streamingContent}
                           <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-middle" />
                         </p>
@@ -255,12 +272,30 @@ export default function WorkshopClient() {
               {/* Error */}
               {error && (
                 <div className="flex gap-3 animate-fade-in-up">
-                  <div className="size-9 rounded-full bg-destructive/10 flex items-center justify-center">
-                    <Bot className="size-4 text-destructive" />
+                  <div className="size-9 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle className="size-4 text-destructive" />
                   </div>
-                  <div className="flex-1">
-                    <div className="bg-destructive/10 text-destructive rounded-2xl rounded-tl-md px-4 py-3 inline-block border border-destructive/20">
-                      <p className="text-sm">{error}</p>
+                  <div className="flex-1 max-w-[85%]">
+                    <div className="bg-destructive/5 text-destructive rounded-2xl rounded-tl-md px-4 py-3 border border-destructive/15">
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">出错了</p>
+                          <p className="text-sm mt-0.5 opacity-90 leading-relaxed">{error}</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            const lastUser = [...messages].reverse().find((m) => m.role === 'user')
+                            if (lastUser) {
+                              handleSend(lastUser.content)
+                            }
+                          }}
+                          className="flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-destructive/10 hover:bg-destructive/20 transition-colors flex-shrink-0 mt-0.5"
+                          title="重试"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          重试
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

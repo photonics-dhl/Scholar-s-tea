@@ -6,7 +6,7 @@
  * - 执行单阶段或多阶段工作流
  * - 上下文传递（前一阶段的输出注入后续阶段）
  * - 质量门控（生成后自批判）
- * - 自动路由（图片 → ZCHAT，文本 → MiniMax）
+ * - 自动路由（图片 → ZCHAT，文本 → ZAI GLM-5.1）
  */
 
 import {
@@ -14,6 +14,7 @@ import {
   chatWithZCHAT,
   hasVisionContent,
   type ChatMessage,
+  type VisionContent,
 } from '@/lib/ai/claude-service'
 import type {
   Skill,
@@ -23,6 +24,7 @@ import type {
   SkillExecutionResult,
   SkillRegistry,
 } from './types'
+import { guardDepth } from '@/lib/utils/loop-guard'
 
 // =============================================================================
 // Skill 注册表
@@ -68,35 +70,51 @@ async function executeStage({
   context,
   useVision,
 }: StageExecutionInput): Promise<{ content: string; error?: string }> {
-  const prompt = stage.promptBuilder(params, context)
-  const systemPrompt = skill.systemPrompt
-  const model = stage.model || skill.defaultModel || 'MiniMax-M2.7'
-  const maxTokens = stage.maxTokens || skill.defaultMaxTokens || 4096
-  const temperature =
-    stage.temperature !== undefined
-      ? stage.temperature
-      : skill.defaultTemperature !== undefined
-        ? skill.defaultTemperature
-        : 0.7
+  return guardDepth(
+    `skill-stage:${skill.id}`,
+    async () => {
+      const prompt = stage.promptBuilder(params, context)
+      const systemPrompt = skill.systemPrompt
+      const model = stage.model || skill.defaultModel || 'glm-5.1'
+      const maxTokens = stage.maxTokens || skill.defaultMaxTokens || 4096
+      const temperature =
+        stage.temperature !== undefined
+          ? stage.temperature
+          : skill.defaultTemperature !== undefined
+            ? skill.defaultTemperature
+            : 0.7
 
-  const messages: ChatMessage[] = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: prompt },
-  ]
+      const messages: ChatMessage[] = [{ role: 'system', content: systemPrompt }]
 
-  // 自动路由：含图片 → ZCHAT，纯文本 → MiniMax
-  const shouldUseVision = useVision || hasVisionContent(messages)
+      // 构建 user message：纯文本 或 文本+图片（vision 格式）
+      const imageList = (params._images as string[] | undefined) || []
+      if (imageList.length > 0) {
+        const userContent: VisionContent[] = [{ type: 'text', text: prompt }]
+        for (const img of imageList) {
+          userContent.push({ type: 'image_url', image_url: { url: img } })
+        }
+        messages.push({ role: 'user', content: userContent })
+      } else {
+        messages.push({ role: 'user', content: prompt })
+      }
 
-  if (shouldUseVision) {
-    return chatWithZCHAT(messages, {
-      systemPrompt,
-      maxTokens,
-      temperature,
-      model: process.env.ZCHAT_VISION_MODEL || 'claude-sonnet-4-5',
-    })
-  }
+      // 自动路由：含图片 / 指定 Claude 模型 → ZCHAT，纯文本 → ZAI
+      const shouldUseVision = useVision || hasVisionContent(messages) || imageList.length > 0
+      const isClaudeModel = model.startsWith('claude-') || model.startsWith('gpt-')
 
-  return chatWithAI(messages)
+      if (shouldUseVision || isClaudeModel) {
+        return chatWithZCHAT(messages, {
+          systemPrompt,
+          maxTokens,
+          temperature,
+          model: isClaudeModel ? model : (process.env.ZCHAT_VISION_MODEL || 'claude-sonnet-4-5'),
+        })
+      }
+
+      return chatWithAI(messages)
+    },
+    5
+  )
 }
 
 // =============================================================================
@@ -148,7 +166,32 @@ ${output.slice(0, 3000)}`
  * @param options 执行选项
  * @returns 执行结果（包含各阶段输出和最终输出）
  */
+/** Skill 工作流总体超时（毫秒）：防止多阶段AI调用无限挂起 */
+const SKILL_TOTAL_TIMEOUT_MS = 5 * 60 * 1000
+
+/** 带超时的 Promise 包装 */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timeout after ${ms}ms`)), ms)
+    ),
+  ])
+}
+
 export async function executeSkill(
+  skillId: string,
+  input: Record<string, unknown>,
+  options: SkillExecutionOptions = {}
+): Promise<SkillExecutionResult> {
+  return withTimeout(
+    _executeSkillInternal(skillId, input, options),
+    SKILL_TOTAL_TIMEOUT_MS,
+    `Skill "${skillId}"`
+  )
+}
+
+async function _executeSkillInternal(
   skillId: string,
   input: Record<string, unknown>,
   options: SkillExecutionOptions = {}
@@ -248,36 +291,42 @@ export async function executeSkillStage(
   context?: Partial<SkillContext>,
   options?: { useVision?: boolean }
 ): Promise<{ content: string; error?: string }> {
-  const skill = getRegistry().get(skillId)
-  if (!skill) {
-    return { content: '', error: `Skill not found: ${skillId}` }
-  }
+  return guardDepth(
+    `skill-stage:${skillId}`,
+    async () => {
+      const skill = getRegistry().get(skillId)
+      if (!skill) {
+        return { content: '', error: `Skill not found: ${skillId}` }
+      }
 
-  const stage = skill.stages.find((s) => s.id === stageId)
-  if (!stage) {
-    return { content: '', error: `Stage not found: ${stageId} in skill ${skillId}` }
-  }
+      const stage = skill.stages.find((s) => s.id === stageId)
+      if (!stage) {
+        return { content: '', error: `Stage not found: ${stageId} in skill ${skillId}` }
+      }
 
-  const fullContext: SkillContext = {
-    topic: (input.topic as string) || context?.topic || '',
-    stageOutputs: context?.stageOutputs || {},
-    metadata: context?.metadata || {},
-  }
+      const fullContext: SkillContext = {
+        topic: (input.topic as string) || context?.topic || '',
+        stageOutputs: context?.stageOutputs || {},
+        metadata: context?.metadata || {},
+      }
 
-  const stageInput = {
-    ...input,
-    ...fullContext.stageOutputs,
-    _stageId: stage.id,
-    _stageName: stage.name,
-  }
+      const stageInput = {
+        ...input,
+        ...fullContext.stageOutputs,
+        _stageId: stage.id,
+        _stageName: stage.name,
+      }
 
-  return executeStage({
-    skill,
-    stage,
-    params: stageInput,
-    context: fullContext,
-    useVision: options?.useVision,
-  })
+      return executeStage({
+        skill,
+        stage,
+        params: stageInput,
+        context: fullContext,
+        useVision: options?.useVision,
+      })
+    },
+    5
+  )
 }
 
 function getRegistry(): SkillRegistry {

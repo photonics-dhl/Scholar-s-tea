@@ -36,8 +36,10 @@ const proposalStage: SkillStage = {
   promptBuilder: (input) => {
     const topic = (input.topic as string) || ''
     const background = (input.background as string) || (input._ragPrefix as string) || undefined
-    return buildProposalPrompt(topic, background)
+    const content = (input.content as string) || undefined
+    return buildProposalPrompt(topic, background, content)
   },
+  // 默认使用 Skill defaultModel (glm-5.1)，主模型失败时自动回退到 MiniMax → gpt-5 → deepseek-v4-flash
   temperature: 0.7,
   qualityGate: { enabled: true },
 }
@@ -50,7 +52,8 @@ const structureStage: SkillStage = {
     const topic = (input.topic as string) || context.topic
     // 如果已有 proposal 输出，注入作为上下文
     const proposal = context.stageOutputs['proposal']
-    return buildStructurePrompt(topic, proposal)
+    const content = (input.content as string) || undefined
+    return buildStructurePrompt(topic, proposal, content)
   },
   temperature: 0.7,
   qualityGate: { enabled: true },
@@ -85,11 +88,12 @@ const writingStage: SkillStage = {
 const dataStage: SkillStage = {
   id: 'data',
   name: '数据/图表',
-  description: '统计方法建议和图表描述',
+  description: '统计方法建议和图表描述（支持上传数据图片进行分析）',
   promptBuilder: (input) => {
     const dataDescription = (input.dataDescription as string) || ''
     const analysisGoal = (input.analysisGoal as string) || ''
-    return buildDataAnalysisPrompt(dataDescription, analysisGoal)
+    const images = (input._images as string[] | undefined) || []
+    return buildDataAnalysisPrompt(dataDescription, analysisGoal, images)
   },
   temperature: 0.5,
   qualityGate: { enabled: true },
@@ -98,7 +102,7 @@ const dataStage: SkillStage = {
 const formattingStage: SkillStage = {
   id: 'formatting',
   name: '排版交付',
-  description: '转换为 LaTeX / Markdown / 纯文本',
+  description: '按用户指定格式转换为 LaTeX / Markdown / 纯文本之一',
   promptBuilder: (input, context) => {
     const format = (input.format as 'latex' | 'markdown' | 'plain') || 'markdown'
     // 收集所有阶段输出作为待排版内容
@@ -124,7 +128,7 @@ export const paperGenerationSkill: Skill = {
   version: '2.0.0',
   systemPrompt: PAPER_GENERATION_SYSTEM_PROMPT,
   stages: [proposalStage, structureStage, writingStage, dataStage, formattingStage],
-  defaultModel: 'MiniMax-M2.7',
+  defaultModel: 'glm-5.1',
   defaultMaxTokens: 4096,
   defaultTemperature: 0.6,
 }

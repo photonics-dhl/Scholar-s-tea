@@ -63,7 +63,7 @@ export function WelcomeScreen({ mode, onQuickPrompt }: WelcomeScreenProps) {
             <Button
               key={i}
               variant="outline"
-              className={`justify-start h-auto py-3 px-4 text-left w-full ${mode.borderColor} hover:${mode.bgColor} transition-all duration-200`}
+              className={`group justify-start h-auto py-3 px-4 text-left w-full ${mode.borderColor} transition-all duration-200 hover:bg-muted`}
               onClick={() => onQuickPrompt(prompt.text)}
             >
               <PromptIcon
@@ -75,7 +75,7 @@ export function WelcomeScreen({ mode, onQuickPrompt }: WelcomeScreenProps) {
                   {prompt.text}
                 </span>
               </div>
-              <ArrowRight className="h-4 w-4 flex-shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100" />
+              <ArrowRight className="h-4 w-4 flex-shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </Button>
           )
         })}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
+import { chatWithZAI } from '@/lib/ai/zai-service';
 
 // POST /api/v1/citations/batch-verify - Agent batch verifies pending citations
 export async function POST(request: NextRequest) {
@@ -110,24 +111,16 @@ async function verifyCitationWithAI(input: {
 }`;
 
   try {
-    const response = await fetch('https://api.minimaxi.com/v1/text/chatcompletion_v2', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.MINIMAX_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'MiniMax-M2.7',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 200,
-      }),
-    });
+    const result = await chatWithZAI(
+      [{ role: 'user', content: prompt }],
+      { model: 'glm-4.7-flash', maxTokens: 200, temperature: 0.3 }
+    );
 
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    if (result.error) {
+      throw new Error(`ZAI API error: ${result.error}`);
+    }
 
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
+    const content = result.content || '';
 
     try {
       const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/(\{[\s\S]*\})/);

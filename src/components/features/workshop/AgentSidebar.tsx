@@ -20,6 +20,7 @@ interface AgentSidebarProps {
   currentSessionId: string | null
   mode: AgentMode
   isOpen: boolean
+  dbAvailable?: boolean
   onToggle: () => void
   onCreateSession: () => void
   onSwitchSession: (sessionId: string) => void
@@ -36,6 +37,7 @@ export function AgentSidebar({
   currentSessionId,
   mode,
   isOpen,
+  dbAvailable,
   onToggle,
   onCreateSession,
   onSwitchSession,
@@ -224,7 +226,7 @@ export function AgentSidebar({
 
         {/* Footer info */}
         <div className="p-3 border-t text-[11px] text-muted-foreground text-center">
-          对话保存在本地浏览器中
+          {dbAvailable ? '对话已同步到账户' : '对话保存在本地浏览器中'}
         </div>
       </aside>
 

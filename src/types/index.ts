@@ -154,6 +154,21 @@ export interface AddMemberDTO {
 }
 
 // ============================================
+// Academic Profile
+// ============================================
+
+export interface AcademicProfile {
+  researchField?: string[]
+  educationLevel?: string
+  institution?: string
+  position?: string
+  interests?: string[]
+  skills?: string[]
+  publications?: string[]
+  bioDetail?: string
+}
+
+// ============================================
 // Re-export Prisma enums
 // ============================================
 

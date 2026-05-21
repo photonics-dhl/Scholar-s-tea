@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
+import { callZAIVision } from '@/lib/ai/zai-service'
 
 const HERMES_API_URL = process.env.HERMES_API_URL || 'http://127.0.0.1:8642/v1/chat/completions'
 const API_SERVER_KEY = process.env.API_SERVER_KEY || 'hk-e4f9a45f3106ee1396164e6dae60137f9f08c0805d75b137404097cc4bdbedac'
@@ -546,77 +547,24 @@ export async function POST(request: NextRequest) {
       const userText = extractTextContent(lastMessage.content)
       let imageDescription: string | null = null
 
-      // Step 1: MiniMax VLM 获取图片描述
-      if (imageUrl) {
-        try {
-          imageDescription = await callMinimaxVLM(userText || '请描述这张图片', imageUrl)
-          console.log('[Hermes] MiniMax VLM description succeeded')
-        } catch (vlmErr) {
-          console.warn('[Hermes] MiniMax VLM failed:', vlmErr)
-        }
-      }
-
-      if (imageDescription) {
-        // Step 2: 用图片描述走 Hermes Gateway（文本模型）
-        const visionSystemPrompt = `${systemPrompt}
-
-【系统提示】用户上传了一张图片，图片描述如下：
-${imageDescription}
-请基于以上图片描述回答用户的问题。`
-
-        const textMessages = enrichedMessages.map((m, idx) => {
-          if (idx === enrichedMessages.length - 1 && m.role === 'user') {
-            return {
-              role: m.role,
-              content: `【用户上传了图片】\n图片描述：${imageDescription}\n\n用户问题：${userText || '请描述这张图片'}`,
-            }
-          }
-          return {
-            role: m.role,
-            content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
-          }
-        })
-
-        // 确保 system prompt 包含图片描述
-        if (textMessages[0]?.role === 'system') {
-          textMessages[0] = { role: 'system', content: visionSystemPrompt }
+      // Step 1: ZAI GLM-4.6V（原生多模态，一步到位）
+      try {
+        const zaiRes = await callZAIVision(
+          enrichedMessages as any,
+          { maxTokens: 2048, temperature: 0.7, stream }
+        )
+        if (zaiRes.ok) {
+          response = zaiRes
+          console.log('[Hermes] Using ZAI GLM-4.6V (native multimodal)')
         } else {
-          textMessages.unshift({ role: 'system', content: visionSystemPrompt })
+          const errText = await zaiRes.text()
+          console.warn('[Hermes] ZAI GLM-4.6V failed:', zaiRes.status, errText)
         }
-
-        const apiBody = {
-          model: 'hermes-agent',
-          messages: textMessages,
-          stream,
-          max_tokens: 2048,
-          temperature: 0.7,
-        }
-
-        try {
-          const gatewayRes = await fetch(HERMES_API_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${API_SERVER_KEY}`,
-              ...(sessionId ? { 'X-Hermes-Session-Id': sessionId } : {}),
-            },
-            body: JSON.stringify(apiBody),
-          })
-
-          if (gatewayRes.ok) {
-            response = gatewayRes
-            console.log('[Hermes] Using MiniMax VLM → Hermes Gateway')
-          } else {
-            const errText = await gatewayRes.text()
-            console.warn('[Hermes] Hermes Gateway failed after VLM:', gatewayRes.status, errText)
-            // 继续走兜底逻辑
-          }
-        } catch (gatewayErr) {
-          console.warn('[Hermes] VLM+Gateway failed, falling back to ZCHAT:', gatewayErr)
-        }
+      } catch (zaiErr) {
+        console.warn('[Hermes] ZAI vision error:', zaiErr)
       }
 
-      // Step 3: ZCHAT vision（兜底 1：VLM 失败 或 Gateway 失败）
+      // Step 2: ZCHAT vision（兜底 1）
       if (!response) {
         try {
           const zchatRes = await callZchatVision(enrichedMessages, 2048, stream)
@@ -626,36 +574,100 @@ ${imageDescription}
           } else {
             const errText = await zchatRes.text()
             console.warn('[Hermes] ZCHAT vision failed:', zchatRes.status, errText)
-            throw new Error(`ZCHAT vision error: ${zchatRes.status}`)
           }
         } catch (zchatErr) {
-          console.warn('[Hermes] ZCHAT fallback to DeepSeek:', zchatErr)
+          console.warn('[Hermes] ZCHAT vision error:', zchatErr)
+        }
+      }
 
-          // Step 4: DeepSeek（兜底 2：纯文本）
-          try {
-            const dsRes = await callDeepseek(enrichedMessages, 2048, stream)
-            if (dsRes.ok) {
-              response = dsRes
-              console.log('[Hermes] Using DeepSeek fallback')
-            } else {
-              const errText = await dsRes.text()
-              console.error('[Hermes] DeepSeek fallback failed:', dsRes.status, errText)
-              return NextResponse.json(
-                { success: false, error: { message: `Vision service error: ${dsRes.status}` } },
-                { status: 502 }
-              )
+      // Step 3: MiniMax VLM → Hermes Gateway（兜底 2：图片描述 + 文本模型）
+      if (!response && imageUrl) {
+        try {
+          imageDescription = await callMinimaxVLM(userText || '请描述这张图片', imageUrl)
+          console.log('[Hermes] MiniMax VLM description succeeded')
+        } catch (vlmErr) {
+          console.warn('[Hermes] MiniMax VLM failed:', vlmErr)
+        }
+
+        if (imageDescription) {
+          const visionSystemPrompt = `${systemPrompt}\n\n【系统提示】用户上传了一张图片，图片描述如下：\n${imageDescription}\n请基于以上图片描述回答用户的问题。`
+
+          const textMessages = enrichedMessages.map((m, idx) => {
+            if (idx === enrichedMessages.length - 1 && m.role === 'user') {
+              return {
+                role: m.role,
+                content: `【用户上传了图片】\n图片描述：${imageDescription}\n\n用户问题：${userText || '请描述这张图片'}`,
+              }
             }
-          } catch (deepseekErr) {
-            console.error('[Hermes] All vision providers failed:', deepseekErr)
-            return NextResponse.json(
-              { success: false, error: { message: '图片识别服务暂不可用，请稍后重试' } },
-              { status: 502 }
-            )
+            return {
+              role: m.role,
+              content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
+            }
+          })
+
+          if (textMessages[0]?.role === 'system') {
+            textMessages[0] = { role: 'system', content: visionSystemPrompt }
+          } else {
+            textMessages.unshift({ role: 'system', content: visionSystemPrompt })
+          }
+
+          const apiBody = {
+            model: 'hermes-agent',
+            messages: textMessages,
+            stream,
+            max_tokens: 2048,
+            temperature: 0.7,
+          }
+
+          try {
+            const gatewayRes = await fetch(HERMES_API_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${API_SERVER_KEY}`,
+                ...(sessionId ? { 'X-Hermes-Session-Id': sessionId } : {}),
+              },
+              body: JSON.stringify(apiBody),
+            })
+
+            if (gatewayRes.ok) {
+              response = gatewayRes
+              console.log('[Hermes] Using MiniMax VLM → Hermes Gateway')
+            } else {
+              const errText = await gatewayRes.text()
+              console.warn('[Hermes] Hermes Gateway failed after VLM:', gatewayRes.status, errText)
+            }
+          } catch (gatewayErr) {
+            console.warn('[Hermes] VLM+Gateway failed:', gatewayErr)
           }
         }
       }
+
+      // Step 4: DeepSeek（兜底 3：纯文本）
+      if (!response) {
+        try {
+          const dsRes = await callDeepseek(enrichedMessages, 2048, stream)
+          if (dsRes.ok) {
+            response = dsRes
+            console.log('[Hermes] Using DeepSeek fallback')
+          } else {
+            const errText = await dsRes.text()
+            console.error('[Hermes] DeepSeek fallback failed:', dsRes.status, errText)
+            return NextResponse.json(
+              { success: false, error: { message: `Vision service error: ${dsRes.status}` } },
+              { status: 502 }
+            )
+          }
+        } catch (deepseekErr) {
+          console.error('[Hermes] All vision providers failed:', deepseekErr)
+          return NextResponse.json(
+            { success: false, error: { message: '图片识别服务暂不可用，请稍后重试' } },
+            { status: 502 }
+          )
+        }
+      }
     } else {
-      // 纯文本请求：走 Hermes Gateway（MiniMax-M2.7）
+      // 纯文本请求：走 Hermes Gateway（已配置为 GLM-5.1）
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${API_SERVER_KEY}`,

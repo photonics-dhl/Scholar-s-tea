@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth';
 import { getPosts, createPost } from '@/services/posts';
 import prisma from '@/lib/db/prisma';
+import { syncPostToKnowledgeBase } from '@/lib/ai/rag-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -121,6 +122,9 @@ export async function POST(request: NextRequest) {
       groupId,
       tags: normalizedTags,
     });
+
+    // Fire-and-forget: sync post to knowledge base for RAG
+    syncPostToKnowledgeBase(post.id);
 
     return NextResponse.json({
       success: true,

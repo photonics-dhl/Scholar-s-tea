@@ -9,7 +9,23 @@
  * - callHermesGatewayStream: 流式（chat 路由）
  */
 
-import type { ChatMessage } from './claude-service'
+import { type ChatMessage, stripThinkBlocks } from './claude-service'
+import { createThinkStrippingStream } from './stream-think-filter'
+import { PAPER_GENERATION_SYSTEM_PROMPT } from './paper-generation-prompts'
+import {
+  PEER_REVIEW_SYSTEM_PROMPT,
+  PEER_REVIEW_JSON_SYSTEM_PROMPT,
+  buildPeerReviewJsonPrompt,
+  parsePeerReviewJson,
+  type PeerReviewResult,
+} from './peer-review-prompts'
+import {
+  GRANT_APPLICATION_SYSTEM_PROMPT,
+  GRANT_APPLICATION_JSON_SYSTEM_PROMPT,
+  buildGrantApplicationJsonPrompt,
+  parseGrantApplicationJson,
+  type GrantApplicationResult,
+} from './grant-application-prompts'
 
 const HERMES_API_URL = process.env.HERMES_API_URL || 'http://127.0.0.1:8642/v1/chat/completions'
 const API_SERVER_KEY = process.env.API_SERVER_KEY || 'hk-e4f9a45f3106ee1396164e6dae60137f9f08c0805d75b137404097cc4bdbedac'
@@ -32,6 +48,9 @@ export interface HermesGatewayOptions {
   stream?: boolean
 }
 
+/** Hermes Gateway 默认超时（毫秒）—— 必须小于 frp 隧道超时，保留 fallback 时间 */
+const HERMES_DEFAULT_TIMEOUT = 30_000
+
 /** 非流式响应 */
 export interface HermesGatewayResponse {
   content: string
@@ -48,10 +67,32 @@ export type HermesGatewayStreamResponse = ReadableStream | { error: string }
 // =============================================================================
 
 /** 构建带 skill 指令的 system prompt */
-function buildSystemPrompt(_personality: string | undefined, _skill: string | undefined): string {
-  // Gateway 自身已有极长的系统提示（~10K tokens），不添加额外 system prompt
-  // 必要指令通过 user prompt 传递，避免 token 爆炸导致超时
-  return ''
+function buildSystemPrompt(personality: string | undefined, skill: string | undefined): string {
+  // Gateway 自身已有极长的系统提示（~10K tokens），保持 system prompt 极简
+  // 仅注入 personality + skill 切换指令，避免 token 爆炸导致超时
+  const parts: string[] = []
+
+  if (skill) {
+    parts.push(`[Skill Mode: ${skill}]`)
+  }
+  if (personality) {
+    const personaMap: Record<string, string> = {
+      professor: 'You are a rigorous university professor. Provide detailed, evidence-based explanations with references.',
+      analyst: 'You are a data-driven analyst. Prioritize facts, structure output with evidence and numbered lists.',
+      technical: 'You are a technical expert. Use precise terminology, concise explanations, and code/examples where relevant.',
+      teacher: 'You are a patient teacher. Explain step-by-step with examples and analogies.',
+      creative: 'You are a creative researcher. Think outside the box and propose innovative angles.',
+      critic: 'You are a sharp but fair critic. Identify flaws precisely and suggest concrete improvements.',
+      kawaii: 'You are a kawaii assistant! Use cute expressions and be enthusiastic~',
+      helpful: 'You are a helpful, friendly AI assistant.',
+      concise: 'You are a concise assistant. Keep responses brief and to the point.',
+      hacker: 'You are an elite hacker. Speak in concise technical terms, no fluff.',
+      warrior: 'You are a disciplined warrior. Cut to the chase with forceful brevity.',
+    }
+    parts.push(personaMap[personality] || `Adopt the "${personality}" persona.`)
+  }
+
+  return parts.join('\n')
 }
 
 /** 将 ChatMessage 转换为 Hermes Gateway 消息格式 */
@@ -115,7 +156,7 @@ export async function callHermesGateway(
   messages: ChatMessage[],
   options: HermesGatewayOptions = {}
 ): Promise<HermesGatewayResponse> {
-  const { skill, personality, sessionId, timeout = 60000, maxTokens = 4096, temperature = 0.7 } = options
+  const { skill, personality, sessionId, timeout = HERMES_DEFAULT_TIMEOUT, maxTokens = 4096, temperature = 0.7 } = options
 
   try {
     const normalized = normalizeMessages(messages)
@@ -181,7 +222,7 @@ export async function callHermesGateway(
     const content = data.choices?.[0]?.message?.content || ''
 
     return {
-      content,
+      content: stripThinkBlocks(content),
       raw: data,
     }
   } catch (error) {
@@ -209,7 +250,7 @@ export async function callHermesGatewayStream(
   messages: ChatMessage[],
   options: HermesGatewayOptions = {}
 ): Promise<HermesGatewayStreamResponse> {
-  const { skill, personality, sessionId, timeout = 60000, maxTokens = 4096, temperature = 0.7 } = options
+  const { skill, personality, sessionId, timeout = HERMES_DEFAULT_TIMEOUT, maxTokens = 4096, temperature = 0.7 } = options
 
   try {
     const normalized = normalizeMessages(messages)
@@ -269,19 +310,23 @@ export async function callHermesGatewayStream(
     }
 
     // Node.js 环境下需要将 Node Readable 转换为 Web ReadableStream
+    let stream: ReadableStream
     if (typeof window === 'undefined' && typeof (response.body as any).getReader !== 'function') {
       const { ReadableStream } = require('stream/web')
       const nodeStream = response.body as unknown as import('stream').Readable
-      return new ReadableStream({
+      stream = new ReadableStream({
         start(controller: ReadableStreamDefaultController) {
           nodeStream.on('data', (chunk) => controller.enqueue(chunk))
           nodeStream.on('end', () => controller.close())
           nodeStream.on('error', (err) => controller.error(err))
         },
       })
+    } else {
+      stream = response.body
     }
 
-    return response.body
+    // 实时过滤 think 标签
+    return stream.pipeThrough(createThinkStrippingStream())
   } catch (error) {
     const message = error instanceof Error ? error.message : '未知错误'
     console.error('[HermesAdapter] Stream error:', message)
@@ -302,38 +347,70 @@ export async function generatePaperViaHermes(
     section?: string
     wordCount?: number
     content?: string
+    dataDescription?: string
+    analysisGoal?: string
+    format?: 'latex' | 'markdown' | 'plain'
     stream?: boolean
   }
 ): Promise<{ content?: string; stream?: ReadableStream; error?: string }> {
-  const { topic, stage = 'proposal', background, section, wordCount, content, stream } = params
+  const { topic, stage = 'proposal', background, section, wordCount, content, dataDescription, analysisGoal, format, stream } = params
 
   const stageDescriptions: Record<string, string> = {
-    proposal: '选题立项：生成开题报告框架，明确研究问题和创新点',
-    structure: '架构规划：设计论文结构，规划章节和图表',
-    writing: '正文写作：分段生成学术文本，保持严谨风格',
+    proposal: '选题立项：基于知识背景材料，原创生成开题报告框架',
+    structure: '架构规划：基于知识背景材料，原创设计论文结构',
+    writing: '正文写作：基于知识背景材料，分段原创生成学术文本',
     data: '数据/图表：统计方法建议和图表描述',
-    formatting: '排版交付：转换为 LaTeX / Markdown / 纯文本',
+    formatting: '综合输出：基于知识背景材料进行原创学术写作，输出为指定格式',
   }
 
-  const stagePrompt = `【Paper Generation — Stage: ${stage}】${stageDescriptions[stage]}
+  // 分阶段 temperature：创意阶段略高，格式/数据阶段更低以确保确定性
+  const stageTemperature: Record<string, number> = {
+    proposal: 0.7,
+    structure: 0.7,
+    writing: 0.6,
+    data: 0.3,
+    formatting: 0.3,
+  }
+  const temperature = stageTemperature[stage] ?? 0.6
+
+  let stagePrompt = `【Paper Generation — Stage: ${stage}】${stageDescriptions[stage]}
 
 Topic: ${topic}
 ${background ? `Background: ${background}\n` : ''}
 ${section ? `Section: ${section}\n` : ''}
 ${wordCount ? `Target length: ~${wordCount} words\n` : ''}
-${content ? `Context:\n${content.slice(0, 1000)}\n` : ''}
+${dataDescription ? `Data Description: ${dataDescription}\n` : ''}
+${analysisGoal ? `Analysis Goal: ${analysisGoal}\n` : ''}
+${format ? `Output Format: ${format.toUpperCase()} (YOU MUST OUTPUT ONLY THIS FORMAT)\n` : ''}`
 
-Generate top-tier academic text with [REF-N] citations. Use [CITATION NEEDED] for unverified claims. Avoid fabricating references.`
+  if (content) {
+    if (stage === 'formatting') {
+      stagePrompt += `\n【知识背景材料】\n${content.slice(0, 8000)}\n\n【任务】基于上述材料进行原创学术写作，并输出为 ${format?.toUpperCase() || '指定'} 格式。\n\n【关键区分】\n你必须首先判断材料是"用户自己撰写的论文内容"还是"外部参考资料（如已发表的 PDF 论文）"：\n\n**情况A：用户自己撰写的论文内容**\n- 特征：内容来自前序阶段的 AI 原创输出，或用户自己写的论文草稿\n- 你的任务：保持核心论点和章节结构，转换为 ${format?.toUpperCase() || '指定'} 格式，进行语言润色和格式规范化\n\n**情况B：外部参考资料（如上传的 PDF 文献）**\n- 特征：内容是已发表的论文或综述，包含作者信息、摘要、完整的章节、参考文献等\n- 你的任务：**绝对禁止直接复制或轻微改写原文。** 你必须先理解材料中的核心知识和研究方法，然后合上材料（mentally），基于自己的理解进行完全原创的写作。输出必须是全新的学术论述，使用完全不同的句式、词汇、结构和论证角度。如果原文是综述，你的输出必须是研究论文（有具体的研究问题、方法、结果），而不是另一篇综述。\n\n【强制约束】\n- 你只能输出 ${format?.toUpperCase() || '指定'} 一种格式\n- 禁止输出其他格式\n- 禁止用占位符代替实际内容\n- 严禁直接照抄参考资料原文`
+    } else {
+      stagePrompt += `\n【知识背景材料】\n${content.slice(0, 4000)}\n\n【重要提醒】\n上述材料仅是你的知识来源，不是需要重写的文本。基于你对材料的理解（而非材料的文字），进行原创性学术写作，生成高质量的学术论文内容。禁止复述、禁止镜像结构、禁止保留原文格式痕迹。`
+    }
+  }
 
-  const messages: ChatMessage[] = [{ role: 'user', content: stagePrompt }]
+  stagePrompt += `\nGenerate top-tier academic text with [REF-N] citations. Use [CITATION NEEDED] for unverified claims. Avoid fabricating references.`
+
+  if (stage === 'formatting') {
+    stagePrompt += `\n\n【格式特例】本阶段为综合输出阶段，允许使用 LaTeX 语法（$...$ 和 $$...$$）输出数学公式，以符合 ${format?.toUpperCase() || '指定'} 格式规范。`
+  } else {
+    stagePrompt += `\n\nImportant: Mathematical formulas must use UTF-8 Unicode symbols (e.g., α, β, Σ, ∫, ℝ, ≤, →) instead of LaTeX ($...$ or $$...$$).`
+  }
+
+  const messages: ChatMessage[] = [
+    { role: 'system', content: PAPER_GENERATION_SYSTEM_PROMPT },
+    { role: 'user', content: stagePrompt },
+  ]
 
   if (stream) {
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'professor',
-      timeout: 45000,
+      timeout: 180_000,
       maxTokens: 2048,
-      temperature: 0.6,
+      temperature,
     })
     if ('error' in result) {
       return { error: result.error }
@@ -344,31 +421,41 @@ Generate top-tier academic text with [REF-N] citations. Use [CITATION NEEDED] fo
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'professor',
-    timeout: 45000,
-    maxTokens: 2048,
-    temperature: 0.6,
+    timeout: 120_000,
+    maxTokens: 4096,
+    temperature,
   })
 
   if (result.error) {
     return { error: result.error }
   }
-  return { content: result.content }
+  return { content: stripThinkBlocks(result.content) }
 }
 
 /** AI 审稿模式：调用 peer-review skill */
 export async function peerReviewViaHermes(
   paperContent: string,
   focus?: string,
-  stream?: boolean
-): Promise<{ content?: string; stream?: ReadableStream; error?: string }> {
-  const reviewPrompt = `【AI 审稿任务】
+  stream?: boolean,
+  structured?: boolean
+): Promise<{ content?: string; structured?: PeerReviewResult; stream?: ReadableStream; error?: string }> {
+  // 结构化模式不支持流式（JSON 需要完整输出才能解析）
+  const isStructured = structured && !stream
 
-请对以下论文进行严格的同行评审，模拟顶级期刊（Nature、Science、NeurIPS、ICML、ACL）审稿人的视角。
+  const reviewPrompt = isStructured
+    ? buildPeerReviewJsonPrompt(paperContent, focus)
+    : `【AI 审稿任务】
+
+请对以下论文进行严格的同行评审。根据论文主题和内容，自动匹配最适合的评审标准：
+- 自然科学/工程类：参考 Nature、Science、IEEE、ACM 等标准
+- 社会科学类：参考领域顶级期刊（如 ASR、AER、APSR 等）的评审框架
+- 人文艺术类：参考该学科权威期刊的学术规范
+- 医学/生命科学类：参考 Lancet、NEJM、JAMA 等标准
 
 ${focus ? `【审稿重点】${focus}\n` : ''}
 
 【待审论文】
-${paperContent.slice(0, 12000)}
+${paperContent.slice(0, 30000)}
 
 【评审维度】
 1. 原创性 (Novelty) — 研究问题是否新颖？与现有工作的区分是否明确？
@@ -398,14 +485,173 @@ ${paperContent.slice(0, 12000)}
 - 检查论文中的引用是否真实（作者、年份、标题是否匹配）
 - 对可疑引用标注 [CITATION CHECK NEEDED]`
 
-  const messages: ChatMessage[] = [{ role: 'user', content: reviewPrompt }]
+  const messages: ChatMessage[] = [
+    { role: 'system', content: isStructured ? PEER_REVIEW_JSON_SYSTEM_PROMPT : PEER_REVIEW_SYSTEM_PROMPT },
+    { role: 'user', content: reviewPrompt },
+  ]
 
   if (stream) {
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'analyst',
-      timeout: 45000,
+      timeout: 120000,
       maxTokens: 2048,
+      temperature: 0.4,
+    })
+    if ('error' in result) {
+      return { error: result.error }
+    }
+    return { stream: result }
+  }
+
+  const result = await callHermesGateway(messages, {
+    skill: 'research-paper-writing',
+    personality: 'analyst',
+    timeout: isStructured ? 120_000 : 20_000,
+    maxTokens: isStructured ? 4096 : 2048,
+    temperature: 0.4,
+  })
+
+  if (result.error) {
+    return { error: result.error }
+  }
+
+  const content = stripThinkBlocks(result.content)
+
+  // 结构化模式：尝试解析 JSON
+  if (isStructured) {
+    const parsed = parsePeerReviewJson(content)
+    if (parsed) {
+      return { content, structured: parsed }
+    }
+    // JSON 解析失败，fallback 返回纯文本
+    console.warn('[peerReviewViaHermes] Structured parse failed, returning raw text')
+  }
+
+  return { content }
+}
+
+/** 文献综述模式：调用 research-paper-writing skill */
+export async function surveyGenerationViaHermes(
+  topic: string,
+  context?: string,
+  stream?: boolean
+): Promise<{ content?: string; stream?: ReadableStream; error?: string }> {
+  const surveyPrompt = `【文献综述辅助任务】
+
+你是一位文献综述专家，擅长梳理研究脉络、比较方法论、发现研究空白。
+
+综述主题：${topic}
+
+${context ? `相关信息：\n${context}\n` : ''}
+
+请帮我生成这个研究领域的文献综述框架，包括：
+
+1. 研究背景与发展历史
+   - 从宏观到微观的逻辑递进
+   - 关键里程碑工作和转折点
+
+2. 现有方法的分类与比较
+   - 按方法论或时间线组织
+   - 批判性比较不同方法的优缺点
+
+3. 关键里程碑工作
+   - 识别领域内的奠基性论文
+   - 标注真实引用 [REF-N]
+
+4. 当前挑战与开放问题
+   - 分析研究空白
+   - 指出方法论局限
+
+5. 未来研究方向
+   - 基于现有 gap 提出 3-5 个潜在方向
+
+注意：
+- 引用的文献必须是真实存在的
+- 不要编造作者、年份或论文标题
+- 如果不确定某个引用，使用 [CITATION NEEDED] 标记`
+
+  const messages: ChatMessage[] = [{ role: 'user', content: surveyPrompt }]
+
+  if (stream) {
+    const result = await callHermesGatewayStream(messages, {
+      skill: 'research-paper-writing',
+      personality: 'analyst',
+      timeout: 120000,
+      maxTokens: 4096,
+      temperature: 0.6,
+    })
+    if ('error' in result) {
+      return { error: result.error }
+    }
+    return { stream: result }
+  }
+
+  const result = await callHermesGateway(messages, {
+    skill: 'research-paper-writing',
+    personality: 'analyst',
+    timeout: 20_000,
+    maxTokens: 4096,
+    temperature: 0.6,
+  })
+
+  if (result.error) {
+    return { error: result.error }
+  }
+  return { content: stripThinkBlocks(result.content) }
+}
+
+/** 论文分析模式：调用 research-paper-writing skill */
+export async function analyzePaperViaHermes(
+  paperContent: string,
+  stream?: boolean
+): Promise<{ content?: string; stream?: ReadableStream; error?: string }> {
+  const analyzePrompt = `【学术论文分析任务】
+
+你是一位资深学术编辑和审稿人，拥有丰富的论文评审经验。
+
+请对以下学术论文进行深入分析，返回结构化的评审意见：
+
+【待分析论文】
+${paperContent.slice(0, 8000)}
+
+【分析维度】
+1. 摘要与关键词
+   - 摘要是否准确概括了研究内容？
+   - 关键词选择是否恰当？
+
+2. 研究问题与创新点
+   - 研究问题是否明确？
+   - 创新点是否有足够支撑？
+
+3. 方法论评估
+   - 实验设计是否合理？
+   - 数据处理方法是否恰当？
+
+4. 结果与讨论
+   - 结果是否充分支撑结论？
+   - 讨论是否深入？
+
+5. 写作质量
+   - 结构是否清晰？
+   - 语言表达是否准确？
+
+6. 改进建议
+   - 列出 3-5 条具体、可操作的修改建议
+
+注意：
+- 保持客观、建设性的态度
+- 建议要具体，避免空泛评价
+- 如果论文内容不完整，基于已有内容分析`
+
+  const messages: ChatMessage[] = [{ role: 'user', content: analyzePrompt }]
+
+  if (stream) {
+    const result = await callHermesGatewayStream(messages, {
+      skill: 'research-paper-writing',
+      personality: 'analyst',
+      timeout: 120000,
+      maxTokens: 4096,
       temperature: 0.5,
     })
     if ('error' in result) {
@@ -417,24 +663,30 @@ ${paperContent.slice(0, 12000)}
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'analyst',
-    timeout: 45000,
-    maxTokens: 2048,
+    timeout: 120000,
+    maxTokens: 4096,
     temperature: 0.5,
   })
 
   if (result.error) {
     return { error: result.error }
   }
-  return { content: result.content }
+  return { content: stripThinkBlocks(result.content) }
 }
 
 /** 基金申请模式：调用 grant-application skill */
 export async function grantApplicationViaHermes(
   topic: string,
   context?: string,
-  stream?: boolean
-): Promise<{ content?: string; stream?: ReadableStream; error?: string }> {
-  const grantPrompt = `【科研项目申请书辅助】
+  stream?: boolean,
+  structured?: boolean
+): Promise<{ content?: string; structured?: GrantApplicationResult; stream?: ReadableStream; error?: string }> {
+  // 结构化模式不支持流式
+  const isStructured = structured && !stream
+
+  const grantPrompt = isStructured
+    ? buildGrantApplicationJsonPrompt(topic, context)
+    : `【科研项目申请书辅助】
 
 你是一位科研项目申请专家，熟悉国家自然科学基金（NSFC）、科技部重点研发计划、各省自然科学基金等各类科研项目的申请流程和评审标准。
 
@@ -468,15 +720,18 @@ ${context ? `背景信息：\n${context}\n` : ''}
 - 不要编造基金评审结果或专家评价
 - 如果不确定某个引用，使用 [CITATION NEEDED] 标记`
 
-  const messages: ChatMessage[] = [{ role: 'user', content: grantPrompt }]
+  const messages: ChatMessage[] = [
+    { role: 'system', content: isStructured ? GRANT_APPLICATION_JSON_SYSTEM_PROMPT : GRANT_APPLICATION_SYSTEM_PROMPT },
+    { role: 'user', content: grantPrompt },
+  ]
 
   if (stream) {
     const result = await callHermesGatewayStream(messages, {
       skill: 'research-paper-writing',
       personality: 'professor',
-      timeout: 45000,
+      timeout: 120000,
       maxTokens: 2048,
-      temperature: 0.7,
+      temperature: 0.5,
     })
     if ('error' in result) {
       return { error: result.error }
@@ -487,13 +742,25 @@ ${context ? `背景信息：\n${context}\n` : ''}
   const result = await callHermesGateway(messages, {
     skill: 'research-paper-writing',
     personality: 'professor',
-    timeout: 45000,
-    maxTokens: 2048,
-    temperature: 0.7,
+    timeout: isStructured ? 120_000 : 20_000,
+    maxTokens: isStructured ? 4096 : 2048,
+    temperature: 0.5,
   })
 
   if (result.error) {
     return { error: result.error }
   }
-  return { content: result.content }
+
+  const content = stripThinkBlocks(result.content)
+
+  // 结构化模式：尝试解析 JSON
+  if (isStructured) {
+    const parsed = parseGrantApplicationJson(content)
+    if (parsed) {
+      return { content, structured: parsed }
+    }
+    console.warn('[grantApplicationViaHermes] Structured parse failed, returning raw text')
+  }
+
+  return { content }
 }

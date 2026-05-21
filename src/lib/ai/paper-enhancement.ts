@@ -8,6 +8,13 @@
 
 import { searchKnowledgeBase, searchMemories } from './rag-service'
 import { chatWithAI, type ChatMessage } from './claude-service'
+import {
+  searchPapersForTopic,
+  injectPapersIntoPrompt,
+  getSearchStrategyForStage,
+  type ExternalPaper,
+  type PaperSearchResult,
+} from './external-paper-search'
 
 // =============================================================================
 // 类型定义
@@ -45,9 +52,10 @@ export interface CitationVerificationResult {
 /**
  * 为论文主题检索相关文献
  *
- * 检索源优先级：
- * 1. 社区论文库（KnowledgeDocument）
- * 2. 用户研究记忆（ResearchMemory）
+ * 检索源优先级（新策略）：
+ * 1. 外部学术数据库（Semantic Scholar + arXiv + Tavily）— **优先使用，解决幻觉问题**
+ * 2. 社区论文库（KnowledgeDocument）— 回退
+ * 3. 用户研究记忆（ResearchMemory）— 回退
  *
  * @param topic 论文主题
  * @param options 检索选项
@@ -59,41 +67,63 @@ export async function retrieveRelatedPapers(
     discipline?: string
     limit?: number
     includeMemories?: boolean
+    stage?: 'proposal' | 'structure' | 'writing' | 'data' | 'formatting'
+    /** 强制使用外部检索（默认 true） */
+    useExternalSearch?: boolean
   }
 ): Promise<RAGContext> {
-  const limit = options?.limit || 5
+  const limit = options?.limit || 10
   const papers: PaperRef[] = []
+  let source: RAGContext['source'] = 'knowledge_base'
 
-  // 1. 检索社区论文库
-  const kbResult = await searchKnowledgeBase(topic, {
-    limit,
-    threshold: 0.65, // 稍微降低阈值，确保有更多结果
-    discipline: options?.discipline,
-  })
+  // ================================================================
+  // 1. 外部学术数据库检索（优先）
+  // ================================================================
+  if (options?.useExternalSearch !== false) {
+    try {
+      const searchOptions = options?.stage
+        ? getSearchStrategyForStage(options.stage)
+        : { limit, yearFrom: new Date().getFullYear() - 5 }
 
-  if (kbResult.results && !kbResult.error) {
-    for (const r of kbResult.results) {
-      papers.push({
-        id: r.id,
-        title: r.title,
-        abstract: r.content?.slice(0, 500),
-        venue: r.source || undefined,
-      })
+      const externalResult = await searchPapersForTopic(topic, searchOptions)
+
+      if (externalResult.papers.length > 0) {
+        for (const p of externalResult.papers) {
+          papers.push({
+            id: p.id,
+            title: p.title,
+            authors: p.authors,
+            year: p.year,
+            abstract: p.abstract,
+            venue: p.venue,
+            url: p.url,
+            citationCount: p.citationCount,
+          })
+        }
+        source = 'mixed'
+        console.log(`[PaperEnhancement] External search returned ${papers.length} papers for "${topic}"`)
+      }
+    } catch (err) {
+      console.warn('[PaperEnhancement] External search failed, falling back to local:', err)
     }
   }
 
-  // 2. 检索研究记忆（如果启用）
-  if (options?.includeMemories !== false) {
-    const memResult = await searchMemories(topic, {
-      limit: Math.min(3, limit),
+  // ================================================================
+  // 2. 本地知识库检索（回退 / 补充）
+  // ================================================================
+  const localLimit = papers.length > 0 ? Math.min(3, limit) : limit
+
+  if (papers.length < limit) {
+    const kbResult = await searchKnowledgeBase(topic, {
+      limit: localLimit,
       threshold: 0.65,
       discipline: options?.discipline,
     })
 
-    if (memResult.results && !memResult.error) {
-      for (const r of memResult.results) {
-        // 避免重复
-        if (!papers.some((p) => p.id === r.id)) {
+    if (kbResult.results && !kbResult.error) {
+      for (const r of kbResult.results) {
+        // 避免与外部检索结果重复
+        if (!papers.some((p) => normalizeTitle(p.title) === normalizeTitle(r.title))) {
           papers.push({
             id: r.id,
             title: r.title,
@@ -105,21 +135,49 @@ export async function retrieveRelatedPapers(
     }
   }
 
-  // 3. 构建上下文文本
+  // 3. 检索研究记忆（如果启用且仍有空缺）
+  if (options?.includeMemories !== false && papers.length < limit) {
+    const memResult = await searchMemories(topic, {
+      limit: Math.min(2, limit - papers.length),
+      threshold: 0.65,
+      discipline: options?.discipline,
+    })
+
+    if (memResult.results && !memResult.error) {
+      for (const r of memResult.results) {
+        if (!papers.some((p) => p.id === r.id || normalizeTitle(p.title) === normalizeTitle(r.title))) {
+          papers.push({
+            id: r.id,
+            title: r.title,
+            abstract: r.content?.slice(0, 500),
+            venue: r.source || undefined,
+          })
+        }
+      }
+    }
+  }
+
+  // ================================================================
+  // 4. 构建上下文文本
+  // ================================================================
   const contextText = papers.length > 0
     ? papers
         .map(
           (p, i) =>
-            `[文献${i + 1}] ${p.title}${p.authors ? ` (${p.authors.join(', ')}${p.year ? `, ${p.year}` : ''})` : ''}${p.venue ? ` — ${p.venue}` : ''}${p.abstract ? `\n摘要: ${p.abstract.slice(0, 300)}` : ''}`
+            `[文献${i + 1}] ${p.title}${p.authors ? ` (${p.authors.join(', ')}${p.year ? `, ${p.year}` : ''})` : ''}${p.venue ? ` — ${p.venue}` : ''}${p.citationCount ? ` (被引 ${p.citationCount} 次)` : ''}${p.abstract ? `\n摘要: ${p.abstract.slice(0, 300)}` : ''}`
         )
         .join('\n\n')
     : ''
 
   return {
-    papers,
+    papers: papers.slice(0, limit),
     contextText,
-    source: papers.length > 0 ? 'mixed' : 'knowledge_base',
+    source,
   }
+}
+
+function normalizeTitle(title: string): string {
+  return title.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim()
 }
 
 /**
@@ -130,16 +188,19 @@ export function buildRAGPromptPrefix(ragContext: RAGContext): string {
     return ''
   }
 
-  return `【相关文献参考】
-以下是从社区论文库中检索到的与你研究主题相关的高质量文献，请在撰写时参考这些文献的观点和方法，并适当引用：
+  const isExternal = ragContext.source !== 'knowledge_base'
+
+  return `【相关文献参考（${isExternal ? '来自 Semantic Scholar / arXiv / Tavily 等真实学术数据库' : '来自社区论文库'}）】
+以下是从学术数据库实时检索到的与你研究主题相关的真实文献。请在撰写时**优先基于这些文献**进行引用和分析：
 
 ${ragContext.contextText}
 
 【引用要求】
-- 你可以使用 [REF-1], [REF-2] 等格式引用上述文献
-- 如果你有其他确定知道的文献，也可以引用
-- 不确定的引用请标注 [CITATION NEEDED]
-- 尽量使引用真实、具体、可验证
+- **优先使用上述文献**，引用格式：[REF-N]（对应上方编号）
+- 如需引用列表外的文献，必须确保其真实存在（作者、年份、标题可查）
+- 无法确认真实性的引用必须标注 [CITATION NEEDED]
+- **禁止编造**作者名、期刊名、卷期号、DOI 或实验数据
+- 所有具体数值标注可信度级别：[VERIFIED] / [LIKELY] / [SPECULATIVE] / [CITATION NEEDED]
 
 ---
 
@@ -243,7 +304,9 @@ ${generatedText.slice(0, 6000)}
         result.content.match(/```json\n?([\s\S]*?)\n?```/) ||
         result.content.match(/(\{[\s\S]*\})/)
       const jsonStr = jsonMatch ? jsonMatch[1] : result.content
-      verification = JSON.parse(jsonStr)
+      // 清理可能的非法控制字符
+      const cleanStr = jsonStr.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+      verification = JSON.parse(cleanStr)
     } catch {
       // JSON 解析失败，返回原文
       return {
@@ -300,6 +363,8 @@ export async function preparePaperEnhancement(
   options?: {
     discipline?: string
     includeMemories?: boolean
+    stage?: 'proposal' | 'structure' | 'writing' | 'data' | 'formatting'
+    useExternalSearch?: boolean
   }
 ): Promise<{
   ragContext: RAGContext
@@ -308,8 +373,10 @@ export async function preparePaperEnhancement(
 }> {
   const ragContext = await retrieveRelatedPapers(topic, {
     discipline: options?.discipline,
-    limit: 5,
+    limit: 10,
     includeMemories: options?.includeMemories,
+    stage: options?.stage,
+    useExternalSearch: options?.useExternalSearch,
   })
 
   const ragPrefix = buildRAGPromptPrefix(ragContext)

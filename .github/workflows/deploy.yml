@@ -45,26 +45,29 @@ jobs:
             echo "=== Deploy Complete ==="
             pm2 list
 
-      - name: Notify Feishu (on success)
-        if: success() && secrets.FEISHU_WEBHOOK_URL
+      - name: Notify Feishu
+        if: always()
+        env:
+          FEISHU_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
         run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d '{
-              "msg_type": "text",
-              "content": {
-                "text": "✅ Scholar'\''s Tea 部署成功\n分支: develop\n提交: ${{ github.sha }}\n作者: ${{ github.actor }}"
-              }
-            }'
+          if [ -z "$FEISHU_URL" ]; then
+            echo "Feishu webhook not configured, skipping notification"
+            exit 0
+          fi
 
-      - name: Notify Feishu (on failure)
-        if: failure() && secrets.FEISHU_WEBHOOK_URL
-        run: |
-          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
+          if [ "${{ job.status }}" = "success" ]; then
+            MSG="✅ Scholar's Tea 部署成功
+分支: develop
+提交: ${{ github.sha }}
+作者: ${{ github.actor }}"
+          else
+            MSG="❌ Scholar's Tea 部署失败
+分支: develop
+提交: ${{ github.sha }}
+作者: ${{ github.actor }}
+请检查 GitHub Actions 日志: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
+
+          curl -X POST "$FEISHU_URL" \
             -H "Content-Type: application/json" \
-            -d '{
-              "msg_type": "text",
-              "content": {
-                "text": "❌ Scholar'\''s Tea 部署失败\n分支: develop\n提交: ${{ github.sha }}\n作者: ${{ github.actor }}\n请检查 GitHub Actions 日志"
-              }
-            }'
+            -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"$MSG\"}}"

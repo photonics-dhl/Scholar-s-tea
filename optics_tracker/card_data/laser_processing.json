@@ -2,31 +2,30 @@
   "domain_name": "激光加工与制造",
   "papers": [
     {
-      "title": "Femtosecond Laser Microfabrication and Magnetic Manipulation of ...",
-      "abstract": "Femtosecond Laser Microfabrication and Magnetic Manipulation of Functional Magnetic Microspheres. Optics 2026, 7, 30. https://doi.org/10.3390/opt7030030. AMA",
+      "title": "Ultrafast Laser Processing for High-Aspect-Ratio Structures - PMC",
+      "abstract": "In this paper, we review the fundamental characteristics of ultrafast laser processing , with a particular emphasis on the underlying principles and significant research related to the realm of high-aspect-ratio machining.",
       "source": "tavily",
-      "url": "https://www.mdpi.com/2673-3269/7/3/30",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11396894/",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "论文信息不完整，仅知主题关于飞秒激光微加工和磁性操作功能磁性微球，缺少摘要、方法、结果等核心内容，无法生成有实质意义的结构化分析。",
-        "research思路": "根据现有信息推断可能涉及功能性磁性微球的制备与磁控操作，但具体研究目标和科学问题无法确认。",
-        "experiment": "论文提到飞秒激光微加工技术，但具体实验方案、设备参数无法从有限信息中提取。",
-        "innovation": "从标题推测可能涉及新型磁性功能微球的激光微加工，但创新点详情需全文才能判断。",
-        "related_work": "有限信息无法关联该领域重要工作，需要完整论文才能列举相关研究。",
-        "impact": "DOI链接显示发表在光学期刊Optics 2026年，但缺摘要和正文无法评估对光学或磁性领域的具体影响。",
-        "note": "提供的论文信息严重不足，仅有标题和发表出处，缺 Abstract/Introduction/Results/Discussion 等核心章节，建议提供完整论文以进行深度分析。"
+        "summary": "综述超快激光加工高深宽比结构的基本原理与重要研究进展",
+        "research思路": "探索超快激光在高深宽比结构加工中的物理机制与技术瓶颈",
+        "experiment": "分析超快激光与材料相互作用过程及关键参数影响",
+        "innovation": "系统整合高深宽比结构加工的原理方法与技术突破",
+        "related_work": "包括激光烧蚀机理、等离子体动力学及加工精度控制等",
+        "impact": "为超快激光微纳加工提供理论基础和技术指导，推动领域发展"
       },
       "domain_trend": {
-        "trend": "论文信息不完整，无法从标题准确判断核心创新点和学术贡献。缺乏摘要、方法、结果等关键内容，导致6维度分析无法完整进行。建议提供完整论文信息（包括DOI、摘要、正文等）以便准确评估该领域发展趋势。",
+        "trend": "超快激光精密加工引领微纳制造革命，突破高深宽比结构制造瓶颈",
         "key_topics": [
-          "信息不足",
-          "需补充摘要",
-          "需全文分析"
+          "超快激光加工技术",
+          "高深宽比结构制造",
+          "激光微纳加工理论"
         ],
-        "development_direction": "无法从现有信息判断领域发展趋势和跨领域融合机会，需待论文信息补充完整后，方可识别活跃研究方向、技术演进路径及潜在跨领域应用。"
+        "development_direction": "领域正朝着更高精度、更复杂结构、更广适用性的方向发展，超快激光技术与多种材料科学、微电子制造、生物医学工程等领域深度融合，推动微纳制造技术向极限精度迈进"
       }
     }
   ]

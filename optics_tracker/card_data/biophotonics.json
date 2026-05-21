@@ -2,42 +2,30 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Biophotonics and nanorobotics for biomedical imaging, biosensing ...",
-      "abstract": "Nature Communications. 2.3. Mechanisms of nanorobotic operation. The Micro-nanorobots application in pharmaceutical drug delivery systems has significantly",
+      "title": "Journal of Biophotonics - Wiley Online Library",
+      "abstract": "Journal of Biophotonics focuses on the interdisciplinary field of biophotonics, publishing cutting-edge research on interactions between light and biological",
       "source": "tavily",
-      "url": "https://www.sciencedirect.com/science/article/pii/S1389556724000285",
+      "url": "https://onlinelibrary.wiley.com/journal/18640648",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
-      "domain_trend": {
-        "trend": "2025年生物医学光子学以高精度光学成像技术为核心,推动多模态融合诊断与智能化光学治疗方案的前沿探索"
+      "analysis": {
+        "summary": "该期刊聚焦生物光子学交叉领域，发表光与生物相互作用的前沿研究。",
+        "research思路": "探索光与生物系统相互作用的机制和应用，推动生物光子学发展。",
+        "experiment": "采用光学成像、光谱学和光动力学等关键技术进行研究。",
+        "innovation": "整合多学科方法，提供光-生物相互作用的全新研究视角。",
+        "related_work": "生物医学光学、光遗传学、光学相干断层成像等相关领域研究。",
+        "impact": "促进基础研究与应用结合，推动生物光子学在医学诊断和治疗中的应用。"
       },
-      "analysis": {
-        "summary": "论文探讨了生物光子学与纳米机器人技术在生物医学成像、生物传感及药物递送系统中的应用整合与作用机制研究。",
-        "research思路": "聚焦于微纳米机器人在药物递送系统中的运行机制，探索光学操控与纳米机器人技术的交叉融合以实现精准生物医学应用。",
-        "experiment": "采用微纳米机器人技术结合生物光子学成像方法，重点研究纳米机器人的操作机制及其在药物递送中的性能表现。",
-        "innovation": "将纳米机器人与生物光子学技术相结合，为生物传感和医学成像提供新型多功能平台，突破传统单一技术的应用局限。",
-        "related_work": "涉及微纳米机器人药物递送、生物光子学成像技术、纳米医药载体研究及医学诊断传感等生物医学工程领域的重要进展。",
-        "impact": "推动了纳米机器人与生物光子学的跨学科融合，为精准医疗和实时生物医学监测提供了创新性技术思路，具有重要学术价值和应用前景。"
-      }
-    },
-    {
-      "title": "Biomedical Optics Express recognizes the 2025 best paper prize ...",
-      "abstract": "Biomedical Optics Express (BOEx) is the primary interdisciplinary outlet for the biomedical optics and biophotonics communities, publishing high-quality, peer-",
-      "source": "tavily",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12904520/",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "该内容为 Biomedical Optics Express 期刊发布的 2025 年度最佳论文奖公告,属于期刊荣誉通报而非具体研究论文。",
-        "research思路": "无具体研究问题,系期刊对 2024 年度发表的高影响力论文的评选与表彰通知。",
-        "experiment": "无实验方案,系学术奖项的评选流程说明,BOEx 根据论文质量和影响力进行审核。",
-        "innovation": "无技术创新,系期刊年度最佳论文评选机制的通知。",
-        "related_work": "BOEx 每年评选年度最佳论文,通常从光学成像、光动力疗法、光热疗法等子领域的高被引论文中产生。",
-        "impact": "最佳论文奖的公布有助于引导该领域研究方向,促进光学成像和生物光子学技术的学术交流与认可。"
+      "domain_trend": {
+        "trend": "多模态光学技术正推动生物医学光子学向精准诊断与个性化治疗革命性转变",
+        "key_topics": [
+          "多模态光学成像",
+          "光-生物相互作用机制",
+          "精准医学诊断与治疗"
+        ],
+        "development_direction": "生物医学光子学正从单一技术向多学科整合方向发展，通过创新的光学方法、算法和材料科学融合，实现更高精度、更安全的生物医学应用，特别是在早期疾病诊断、无创监测和靶向治疗领域展现出巨大潜力。"
       }
     }
   ]

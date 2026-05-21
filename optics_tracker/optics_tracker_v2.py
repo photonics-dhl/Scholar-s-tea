@@ -16,6 +16,11 @@ except ImportError:
     pass  # python-dotenv 未安装则跳过
 
 try:
+    import httpx
+except ImportError:
+    httpx = None
+
+try:
     import requests
 except ImportError:
     print("ERROR: requests not installed")
@@ -662,11 +667,12 @@ class PubMedSearcher:
 
 
 class MiniMaxAnalyzer:
-    """MiniMax M2.7 论文分析 - 生成6维度结构化分析
+    """论文分析 - 生成6维度结构化分析
 
-    支持双源热备：MiniMax 优先，529 超载时自动切换 DUCKCODING gpt-5.4。
+    支持三源热备：ZAI glm-4.5（主力）→ DUCKCODING gpt-5.4 → MiniMax M2.7（兜底）。
     """
 
+    ZAI_API_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions"
     API_URL = "https://api.minimax.chat/v1/chat/completions"
     DUCK_API_URL = "https://www.duckcoding.ai/v1/chat/completions"
 
@@ -696,9 +702,10 @@ ArXiv ID：{arxiv_id}
 }}
 """
 
-    def __init__(self, api_key: str = None, duck_api_key: str = None):
+    def __init__(self, api_key: str = None, duck_api_key: str = None, zai_api_key: str = None):
         self.api_key = api_key or os.getenv("MINIMAX_API_KEY", "")
         self.duck_api_key = duck_api_key or os.getenv("DUCKCODING_API_KEY", "")
+        self.zai_api_key = zai_api_key or os.getenv("ZAI_API_KEY", "")
 
     def _call_api(self, prompt: str, max_tokens: int = 512, temperature: float = 0.3) -> str:
         """通用 API 调用接口，供分类等非分析任务使用"""
@@ -756,14 +763,71 @@ ArXiv ID：{arxiv_id}
             pass
         return ""
 
+    def _call_zai(self, prompt: str, model: str = "glm-4.5", max_tokens: int = 4096, temperature: float = 0.3) -> str:
+        """通过 ZAI API 调用分析（主力，使用 httpx 避免 requests SSL 兼容性问题）
+        
+        ⚠️ Coding Plan 端点默认开启 Thinking Mode，content 为空，实际输出在 reasoning_content。
+        通过设置 thinking.type=disabled 关闭思考模式，让 content 正常返回。
+        参考：https://docs.z.ai/guides/capabilities/thinking-mode
+        """
+        if not self.zai_api_key:
+            return ""
+        # 关闭 Thinking Mode，让 content 正常返回（Coding Plan 端点默认开启）
+        _request_body = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            "thinking": {"type": "disabled"}
+        }
+        try:
+            if httpx is not None:
+                # httpx 方式：SSL 兼容性更好，稳定走代理
+                with httpx.Client(proxy="http://127.0.0.1:7890", timeout=180) as client:
+                    response = client.post(
+                        self.ZAI_API_URL,
+                        headers={
+                            "Authorization": f"Bearer {self.zai_api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json=_request_body
+                    )
+            else:
+                # fallback: requests + verify=False（httpx 未安装时兜底）
+                response = requests.post(
+                    self.ZAI_API_URL,
+                    headers={
+                        "Authorization": f"Bearer {self.zai_api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json=_request_body,
+                    timeout=120,
+                    proxies=PROXIES,
+                    verify=False
+                )
+            if response.status_code == 200:
+                result = response.json() if hasattr(response, 'json') and callable(response.json) else response.json()
+                message = result.get("choices", [{}])[0].get("message", {})
+                # 优先取 content（thinking=disabled 时应正常返回），兜底取 reasoning_content
+                content = message.get("content", "") or message.get("reasoning_content", "")
+
+                return content
+            elif response.status_code == 429:
+                print(f"  WARNING: ZAI API rate limited (429), falling back...")
+            else:
+                text = response.text[:200] if hasattr(response, 'text') else str(response.content[:200])
+                print(f"  WARNING: ZAI API returned {response.status_code}: {text}")
+        except Exception as e:
+            print(f"  WARNING: ZAI request failed: {e}")
+        return ""
+
     def analyze_paper(self, paper: Dict) -> Dict:
         """分析单篇论文，返回6维度分析结果
 
-        策略：DUCKCODING gpt-5.4（JSON mode）优先，失败则切换 MiniMax。
-        DUCKCODING 支持强制 JSON mode，Parse 成功率接近 100%。
+        策略：ZAI glm-4.5（主力）→ DUCKCODING gpt-5.4 → MiniMax M2.7（兜底）。
         """
-        if not self.api_key and not self.duck_api_key:
-            print("  WARNING: No API key set (MINIMAX_API_KEY / DUCKCODING_API_KEY), skipping analysis")
+        if not self.zai_api_key and not self.duck_api_key and not self.api_key:
+            print("  WARNING: No API key set (ZAI_API_KEY / DUCKCODING_API_KEY / MINIMAX_API_KEY), skipping analysis")
             return {}
 
         title = paper.get("title", "")
@@ -776,19 +840,31 @@ ArXiv ID：{arxiv_id}
             arxiv_id=arxiv_id
         )
 
-        # ---- Primary: DUCKCODING gpt-5.4（JSON mode，稳定可靠）----
+        # ---- Primary: ZAI glm-4.5（快速、低成本）----
+        if self.zai_api_key:
+            try:
+                content = self._call_zai(prompt, model="glm-4.5", max_tokens=1200)
+                if content:
+                    result = self._parse_analysis(content)
+                    if result:
+                        return result
+                    print(f"  WARNING: ZAI parse failed, trying DUCKCODING...")
+            except Exception as e:
+                print(f"  WARNING: ZAI request failed: {e}")
+
+        # ---- Secondary: DUCKCODING gpt-5.4（JSON mode，稳定可靠）----
         if self.duck_api_key:
             try:
                 content = self._call_duckcoding(prompt, max_tokens=1200)
                 if content:
                     result = self._parse_analysis(content)
-                    if result:  # JSON mode 几乎不会 parse 失败
+                    if result:
                         return result
                     print(f"  WARNING: DUCKCODING parse failed, trying MiniMax...")
             except Exception as e:
                 print(f"  WARNING: DUCKCODING request failed: {e}")
 
-        # ---- Fallback: MiniMax ----
+        # ---- Fallback: MiniMax M2.7 ----
         if self.api_key:
             try:
                 response = requests.post(
@@ -817,7 +893,7 @@ ArXiv ID：{arxiv_id}
                     print(f"  WARNING: MiniMax parse failed, paper dropped")
 
                 elif response.status_code == 529:
-                    print(f"  WARNING: MiniMax 529 overloaded (primary already tried DUCKCODING)")
+                    print(f"  WARNING: MiniMax 529 overloaded (primary already tried ZAI+DUCKCODING)")
 
             except Exception as e:
                 print(f"  WARNING: MiniMax request failed: {e}")
@@ -927,11 +1003,11 @@ ArXiv ID：{arxiv_id}
         if not analyzable:
             return papers
 
-        if not self.api_key:
-            print(f"  WARNING: MINIMAX_API_KEY not set, skipping analysis")
+        if not self.zai_api_key and not self.duck_api_key and not self.api_key:
+            print(f"  WARNING: No API key set (ZAI/DUCKCODING/MINIMAX), skipping analysis")
             return papers
 
-        print(f"  MiniMax: parallel analyzing {len(analyzable)} papers...")
+        print(f"  AI: parallel analyzing {len(analyzable)} papers (ZAI→DUCKCODING→MiniMax)...")
 
         # 方法1: 尝试使用线程池并行（适合 IO 密集型）
         try:
@@ -1012,7 +1088,7 @@ ArXiv ID：{arxiv_id}
 
     def generate_domain_trends(self, cat_id: str, papers: List[Dict], cat: Dict) -> Dict:
         """分析领域内多篇论文，生成一句话趋势概括"""
-        if not self.api_key:
+        if not self.zai_api_key and not self.api_key:
             return {"trend": f"{len(papers)}篇新论文"}
 
         # 过滤有效论文
@@ -1037,31 +1113,43 @@ ArXiv ID：{arxiv_id}
             paper_list="\n\n".join(paper_list)
         )
 
-        try:
-            response = requests.post(
-                self.API_URL,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "MiniMax-M2.7",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 500,
-                    "temperature": 0.7
-                },
-                timeout=60,
-                proxies=PROXIES
-            )
+        # ---- Primary: ZAI glm-4.5 ----
+        if self.zai_api_key:
+            try:
+                content = self._call_zai(prompt, model="glm-4.5", max_tokens=500, temperature=0.7)
+                if content:
+                    result = self._parse_trend_result(content)
+                    if result:
+                        return result
+            except Exception as e:
+                print(f"  WARNING: ZAI domain trend analysis failed: {e}")
 
-            if response.status_code == 200:
-                result = response.json()
-                message = result.get("choices", [{}])[0].get("message", {})
-                # MiniMax M2.7 使用 reasoning_content 存储思考过程
-                content = message.get("content", "") or message.get("reasoning_content", "")
-                return self._parse_trend_result(content)
-        except Exception as e:
-            print(f"  WARNING: MiniMax domain trend analysis failed: {e}")
+        # ---- Fallback: MiniMax M2.7 ----
+        if self.api_key:
+            try:
+                response = requests.post(
+                    self.API_URL,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": "MiniMax-M2.7",
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 500,
+                        "temperature": 0.7
+                    },
+                    timeout=60,
+                    proxies=PROXIES
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    message = result.get("choices", [{}])[0].get("message", {})
+                    content = message.get("content", "") or message.get("reasoning_content", "")
+                    return self._parse_trend_result(content)
+            except Exception as e:
+                print(f"  WARNING: MiniMax domain trend analysis failed: {e}")
     def _parse_trend_result(self, content: str) -> Dict:
         """解析领域趋势分析结果"""
         import re
@@ -1145,7 +1233,7 @@ ArXiv ID：{arxiv_id}
 
     def generate_domain_trends_from_analysis(self, cat_id: str, papers: List[Dict], cat: Dict) -> Dict:
         """基于6维度分析结果生成领域趋势"""
-        if not self.api_key:
+        if not self.zai_api_key and not self.api_key:
             return {"trend": f"{len(papers)}篇新论文"}
 
         # 收集有分析结果的论文
@@ -1176,30 +1264,43 @@ ArXiv ID：{arxiv_id}
             paper_analysis_list="\n".join(paper_list)
         )
 
-        try:
-            response = requests.post(
-                self.API_URL,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "MiniMax-M2.7",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 500,
-                    "temperature": 0.7
-                },
-                timeout=60,
-                proxies=PROXIES
-            )
+        # ---- Primary: ZAI glm-4.5 ----
+        if self.zai_api_key:
+            try:
+                content = self._call_zai(prompt, model="glm-4.5", max_tokens=500, temperature=0.7)
+                if content:
+                    result = self._parse_trend_result(content)
+                    if result:
+                        return result
+            except Exception as e:
+                print(f"  WARNING: ZAI domain trend from analysis failed: {e}")
 
-            if response.status_code == 200:
-                result = response.json()
-                message = result.get("choices", [{}])[0].get("message", {})
-                content = message.get("content", "") or message.get("reasoning_content", "")
-                return self._parse_trend_result(content)
-        except Exception as e:
-            print(f"  WARNING: MiniMax domain trend from analysis failed: {e}")
+        # ---- Fallback: MiniMax M2.7 ----
+        if self.api_key:
+            try:
+                response = requests.post(
+                    self.API_URL,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": "MiniMax-M2.7",
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 500,
+                        "temperature": 0.7
+                    },
+                    timeout=60,
+                    proxies=PROXIES
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    message = result.get("choices", [{}])[0].get("message", {})
+                    content = message.get("content", "") or message.get("reasoning_content", "")
+                    return self._parse_trend_result(content)
+            except Exception as e:
+                print(f"  WARNING: MiniMax domain trend from analysis failed: {e}")
 
         return {"trend": f"{len(papers)}篇新论文"}
 
@@ -2701,16 +2802,18 @@ def main():
             s2_searcher.sort_by_quality(papers)
         papers = papers[:top_n]
 
-        # MiniMax 6维度分析（analyze=True 时执行，不受 fast 影响）
+        # AI 6维度分析（analyze=True 时执行，不受 fast 影响）
         # 分析所有待显示论文（最多6篇），确保子卡片和展开面板都有完整6维分析
-        if analyze and minimax_analyzer.api_key:
-            print(f"    Running MiniMax 6-dimension analysis (parallel, analyzing up to 6 papers)...")
+        # 三源热备：ZAI glm-4.5 → DUCKCODING gpt-5.4 → MiniMax M2.7
+        has_any_key = minimax_analyzer.zai_api_key or minimax_analyzer.duck_api_key or minimax_analyzer.api_key
+        if analyze and has_any_key:
+            print(f"    Running AI 6-dimension analysis (ZAI→DUCKCODING→MiniMax, analyzing up to 6 papers)...")
             papers = minimax_analyzer.batch_analyze(papers, top_n=min(6, top_n))
-        elif analyze and not minimax_analyzer.api_key:
-            print(f"    WARNING: MINIMAX_API_KEY not set, skipping AI analysis")
+        elif analyze and not has_any_key:
+            print(f"    WARNING: No API key set (ZAI/DUCKCODING/MINIMAX), skipping AI analysis")
 
         # 生成领域趋势（基于分析结果）
-        if minimax_analyzer.api_key and any(p.get("analysis") for p in papers):
+        if has_any_key and any(p.get("analysis") for p in papers):
             print(f"    Generating domain trends based on analysis...")
             trend_result = minimax_analyzer.generate_domain_trends_from_analysis(category_id, papers, cat)
             if trend_result and papers:

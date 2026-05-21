@@ -2,74 +2,81 @@
   "domain_name": "硅基光子学与量子光学",
   "papers": [
     {
-      "title": "Covert Signaling for Communication and Sensing over the Bosonic Channels",
-      "abstract": "Preventing signal detection in communication and active sensing requires careful control of transmission power. In fact, the square-root laws (SRL) for covert classical and quantum communication and sensing prescribe that the average output power per channel use scales as $1/\\sqrt{n}$ for $n$ channel uses. Two strategies for achieving this are diffuse and sparse signaling. The former transmits signals with power decaying as $1/\\sqrt{n}$ on all $n$ channel uses, which is convenient for mathematical analysis. The latter transmits constant-power signals rarely, on approximately $\\sqrt{n}$ out of $n$ channel uses, while remaining silent on the others. This offers significant practical advantages in compatibility with modern digital transmitters. Here, we study sparse signaling over lossy thermal-noise bosonic channels, which describe quantumly many practical channels (including optical, microwave, and radio-frequency). We characterize the input signal state that minimizes detectability. We find an unintuitive optimal quantum state structure: a mixture of just two consecutive photon-number states. In particular, in the low-brightness regime, the optimal signal state is a mixture of vacuum and a single photon. Since these states are generally suboptimal for both communication and active sensing, we explore the resulting trade-off and identify input-power thresholds for transitions between optimizing for covertness vs. performance in communication and sensing tasks.",
-      "arxiv_id": "2605.08066v1",
-      "published": "2026-05-08",
-      "url": "http://arxiv.org/abs/2605.08066v1",
+      "title": "Switching Rydberg interactions by three orders of magnitude using a terahertz field",
+      "abstract": "Atom-based quantum computing exploits the ability to enhance atom-atom interactions by employing laser excitation to higher-excited Rydberg states. Additional fields that drive transitions between Rydberg states can offer independent control of these atom-atom interactions. However, as microwave (mw) fields only provide access to states with similar principal quantum number $n$, their ability to switch the interactions' strength is limited. Here, we use a pulsed terahertz field to rapidly switch the strength of interactions between Rydberg atoms by three orders of magnitude. We demonstrate interaction switching using photon storage, where the terahertz field induces an interaction induced dephasing of the stored photon. This ability to switch interactions offers advantages for single-qubit readout, state-detection schemes, quantum annealing, and Rydberg quantum optics.",
+      "arxiv_id": "2605.18664v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.18664v1",
       "authors": [
-        "Tianrui Tan",
-        "Evan J. D. Anderson",
-        "Michael S. Bullock"
+        "Karen Wadenpfuhl",
+        "Aaron Reinhard",
+        "Oliver Hughes"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "论文研究了在损耗热噪声玻色子信道上实现隐蔽通信和感知的稀疏信号策略，确定了使敌方检测器可检测性最小化的最优输入信号状态。",
-        "research思路": "针对平方根律约束下的隐蔽通信问题，采用稀疏信号策略代替传统扩散信号，分析其在实际量子信道中的性能，寻求最优功率分配与信号设计。",
-        "experiment": "基于玻尔兹曼热噪声统计模型，采用变分法和优化理论，对稀疏信号的最优信号状态进行数学表征，分析功率约束下的可检测性度量。",
-        "innovation": "首次将稀疏信号策略应用于损耗热噪声玻色子信道，突破了传统扩散信号的理论框架约束，为实际量子通信系统的隐蔽传输提供可工程化实现方案。",
-        "related_work": "主要包括Bash等人关于经典和量子信道隐蔽通信的平方根律理论、量子感知中的低检测概率方法、以及光场态在高斯噪声信道中的传输特性研究。",
-        "impact": "为量子保密通信和低截获概率感知系统提供新的理论基础，推动了隐蔽通信从理论分析向实际应用的关键步骤，对量子信息处理领域具有重要指导意义。"
+        "summary": "利用太赫兹场实现里德堡原子相互作用强度三个数量级的快速切换",
+        "research思路": "解决里德堡原子相互作用强度难以灵活调控的问题，克服微波场调控局限性",
+        "experiment": "采用脉冲太赫兹场调控里德堡原子相互作用，通过光子存储实验验证相互作用切换",
+        "innovation": "首次实现太赫兹场对里德堡原子相互作用三个数量级的快速调控，突破微波场限制",
+        "related_work": "里德堡量子计算、量子模拟、里德堡量子光学、量子退火等领域研究",
+        "impact": "为量子计算、量子模拟、量子退火等提供新调控手段，推动里德堡量子技术发展"
       },
       "domain_trend": {
-        "trend": "该领域暂无趋势分析"
+        "trend": "量子光学调控技术突破推动硅基光子量子计算与多体量子模拟新发展",
+        "key_topics": [
+          "里德堡原子量子调控",
+          "普适量子控制方案",
+          "波导多体量子光学系统"
+        ],
+        "development_direction": "领域正朝着高精度量子操控、可扩展多体量子系统构建以及跨技术平台融合方向发展，特别是在量子计算与量子模拟应用方面展现出巨大潜力。硅基光子学平台与量子光学系统的结合将促进量子信息处理技术的实用化进程。"
       }
     },
     {
-      "title": "Error Correction of Beamsplitter-Generated Entangled GKP States",
-      "abstract": "To be useful, quantum computers will be required to successfully correct errors occurring at the hardware level. Bosonic codes provide a hardware-efficient option for error correction, but fault-tolerance further requires that the available gate interactions be compatible with the code. A promising bosonic code is the Gottesman-Kitaev-Preskill (GKP) code, for which a linear beamsplitter-like coupling between two bosonic modes is fault-tolerant, making this a key primitive for building larger systems. Here, using two motional modes of a trapped ion, we demonstrate the generation of entangled states of GKP qubits by interfering two qunaught states, which have a grid structure but carry no logical information, on a beamsplitter. We generate all four Bell states with an average fidelity of 69%, and subsequently demonstrate an extension of the entangled state lifetime through the use of quantum error correction. These results complete the set of Gaussian operations required for quantum computing with GKP codes and enable explorations of multi-mode bosonic encodings as well as fundamental tests of information channels.",
-      "arxiv_id": "2605.08009v1",
-      "published": "2026-05-08",
-      "url": "http://arxiv.org/abs/2605.08009v1",
+      "title": "Universal Jaynes-Cummings Control of an Oscillator",
+      "abstract": "The Jaynes-Cummings (JC) interaction-the coherent exchange of excitations between a two-level system and a harmonic oscillator-is one of the fundamental interactions of quantum optics, realized across platforms such as cavity quantum electrodynamics, trapped ions, mechanical resonators, and superconducting circuits. Although JC interactions and qubit rotations form a universal gate set for oscillator control, practical implementations have not been demonstrated. Here we develop and experimentally demonstrate universal JC-based oscillator control by compiling arbitrary unitary gates into sequences of JC interactions and qubit rotations. In our experiment, the oscillator is realized using a mode of a high quality factor microwave cavity and the ancilla qubit using a superconducting transmon circuit, with the JC interaction implemented by a sideband interaction enabled by the Josephson nonlinearity. The native gates are constructed to be closed below a chosen cutoff photon number, encoding a qudit with suppressed leakage errors, while ancilla relaxation errors are detectable. We further find that the dispersive shift serves as a compilation resource that reduces circuit depths. We demonstrate universal qudit control and implement a single-qutrit gate set with a mean post-selected process fidelity of 96%, as well as ququart and ququint shift gates. These results establish Jaynes-Cummings control as a practical route to universal oscillator control, enabling programmable bosonic processors across a variety of quantum platforms.",
+      "arxiv_id": "2605.18658v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.18658v1",
       "authors": [
-        "Moritz Fontboté-Schmidt",
-        "Jeremy Metzner",
-        "Florence Berterottière"
+        "Jordan Huang",
+        "Ethan Kasaba",
+        "Thomas J. DiNapoli"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "使用囚禁离子系统通过分束器干涉qunaught态成功生成纠缠GKP量子比特，产生四个Bell态（平均保真度69%），并首次演示量子纠错延长纠缠态寿命。",
-        "research思路": "解决GKP码容错门实现问题，利用分束器作为高斯操作产生纠缠态，同时验证量子纠错对延长相干时间的效果，为构建可扩展容错量子计算机提供关键技术基础。",
-        "experiment": "采用囚禁离子的两个运动模式作为量子比特载体，使用线性分束器耦合干涉两个qunaught态（具网格结构但无逻辑信息），生成纠缠态后进行Bell态层析测量和纠错演示。",
-        "innovation": "首次实现GKP码的纠缠态生成（此前仅有单模GKP态），通过分束器高斯操作实现容错纠缠门，并系统性地演示量子纠错对纠缠态寿命的延长效果。",
-        "related_work": "包括GKP码原始理论（Gottesman-Kitaev-Preskill, 2001）、超导和离子阱平台的单模GKP态实验、连续变量纠缠态研究、以及其他玻色码如猫码的实现工作。",
-        "impact": "为离子阱平台实现容错量子计算奠定基础，分束器作为可容错门完成高斯门集合的关键组件，推动GKP码从理论走向实际应用的重要里程碑。"
+        "summary": "实现了基于Jaynes-Cummings相互作用的普适振子量子控制方案",
+        "research思路": "解决JC相互作用与量子比特旋转组成的普适门集在实验中尚未实现的问题",
+        "experiment": "采用高品质因子微波腔模作为振子，超导transmon电路作为辅助量子比特",
+        "innovation": "首次实验证明了基于JC相互作用的普适振子控制，构建了在选定光子数下封闭的本征门",
+        "related_work": "腔量子电动力学、囚禁离子、机械振子、超导电路等平台的JC相互作用研究",
+        "impact": "为量子光学和量子信息处理提供了新的控制范式，推动量子计算发展"
       }
     },
     {
-      "title": "Subwavelength grating waveguide filter based on cladding modulation with phase-change material grating",
-      "abstract": "Subwavelength engineering and utilizing phase-change materials with large contrast in their optical properties have become powerful design tools for integrated silicon photonics. Reversible phase-transition of phase-change materials such as Ge2Sb2Te5 (GST) provides a new degree of freedom and opens up the possibility of adding new functionalities to the designed devices. We present an optical filter based on a silicon subwavelength grating (SWG) waveguide evanescently coupled to phase-change material loading segments arranged periodically around the SWG core. The effect of the GST loading segments' geometry and their distance from the SWG core on the filter's central wavelength and bandwidth are studied with three-dimensional finite-difference time-domain simulations. The employment of GST in the structure adds a switching functionality with an extinction ratio of 28.8 dB. We also examine the possibility of using the proposed structure as a reconfigurable filter by controlling the partial crystallization of the GST offering a blueshift of more than 4 nm.",
-      "arxiv_id": "2605.07715v1",
-      "published": "2026-05-08",
-      "url": "http://arxiv.org/abs/2605.07715v1",
+      "title": "Realization of waveguide many-body quantum optics",
+      "abstract": "Controlling light photon-by-photon is central to quantum optics. At a fundamental level, photon interactions are mediated by their coupling to atoms, and ultimate control requires deterministic light-matter interfacing of single photons to single atoms. Extending this paradigm to radiatively couple multiple individual atoms in a deterministic and scalable manner opens the arena of many-body quantum optics. Here, we realize such a setting by coherently coupling solid-state artificial atoms to a nanophotonic waveguide and demonstrate higher-order photon correlations that are controlled by the number of quantum emitters. We study the scaling of nonlinear photonic transport induced by emitter-photon scattering and demonstrate that adding a quantum emitter generates higher-order photon correlations. Specifically, we experimentally observe genuine three-photon correlations from a pair of collectively coupled emitters, while contributions from lower photon numbers are suppressed. In addition, we scale to three resonant quantum emitters coupled to the waveguide. These advancements demonstrate the onset of many-body quantum optics in waveguide quantum electrodynamics, enabling new photonic quantum simulators, the creation of many-body entangled states, and the exploration of novel quantum phase transitions.",
+      "arxiv_id": "2605.18525v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.18525v1",
       "authors": [
-        "S. Hadi Badri",
-        "Saeid Gholami Farkoush"
+        "Lena M. Hansen",
+        "Clara Henke",
+        "Christoph Hotter"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出一种基于硅亚波长光栅波导与GST相变材料相结合的可切换/可重构光学滤波器，实现28.8 dB消光比。",
-        "research思路": "解决集成硅光子学中紧凑型可重构滤波器件设计问题，利用相变材料的光学特性可逆切换特性为器件增添动态调控能力。",
-        "experiment": "采用三维有限差分时域（3D-FDTD）方法系统模拟研究GST加载段的几何尺寸、间距对滤波器中心波长和带宽的调控规律。",
-        "innovation": "首次将GST相变材料与亚波长光栅波导结构耦合，突破传统滤波器固定参数限制，实现滤波功能的电控切换与波长可调谐。",
-        "related_work": "亚波长光栅波导技术、GST相变材料光学特性研究、集成光子滤波器设计、相变材料可重构光子器件等领域。",
-        "impact": "为智能光子集成电路提供新型可编程器件方案，推动相变材料在集成光子学中的应用，具有重要学术价值和应用前景。"
+        "summary": "实现波导多体量子光学，通过集体耦合人造原子展示可控的高阶光子关联",
+        "research思路": "解决如何确定性地耦合多个原子与光子，实现多体量子光学中的非线性光子传输",
+        "experiment": "将固态人造原子相干耦合到纳米光子波导，研究发射体-光子散射引起的非线性光子传输",
+        "innovation": "首次从一对集体耦合发射体中观察到真正的三光子关联，同时抑制低光子数贡献",
+        "related_work": "单原子-光子强耦合、腔量子电动力学、量子发射体阵列研究",
+        "impact": "为可扩展多体量子光学系统奠定基础，推动量子信息处理和量子模拟发展"
       }
     }
   ]

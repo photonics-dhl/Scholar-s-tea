@@ -2,42 +2,66 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "New fiber-optic sensing method reads strain and displacement through electrical signals | EurekAlert!",
-      "abstract": "A service of the American Association for the Advancement of Science. Electrical-domain interference in polymer optical fibers offers a simpler route to fast sensing without conventional optical-spectrum analysis. Graphical overview of electrical-domain fiber-optic sensing. Light transmitted through",
+      "title": "Key Laboratory of Optical Fiber Sensing and Communications Ministry of Education-School of information and Communication Engineering",
+      "abstract": "### Key Laboratory of Optical Fiber Sensing and Communications, Ministry of Education. The Key Laboratory of Optical Fiber Sensing and Communications, Ministry of Education, is affiliated with the University of Electronic Science and Technology of China. Over the past two decades, the laboratory's c",
       "source": "tavily",
-      "url": "https://www.eurekalert.org/news-releases/1127421",
+      "url": "https://www.sice.uestc.edu.cn/sice_en/Research/Research_Platform/KL.htm",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "提出一种基于聚合物光纤电域干涉的新型传感方法，通过电信号直接读取应变和位移，实现快速简化的光纤传感测量。",
-        "research思路": "解决传统光纤传感依赖复杂光学频谱分析导致测量速度慢、系统复杂的问题，探索通过电域信号处理简化测量流程的新途径。",
-        "experiment": "采用聚合物光纤作为传感介质，利用电域干涉效应替代传统光域分析，通过电信号处理实现应变和位移的实时读取。",
-        "innovation": "首次将干涉信号检测从光学域转换至电学域，无需光谱分析仪器即可实现快速传感，大幅简化测量系统复杂度。",
-        "related_work": "传统光纤布拉格光栅(FBG)传感、Michelson干涉仪传感技术、聚合物光纤传感器的电域表征方法等。",
-        "impact": "该方法降低了光纤传感系统的技术门槛和成本，为需要快速、简捷应变监测的工业检测和结构健康监测应用提供了新方案。"
+        "summary": "介绍了光纤传感与通信教育部重点实验室的背景与研究历程",
+        "research思路": "展示该实验室在光纤传感与通信领域的科研积累",
+        "experiment": "未提供具体实验方法，仅描述实验室概况",
+        "innovation": "无具体创新点，属于实验室介绍性内容",
+        "related_work": "需结合光纤传感与通信领域经典文献",
+        "impact": "展示中国高校在该领域的研究实力与平台建设"
       },
       "domain_trend": {
-        "trend": "光纤传感正从专用传感网络向通信基础设施融合迁移，电域检测技术革新简化系统复杂度，分布式多参数感知成为工业化应用突破口。"
+        "trend": "光纤传感技术正突破点式限制，向分布式、多参数智能化监测网络革命性演进",
+        "key_topics": [
+          "分布式光纤传感",
+          "多参数同步监测",
+          "结构健康监测应用"
+        ],
+        "development_direction": "光纤传感技术正从传统点式监测向分布式、智能化方向发展，通过结合FBG、布里渊散射和拉曼散射等技术，实现长距离、多参数同步监测，推动智能基础设施、结构健康监测等领域的应用革新，并与光通信技术深度融合，构建数字化感知网络。"
       }
     },
     {
-      "title": "Seamless integration of distributed acoustic sensing and passive ...",
-      "abstract": "Explore Benefits of Distributed Fiber Optic Sensing for Optical Network Service Providers. J. Lightwave Technol. 41, 3758–3766 (2023)",
+      "title": "Turning Fiber into a Sensing System: The Magic of Fiber Optics Sensing | IEEE Communications Society",
+      "abstract": "# Turning Fiber into a Sensing System: The Magic of Fiber Optics Sensing. This is the power of fiber optic sensing, a technology that transforms ordinary optical fibers into the digital world’s sensory network. ## Fiber Sensing Technologies: From Invisible Antennae to the Perceptual Revolution of th",
       "source": "tavily",
-      "url": "https://www.nature.com/articles/s44172-026-00662-z",
+      "url": "https://www.comsoc.org/publications/ctn/turning-fiber-sensing-system-magic-fiber-optics-sensing",
       "authors": [],
       "citations": 0,
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "提出将分布式声学传感(DAS)技术与现有光纤通信网络无缝集成的方案，探索光网络服务提供商利用现有基础设施开展传感服务的商业价值与技术可行性。",
-        "research思路": "针对光网络基础设施利用率不足的问题，研究如何利用已部署光纤同时承载通信与传感功能，解决成本敏感型DAS部署中基础设施复用与信号串扰的关键技术挑战。",
-        "experiment": "基于相干OTDR架构搭建DAS系统，在实际城域光纤网络中验证振动检测性能；建立成本效益分析模型，量化基础设施复用带来的经济收益。",
-        "innovation": "首次系统评估通信光纤承载DAS功能的技术-经济双维度可行性；提出低插入损耗的传感-通信共存方案，突破了传统DAS需要专用传感光纤的限制。",
-        "related_work": "DAS技术方面参考Taylor et al. (2019)关于Φ-OTDR的综述；光网络融合传感方面关注Zhu et al.关于传感辅助通信网络监控的工作；商业模型参考ICT基础设施共享研究。",
-        "impact": "为电信运营商开辟了新的增值服务方向，推动DAS从专用传感网络向通信基础设施融合迁移，对智慧城市感知网络和下一代光网络架构设计具有重要参考价值。"
+        "summary": "将普通光纤转变为数字化感知网络的光纤传感技术，实现物理世界的实时监测。",
+        "research思路": "解决如何利用普通光纤构建高灵敏度、分布式传感系统以替代传统电子传感器的问题。",
+        "experiment": "采用光纤干涉、散射和布拉格光栅等关键技术，实现温度、应变等物理量的精确测量。",
+        "innovation": "突破传统点式传感限制，实现长距离分布式、多参数同步监测，显著提升传感网络覆盖范围。",
+        "related_work": "分布式声波传感(DAS)、布里渊光时域分析(BOTDA)、光纤布拉格光栅(FBG)阵列等技术。",
+        "impact": "推动光纤传感在结构健康监测、周界安防等领域的应用，为智能基础设施提供关键技术支撑。"
+      }
+    },
+    {
+      "title": "Nature Index Fiber Optic Sensing Technologies for Structural Health Monitoring",
+      "abstract": "# Fiber Optic Sensing Technologies for Structural Health Monitoring. Fiber optic sensing has emerged as a transformative approach for monitoring the integrity of civil, mechanical and aerospace structures. Core technologies include fiber Bragg gratings (FBGs) for point and quasi-distributed measurem",
+      "source": "tavily",
+      "url": "https://www.nature.com/nature-index/topics/l4/fiber-optic-sensing-technologies-for-structural-health-monitoring",
+      "authors": [],
+      "citations": 0,
+      "venue": "Web",
+      "arxiv_id": "",
+      "analysis": {
+        "summary": "综述了光纤传感技术在结构健康监测领域的核心技术与应用进展，重点聚焦FBG传感器在土木、机械及航空航天结构中的点测量与准分布式测量能力。",
+        "research思路": "解决传统电学传感器在复杂环境下易受干扰、难以实现大范围长距离监测的问题，探索光纤传感作为高灵敏度、抗电磁干扰的替代方案。",
+        "experiment": "系统梳理FBG传感器的工作原理（波长编码机制）、封装工艺及解调技术，结合实际结构测试案例验证其在应变、温度等参数监测中的准确性。",
+        "innovation": "提出基于FBG的准分布式传感网络架构，实现多点同步监测；同时综述了新兴的布里渊散射和拉曼散射光纤传感技术，扩展了监测维度。",
+        "related_work": "主要关联工作包括：Lowry等人的早期FBG封装研究、Measures等人的桥梁监测系统、Fuhr等人的航空航天应用、以及近年来基于BOTDA/BOTDR的分布式传感技术进展。",
+        "impact": "为结构健康监测领域提供了全面的光纤传感技术参考，推动了从点式向分布式、从单参数向多参数监测的技术演进，对智能基础设施和智慧城市发展具有重要支撑意义。"
       }
     }
   ]

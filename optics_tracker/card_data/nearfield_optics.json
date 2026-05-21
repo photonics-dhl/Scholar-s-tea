@@ -2,72 +2,81 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Near-field thermal transport in periodic photonic structures",
-      "abstract": "",
-      "doi": "10.1103/b23m-yhws",
-      "url": "https://doi.org/10.1103/b23m-yhws",
+      "title": "Reinforcement Learning Assisted Quantum Simulation of Many-Body Excited States and Real-Time Dynamics",
+      "abstract": "The computation of electronic excited states and real-time quantum dynamics of many-fermion systems is among the most promising applications of near-term quantum computing. In this work, we generalize the reinforcement learning contracted quantum eigensolver (RL-CQE), previously developed for ground-state problems, to electronic excited states and real-time quantum dynamics, in which a deep Q-network agent adaptively selects the two-body operators at each iteration, yielding more compact ansätze and improved robustness with respect to critical hyperparameters. A key feature of the algorithm is a scalable state representation based on the ACSE residuals, whose dimension grows with the one-particle basis but remains independent of the number of targeted excited states. We also verify the equivalence of sign-free qubit operators in the excited-state setting, extending a result previously established for ground-state problems. Our RL-CQE for time evolution derives from a constant-scaling ansatz that represents the wave function with a fixed number of unitary transformations independent of simulation time $t$, enabled by the shared unitary structure of the purified ensemble treatment of excited states. Benchmarks on chemical systems demonstrate chemical accuracy with minimal operator counts across a range of bond lengths.",
+      "arxiv_id": "2605.18569v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.18569v1",
       "authors": [
-        "Anonymous"
+        "Jiaji Zhang",
+        "Lipeng Chen",
+        "Carlos L. Benavides-Riveros"
       ],
       "citations": 0,
-      "venue": "Physical Review Applied",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "核心科学贡献的一句话总结",
-        "research思路": "解决的科学/技术问题",
-        "experiment": "研究方法与技术路线",
-        "innovation": "相比前人的突破点",
-        "related_work": "领域重要关联研究",
-        "impact": "对学科发展的意义评估"
+        "summary": "将强化学习辅助量子本征求解器扩展到激发态和实时量子动力学模拟",
+        "research思路": "解决多费米子系统激发态和实时量子动力学的高效量子计算问题",
+        "experiment": "采用深度Q网络自适应选择双体算子，基于ACSE残差的状态表示",
+        "innovation": "扩展RL-CQE到激发态，提出与目标态数无关的可扩展状态表示",
+        "related_work": "量子本征求解器(VQE)、量子模拟、量子计算中的强化学习应用",
+        "impact": "推动近程量子计算在激发态和动力学模拟中的实际应用"
       },
       "domain_trend": {
-        "trend": "近场光学正突破热-耦合动力学瓶颈，从被动测量迈向量子界面主动热管理，探索周期性结构与实时探测的融合路径。"
+        "trend": "智能与硬件协同驱动量子近场光学突破实用化瓶颈",
+        "key_topics": [
+          "量子模拟与计算优化",
+          "低温硬件控制技术",
+          "自动化量子算法"
+        ],
+        "development_direction": "近场光学领域正向智能化、规模化和实用化方向快速发展，通过机器学习算法优化量子计算性能，结合先进硬件控制技术突破扩展性瓶颈，同时建立自动化框架降低量子技术使用门槛，推动量子计算在工业应用中的落地。"
       }
     },
     {
-      "title": "Limits of Stable Near-Field Probing in Nanophotonic Traps",
-      "abstract": "Near-fields around nanophotonic structures and waveguides can be used to optically interface particles ranging from atoms and molecules to microscopic biological and synthetic particles. Due to the strong, non-linear dependence of the near-field coupling strength on the particles' position, a change of the spread of the particles' position will change their mean coupling strength. When the particles are trapped, this position spread depends on their temperature, generally leading to temperature-dependent coupling. Here, we experimentally demonstrate that this effect renders optical probing of trapped particles with near fields an inherently transient process. Specifically, we trap cold atoms in a two-color dipole trap surrounding an optical nanofiber and probe them with the evanescent field of guided, resonant light. The scattering of this probe light heats up the atoms, leading to a decrease of the coupling strength as well as loss of atoms. We observe both effects via a concurrent decrease of the absorption signal. In addition, we demonstrate that the coupling strength can be recovered by cooling the atoms back to their initial temperature. Our findings are relevant for numerous situations where stable coupling of trapped particles to a nanophotonic structure is required.",
-      "arxiv_id": "2605.07798v1",
-      "published": "2026-05-08",
-      "url": "http://arxiv.org/abs/2605.07798v1",
+      "title": "The QuaST Decision Tree: Achieving Automation With Data-Based Recommendations",
+      "abstract": "Quantum computers are increasingly powerful. Software tools for the development of quantum-enhanced algorithms are maturing. However, the software stack still lacks the connection to applications that would enable hybrid algorithms combining classical and quantum computing steps. End users need to be assisted in choosing the best combination of preprocessing, postprocessing, classical and quantum algorithms options. The application-facing software stack is therefore required to cover problem modeling, encoding, algorithm selection and hyperparameter tuning. A variety of tools exist for specific recommendations. The QuaST Decision Tree reflects the complexity in combining individual decisions in its modular network structure, consisting of flexible computation nodes with modular recommendations. It can easily be configured to serve in an industrial solver, an HPC software stack, or for rapid prototyping in development. The key ingredient, automation, is delivered by modules. We present one such module judging the feasibility of variational algorithms based on a robust scalability analysis and classification of problem instances. The automation improves the performance of end-to-end solutions, highlights the benefit to be gained from the hybrid quantum solution, reduces expensive trial-and-error testing, and leads to an improved utilization of quantum devices for a practical benefit.",
+      "arxiv_id": "2605.18539v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.18539v1",
       "authors": [
-        "Johannes Piotrowski",
-        "Constanze Bach",
-        "Nicolás Vera Paz"
+        "Benedikt Poggel",
+        "Lena Tokuhiro",
+        "Georg Kruse"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实验证明近场耦合强度与粒子温度的相互依赖使纳米光子陷阱中的光学探测成为本质上的瞬态过程，探针光散射加热导致耦合强度持续下降。",
-        "research思路": "针对近场探测中耦合强度与粒子位置分布的非线性依赖问题，通过冷原子-纳米光纤系统验证温度升高如何引发耦合-加热的正反馈循环，揭示近场探测的根本限制。",
-        "experiment": "在光纳米纤维周围构建双色偶极子陷阱捕获冷原子，利用引导共振光的倏逝场进行探测，通过监测原子损失和耦合强度变化来量化探针加热效应。",
-        "innovation": "首次实验揭示了近场探测中温度-耦合强度的正反馈机制，定量展示探针光散射加热如何导致耦合强度下降和原子损失，为近场探测建立了稳定性的基本限制。",
-        "related_work": "包括纳米光纤原子陷阱（Javey group、NVCTION）、倏逝场耦合研究（Vuckovic group）、光力加热机制、以及表面原子探针等近场接口技术。",
-        "impact": "为纳米光子接口的设计提供了温度依赖耦合的基本约束，提示需要开发低加热探测方案或主动热管理策略，对量子接口和生物传感器发展具有重要指导意义。"
+        "summary": "提出QuaST决策树，实现量子-经典混合算法的自动化选择与优化。",
+        "research思路": "解决量子计算软件栈缺乏与应用连接的问题，辅助用户选择最优算法组合。",
+        "experiment": "构建模块化网络结构的决策树，通过灵活计算节点实现自动化推荐。",
+        "innovation": "首次将复杂决策组合模块化，支持工业求解器、HPC及快速原型开发。",
+        "related_work": "量子算法开发工具如Qiskit、Cirq，以及经典HPC优化框架。",
+        "impact": "推动量子计算实用化，降低混合算法开发门槛，加速工业应用落地。"
       }
     },
     {
-      "title": "svPITE: A Python package for the state-vector-based probabilistic imaginary-time evolution algorithm",
-      "abstract": "We present a Python package for ground-state preparation based on the probabilistic imaginary-time evolution algorithm, with particular focus on its state-vector-based implementation. A standard shot-based simulation is also supported, and results can be benchmarked against exact diagonalisation via a dedicated wrapper. The package enables efficient tuning of initial parameters, facilitating systematic exploration and optimisation of the method's performance. Starting from the prepared ground state, the strong interoperability with other packages further enables real-time evolution and the computation of spectral functions, such as the spin-spin dynamical structure factor.",
-      "arxiv_id": "2605.07559v1",
-      "published": "2026-05-08",
-      "url": "http://arxiv.org/abs/2605.07559v1",
+      "title": "Cryogenic Time-Division-Multiplexed Voltage Control for Scalable Trapped-Ion Quantum Processors",
+      "abstract": "Trapped-ion quantum computers based on the quantum charge-coupled device architecture require on the order of ten trap electrodes per qubit, making the number of vacuum feedthroughs a bottleneck at the system scale. Time-division multiplexed (TDM)-based voltage control for trap electrodes provides a natural route to alleviate this constraint. However, previous studies have been limited to architectural proposals for static trap-potential compensation and room-temperature demonstrations of dynamic-electrode control, leaving cryogenic operation of TDM-based voltage control for static and dynamic electrodes experimentally unexplored. In this study, we develop and cryogenically validate TDM-based voltage control schemes for two distinct electrode classes. For static electrodes used in trap-potential compensation, we implement a 32-channel demultiplexed system operating at approximately 27~K, achieving an effective voltage update rate of 37.5~kHz with an output range of $\\pm10~\\mathrm{V}$ per channel. For dynamic electrodes used in ion operations, such as shuttling, we implement a four-channel demultiplexed system operating at approximately 14~K, achieving an effective voltage update rate of 1~MHz with a comparable output range. These results establish TDM-based voltage control as a practical approach for both electrode classes, providing a path for mitigating the vacuum feedthrough bottleneck in scalable trapped-ion quantum processors.",
+      "arxiv_id": "2605.17824v1",
+      "published": "2026-05-18",
+      "url": "http://arxiv.org/abs/2605.17824v1",
       "authors": [
-        "Pascal Sievers",
-        "Satoshi Ejima"
+        "Ryutaro Ohira",
+        "Shinichi Morisaka",
+        "Yoshinori Kurimoto"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "svPITE是一个基于概率虚时间演化的基态制备Python包，首次实现了状态矢量形式(state-vector)的算法实现，支持精确对角化基准测试并可计算谱函数。",
-        "research思路": "解决量子多体系统基态制备的计算问题，通过概率虚时间演化(PITE)算法从初始波函数向系统基态投影，并特别关注全态矢量模拟而非经典噪声模拟。",
-        "experiment": "核心方法基于虚时间演化的概率抽样实现：系统性地调优初始参数进行性能优化，通过专用封装器对比精确对角化结果进行基准测试，并利用互操作性计算自旋-自旋动力学结构因子等谱函数。",
-        "innovation": "首次将PITE算法以状态矢量形式实现（而非标准shot-based模拟），支持全量子态的直接模拟；内置基准测试模块和参数高效调优框架；与实时演化模块深度集成可计算动力学谱函数。",
-        "related_work": "该领域的重要工作包括：变分量子本征求解器(VQE)、量子退火(QA)、张量网络方法用于基态求解、基于密度矩阵的重规范化群(DMRG)、以及量子相位估计(QPE)等标准基态制备算法。",
-        "impact": "为量子基态制备领域提供了首个统一的状态矢量+shot模拟的PITE开源实现，降低了准入门槛；其模块化设计和互操作性使其成为连接基态制备与动力学模拟的桥梁，对量子模拟算法发展具有重要推动作用。"
+        "summary": "开发并验证了低温时分复用电压控制方案，解决了囚禁离子量子处理器扩展性瓶颈问题。",
+        "research思路": "解决量子电荷耦合器件架构中真空馈通数量限制导致的系统扩展瓶颈问题。",
+        "experiment": "构建32通道解复用系统，在27K低温下测试静态和动态电极两类控制方案。",
+        "innovation": "首次实现低温时分复用电压控制的实验验证，同时支持静态和动态电极控制。",
+        "related_work": "静态势补偿架构研究、室温动态电极控制演示、量子电荷耦合器件架构发展。",
+        "impact": "为规模化囚禁离子量子处理器提供关键技术路径，推动实用化量子计算发展。"
       }
     }
   ]

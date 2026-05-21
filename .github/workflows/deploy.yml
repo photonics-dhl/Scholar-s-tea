@@ -1,0 +1,70 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [develop]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to 10.72.212.33
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script_stop: true
+          script: |
+            set -e
+            cd ~/scholars
+
+            echo "=== [1/4] Environment Check ==="
+            node -v
+            pm2 list
+
+            echo "=== [2/4] Build Socket Server ==="
+            cd server
+            npm run build
+            cd ..
+
+            echo "=== [3/4] Build Next.js ==="
+            npm run build
+
+            echo "=== [4/4] Restart PM2 ==="
+            pm2 restart ecosystem.config.js
+            pm2 save
+
+            echo "=== Deploy Complete ==="
+            pm2 list
+
+      - name: Notify Feishu (on success)
+        if: success() && secrets.FEISHU_WEBHOOK_URL
+        run: |
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "text",
+              "content": {
+                "text": "✅ Scholar'\''s Tea 部署成功\n分支: develop\n提交: ${{ github.sha }}\n作者: ${{ github.actor }}"
+              }
+            }'
+
+      - name: Notify Feishu (on failure)
+        if: failure() && secrets.FEISHU_WEBHOOK_URL
+        run: |
+          curl -X POST ${{ secrets.FEISHU_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d '{
+              "msg_type": "text",
+              "content": {
+                "text": "❌ Scholar'\''s Tea 部署失败\n分支: develop\n提交: ${{ github.sha }}\n作者: ${{ github.actor }}\n请检查 GitHub Actions 日志"
+              }
+            }'

@@ -159,7 +159,9 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
         console.log(`User disconnected: ${userId}`);
       }
 
-      for (const roomId of joinedRooms) {
+      const rooms = Array.from(joinedRooms)
+      for (let i = 0; i < rooms.length; i++) {
+        const roomId = rooms[i]
         try {
           // Remove participant
           await query(

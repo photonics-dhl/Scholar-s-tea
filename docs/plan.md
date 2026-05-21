@@ -79,7 +79,7 @@ ResearchGroup
 
 **技术选型**：WebSocket (Socket.io/WS) + 房间管理系统
 
-### 1.5 思想工坊（AI 助手）
+### 1.5 AI Workshop（AI 助手）
 
 **定位**：学术专用 AI 对话助手
 
@@ -122,7 +122,7 @@ ResearchGroup
 | 实时通信 | Socket.io Client | Tea Party 功能 |
 | 富文本 | Tiptap / Slate | 论文、评论编辑 |
 | 搜索 | Algolia / Typesense | 全文搜索 |
-| AI 集成 | LangChain.js | 思想工坊 |
+| AI 集成 | LangChain.js | AI Workshop |
 
 ### 2.2 后端技术栈
 
@@ -328,7 +328,7 @@ interface TeaPartyEvents {
 | TOP10 | `/top-questions` | 本月热门问题 |
 | Tea Party | `/tea-party` | 聊天室列表 |
 | 茶话会房间 | `/tea-party/:id` | 实时聊天 |
-| 思想工坊 | `/workshop` | AI 对话 |
+| AI Workshop | `/workshop` | AI 对话 |
 | 用户主页 | `/users/:id` | 个人主页 |
 | 搜索 | `/search` | 全局搜索 |
 
@@ -414,7 +414,7 @@ interface TeaPartyEvents {
 - 屏幕共享（可选）
 
 ### Phase 4: AI 增强 (持续)
-- 思想工坊
+- AI Workshop
 - 智能推荐
 - 评分优化
 - 知识图谱

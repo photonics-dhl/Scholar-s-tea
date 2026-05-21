@@ -187,9 +187,9 @@ memory:
   user_char_limit: 3000
   user_profile_enabled: true
 model:
-  base_url: https://api.minimaxi.com/v1
-  default: MiniMax-M2.7
-  provider: minimax
+  base_url: https://api.z.ai/api/coding/paas/v4
+  default: glm-5.1
+  provider: zai
 network:
   force_ipv4: false
 personalities: {}
@@ -280,7 +280,7 @@ stt:
     model: voxtral-mini-latest
   openai:
     model: null
-  provider: minimax
+  provider: zai
 telegram:
   channel_prompts: {}
 terminal:

@@ -26,6 +26,9 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Academic profile (JSON stored)
+  academicProfile Json?  @db.Json
+
   // Relations
   accounts      Account[]
   sessions      Session[]
@@ -40,6 +43,7 @@ model User {
   citations     CommunityCitation[] @relation("CitationUser")
   verifiedCitations CommunityCitation[] @relation("CitationVerifier")
   topTenVotes   TopTenVote[]
+  workshopSessions WorkshopSession[]
 }
 
 model Account {
@@ -517,6 +521,41 @@ model QuestionVote {
   question TopQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([questionId, userId])
+}
+
+// ============================================
+// Workshop (AI Chat Sessions)
+// ============================================
+
+model WorkshopSession {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("新对话")
+  mode      String   @default("general") // AgentMode: general, paper, grant, survey, research, peer_review, paper_generation, community_manager
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages WorkshopMessage[]
+
+  @@index([userId])
+  @@index([updatedAt])
+}
+
+model WorkshopMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // user | assistant | system
+  content   String   @db.Text
+  citations String?  @db.Text // JSON: CitationVerifyResult[]
+  ragContext String? @db.Text // JSON: RAG source cards
+  attachments String? @db.Text // JSON: ChatAttachment[]
+  createdAt DateTime @default(now())
+
+  session WorkshopSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([createdAt])
 }
 
 // ============================================

@@ -1,8 +1,13 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: '确认部署到生产环境 (输入 yes)'
+        required: true
+        default: 'no'
+        type: string
 
 concurrency:
   group: deploy-production
@@ -11,6 +16,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to 10.72.212.33
+    if: github.event.inputs.confirm == 'yes'
     runs-on: ubuntu-latest
 
     steps:

@@ -2,80 +2,81 @@
   "domain_name": "超材料与纳米光学",
   "papers": [
     {
-      "title": "Modeling Growth and Plasma Oxygen Effects on Metal Purity in Platinum EBID",
-      "abstract": "Electron Beam-Induced Deposition (EBID) enables site-specific nanofabrication but suffers from significant carbon contamination, limiting its applicability in plasmonics, nanoelectronics, and sensing. In this study, we investigate the relationship between EBID process parameters such as beam current, acceleration voltage, and dwell time, and the platinum-to-carbon composition of deposited nanostructures. Using Energy Dispersive X-Ray Spectroscopy (EDX), we establish a hindered exponential growth model that correlates deposit composition with fabrication conditions. To enhance metal purity, we apply plasma oxygen treatment, exposing EBID deposits to a 30 W plasma for 30 minutes in a tabletop plasma generator. Post-treatment EDX analysis confirms a systematic increase in platinum content, while SEM inspection reveals nanostructure shrinkage due to carbon removal. This work aims to provide a framework for optimizing EBID fabrication and post-processing strategies to enhance material performance.",
-      "arxiv_id": "2605.17551v1",
-      "published": "2026-05-17",
-      "url": "http://arxiv.org/abs/2605.17551v1",
+      "title": "Towards compact high-frequency nonreciprocal devices using nanoplasma-switched time-varying metasurfaces",
+      "abstract": "Time-modulated systems have received growing interest in recent years. They allow us to tailor effects, such as frequency conversion, single-direction propagation, etc. For the microwave band, semiconductor elements, such as varactors, are usually used as time-modulated elements but their modulation frequency has been limited to the few-gigahertz range. Recent advances in nanoplasma switches, i.e., two-state electronic switches based on a gas discharge in a nanometer-scale gap, provide a new potential for developing time-modulated systems with high operating frequencies. Here, we develop an analytical framework based on the time-Floquet method for the design of nonreciprocal time-modulated devices based on two-state time-modulated elements, for instance, nanoplasma-based switches. A practical example of a microwave isolator operating at 100~GHz frequency is developed and studied both analytically and using full-wave simulations. A potential realization in a parallel-plate waveguide is also simulated numerically.",
+      "arxiv_id": "2605.20836v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20836v1",
       "authors": [
-        "Marianna D'Amato",
-        "Linda Piscopo",
-        "Hanna Le Jeannic"
+        "Mikhail Sidorenko",
+        "Jin Zhang",
+        "Xuchen Wang"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "建立EBID铂沉积组成模型并验证等离子氧处理提升金属纯度的方法",
-        "research思路": "解决EBID纳米制造中碳污染问题，提高铂沉积物金属纯度",
-        "experiment": "通过EDX分析沉积组成，建立受阻指数增长模型，采用30W等离子氧处理30分钟",
-        "innovation": "首次建立EBID参数与铂碳组成关系模型，验证等离子氧处理可有效去除碳杂质",
-        "related_work": "EBID工艺优化、金属沉积物纯度提升、等离子后处理技术研究",
-        "impact": "为EBID在等离激元和纳米电子学应用提供优化框架，推动高纯度纳米结构制备"
+        "summary": "提出基于纳米等离子体开关的时间调制超表面设计方法，实现高频非互易器件",
+        "research思路": "解决传统半导体调制器频率限制问题，开发高频时间调制系统",
+        "experiment": "采用时间Floquet分析方法，设计100GHz微波隔离器并进行全波仿真验证",
+        "innovation": "首次将纳米等离子体开关应用于时间调制超表面，突破GHz频率限制",
+        "related_work": "包括微波半导体调制器、Floquet理论应用、等离子体开关技术等",
+        "impact": "为高频非互易器件设计提供新途径，推动太赫兹通信和成像技术发展"
       },
       "domain_trend": {
-        "trend": "超表面设计与制备革新推动纳米光学向高纯度、多功能、高效集成化快速发展",
+        "trend": "超材料与纳米光子学正突破传统光学限制，推动高频非互易器件与混合谐振技术革命",
         "key_topics": [
-          "高纯度纳米结构制备",
-          "多通道传感技术",
-          "超表面高效建模分析"
+          "时间调制超表面",
+          "混合谐振器设计",
+          "纳米等离子体结构优化"
         ],
-        "development_direction": "该领域正朝着提高材料纯度与结构精度、发展多功能集成器件、建立高效理论模型方向快速发展，通过与微电子、生物传感等领域的深度融合，推动纳米光学从基础研究向实际应用转化"
+        "development_direction": "超材料与纳米光学正向多功能、高频化和跨应用领域方向发展，重点突破传统光学限制，通过混合谐振理论、新型纳米结构和时间调制技术，实现在通信、传感、生物医学和量子技术等领域的革命性应用"
       }
     },
     {
-      "title": "Dual-Polarization Quasi-BIC Refractive Index Sensing via Dielectric Symmetry Breaking in TiO$_2$-BeS Metasurfaces",
-      "abstract": "A dual-polarization dielectric metasurface sensor based on TiO$_2$ nanobar pairs with a 20\\,nm BeS gap insert is numerically investigated in the near-infrared. The BeS layer introduces dielectric symmetry breaking without requiring geometric asymmetry, enabling polarization-selective excitation of two distinct resonances. Under TE illumination, the structure supports a quasi-BIC resonance at 879.2\\,nm with $Q=128$, whereas TM excitation produces a broader magnetic dipole resonance at 910.8\\,nm with $Q=36$. The spectral separation between the two modes enables simultaneous tracking of both polarization channels within a single measurement window. For background refractive indices from 1.00 to 1.05, the TE and TM resonances exhibit sensitivities of 243.1 and 178.8\\,nm/RIU, respectively. The corresponding figures of merit reach 35 and 7\\,RIU$^{-1}$, with detection limits on the order of $10^{-5}$\\,RIU. Field distributions show strong confinement of the TE mode inside the gap region, leading to enhanced overlap with the surrounding analyte. Because the two resonances respond differently to refractive-index variations, the metasurface produces a polarization-dependent spectral fingerprint that may provide additional selectivity beyond conventional single-channel dielectric sensors. The proposed platform further shows good tolerance against dimensional variation and consistent resonance behavior across independent FDTD solvers.",
-      "arxiv_id": "2605.17549v1",
-      "published": "2026-05-17",
-      "url": "http://arxiv.org/abs/2605.17549v1",
+      "title": "Engineering Hybrid Resonances in Nanophotonics",
+      "abstract": "Hybridization of resonances is known to overcome inherent limitations of individual systems, enabling advanced functionalities and applications. Here we discuss hybrid plasmonic-Mie resonators that emerged recently as a promising direction in advancing nanophotonic structures by synergistically combining the strong near-field enhancement of plasmonic components with the low-loss, multipolar resonances of dielectric Mie elements. We review the recent progress in the field, encompassing the fundamental physical principles, structural design strategies, material platforms, computational optimization approaches, and representative device implementations. Our discussion starts by evaluating the complementary characteristics of plasmonic and Mie resonances followed by a description of the coupling between these resonances in order to boost light-matter interactions. Afterward, we explore the performance of efficient hybrid resonators for different application areas. Apart from the conventional metal-dielectric systems, we consider the recent class of epsilon-near-zero (ENZ) materials, which can provide unique advantages in terms of field localization, phase engineering, and energy flow management in the vicinity of zero-permittivity conditions, offering more flexibility in designing hybrid nano-optical devices. Lastly, we point out potential research avenues aiming to improve functional and efficient nanophotonic devices, especially those involving emerging topological material systems, such as Sb2Te3, Bi2Te3, Bi2Se3, combining plasmonic amplification, dielectric confinement, and spin-dependent optical behavior.",
+      "arxiv_id": "2605.20605v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20605v1",
       "authors": [
-        "Shoumik debnath",
-        "Sudipta Saha"
+        "Shutao Zhang",
+        "Cheng-Feng Pan",
+        "Yandong Fan"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出基于TiO₂-BeS超表面的双偏振准BIC折射率传感器，实现高灵敏度和双通道检测",
-        "research思路": "解决传统传感器中几何不对称性需求问题，通过介质对称破缺实现偏振选择共振",
-        "experiment": "采用TiO₂纳米棒对与20nm BeS间隙层，数值模拟近红外双偏振共振特性",
-        "innovation": "首次用BeS层引入介质对称破缺，无需几何不对称即可实现双偏振准BIC共振",
-        "related_work": "全介质BIC传感器、对称破缺超表面设计、双通道偏振传感技术",
-        "impact": "为高灵敏度、多通道生物传感提供新思路，推动微型化集成传感芯片发展"
+        "summary": "结合等离子体与米氏共振优势，设计高效纳米光子混合谐振器，突破单一系统局限。",
+        "research思路": "解决等离子体高损耗和米氏共振场强不足的问题，通过混合共振增强光物质相互作用。",
+        "experiment": "采用结构设计策略、材料平台选择及计算优化方法，实现混合谐振器的性能提升。",
+        "innovation": "首次系统提出等离子体-米氏混合谐振器理论框架，并验证其在多个应用场景的优势。",
+        "related_work": "包括纯等离子体纳米结构、全介质米氏谐振器及表面等离激元-光子晶体混合系统研究。",
+        "impact": "为纳米光子器件设计提供新范式，推动传感、非线性光学及量子技术等领域发展。"
       }
     },
     {
-      "title": "Semi-analytical Model of Multi-tile Rectangular Waveguide-fed Metasurfaces using Coupled Dipole Modeling Framework",
-      "abstract": "We present a semi-analytical model to analyze multi-tile metasurface antennas consisting of a set of metasurface tiles and a practical power-dividing network that excites the tiles. The metasurface tiles consist of arrays of rectangular waveguides with subwavelength metamaterial radiators etched into their top walls, each of which can be accurately modeled as polarizable dipoles. The feed structure for the arrays comprises a slotted waveguide attached to their bottom wall, with coupling slots inserted into the common wall that are likewise modeled as polarizable dipoles. The proposed semi-analytical model employs a coupled-dipole framework that accurately captures dipolar interactions among constituent elements within the metasurface tiles, along with a multi-port network analysis technique that accounts for electromagnetic interactions between the tiles and the power divider, thereby forming a self-consistent formulation. The proposed model enables the prediction of key performance metrics, including overall S-parameters, radiation patterns, and gain, and is validated through full-wave numerical simulations. By significantly reducing the computational complexity associated with electrically large apertures, the proposed framework enables rapid and efficient modeling of the overall structure, thereby facilitating iterative optimization. The proposed model has potential applications as an efficient forward model for the design of wireless systems requiring large-aperture metasurface antennas, including remote sensing and next-generation wireless communication networks.",
-      "arxiv_id": "2605.17541v1",
-      "published": "2026-05-17",
-      "url": "http://arxiv.org/abs/2605.17541v1",
+      "title": "Gold Bipyramids as a Promising Alternative to Gold Nanorods for Analytical and Biomedical Applications",
+      "abstract": "Pentagonal gold bipyramids with dimensions of 75x25 nm and a longitudinal plasmon resonance (PR) at 753 nm are synthesized. For comparison, gold nanorods with a diameter of 20 nm, lengths ranging from 95 to 50 nm, and longitudinal PR from 945 to 644 nm were synthesized by chemical etching. The samples were characterized by UV-vis spectroscopy and transmission electron microscopy (TEM). It is shown that the absorption spectral quality factor of the bipyramids is significantly higher than that of the nanorods. To compare the nanoparticles as platforms for surface-enhanced Raman scattering (SERS), their surface was functionalized with thiolated nitrobenzene molecules (NBT). It is demonstrated that the SERS enhancement factor for the bipyramids is approximately three times higher than that for the nanorods. The red shift of the bipyramids' PR after functionalization with NBT molecules is also about three times greater than for nanorods with the same PR. This agrees with the theoretical estimate of the bipyramids' PR shift being more sensitive to variations in the refractive index of the external medium or the dielectric shell thickness than that of gold nanospheres and nanorods. The high efficiency of the bipyramids as thermosensitizers for converting laser radiation into heat in photothermal therapy is experimentally and theoretically demonstrated. Effective photothermal killing of E. coli was shown upon irradiation with a laser at the plasmon resonance wavelength using nanobipyramids or nanorods.",
+      "arxiv_id": "2605.20582v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20582v1",
       "authors": [
-        "Insang Yoo",
-        "Michael Boyarsky",
-        "David R. Smith"
+        "Andrey M. Burov",
+        "Sergey V. Zarkov",
+        "Arina V. Drozd"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出一种多瓦片矩形波导馈电超表面的半解析模型，基于耦合偶极子建模框架",
-        "research思路": "解决多瓦片超表面天线与功分网络电磁耦合分析的复杂性问题",
-        "experiment": "采用耦合偶极子框架结合多端口网络分析技术建模电磁相互作用",
-        "innovation": "将超表面瓦片内偶极相互作用与瓦片-功分器网络分析自洽结合",
-        "related_work": "单瓦片超表面建模、波导馈电天线分析、电磁耦合计算方法等研究",
-        "impact": "为大型复杂超表面天线系统设计提供高效准确的分析工具"
+        "summary": "证明金双锥体比金纳米棒在SERS应用中具有三倍增强效果",
+        "research思路": "解决金纳米棒作为SERS基底效果不足的问题",
+        "experiment": "合成金双锥体和纳米棒，比较其光谱质量和SERS增强效果",
+        "innovation": "首次系统比较金双锥体与金纳米棒的光学性能和应用潜力",
+        "related_work": "金纳米结构的光学性质、SERS增强机理、表面功能化研究",
+        "impact": "为生物医学和光学分析提供更高效的纳米材料选择"
       }
     }
   ]

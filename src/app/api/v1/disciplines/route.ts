@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { getDisciplines } from '@/services/disciplines';
+import { successResponse, apiErrors } from '@/lib/api/response';
 
 const getCachedDisciplines = unstable_cache(
   async () => getDisciplines(),
@@ -13,23 +13,8 @@ const getCachedDisciplines = unstable_cache(
 export async function GET() {
   try {
     const disciplines = await getCachedDisciplines();
-
-    return NextResponse.json({
-      success: true,
-      data: disciplines,
-    });
+    return successResponse(disciplines);
   } catch (error) {
-    console.error('GET /api/v1/disciplines error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        data: null,
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: error instanceof Error ? error.message : '服务器内部错误',
-        },
-      },
-      { status: 500 }
-    );
+    return apiErrors.internal(error, '获取学科列表失败');
   }
 }

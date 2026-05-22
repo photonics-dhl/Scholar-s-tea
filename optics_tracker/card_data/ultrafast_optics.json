@@ -2,81 +2,83 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "Electronic mechanism of sub-100-fs demagnetization induced by a femtosecond light pulse",
-      "abstract": "A quantitative understanding of the processes that trigger light-induced demagnetization on ultrashort timescales is crucial for achieving an ultrafast, radiation-controlled magnetic response in materials. This milestone is essential for developing next-generation magnetic storage devices and ultrafast magnetic switches. In this theoretical study, we investigated demagnetization triggered in a single magnetic domain by light pulses ranging from a few to a few tens of femtoseconds in duration, with photon energies spanning the optical and X-ray regimes, under strongly non-equilibrium conditions. We predicted a loss of magnetization in the sub-100-fs range in all cases, primarily due to the excitation of the electronic system and the subsequent redistribution of electrons within the magneto-sensitive band. The considered timescales were too short for phonon-mediated processes or inter-site Heisenberg exchange processes to contribute significantly. These findings pave the way for highly accurate, radiation-driven magnetization control in magnetic materials at sub-100-femtosecond timescales with potential practical applications.",
-      "arxiv_id": "2605.18638v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18638v1",
+      "title": "A strategy for high-quality EBSD surface processing in femtosecond laser machining",
+      "abstract": "",
+      "doi": "10.1016/j.optlastec.2026.115535",
+      "url": "https://doi.org/10.1016/j.optlastec.2026.115535",
       "authors": [
-        "Konrad J. Kapcia",
-        "Victor Tkachenko",
-        "Flavio Capotondi"
+        "Hongyan Guo",
+        "Zhaojiang Xue",
+        "Yifei Hao",
+        "Xin Tan",
+        "Wentao Wu"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
+      "venue": "Optics &amp; Laser Technology",
+      "published": 2026,
+      "source": "crossref",
       "analysis": {
-        "summary": "揭示了超快激光脉冲诱导亚100飞秒退磁化的电子机制，为超快磁性器件设计提供理论基础。",
-        "research思路": "解决超快退磁化机制不明确问题，探究光脉冲诱导磁序破坏的微观物理过程。",
-        "experiment": "理论模拟研究单一磁域在光学和X射线脉冲激发下的超快退磁化动力学过程。",
-        "innovation": "首次明确电子激发和重分布是亚100飞秒退磁主因，排除了声子或海森堡交换机制。",
-        "related_work": "Beaurepaire超快退磁实验、Bigot磁动力学理论、Stanciu全光磁化翻转研究。",
-        "impact": "为超快磁性存储和开关器件设计提供关键理论指导，推动自旋电子学超快控制发展。"
+        "summary": "提出飞秒激光加工中高质量EBSD表面处理策略，提升材料表征精度。",
+        "research思路": "解决飞秒激光加工后表面损伤导致的EBSD分析质量问题。",
+        "experiment": "优化飞秒激光参数与后处理工艺，结合EBSD表征验证效果。",
+        "innovation": "首次系统建立飞秒激光加工与EBSD表面质量的关联模型。",
+        "related_work": "包括激光抛光、电解抛光及低能离子束表面处理技术。",
+        "impact": "为材料微观结构表征提供新方法，推动先进制造与材料科学发展。"
       },
       "domain_trend": {
-        "trend": "超快光学引领量子相干动力学与全光计算革命性突破",
+        "trend": "超快光学正引领材料表征与调制革新，通过飞秒激光加工与拓扑声子学突破技术边界。",
         "key_topics": [
-          "超快磁性控制",
-          "量子流体非平衡动力学",
-          "全光神经网络"
+          "飞秒激光表面处理",
+          "ENZ材料超快调制",
+          "拓扑声子学"
         ],
-        "development_direction": "超快光学正从单一观测工具向多学科融合的技术平台转变，通过精确控制量子相干动力学，在自旋电子学、量子流体和光计算等领域开辟新范式，推动超高速、低能耗信息处理技术发展"
+        "development_direction": "超快光学正向多学科深度融合方向发展，飞秒激光技术与材料表征、纳米光子学、拓扑物理等领域交叉创新，推动超快调制精度提升、新型功能材料开发及先进制造技术突破。未来趋势将聚焦于更高精度、更快响应的光学器件设计，以及基于超快现象的新应用开发，特别是在量子计算和信息处理领域的应用。"
       }
     },
     {
-      "title": "Coherent spectroscopy of collective excitations in superfluid helium far from equilibrium",
-      "abstract": "Ultrafast dynamics of collective excitations in superfluids remains largely unexplored beyond the roton regime, despite its importance for understanding nonequilibrium processes in these systems. Here, we employ ultrafast coherent control with sequences of femtosecond pulses to perform spectroscopy of multiple branches of the Landau excitation spectrum in superfluid helium far from equilibrium. By measuring the time-resolved optical birefringence, we track the nonequilibrium dynamics of maxon pairs and Pitaevskii plateau excitations alongside the previously studied roton pairs, revealing surprisingly strong binding energy of maxon pairs, their extremely short lifetime, and the influence of the quasiparticle effective mass on the phase of the coherent response. These results demonstrate the ability to extract previously inaccessible information about collective excitations in a strongly interacting quantum fluid by probing its nonequilibrium dynamics on femtosecond and picosecond timescales.",
-      "arxiv_id": "2605.17835v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.17835v1",
+      "title": "Intraband and Interband Competition Drives Ultrafast Modulations of Indium Tin Oxide",
+      "abstract": "Transparent conducting oxides near their epsilon-near-zero frequency exhibit near-unity ultrafast modulations of the refractive index which have enabled the field of time-varying metamaterials, yet the underlying carrier dynamics at high driving fluences remain poorly understood. Here, we report ultrafast modulations in the reflectivity and transmissivity of indium tin oxide, and a non-monotonic oscillatory behavior. This is especially evident in the time evolution of the complex Fresnel coefficients retrieved directly from pump-probe spectrograms using a optical gating technique, GRUMPY FROG. The dynamics of the retrieved plasma frequency and damping coefficient are well captured by an extended two-temperature model incorporating a competing nonlinear interband process: at high fluences, Auger-type scattering of hot conduction electrons promotes valence band carriers, increasing the plasma frequency while accelerating hot-electron cooling and raising the damping coefficient. These results clarify the origin of anomalous high-fluence dynamics in indium tin oxide and identify a fluence-tuneable modulation dynamic with direct implications for ultrafast refractive index engineering in time-varying photonic devices and optical switching",
+      "arxiv_id": "2605.21432v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21432v1",
       "authors": [
-        "Gabriel Voith",
-        "Alexander A. Milner",
-        "Valery Milner"
+        "Anthony C Harwood",
+        "Sean Z J Lim",
+        "T V Raziman"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "利用超快相干控制技术首次实现超流氦中多分支Landau激发谱的非平衡态相干光谱学研究",
-        "research思路": "解决超流体中超出旋子区域的集体激发非平衡动力学未被探索的科学问题",
-        "experiment": "采用飞秒脉冲序列的超快相干控制技术，通过时间分辨光学双折射测量追踪非平衡动力学",
-        "innovation": "首次实现对maxon对和Pitaevskii平台激发的非平衡动力学研究，揭示其强结合能和极短寿命",
-        "related_work": "旋子对的先前研究，Landau激发谱理论，强相互作用量子流体中的准粒子动力学研究",
-        "impact": "为研究强相互作用量子流体中集体激发提供了新方法，开辟了超快非平衡动力学研究新方向"
+        "summary": "揭示了ITO在ENZ频率下超快调制过程中带内与带间过程的竞争机制，发现Auger散射在高光强下促进价带载流子，导致等离子体频率增加和阻尼系数上升的非单调振荡行为。",
+        "research思路": "针对高驱动光强下ITO载流子动力学机理不明的难题，通过直接测量复菲涅耳系数的时间演化，区分带内Drude响应与非线性带间过程，建立扩展双温模型描述Auger型散射导致的竞争效应。",
+        "experiment": "采用GRUMPY FROG光学门控技术从泵浦-探针光谱图中实时检索复菲涅耳系数，测量反射率和透射率的超快演化时域波形，获取等离子体频率和阻尼系数的时间分辨动力学数据。",
+        "innovation": "提出可同时捕获等离子体频率和阻尼系数动态演化的扩展双温模型；首次直接测量复菲涅耳系数的时域演化；揭示高光强下Auger型散射作为竞争性带间过程对等离子体动力学的调控机制。",
+        "related_work": "M. Z. Alam等关于ENZ材料超快调制的基础工作；时间域超材料先驱研究（如H. Lakhotia、K. Fan等）；氧化物透明导电电极的超快光学响应研究；热电子弛豫动力学的双温模型理论。",
+        "impact": "为时变超材料提供了对高光强下载流子动力学的基本理解，有助于优化ENZ材料实现更大调制幅度和更快响应速度，推动超快光开关、光调制器和时域光子器件的发展。"
       }
     },
     {
-      "title": "Optical Neural Networks from Coherent Transient Dynamics in Waveguide QED",
-      "abstract": "Optical neural networks promise ultrafast, low-energy information processing by performing computation directly with photons. Current implementations, however, are largely restricted to steady-state operation and rely on high-latency electro-optical conversion for nonlinear activation. To address these limitations, we propose an all-optical fully connected neural network architecture in which the basic neuronal functions are realized by coherent transient quantum dynamics. Within this framework, phase-tunable nonlocal interference in a giant cavity implements programmable synaptic weights; an integrator operating in the bad cavity regime performs temporal summation by coherently combining sequential wavepackets; and transient Rabi dynamics of a driven two-level system provide nonlinear activation. Full-physics simulations demonstrate high classification accuracy on MNIST and colored-object recognition tasks. These results eliminate the optoelectronic activation bottleneck, reduce latency, and establish transient light-matter dynamics as a native physical resource for high-dimensional nonlinear information processing, paving the way toward fully optical neuromorphic computing.",
-      "arxiv_id": "2605.17752v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.17752v1",
+      "title": "Topological phononics",
+      "abstract": "Topological phononics extends the foundational concepts of topological condensed matter physics to the realm of lattice vibrations and classical mechanical waves, unlocking robust, defect-immune states and phenomena beyond the reach of conventional phononic engineering. This review provides a unified, systematic framework for understanding topological phonons across natural and artificial systems, spanning solid-state materials, acoustic/mechanical metamaterials, and non-Hermitian platforms. We cover the core theoretical principles -- from Berry curvature and symmetry-protected topological invariants to bulk-boundary correspondence -- alongside experimental advances in probing topological phonon states via inelastic scattering and momentum-resolved techniques for solid-state phonons as well as pump-probe measurements in acoustic/mechanical metamaterials. Key topics include Weyl/Dirac/nodal-line phonons in crystalline solids, symmetry-engineered topological phases in metamaterials, non-Hermitian effects (exceptional points, skin effect), and emergent directions such as Floquet engineering, synthetic dimensions, and real-space topological textures (skyrmions, merons). We also highlight technological applications in robust waveguides, on-chip surface-acoustic-wave devices, and acoustofluidics, while outlining future challenges and opportunities in quantum phononics, nonlinear topological phenomena, and interdisciplinary integration with photonics and electronics. This review serves as a comprehensive guide across physics, materials science, and engineering, bridging fundamental theory with cutting-edge experiments and innovations in topological phononics.",
+      "arxiv_id": "2605.20900v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20900v1",
       "authors": [
-        "Jiande Cao",
-        "Yexiong Zeng",
-        "Franco Nori"
+        "Zeguo Chen",
+        "Tiantian Zhang",
+        "Xulong Wang"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出基于波导QED中相干瞬态动力学的全光学神经网络架构",
-        "research思路": "解决现有光学神经网络中电光转换瓶颈和高延迟问题",
-        "experiment": "采用波导QED系统，通过巨腔相干干涉实现可编程突触权重和两能级系统非线性激活",
-        "innovation": "首次利用量子相干瞬态动力学实现全光学神经网络，消除光电转换瓶颈",
-        "related_work": "基于光电转换的光学神经网络、集成光子计算、量子光学计算",
-        "impact": "为超高速、低能耗光学计算提供新范式，推动全光学人工智能发展"
+        "summary": "拓扑声子学将凝聚态拓扑概念推广到晶格振动和机械波领域，实现稳健无缺陷的状态和现象。",
+        "research思路": "解决传统声子工程中难以实现的鲁棒性和缺陷免疫问题，拓展拓扑物理应用范围。",
+        "experiment": "结合非弹性散射、动量分辨技术测量固体中拓扑声子，声学超材料采用泵浦探测方法。",
+        "innovation": "首次建立统一框架理解自然和人工系统中拓扑声子，涵盖非厄米平台和对称工程。",
+        "related_work": "拓扑光子学、拓扑绝缘体、声学/力学超材料设计、非厄米物理相关研究。",
+        "impact": "为声子调控提供新范式，推动量子计算、声波器件和材料科学交叉领域发展。"
       }
     }
   ]

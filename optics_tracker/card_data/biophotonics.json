@@ -2,30 +2,81 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Journal of Biophotonics - Wiley Online Library",
-      "abstract": "Journal of Biophotonics focuses on the interdisciplinary field of biophotonics, publishing cutting-edge research on interactions between light and biological",
-      "source": "tavily",
-      "url": "https://onlinelibrary.wiley.com/journal/18640648",
-      "authors": [],
+      "title": "Near-Field Vibrational Energy Transfer for Mid-Infrared Upconversion in Plasmonic Nanogaps",
+      "abstract": "Förster energy transfer underpins modern photonics, yet establishing an analogous vibrational pathway in the mid-infrared (MIR) remains highly challenging, as sub-picosecond intramolecular vibrational redistribution (IVR) suppresses intermolecular coupling. Here we demonstrate vibrational donor--acceptor transfer in the MIR and subsequent upconversion to visible luminescence enabled by sub-2 nm plasmonic nanogaps. The extreme lateral field confinement in metal--molecule--metal ring cavities defined by self-assembled molecular spacers couples efficiently to in-plane molecular dipoles. Continuous-wave MIR excitation selectively populates $-\\mathrm{C}\\equiv\\mathrm{N}$ vibrational donors, and plasmon-enhanced near-field coupling transfers this energy to nearby electronic acceptors, generating anti-Stokes visible emission under low power densities. Upconversion efficiencies exceeding $0.3\\%$ are observed, limited by competition between the plasmon-mediated transfer rate and IVR. These results show that extreme plasmonic confinement can redirect molecular vibrational relaxation pathways, opening a route toward vibrational nanophotonics, intermolecular interactions for bioimaging, and room-temperature MIR detection based on molecular degrees of freedom.",
+      "arxiv_id": "2605.19498v1",
+      "published": "2026-05-19",
+      "url": "http://arxiv.org/abs/2605.19498v1",
+      "authors": [
+        "Avisekh Pal",
+        "Anju Sajan",
+        "Christopher Sumner"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "该期刊聚焦生物光子学交叉领域，发表光与生物相互作用的前沿研究。",
-        "research思路": "探索光与生物系统相互作用的机制和应用，推动生物光子学发展。",
-        "experiment": "采用光学成像、光谱学和光动力学等关键技术进行研究。",
-        "innovation": "整合多学科方法，提供光-生物相互作用的全新研究视角。",
-        "related_work": "生物医学光学、光遗传学、光学相干断层成像等相关领域研究。",
-        "impact": "促进基础研究与应用结合，推动生物光子学在医学诊断和治疗中的应用。"
+        "summary": "实现了等离子体纳米间隙中近场振动能量传递和中红外上转换",
+        "research思路": "解决中红外振动能量传递受分子内振动再分布抑制的问题",
+        "experiment": "利用自组装分子间隔物定义亚2nm金属-分子-金属环形腔",
+        "innovation": "首次在中红外波段实现振动供体-受体传递并上转换至可见光",
+        "related_work": "Förster能量转移、等离子体增强光谱、分子振动耦合",
+        "impact": "为高效中红外探测和转换器件设计提供新思路"
       },
       "domain_trend": {
-        "trend": "多模态光学技术正推动生物医学光子学向精准诊断与个性化治疗革命性转变",
+        "trend": "纳米光子学驱动的生物传感技术正实现从分子到疾病的精确探测新突破",
         "key_topics": [
-          "多模态光学成像",
-          "光-生物相互作用机制",
-          "精准医学诊断与治疗"
+          "中红外能量转换",
+          "无标记光学传感平台",
+          "单分子检测技术"
         ],
-        "development_direction": "生物医学光子学正从单一技术向多学科整合方向发展，通过创新的光学方法、算法和材料科学融合，实现更高精度、更安全的生物医学应用，特别是在早期疾病诊断、无创监测和靶向治疗领域展现出巨大潜力。"
+        "development_direction": "生物与医学光子学正朝着更高效、更灵敏的传感与检测技术发展，重点聚焦于纳米光子结构创新、多平台性能优化以及单分子水平检测技术突破，同时积极推进与材料科学、纳米技术和临床诊断的跨领域融合应用"
+      }
+    },
+    {
+      "title": "Comparative performance of three optical biosensing platforms for SARS-CoV-2 antibodies detection in human serum",
+      "abstract": "This study presents a rigorous comparative analysis of two label-free optical biosensing platforms, Bloch surface wave (BSW) and microring resonator (MRR), for the detection of SARS-CoV-2 antibodies in human serum. To ensure direct comparability, a new BSW readout system was established alongside an existing MRR platform, allowing assays to be conducted under nearly identical experimental conditions. Both sensors were functionalized with various SARS-CoV-2 Spike and Nucleocapsid protein variants to capture specific host antibodies. The results demonstrate that both platforms provide rapid, quantitative, and sensitive detection of anti-Spike and anti-Nucleocapsid antibodies without the need for secondary labels. Furthermore, the platforms show excellent agreement with longitudinal serology benchmarks and high repeatability across different biochip batches. This work establishes both BSW and MRR technologies as powerful, low-cost candidates for next-generation clinical diagnostics and serological surveillance.",
+      "arxiv_id": "2604.08225v1",
+      "published": "2026-04-09",
+      "url": "http://arxiv.org/abs/2604.08225v1",
+      "authors": [
+        "Agostino Occhicone",
+        "Alberto Sinibaldi",
+        "Peter Munzert"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "比较BSW和MRR两种无标记光学传感平台检测人血清中SARS-CoV-2抗体的性能",
+        "research思路": "解决如何直接、快速、灵敏地检测血清中新冠病毒抗体的问题",
+        "experiment": "建立新BSW系统并与现有MRR平台对比，使用Spike和Nucleocapsid蛋白功能化",
+        "innovation": "首次在相同实验条件下直接比较BSW和MRR平台性能",
+        "related_work": "ELISA、表面等离子体共振(SPR)等传统抗体检测技术",
+        "impact": "为下一代低成本、高灵敏度临床诊断技术提供重要参考"
+      }
+    },
+    {
+      "title": "Digital nanophotonic biosensing empowered by silicon Mie voids",
+      "abstract": "Optical biosensors are indispensable in medical and environmental diagnostics, yet existing approaches are fundamentally limited in their sensitivity due to ensemble-averaged measurements. Digital biosensing has emerged as a promising solution for resolving individual binding events, thereby providing signals at very low analyte concentrations down to the single-molecule level. Here, we present a novel concept for digital optical biosensing empowered by dielectric Mie voids, combining nanoparticle-based contrast enhancement and deep learning for ultrasensitive biomarker detection. The resonantly trapped light in the air cavities of the periodic Mie void arrays ensures strong overlap between the near-fields and the single gold nanoparticles that are captured on the surface in the presence of the protein biomarker. Remarkably, this strong interaction creates high-contrast digital signals for the precise counting of single nanoparticles located both within and outside the voids, yielding efficient use of the entire sensor area for high sensitivity. We employ deep-ultraviolet (DUV) lithography for the scalable and low-cost production of Mie voids in silicon wafers and automated image analysis with a convolutional neural network for robust nanoparticle counting. As a proof of our concept, we demonstrate the detection of an important disease biomarker, interleukin-6 (IL-6), from small sample volumes at concentrations as low as 1.84 pg/ml, within the physiological range of healthy individuals. Owing to its scalability, precision, and adaptability, our digital nanophotonic biosensing approach based on silicon Mie voids establishes a versatile route for applications ranging from bioanalytics to health and environmental monitoring.",
+      "arxiv_id": "2604.01182v1",
+      "published": "2026-04-01",
+      "url": "http://arxiv.org/abs/2604.01182v1",
+      "authors": [
+        "Daniil Riabov",
+        "Abtin Saateh",
+        "Wenhong Yang"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出基于硅Mie空腔的数字纳米光学生物传感器，实现单分子水平的生物标志物检测。",
+        "research思路": "解决传统光学生物传感器灵敏度受限于系综平均测量的问题，实现单分子检测。",
+        "experiment": "结合介电Mie空腔阵列、纳米粒子对比增强和深度学习技术进行生物标志物检测。",
+        "innovation": "首次将Mie空腔结构用于数字生物传感，实现空腔内外单纳米粒子高对比度计数。",
+        "related_work": "数字ELISA、单分子荧光、等离子体纳米孔传感等单分子检测技术。",
+        "impact": "为超灵敏生物标志物检测提供新平台，推动医疗诊断和环境监测领域发展。"
       }
     }
   ]

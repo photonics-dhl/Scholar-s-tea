@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { getInstitutionTree } from '@/services/groups';
+import { successResponse, apiErrors } from '@/lib/api/response';
 
 const getCachedInstitutions = unstable_cache(
   async () => getInstitutionTree(),
@@ -13,23 +13,8 @@ const getCachedInstitutions = unstable_cache(
 export async function GET() {
   try {
     const institutions = await getCachedInstitutions();
-
-    return NextResponse.json({
-      success: true,
-      data: institutions,
-    });
+    return successResponse(institutions);
   } catch (error) {
-    console.error('GET /api/v1/institutions error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        data: null,
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: error instanceof Error ? error.message : '服务器内部错误',
-        },
-      },
-      { status: 500 }
-    );
+    return apiErrors.internal(error, '获取机构列表失败');
   }
 }

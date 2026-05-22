@@ -2,81 +2,79 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Reinforcement Learning Assisted Quantum Simulation of Many-Body Excited States and Real-Time Dynamics",
-      "abstract": "The computation of electronic excited states and real-time quantum dynamics of many-fermion systems is among the most promising applications of near-term quantum computing. In this work, we generalize the reinforcement learning contracted quantum eigensolver (RL-CQE), previously developed for ground-state problems, to electronic excited states and real-time quantum dynamics, in which a deep Q-network agent adaptively selects the two-body operators at each iteration, yielding more compact ansätze and improved robustness with respect to critical hyperparameters. A key feature of the algorithm is a scalable state representation based on the ACSE residuals, whose dimension grows with the one-particle basis but remains independent of the number of targeted excited states. We also verify the equivalence of sign-free qubit operators in the excited-state setting, extending a result previously established for ground-state problems. Our RL-CQE for time evolution derives from a constant-scaling ansatz that represents the wave function with a fixed number of unitary transformations independent of simulation time $t$, enabled by the shared unitary structure of the purified ensemble treatment of excited states. Benchmarks on chemical systems demonstrate chemical accuracy with minimal operator counts across a range of bond lengths.",
-      "arxiv_id": "2605.18569v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18569v1",
+      "title": "Low-Divergence Quasi-Gaussian Emission at Watt-Level Power from a Large-Diameter Ring-Aperture VCSEL",
+      "abstract": "The far-field emission of large-area vertical-cavity surface-emitting lasers (VCSELs) is commonly associated with multimode, high-divergence beam profiles, limiting applicability in high-brightness free-space systems. We investigate angular emission characteristics of a 1 mm-diameter ring-aperture watt-class VCSEL and establish a theoretical framework capturing the formation of its far-field radiation patterns. Modeling the near field as an azimuthally modulated ring distribution and evaluating the far field within the Fresnel approximation, we demonstrate that a quasi-Gaussian far-field profile emerges from combined lower-order azimuthal modes, even in a highly multimode cavity.   Experimentally, we observe a current-driven transition of the far-field distribution from a high-divergence ring at low injection levels to a narrow central beam at elevated currents. At high drive currents, the emission approaches a near-Gaussian profile with a full width at half maximum of 8°, while maintaining watt-class output power. Angle-resolved spectroscopy associates the central emission with longer-wavelength, lower-order modes, whereas the outer ring originates from shorter-wavelength, higher-order contributions. Combined with electroluminescence measurements and wavelength-dependent photon lifetime analysis, these results demonstrate that spectral and angular emission are determined by the interplay between wavelength-dependent material gain and angle-dependent cavity losses. This approach establishes a general framework for controlling beam divergence and modal content in large-area VCSELs, enabling high-power operation with near-Gaussian, low-divergence beam profiles.",
+      "arxiv_id": "2605.21110v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21110v1",
       "authors": [
-        "Jiaji Zhang",
-        "Lipeng Chen",
-        "Carlos L. Benavides-Riveros"
+        "Marta Więckowska",
+        "Luke Graham",
+        "James Guenter"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
-      "analysis": {
-        "summary": "将强化学习辅助量子本征求解器扩展到激发态和实时量子动力学模拟",
-        "research思路": "解决多费米子系统激发态和实时量子动力学的高效量子计算问题",
-        "experiment": "采用深度Q网络自适应选择双体算子，基于ACSE残差的状态表示",
-        "innovation": "扩展RL-CQE到激发态，提出与目标态数无关的可扩展状态表示",
-        "related_work": "量子本征求解器(VQE)、量子模拟、量子计算中的强化学习应用",
-        "impact": "推动近程量子计算在激发态和动力学模拟中的实际应用"
-      },
       "domain_trend": {
-        "trend": "智能与硬件协同驱动量子近场光学突破实用化瓶颈",
+        "trend": "突破量子极限：近场光学在量子噪声控制与精密测量领域展现革命性突破",
         "key_topics": [
-          "量子模拟与计算优化",
-          "低温硬件控制技术",
-          "自动化量子算法"
+          "量子通道膨胀理论",
+          "Kerr非线性相位精密测量",
+          "光子减法量子传感"
         ],
-        "development_direction": "近场光学领域正向智能化、规模化和实用化方向快速发展，通过机器学习算法优化量子计算性能，结合先进硬件控制技术突破扩展性瓶颈，同时建立自动化框架降低量子技术使用门槛，推动量子计算在工业应用中的落地。"
+        "development_direction": "近场光学领域正从基础理论研究向高精度量子传感应用转变，量子噪声控制与量子精密测量成为主导研究方向，融合非线性光学与量子信息处理技术将推动下一代量子传感器件的创新发展"
+      },
+      "analysis": {
+        "summary": "展示大直径环形孔径VCSEL可实现瓦级低发散准高斯光束输出。",
+        "research思路": "解决大面积VCSEL多模高发散光束限制自由空间应用的问题。",
+        "experiment": "研究1mm环形孔径瓦级VCSEL角度特性，建立理论框架分析远场辐射。",
+        "innovation": "证明多模腔中通过低阶方位角模组合可产生准高斯远场分布。",
+        "related_work": "传统大面积VCSEL多模发射、光束整形技术、高亮度自由空间系统。",
+        "impact": "为高亮度自由空间应用提供新型VCSEL光源，推动VCSEL在新领域应用。"
       }
     },
     {
-      "title": "The QuaST Decision Tree: Achieving Automation With Data-Based Recommendations",
-      "abstract": "Quantum computers are increasingly powerful. Software tools for the development of quantum-enhanced algorithms are maturing. However, the software stack still lacks the connection to applications that would enable hybrid algorithms combining classical and quantum computing steps. End users need to be assisted in choosing the best combination of preprocessing, postprocessing, classical and quantum algorithms options. The application-facing software stack is therefore required to cover problem modeling, encoding, algorithm selection and hyperparameter tuning. A variety of tools exist for specific recommendations. The QuaST Decision Tree reflects the complexity in combining individual decisions in its modular network structure, consisting of flexible computation nodes with modular recommendations. It can easily be configured to serve in an industrial solver, an HPC software stack, or for rapid prototyping in development. The key ingredient, automation, is delivered by modules. We present one such module judging the feasibility of variational algorithms based on a robust scalability analysis and classification of problem instances. The automation improves the performance of end-to-end solutions, highlights the benefit to be gained from the hybrid quantum solution, reduces expensive trial-and-error testing, and leads to an improved utilization of quantum devices for a practical benefit.",
-      "arxiv_id": "2605.18539v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18539v1",
+      "title": "Symmetric dilations of Pauli channels and semigroups",
+      "abstract": "We explore the symmetry properties of Stinespring dilations of single-qubit Pauli channels, addressing both the generic case and the specific examples of phase damping and depolarizing channels. For each scenario, we derive the representation of the Pauli group acting on the Hilbert space of the environment. We then focus on dilations that are continuous in time and driven by a time-independent Hamiltonian, and on collision models that generate a Pauli dynamical semigroup in the limit of fast collisions. First, we complement some recent general results on these types of dilations (M. Cattaneo, Phys. Rev. A 111, 022209 (2025)) with some additions and clarifications, including the case of covariant channels with strongly conserved quantities. Next, we show that the covariance property of Pauli channels impose strong constraints on both the dilation Hamiltonian and the initial state of the environment, and demonstrate how these constraints can be exploited to explicitly construct the time-dependent dilations in all considered cases. Our results are relevant for the quantum simulation of Pauli channels via unitary dilations and of Pauli semigroups via collision models, both in the laboratory and on quantum computers.",
+      "arxiv_id": "2605.20907v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20907v1",
       "authors": [
-        "Benedikt Poggel",
-        "Lena Tokuhiro",
-        "Georg Kruse"
+        "Marco Cattaneo"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出QuaST决策树，实现量子-经典混合算法的自动化选择与优化。",
-        "research思路": "解决量子计算软件栈缺乏与应用连接的问题，辅助用户选择最优算法组合。",
-        "experiment": "构建模块化网络结构的决策树，通过灵活计算节点实现自动化推荐。",
-        "innovation": "首次将复杂决策组合模块化，支持工业求解器、HPC及快速原型开发。",
-        "related_work": "量子算法开发工具如Qiskit、Cirq，以及经典HPC优化框架。",
-        "impact": "推动量子计算实用化，降低混合算法开发门槛，加速工业应用落地。"
+        "summary": "研究Pauli通道的对称性膨胀性质及其在时间连续膨胀和碰撞模型中的应用",
+        "research思路": "解决单量子比特Pauli通道的Stinespring膨胀对称性表征问题",
+        "experiment": "理论推导Pauli群在环境希尔伯特空间的表示，分析膨胀哈密顿量和环境初态约束",
+        "innovation": "揭示Pauli通道协变性对膨胀哈密顿量和环境初态的强约束条件",
+        "related_work": "M. Cattaneo关于膨胀类型的一般性结果及协变通道研究",
+        "impact": "为量子通道膨胀理论提供新工具，促进量子噪声控制和量子信息处理发展"
       }
     },
     {
-      "title": "Cryogenic Time-Division-Multiplexed Voltage Control for Scalable Trapped-Ion Quantum Processors",
-      "abstract": "Trapped-ion quantum computers based on the quantum charge-coupled device architecture require on the order of ten trap electrodes per qubit, making the number of vacuum feedthroughs a bottleneck at the system scale. Time-division multiplexed (TDM)-based voltage control for trap electrodes provides a natural route to alleviate this constraint. However, previous studies have been limited to architectural proposals for static trap-potential compensation and room-temperature demonstrations of dynamic-electrode control, leaving cryogenic operation of TDM-based voltage control for static and dynamic electrodes experimentally unexplored. In this study, we develop and cryogenically validate TDM-based voltage control schemes for two distinct electrode classes. For static electrodes used in trap-potential compensation, we implement a 32-channel demultiplexed system operating at approximately 27~K, achieving an effective voltage update rate of 37.5~kHz with an output range of $\\pm10~\\mathrm{V}$ per channel. For dynamic electrodes used in ion operations, such as shuttling, we implement a four-channel demultiplexed system operating at approximately 14~K, achieving an effective voltage update rate of 1~MHz with a comparable output range. These results establish TDM-based voltage control as a practical approach for both electrode classes, providing a path for mitigating the vacuum feedthrough bottleneck in scalable trapped-ion quantum processors.",
-      "arxiv_id": "2605.17824v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.17824v1",
+      "title": "Enhancing Phase Estimation in a Hybrid Interferometer via Kerr Nonlinearity and Photon Subtraction",
+      "abstract": "We propose a high-precision phase estimation scheme in a hybrid interferometer by synergistically combining a Kerr nonlinear phase shifter and multi-photon subtraction operations. Using a coherent state and a vacuum state as input resources, we systematically evaluate the phase sensitivity via homodyne detection and analyze the quantum Fisher information as well as the quantum Cramér-Rao bound under both ideal and lossy conditions. Our results show that the joint integration of Kerr nonlinearity and multi-photon subtraction yields remarkable advantages over either technique used alone. The proposed scheme enables the phase sensitivity to surpass the standard quantum limit, exceed the conventional Heisenberg scaling ($1/N$), and approach the super-Heisenberg scaling ($1/N^{2}$)-a direct consequence of Kerr nonlinearity. More precisely, the super-Heisenberg scaling $\\propto $ $1/N^{2}$ is the ultimate precision limit permitted by the $k=2$ Kerr nonlinearity and does not violate the fundamental Heisenberg limit for linear phase accumulation. Even under moderate internal photon loss, the system maintains high precision and exhibits enhanced robustness to decoherence. The Kerr nonlinearity introduces an intensity-dependent phase shift proportional to the squared photon number, while multi-photon subtraction tailors non-Gaussian states to strengthen phase information extraction. Compared with existing schemes based on hybrid interferometers or SU(1,1) interferometers, our architecture achieves superior precision and stronger loss resilience. All components are experimentally accessible with current quantum optical technologies. This work provides a promising route for practical high-precision quantum metrology and quantum sensing.",
+      "arxiv_id": "2605.20893v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.20893v1",
       "authors": [
-        "Ryutaro Ohira",
-        "Shinichi Morisaka",
-        "Yoshinori Kurimoto"
+        "Lifen Guo",
+        "Qingqian Kang",
+        "Zekun Zhao"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "开发并验证了低温时分复用电压控制方案，解决了囚禁离子量子处理器扩展性瓶颈问题。",
-        "research思路": "解决量子电荷耦合器件架构中真空馈通数量限制导致的系统扩展瓶颈问题。",
-        "experiment": "构建32通道解复用系统，在27K低温下测试静态和动态电极两类控制方案。",
-        "innovation": "首次实现低温时分复用电压控制的实验验证，同时支持静态和动态电极控制。",
-        "related_work": "静态势补偿架构研究、室温动态电极控制演示、量子电荷耦合器件架构发展。",
-        "impact": "为规模化囚禁离子量子处理器提供关键技术路径，推动实用化量子计算发展。"
+        "summary": "提出结合Kerr非线性与光子减法的混合干涉仪，实现相位精度突破标准量子极限",
+        "research思路": "解决相位估计精度受限问题，突破标准量子极限并逼近超海森堡标度",
+        "experiment": "采用相干态+真空态输入，结合Kerr非线性相移器和多光子减法操作",
+        "innovation": "首次联合利用Kerr非线性和光子减法，实现超海森堡标度(1/N²)的相位精度",
+        "related_work": "包括量子干涉仪、非线性光学相位估计、光子减法技术等方向研究",
+        "impact": "为量子精密测量提供新范式，推动高精度相位传感技术发展"
       }
     }
   ]

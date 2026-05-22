@@ -2,81 +2,79 @@
   "domain_name": "硅基光子学与量子光学",
   "papers": [
     {
-      "title": "Switching Rydberg interactions by three orders of magnitude using a terahertz field",
-      "abstract": "Atom-based quantum computing exploits the ability to enhance atom-atom interactions by employing laser excitation to higher-excited Rydberg states. Additional fields that drive transitions between Rydberg states can offer independent control of these atom-atom interactions. However, as microwave (mw) fields only provide access to states with similar principal quantum number $n$, their ability to switch the interactions' strength is limited. Here, we use a pulsed terahertz field to rapidly switch the strength of interactions between Rydberg atoms by three orders of magnitude. We demonstrate interaction switching using photon storage, where the terahertz field induces an interaction induced dephasing of the stored photon. This ability to switch interactions offers advantages for single-qubit readout, state-detection schemes, quantum annealing, and Rydberg quantum optics.",
-      "arxiv_id": "2605.18664v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18664v1",
+      "title": "Essentially singular limits of Jacobi operators and applications to higher-order squeezing",
+      "abstract": "We study a family of Jacobi operators in which the diagonal entries are multiplied by a coupling parameter $λ\\geq0$. Under suitable conditions, the operator is self-adjoint for every $λ>0$, while the formal limit at $λ=0$ is a symmetric Jacobi operator admitting a one-parameter family of self-adjoint extensions. A central ingredient of our analysis is the derivation of uniform bounds for square-summable generalized eigenvectors in the small-$λ$ regime, which combines discrete WKB methods with Airy-function asymptotics. Using these estimates, we analyze the limiting behavior $λ\\to0$ in the strong resolvent sense, proving that for every sequence $λ_j\\to0$ one can extract a subsequence along which the corresponding Jacobi operators converge to some self-adjoint extension of the limiting operator; conversely, every such extension can be obtained in this way. We call this behavior an essentially singular limit, by analogy with essential singularities in complex analysis.   As an application, we study higher-order squeezing operators arising in quantum optics. Using the connection with Jacobi operators, we show that when the relative strength of the free-field term tends to zero, different self-adjoint extensions of the squeezing operator are selected along different sequences. In particular, this limit does not single out a physically distinguished self-adjoint extension, but instead identifies a distinguished subclass of extensions compatible with the underlying symmetry.",
+      "arxiv_id": "2605.21355v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21355v1",
       "authors": [
-        "Karen Wadenpfuhl",
-        "Aaron Reinhard",
-        "Oliver Hughes"
+        "Felix Fischer",
+        "Daniel Burgarth",
+        "Davide Lonigro"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "利用太赫兹场实现里德堡原子相互作用强度三个数量级的快速切换",
-        "research思路": "解决里德堡原子相互作用强度难以灵活调控的问题，克服微波场调控局限性",
-        "experiment": "采用脉冲太赫兹场调控里德堡原子相互作用，通过光子存储实验验证相互作用切换",
-        "innovation": "首次实现太赫兹场对里德堡原子相互作用三个数量级的快速调控，突破微波场限制",
-        "related_work": "里德堡量子计算、量子模拟、里德堡量子光学、量子退火等领域研究",
-        "impact": "为量子计算、量子模拟、量子退火等提供新调控手段，推动里德堡量子技术发展"
+        "summary": "研究Jacobi算子在耦合参数趋于零时的本质奇异极限行为及其在高阶压缩中的应用。",
+        "research思路": "解决耦合参数趋于零时Jacobi算子的自伴延拓问题及强预解收敛性。",
+        "experiment": "结合离散WKB方法和Airy函数渐近分析，导出平方可积广义特征向量的一致界。",
+        "innovation": "提出",
+        "related_work": "包括谱理论中Jacobi算子研究、算子极限理论及量子光学中的高阶压缩现象。",
+        "impact": "为算子极限理论提供新视角，在量子光学和谱分析领域具有潜在应用价值。"
       },
       "domain_trend": {
-        "trend": "量子光学调控技术突破推动硅基光子量子计算与多体量子模拟新发展",
+        "trend": "硅基量子光子学融合机器学习，实现单光子精准操控与新型量子计算范式",
         "key_topics": [
-          "里德堡原子量子调控",
-          "普适量子控制方案",
-          "波导多体量子光学系统"
+          "量子光学基础理论",
+          "量子机器学习与控制",
+          "单光子探测与操控"
         ],
-        "development_direction": "领域正朝着高精度量子操控、可扩展多体量子系统构建以及跨技术平台融合方向发展，特别是在量子计算与量子模拟应用方面展现出巨大潜力。硅基光子学平台与量子光学系统的结合将促进量子信息处理技术的实用化进程。"
+        "development_direction": "从基础量子光学理论创新到跨领域应用拓展，硅基光子学作为平台正融合量子计算、机器学习和精密测量技术，推动量子信息处理与量子传感的实用化进程。"
       }
     },
     {
-      "title": "Universal Jaynes-Cummings Control of an Oscillator",
-      "abstract": "The Jaynes-Cummings (JC) interaction-the coherent exchange of excitations between a two-level system and a harmonic oscillator-is one of the fundamental interactions of quantum optics, realized across platforms such as cavity quantum electrodynamics, trapped ions, mechanical resonators, and superconducting circuits. Although JC interactions and qubit rotations form a universal gate set for oscillator control, practical implementations have not been demonstrated. Here we develop and experimentally demonstrate universal JC-based oscillator control by compiling arbitrary unitary gates into sequences of JC interactions and qubit rotations. In our experiment, the oscillator is realized using a mode of a high quality factor microwave cavity and the ancilla qubit using a superconducting transmon circuit, with the JC interaction implemented by a sideband interaction enabled by the Josephson nonlinearity. The native gates are constructed to be closed below a chosen cutoff photon number, encoding a qudit with suppressed leakage errors, while ancilla relaxation errors are detectable. We further find that the dispersive shift serves as a compilation resource that reduces circuit depths. We demonstrate universal qudit control and implement a single-qutrit gate set with a mean post-selected process fidelity of 96%, as well as ququart and ququint shift gates. These results establish Jaynes-Cummings control as a practical route to universal oscillator control, enabling programmable bosonic processors across a variety of quantum platforms.",
-      "arxiv_id": "2605.18658v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18658v1",
+      "title": "Software Between Quantum and Machine Learning -- And Down to Pulses",
+      "abstract": "Contemporary quantum computing platforms remain, in essence, programmable physical systems whose control is typically mediated through unitary gate abstractions. While such abstractions provide a uniform interface, they obscure important aspects of the underlying hardware and may limit the exploitation of its full capabilities. Direct operation at the control-pulse level offers a more expressive and physically faithful paradigm, enabling, for instance, the implementation of tailored error-mitigation and optimisation strategies. However, this increased expressivity comes at the cost of greater quantum software development complexity, necessitating structured and accessible tooling.   We present a software framework, integrated within the QML-Essentials package, that extends quantum machine learning (QML) methodologies to encompass pulse-level modelling. By embedding quantum optimal control techniques within a QML setting, our approach enables the seamless combination of gate-based and pulse-level representations. The framework provides a comprehensive suite of modelling and analytical capabilities. In particular, we introduce composable ansatz constructions based on interchangeable building blocks, and support for end-to-end optimisation of pulse parameters. Motivated by the central role of quantum Fourier models, we further incorporate a range of Fourier-analytic diagnostics, complemented by extended measures of entanglement. All performance-critical components are implemented in a high-performance environment using JAX and supported by a dedicated quantum simulator. Taken together, the framework facilitates reproducible and systematic investigations, while bridging the conceptual and practical divide between abstract circuit models and hardware-aware optimisation. It provides a robust foundation for future developments at the intersection of QML and quantum control.",
+      "arxiv_id": "2605.21286v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21286v1",
       "authors": [
-        "Jordan Huang",
-        "Ethan Kasaba",
-        "Thomas J. DiNapoli"
+        "Maja Franz",
+        "Melvin Strobl",
+        "Jonathan Hunz"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实现了基于Jaynes-Cummings相互作用的普适振子量子控制方案",
-        "research思路": "解决JC相互作用与量子比特旋转组成的普适门集在实验中尚未实现的问题",
-        "experiment": "采用高品质因子微波腔模作为振子，超导transmon电路作为辅助量子比特",
-        "innovation": "首次实验证明了基于JC相互作用的普适振子控制，构建了在选定光子数下封闭的本征门",
-        "related_work": "腔量子电动力学、囚禁离子、机械振子、超导电路等平台的JC相互作用研究",
-        "impact": "为量子光学和量子信息处理提供了新的控制范式，推动量子计算发展"
+        "summary": "提出将量子机器学习扩展到脉冲级建模的软件框架，突破量子门抽象限制。",
+        "research思路": "解决量子计算中门级抽象掩盖硬件能力、限制性能优化的问题。",
+        "experiment": "在QML-Essentials包中集成量子最优控制技术，实现门与脉冲级混合建模。",
+        "innovation": "首次将量子机器学习与脉冲级控制结合，提供更物理真实的量子计算范式。",
+        "related_work": "量子最优控制、量子错误缓解、量子计算编译与优化领域研究。",
+        "impact": "为量子计算提供底层硬件优化新路径，推动量子软件工具发展。"
       }
     },
     {
-      "title": "Realization of waveguide many-body quantum optics",
-      "abstract": "Controlling light photon-by-photon is central to quantum optics. At a fundamental level, photon interactions are mediated by their coupling to atoms, and ultimate control requires deterministic light-matter interfacing of single photons to single atoms. Extending this paradigm to radiatively couple multiple individual atoms in a deterministic and scalable manner opens the arena of many-body quantum optics. Here, we realize such a setting by coherently coupling solid-state artificial atoms to a nanophotonic waveguide and demonstrate higher-order photon correlations that are controlled by the number of quantum emitters. We study the scaling of nonlinear photonic transport induced by emitter-photon scattering and demonstrate that adding a quantum emitter generates higher-order photon correlations. Specifically, we experimentally observe genuine three-photon correlations from a pair of collectively coupled emitters, while contributions from lower photon numbers are suppressed. In addition, we scale to three resonant quantum emitters coupled to the waveguide. These advancements demonstrate the onset of many-body quantum optics in waveguide quantum electrodynamics, enabling new photonic quantum simulators, the creation of many-body entangled states, and the exploration of novel quantum phase transitions.",
-      "arxiv_id": "2605.18525v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18525v1",
+      "title": "Velocity-Controlled Directional Readout of Single Photons",
+      "abstract": "Photodetection is usually treated in the frame in which the detector is at rest relative to the optical apparatus. We show that uniform motion of an electric Glauber detector changes the single-click POVM realized on two counterpropagating single-photon modes. Motion Doppler-shifts the alternatives in the detector frame; finite bandwidth then converts propagation direction into a detection bias without decohering the photon. For a Lorentzian response near one Doppler branch, the readout crosses from phase-sensitive to direction-sensitive with a quality-factor-enhanced onset. Finite-time integration adds Doppler-beat visibility loss, separating passive covariance from measurement change.",
+      "arxiv_id": "2605.21206v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21206v1",
       "authors": [
-        "Lena M. Hansen",
-        "Clara Henke",
-        "Christoph Hotter"
+        "Mohamed Hatifi"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实现波导多体量子光学，通过集体耦合人造原子展示可控的高阶光子关联",
-        "research思路": "解决如何确定性地耦合多个原子与光子，实现多体量子光学中的非线性光子传输",
-        "experiment": "将固态人造原子相干耦合到纳米光子波导，研究发射体-光子散射引起的非线性光子传输",
-        "innovation": "首次从一对集体耦合发射体中观察到真正的三光子关联，同时抑制低光子数贡献",
-        "related_work": "单原子-光子强耦合、腔量子电动力学、量子发射体阵列研究",
-        "impact": "为可扩展多体量子光学系统奠定基础，推动量子信息处理和量子模拟发展"
+        "summary": "探测器运动改变了单光子探测的POVM，实现速度控制的方向读出",
+        "research思路": "解决运动探测器如何改变单光子探测特性及方向分辨问题",
+        "experiment": "分析运动Glauber探测器对两反向传播单光子模式的响应",
+        "innovation": "发现运动可将传播方向转化为检测偏置且不退相干",
+        "related_work": "静止探测器POVM理论、量子光学中的多普勒效应研究",
+        "impact": "为量子通信和量子计量中的方向敏感探测提供新方法"
       }
     }
   ]

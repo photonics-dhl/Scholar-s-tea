@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db/prisma'
+import { successResponse, apiErrors } from '@/lib/api/response'
 
 const getCachedStats = unstable_cache(
   async () => {
@@ -21,26 +21,13 @@ const getCachedStats = unstable_cache(
 export async function GET() {
   try {
     const stats = await getCachedStats()
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        users: stats.totalUsers,
-        groups: stats.totalGroups,
-        posts: stats.totalPosts,
-        publications: stats.totalPublications,
-      },
-      meta: null,
+    return successResponse({
+      users: stats.totalUsers,
+      groups: stats.totalGroups,
+      posts: stats.totalPosts,
+      publications: stats.totalPublications,
     })
   } catch (error) {
-    console.error('GET /api/v1/public-stats error:', error)
-    return NextResponse.json(
-      {
-        success: false,
-        data: null,
-        error: { code: 'INTERNAL_ERROR', message: '获取统计数据失败' },
-      },
-      { status: 500 }
-    )
+    return apiErrors.internal(error, '获取统计数据失败')
   }
 }

@@ -2,80 +2,81 @@
   "domain_name": "非线性光学",
   "papers": [
     {
-      "title": "Quantum Model for CVRPTW",
-      "abstract": "This paper proposes a quantum algorithm for the capacitated vehicle routing problem with time windows (CVRPTW) based on Grover Search framework. This problem is often faced by Postal services in the context of package delivery or other time-sensitive operations. We provide an implementation on gate based quantum computer of a model inspired by classical route first, cluster second technique. The quantum paradigm allows to overcome suboptimality inherent property of this decomposition. In the current NISQ (Noisy Intermediate-Scale Quantum) era, the most important limitation is the number of available qubits which makes time windows and capacity constraints hard to tackle. We introduce a qubit-efficient split-inspired modeling which adds only a linear number of decision qubits to standard quantum formulations for Traveling Salesman Problem (TSP).",
-      "arxiv_id": "2605.18393v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18393v1",
+      "title": "Combining non-parametric quantum states and MERA tensor networks for ground-state optimization",
+      "abstract": "Hybrid tensor networks offer a promising route to enhance the expressivity of classical tensor network methods by incorporating quantum states prepared on a quantum computer. Existing approaches are limited by the variational optimization of the quantum component of the tensor network. In this work, we introduce an alternative strategy that combines a non-parametric quantum state prepared through quantum annealing and a classical isometric tensor network. The latter is variationally optimized while the former is used as a fixed, boundary tensor resource in the form of classical shadows. We demonstrate the feasibility of this approach through extensive numerical simulations on the transverse-field Ising model, showing that the optimization procedure remains robust under statistical and hardware noise. Moreover, our results indicate that our newly proposed setup improves the accuracy of the obtained ground state approximation compared to the original quantum simulation, without increasing the depth of the applied quantum circuits. Therefore, this setup offers a practical route to scale variational quantum algorithms towards the quantum utility scale.",
+      "arxiv_id": "2605.21447v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21447v1",
       "authors": [
-        "Imran Meghazi",
-        "Éric Bourreau"
+        "Julian Schuhmacher",
+        "Alberto Baiardi",
+        "Francesco Tacchino"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出一种基于Grover搜索框架的量子算法解决带容量和时间窗的车辆路径问题。",
-        "research思路": "解决NISQ时代量子计算中带容量和时间窗约束的车辆路径问题。",
-        "experiment": "采用基于门的量子计算机实现受",
-        "innovation": "引入量子位高效的分割启发式建模，仅添加线性数量的决策量子位。",
-        "related_work": "旅行商问题量子算法、量子组合优化、车辆路径问题经典启发式方法。",
-        "impact": "为量子计算在物流优化中的应用提供新思路，推动量子算法实用化发展。"
+        "summary": "提出结合非参量量子态与MERA张量网络的混合方法优化基态近似精度",
+        "research思路": "解决现有混合张量网络中量子分量变分优化的局限性",
+        "experiment": "用量子退火制备非参量量子态，结合经典等距张量网络进行变分优化",
+        "innovation": "将量子态作为固定边界资源，避免量子参数优化，提高鲁棒性",
+        "related_work": "量子张量网络、MERA、变分量子特征求解器相关工作",
+        "impact": "为量子-经典混合计算提供新范式，增强基态近似精度和噪声鲁棒性"
       },
       "domain_trend": {
-        "trend": "量子算法与光学系统深度融合推动计算优化和基础验证新突破",
+        "trend": "量子计算与经典计算深度融合，突破基态近似、预言机优化和过程合成瓶颈",
         "key_topics": [
-          "量子算法优化",
-          "线性光学验证",
-          "分布式量子资源管理"
+          "量子-经典混合计算",
+          "量子资源优化",
+          "量子强化学习"
         ],
-        "development_direction": "非线性光学正从理论研究向实用化应用快速发展，量子算法与光学系统的结合为解决复杂优化问题和验证量子基础理论提供了新途径，同时跨领域的资源管理和分配策略正成为量子计算实用化的关键支撑。"
+        "development_direction": "非线性光学领域正加速与量子计算融合，通过非参量量子态、资源优化模型和强化学习算法，推动量子计算实用化进程，解决噪声鲁棒性和可扩展性等关键挑战。"
       }
     },
     {
-      "title": "Linear-optical test of quantum contextuality with sequential measurements",
-      "abstract": "Quantum contextuality provides a fundamental signature of nonclassical behavior that cannot be explained by noncontextual hidden-variable models. We propose and experimentally implement a linear-optical setup for demonstrating Kochen-Specker contextuality via a violation of the KCBS inequality using single photons. Our scheme employs sequential measurements realized with linear-optical networks and on-off photodetectors. The construction ensures that each co-measured observable is implemented by the same physical operation across different contexts. Our experimental results demonstrate a clear violation of the KCBS inequality and robustness against photon loss. Beyond fundamental investigations, the proposed setup provides a practical tool for probing non-classicality and photon-number statistics of quantum states, which in turn enables the verification of single-photon sources.",
-      "arxiv_id": "2605.18112v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.18112v1",
+      "title": "Modeling and Resource Optimization for Quantum Oracles",
+      "abstract": "Quantum computing has demonstrated its significant advantage over supercomputing for specific applications and shown promising prospect, such as machine learning, cryptography, finance, etc.. Quantum oracles are very common in many quantum algorithms and oracle resource consumption directly affects algorithm performance. However, existing oracle designs often exhibit high resource overhead and limited compatibility. Moreover, structured description tools and complexity analysis methods are lacked. In this work, we introduces a Hierarchical Recursive Synthesis-Evaluation (HRSE) model, enabling formal description and precise quantum gate complexity analysis of oracles. Based on this model, we propose an Adaptive Space-depth Trade-off (ASDT) algorithm for generating oracle structures under a fixed qubit constraint. We provide a theoretical proof showing that the ASDT algorithm achieves the optimal gate count for a given number of qubits. Experimental results show that the ASDT algorithm reduces the average quantum circuit depth by 53.99% compared with the W-cycle approach, with the number of variables being 10, 15, and 20, respectively.",
+      "arxiv_id": "2605.21380v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21380v1",
       "authors": [
-        "Jiaqi Liu",
-        "Bita Olamaei",
-        "Lijian Zhang"
+        "Zhihang Li",
+        "Bo Zhao",
+        "Chuanbing Han"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "利用线性光学装置和单光子实现KCBS不等式违背，验证量子上下文关联性。",
-        "research思路": "解决如何通过实验验证量子上下文关联性问题，证明非经典行为。",
-        "experiment": "采用线性光学网络和单光子探测器实现顺序测量，确保可观测量的物理实现一致性。",
-        "innovation": "首次在线性光学系统中实现KCBS不等式验证，且对光子损失具有鲁棒性。",
-        "related_work": "Kochen-Specker理论、Cabello等人的上下文关联实验、光子数统计探测。",
-        "impact": "为量子非经典性验证和单光子源检测提供实用工具，推动量子基础研究。"
+        "summary": "提出HRSE模型和ASDT算法，优化量子预言机资源消耗与性能",
+        "research思路": "解决量子预言机高资源开销、兼容性差和缺乏结构化描述工具问题",
+        "experiment": "构建HRSE模型形式化描述预言机，提出ASDT算法固定量子比特约束优化结构",
+        "innovation": "首次实现预言机量子门复杂度精确分析，证明ASDT在固定量子比特下最优",
+        "related_work": "量子算法优化、量子电路综合、量子复杂度理论相关研究",
+        "impact": "为量子算法设计提供理论工具，推动量子计算实用化进程"
       }
     },
     {
-      "title": "A System Aware Resource Allocation for Distributed Workflows in Quantum Computing Environments",
-      "abstract": "Rapid advancements in cloud based platforms providing access to quantum computing capabilities have opened up several challenges for efficient usage of these highly delicate and costly devices. Although most of the current systems use a priority based access protocol, they are unable to fully support reliable, efficient, and scalable execution of larger-scale applications. To overcome this limitation, we propose a comprehensive solution for efficient allocation of quantum programs to appropriate quantum devices, considering all the relevant cost metrics into account including, fidelity, execution time and communication overhead. We also formulate use-cases for distributed quantum workflow and propose modified graph based algorithms to solve for allocation of such use-cases, assuming a hybrid classical-quantum network. Since hardware advancements in large standalone devices is an ongoing process, it is critical to investigate such distributed workflows to maximize the best utilization of current NISQ devices. Our empirical study shows that the proposed techniques perform better than state-of-the-art methods for almost all evaluation parameters, with average improvements of approximately $5\\%$ in execution time, $30\\%$ in communication overhead, $40\\%$ in wait time and $2\\%$ in fidelity, providing better solutions to efficient allocation strategies.",
-      "arxiv_id": "2605.17944v1",
-      "published": "2026-05-18",
-      "url": "http://arxiv.org/abs/2605.17944v1",
+      "title": "Enhanced Reinforcement Learning-based Process Synthesis via Quantum Computing",
+      "abstract": "In this work, we present quantum reinforcement learning (RL) as a solution strategy for process synthesis problems. Building on our prior work, we develop a generalized framework that formally poses process synthesis as a Markov decision process and introduces quantum-enhanced RL algorithms to solve it with improved scalability. Earlier implementations of quantum-based RL for process synthesis were limited by qubit requirements, which scaled poorly with problem complexity. This work overcomes this challenge by introducing state encoding algorithms to decouple qubit requirements from problem size. A classical RL-based solution strategy is used as a baseline to benchmark the quantum algorithms under identical training conditions. All algorithms are evaluated across a flowsheet synthesis problem of increasing unit counts to analyze their performance and scalability. Results show that all approaches are capable of identifying the optimal flowsheet designs in small design spaces. For moderate-scale unit counts, quantum approaches demonstrate competitive performance on a per-episode basis and improved efficiency on a per-parameter basis versus the classical RL benchmark. This work provides a foundation for future quantum computing applications within process systems engineering, establishes a controlled benchmark for comparing classical and quantum algorithms, and shows that the proposed quantum variants remain competitive for the process synthesis problem examined in this work.",
+      "arxiv_id": "2605.21213v1",
+      "published": "2026-05-20",
+      "url": "http://arxiv.org/abs/2605.21213v1",
       "authors": [
-        "Abhishek Sawaika",
-        "Udaya Parampalli",
-        "Rajkumar Buyya"
+        "Austin Braniff",
+        "Fengqi You",
+        "Yuhe Tian"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出量子计算环境中分布式工作流系统感知资源分配方案",
-        "research思路": "解决量子云计算中设备分配低效问题，优化保真度、执行时间和通信开销",
-        "experiment": "采用混合经典-量子网络模型，基于改进图算法实现资源分配",
-        "innovation": "首次综合考虑多成本指标，提出分布式量子工作流用例及分配算法",
-        "related_work": "包括量子云平台优先级访问协议、量子资源调度及量子-经典混合计算研究",
-        "impact": "为大规模量子应用提供高效执行框架，推动量子计算实用化进程"
+        "summary": "提出量子强化学习框架解决过程合成问题，克服量子比特需求随问题规模增长的瓶颈。",
+        "research思路": "解决量子强化学习在过程合成中量子比特需求随问题复杂度指数增长的 scalability 问题。",
+        "experiment": "将过程合成建模为马尔可夫决策过程，引入状态编码算法解耦量子比特与问题规模，对比经典与量子算法。",
+        "innovation": "通过状态编码算法突破量子比特需求与问题规模的耦合关系，提升量子强化学习的可扩展性。",
+        "related_work": "基于经典强化学习的过程合成方法、早期量子强化学习在过程合成中的应用、量子计算优化算法。",
+        "impact": "为量子计算在过程合成中的实用化奠定基础，推动量子强化学习在复杂工程问题中的应用。"
       }
     }
   ]

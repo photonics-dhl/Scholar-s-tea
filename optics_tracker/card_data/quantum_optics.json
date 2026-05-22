@@ -2,35 +2,63 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "Key Laboratory of Optical Fiber Sensing and Communications Ministry of Education-School of information and Communication Engineering",
-      "abstract": "### Key Laboratory of Optical Fiber Sensing and Communications, Ministry of Education. The Key Laboratory of Optical Fiber Sensing and Communications, Ministry of Education, is affiliated with the University of Electronic Science and Technology of China. Over the past two decades, the laboratory's c",
-      "source": "tavily",
-      "url": "https://www.sice.uestc.edu.cn/sice_en/Research/Research_Platform/KL.htm",
-      "authors": [],
+      "title": "Reconfigurable generation of high-power structured light via nonlinear beam shaping",
+      "abstract": "High-power structured light has a wide range of applications, from material processing and high-capacity optical communications to programmable electron beams, plasmas, and nuclear states. On-demand generation of structured light and adaptive control of beam profiles are essential for many practical applications, but are difficult to achieve at high power. Here, we demonstrate reconfigurable generation of structured light from a high-power multimode-fiber laser amplifier through full-field control of a low-power seed. An efficient nonlinear beam shaping scheme based on a local linear approximation of the complex nonlinear input--output relation is developed and realized in situ. Diverse structured beams such as Gaussian, Bessel, vector and orbital angular momentum beams are directly generated from the fiber amplifier at powers exceeding 500 W. Our scheme enables real-time programmability of structured light and is readily scalable to even higher power levels. This work provides a general framework for controlling high-dimensional nonlinear systems without accurate knowledge or tractable model.",
+      "arxiv_id": "2605.19996v1",
+      "published": "2026-05-19",
+      "url": "http://arxiv.org/abs/2605.19996v1",
+      "authors": [
+        "KyeoReh Lee",
+        "Baichuan Huang",
+        "Peyman Ahmadi"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "介绍了光纤传感与通信教育部重点实验室的背景与研究历程",
-        "research思路": "展示该实验室在光纤传感与通信领域的科研积累",
-        "experiment": "未提供具体实验方法，仅描述实验室概况",
-        "innovation": "无具体创新点，属于实验室介绍性内容",
-        "related_work": "需结合光纤传感与通信领域经典文献",
-        "impact": "展示中国高校在该领域的研究实力与平台建设"
+        "summary": "实现高功率光纤放大器中结构化光的可重构生成，通过非线性波束整形突破功率限制。",
+        "research思路": "解决高功率结构化光按需生成与自适应控制的难题，克服传统方法在高功率下的局限性。",
+        "experiment": "采用基于局部线性近似的高效非线性波束整形方案，通过低功率种子源全场控制实现。",
+        "innovation": "首次在高功率(>500W)光纤放大器中直接生成多种结构化光束，并实现实时可编程控制。",
+        "related_work": "包括空间光调制器波束整形、数字微镜器件控制、以及低功率结构化光生成技术。",
+        "impact": "为高功率结构化光应用开辟新途径，推动材料加工、光通信等领域的技术革新。"
       },
       "domain_trend": {
-        "trend": "光纤传感技术正突破点式限制，向分布式、多参数智能化监测网络革命性演进",
+        "trend": "光通信与光纤传感正迈向高功率可重构、量子级集成与全功能感知网络新时代",
         "key_topics": [
-          "分布式光纤传感",
-          "多参数同步监测",
-          "结构健康监测应用"
+          "高功率结构化光生成",
+          "量子级电光机械集成",
+          "全光纤传感系统"
         ],
-        "development_direction": "光纤传感技术正从传统点式监测向分布式、智能化方向发展，通过结合FBG、布里渊散射和拉曼散射等技术，实现长距离、多参数同步监测，推动智能基础设施、结构健康监测等领域的应用革新，并与光通信技术深度融合，构建数字化感知网络。"
+        "development_direction": "光通信与光纤传感领域正从单一功能向多功能、高功率、量子级精度的智能集成系统发展，通过突破传统功率限制、实现量子级操作兼容性以及将普通光纤转变为多功能感知网络，为材料加工、量子通信、智能城市等领域提供革命性解决方案"
       }
     },
     {
-      "title": "Turning Fiber into a Sensing System: The Magic of Fiber Optics Sensing | IEEE Communications Society",
-      "abstract": "# Turning Fiber into a Sensing System: The Magic of Fiber Optics Sensing. This is the power of fiber optic sensing, a technology that transforms ordinary optical fibers into the digital world’s sensory network. ## Fiber Sensing Technologies: From Invisible Antennae to the Perceptual Revolution of th",
+      "title": "Release-free electro-optomechanical crystal modulator",
+      "abstract": "Electro-optic modulation is central to classical optical communications and emerging quantum technologies. High-confinement optomechanical crystal modulators enable microwave-optical transduction through strong optomechanical interactions and offer a promising interface between superconducting qubits and optical fibers. However, their performance is limited by thermal noise from optical absorption. Release-free optomechanical crystals provide improved thermal anchoring but have not yet been integrated into a microwave-optical transducer. Here, we demonstrate a release-free electro-optomechanical transducer combining strong optomechanical interactions in silicon with the efficient piezoelectricity of lithium niobate via micro-transfer printing. We observe electro- and optomechanical coupling rates compatible with quantum-level operation when co-integrated with a superconducting microwave circuit. This advance moves release-free electro-optomechanical devices toward practical microwave-optical interfaces.",
+      "arxiv_id": "2605.05190v2",
+      "published": "2026-05-06",
+      "url": "http://arxiv.org/abs/2605.05190v2",
+      "authors": [
+        "Paul Burger",
+        "Joey Frey",
+        "Johan Kolvik"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "实现了无需释放的硅-铌酸锂电光机械晶体调制器，实现微波-光量子转换",
+        "research思路": "解决传统光机械晶体调制器因热噪声限制性能的问题，改善热锚定",
+        "experiment": "通过微转移打印技术将硅与铌酸锂结合，集成超导微波电路",
+        "innovation": "首次将释放自由结构与微波-光转换器集成，实现量子级操作兼容性",
+        "related_work": "高限制光机械晶体调制器、超导量子比特-光纤界面研究",
+        "impact": "为量子技术提供实用微波-光转换接口，推动量子通信与计算发展"
+      }
+    },
+    {
+      "title": "Turning Fiber into a Sensing System: The Magic of Fiber Optics ...",
+      "abstract": "This is the power of fiber optic sensing, a technology that transforms ordinary optical fibers into the digital world's sensory network. In",
       "source": "tavily",
       "url": "https://www.comsoc.org/publications/ctn/turning-fiber-sensing-system-magic-fiber-optics-sensing",
       "authors": [],
@@ -38,30 +66,12 @@
       "venue": "Web",
       "arxiv_id": "",
       "analysis": {
-        "summary": "将普通光纤转变为数字化感知网络的光纤传感技术，实现物理世界的实时监测。",
-        "research思路": "解决如何利用普通光纤构建高灵敏度、分布式传感系统以替代传统电子传感器的问题。",
-        "experiment": "采用光纤干涉、散射和布拉格光栅等关键技术，实现温度、应变等物理量的精确测量。",
-        "innovation": "突破传统点式传感限制，实现长距离分布式、多参数同步监测，显著提升传感网络覆盖范围。",
-        "related_work": "分布式声波传感(DAS)、布里渊光时域分析(BOTDA)、光纤布拉格光栅(FBG)阵列等技术。",
-        "impact": "推动光纤传感在结构健康监测、周界安防等领域的应用，为智能基础设施提供关键技术支撑。"
-      }
-    },
-    {
-      "title": "Nature Index Fiber Optic Sensing Technologies for Structural Health Monitoring",
-      "abstract": "# Fiber Optic Sensing Technologies for Structural Health Monitoring. Fiber optic sensing has emerged as a transformative approach for monitoring the integrity of civil, mechanical and aerospace structures. Core technologies include fiber Bragg gratings (FBGs) for point and quasi-distributed measurem",
-      "source": "tavily",
-      "url": "https://www.nature.com/nature-index/topics/l4/fiber-optic-sensing-technologies-for-structural-health-monitoring",
-      "authors": [],
-      "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
-      "analysis": {
-        "summary": "综述了光纤传感技术在结构健康监测领域的核心技术与应用进展，重点聚焦FBG传感器在土木、机械及航空航天结构中的点测量与准分布式测量能力。",
-        "research思路": "解决传统电学传感器在复杂环境下易受干扰、难以实现大范围长距离监测的问题，探索光纤传感作为高灵敏度、抗电磁干扰的替代方案。",
-        "experiment": "系统梳理FBG传感器的工作原理（波长编码机制）、封装工艺及解调技术，结合实际结构测试案例验证其在应变、温度等参数监测中的准确性。",
-        "innovation": "提出基于FBG的准分布式传感网络架构，实现多点同步监测；同时综述了新兴的布里渊散射和拉曼散射光纤传感技术，扩展了监测维度。",
-        "related_work": "主要关联工作包括：Lowry等人的早期FBG封装研究、Measures等人的桥梁监测系统、Fuhr等人的航空航天应用、以及近年来基于BOTDA/BOTDR的分布式传感技术进展。",
-        "impact": "为结构健康监测领域提供了全面的光纤传感技术参考，推动了从点式向分布式、从单参数向多参数监测的技术演进，对智能基础设施和智慧城市发展具有重要支撑意义。"
+        "summary": "将普通光纤转变为数字世界感知网络的光纤传感技术",
+        "research思路": "解决如何利用光纤作为分布式传感系统实现实时监测的问题",
+        "experiment": "采用光纤光学原理和信号处理技术构建分布式传感网络",
+        "innovation": "实现了将普通光纤转变为高灵敏度、多功能的传感系统",
+        "related_work": "分布式光纤传感、光纤布拉格光栅、光纤陀螺仪等领域研究",
+        "impact": "为基础设施监测、智能城市等领域提供了新型感知解决方案"
       }
     }
   ]

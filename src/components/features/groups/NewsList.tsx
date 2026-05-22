@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Calendar, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -83,11 +84,15 @@ export function NewsList({ groupId }: NewsListProps) {
       {news.map((item) => (
         <div key={item.id} className="rounded-lg border bg-card p-4">
           {item.coverImage && (
-            <img
-              src={item.coverImage}
-              alt={item.title}
-              className="mb-3 h-40 w-full rounded-md object-cover"
-            />
+            <div className="relative mb-3 h-40 w-full rounded-md overflow-hidden">
+              <Image
+                src={item.coverImage}
+                alt={item.title}
+                fill
+                className="object-cover rounded-md"
+                sizes="(max-width: 768px) 100vw, 600px"
+              />
+            </div>
           )}
           <h3 className="font-medium">{item.title}</h3>
           {item.content && (

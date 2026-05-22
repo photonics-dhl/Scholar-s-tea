@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Building2, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,10 +62,12 @@ export function GroupHeader({
             {/* Logo */}
             <div className="flex h-32 w-32 items-center justify-center rounded-xl border-4 border-background bg-background shadow-lg">
               {group.logo ? (
-                <img
+                <Image
                   src={group.logo}
                   alt={group.name}
-                  className="h-full w-full rounded-xl object-cover"
+                  width={128}
+                  height={128}
+                  className="rounded-xl object-cover"
                 />
               ) : (
                 <Building2 className="h-16 w-16 text-muted-foreground" />
@@ -82,10 +85,12 @@ export function GroupHeader({
               </div>
               <p className="mt-1 flex items-center text-muted-foreground">
                 {group.institution?.logo && (
-                  <img
+                  <Image
                     src={group.institution.logo}
                     alt=""
-                    className="mr-1.5 h-4 w-4"
+                    width={16}
+                    height={16}
+                    className="mr-1.5"
                   />
                 )}
                 {group.institution?.name}

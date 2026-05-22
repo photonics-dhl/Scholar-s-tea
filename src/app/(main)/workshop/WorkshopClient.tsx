@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
 import { Sparkles, PanelLeft, PanelLeftClose, Bot, Loader2, AlertCircle, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,8 +17,15 @@ import { AgentModeSelector } from '@/components/features/workshop/AgentModeSelec
 import { ChatMessageItem } from '@/components/features/workshop/ChatMessage'
 import { ChatInput } from '@/components/features/workshop/ChatInput'
 import { WelcomeScreen } from '@/components/features/workshop/WelcomeScreen'
-import { PeerReviewPanel } from '@/components/features/workshop/PeerReviewPanel'
-import { PaperGenerationPanel } from '@/components/features/workshop/PaperGenerationPanel'
+
+const PeerReviewPanel = dynamic(
+  () => import('@/components/features/workshop/PeerReviewPanel').then((m) => m.PeerReviewPanel),
+  { ssr: false }
+)
+const PaperGenerationPanel = dynamic(
+  () => import('@/components/features/workshop/PaperGenerationPanel').then((m) => m.PaperGenerationPanel),
+  { ssr: false }
+)
 
 const VALID_MODES = Object.keys(agentModes) as AgentMode[]
 

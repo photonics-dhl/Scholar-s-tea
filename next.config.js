@@ -15,6 +15,22 @@ const nextConfig = {
         protocol: 'http',
         hostname: '10.72.212.33',
       },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.byteimg.com',
+      },
     ],
   },
   webpack: (config, { isServer }) => {

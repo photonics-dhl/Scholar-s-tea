@@ -8,8 +8,16 @@ import { CitationCard } from './CitationCard'
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown'
 import { ImageLightbox } from '@/components/features/tea-party/ImageLightbox'
 import type { ChatMessage } from '@/hooks/useChat'
-import { PeerReviewScoreCard } from './PeerReviewScoreCard'
-import { GrantApplicationWizard } from './GrantApplicationWizard'
+import dynamic from 'next/dynamic'
+
+const PeerReviewScoreCard = dynamic(
+  () => import('./PeerReviewScoreCard').then((m) => m.PeerReviewScoreCard),
+  { ssr: false }
+)
+const GrantApplicationWizard = dynamic(
+  () => import('./GrantApplicationWizard').then((m) => m.GrantApplicationWizard),
+  { ssr: false }
+)
 
 interface ChatMessageProps {
   message: ChatMessage

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { Building2, Users, FileText, Newspaper, Award, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
@@ -46,10 +47,12 @@ export function GroupCard({ group, className, animationDelay = 0 }: GroupCardPro
         {/* Logo */}
         <div className="absolute left-4 top-12 flex h-16 w-16 items-center justify-center rounded-full border-2 border-background bg-background shadow-md transition-transform duration-200 group-hover:scale-105">
           {group.logo ? (
-            <img
+            <Image
               src={group.logo}
               alt={group.name}
-              className="h-full w-full rounded-lg object-cover"
+              width={64}
+              height={64}
+              className="rounded-lg object-cover"
             />
           ) : (
             <Building2 className="h-8 w-8 text-journal-primary" />
@@ -64,10 +67,12 @@ export function GroupCard({ group, className, animationDelay = 0 }: GroupCardPro
             </h3>
             <p className="mt-1 flex items-center text-xs text-muted-foreground">
               {group.institution.logo && (
-                <img
+                <Image
                   src={group.institution.logo}
                   alt=""
-                  className="mr-1 h-3 w-3"
+                  width={12}
+                  height={12}
+                  className="mr-1"
                 />
               )}
               <span className="truncate">{group.institution.name}</span>

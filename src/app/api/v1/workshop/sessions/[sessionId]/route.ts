@@ -25,6 +25,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
       include: {
         messages: {
           orderBy: { createdAt: 'asc' },
+          take: 100,
           select: {
             id: true,
             role: true,

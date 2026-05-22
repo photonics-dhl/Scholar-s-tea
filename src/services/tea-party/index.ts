@@ -57,31 +57,31 @@ export async function getTeaPartyRooms(params: RoomListParams = {}) {
     ];
   }
 
-  // Get total count
-  const total = await prisma.teaPartyRoom.count({ where });
-
-  // Get rooms with relations
-  const rooms = await prisma.teaPartyRoom.findMany({
-    where,
-    include: {
-      host: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
+  // Parallel count + fetch
+  const [total, rooms] = await Promise.all([
+    prisma.teaPartyRoom.count({ where }),
+    prisma.teaPartyRoom.findMany({
+      where,
+      include: {
+        host: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        _count: {
+          select: {
+            participants: true,
+            messages: true,
+          },
         },
       },
-      _count: {
-        select: {
-          participants: true,
-          messages: true,
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
 
   return {
     rooms: rooms.map((r: any) => ({

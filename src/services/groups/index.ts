@@ -46,42 +46,42 @@ export async function getGroups(params: GroupListParams = {}) {
     };
   }
 
-  // Get total count
-  const total = await prisma.researchGroup.count({ where });
-
-  // Get groups with relations
-  const groups = await prisma.researchGroup.findMany({
-    where,
-    include: {
-      institution: {
-        select: {
-          id: true,
-          name: true,
-          logo: true,
+  // Parallel count + fetch
+  const [total, groups] = await Promise.all([
+    prisma.researchGroup.count({ where }),
+    prisma.researchGroup.findMany({
+      where,
+      include: {
+        institution: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+          },
+        },
+        college: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            members: true,
+            publications: true,
+            news: true,
+            patents: true,
+            posts: true,
+          },
         },
       },
-      college: {
-        select: {
-          id: true,
-          name: true,
-        },
+      orderBy: {
+        [sortBy]: sortOrder,
       },
-      _count: {
-        select: {
-          members: true,
-          publications: true,
-          news: true,
-          patents: true,
-          posts: true,
-        },
-      },
-    },
-    orderBy: {
-      [sortBy]: sortOrder,
-    },
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
 
   return {
     groups,

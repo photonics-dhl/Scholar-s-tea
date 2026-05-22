@@ -371,7 +371,6 @@ export async function searchTavily(
         }))
 
       if (papers.length > 0) {
-        console.log(`[ExternalPaperSearch] Tavily key ${idx + 1}/${keys.length} returned ${papers.length} results`)
       }
       return papers
     } catch (error) {
@@ -415,7 +414,6 @@ export async function searchPapersForTopic(
 
   const limit = options?.limit || 10
 
-  console.log(`[ExternalPaperSearch] Searching papers for: "${topic}"`)
 
   // 并行检索三个来源
   const [s2Papers, arxivPapers, tavilyPapers] = await Promise.all([
@@ -432,10 +430,6 @@ export async function searchPapersForTopic(
       return []
     }),
   ])
-
-  console.log(
-    `[ExternalPaperSearch] Raw results — S2: ${s2Papers.length}, arXiv: ${arxivPapers.length}, Tavily: ${tavilyPapers.length}`
-  )
 
   // 合并并去重
   const allPapers: ExternalPaper[] = []
@@ -490,10 +484,6 @@ export async function searchPapersForTopic(
   }
 
   setCache(cacheKey, result)
-
-  console.log(
-    `[ExternalPaperSearch] Final: ${finalPapers.length} unique papers from ${result.sources.join(', ')}`
-  )
 
   return result
 }

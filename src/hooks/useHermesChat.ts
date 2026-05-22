@@ -333,7 +333,6 @@ export function useHermesChat(
         flushSSE();
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
-          console.log('[Hermes] Request aborted');
           return;
         }
         console.error('Hermes chat error:', error);

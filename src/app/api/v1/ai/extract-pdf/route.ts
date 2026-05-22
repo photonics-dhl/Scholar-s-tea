@@ -39,18 +39,7 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    console.log('[extract-pdf] Parsing PDF:', file.name, 'size:', buffer.length, 'maxLength:', maxLength)
     const result = await extractTextFromPdfBuffer(buffer, maxLength)
-    console.log(
-      '[extract-pdf] Parsed:',
-      result.numpages,
-      'pages, total length:',
-      result.totalLength,
-      'returned length:',
-      result.text.length,
-      'truncated:',
-      result.wasTruncated
-    )
 
     if (result.error) {
       return NextResponse.json(

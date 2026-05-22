@@ -44,7 +44,6 @@ async function getImageBase64(imageUrl: string): Promise<string | null> {
     }
 
     if (!pathname.startsWith('/uploads/')) {
-      console.log('[vision] URL not in /uploads/:', pathname)
       return null
     }
 
@@ -65,7 +64,6 @@ async function getImageBase64(imageUrl: string): Promise<string | null> {
     }
     const mimeType = mimeMap[ext] || 'image/png'
 
-    console.log('[vision] Converted image to base64:', filename, 'size:', buffer.length, 'mime:', mimeType)
     return `data:${mimeType};base64,${base64}`
   } catch (err) {
     console.error('[vision] Failed to convert image:', err)
@@ -77,11 +75,9 @@ async function buildVisionMessages(
   messages: ChatMessage[],
   attachments: ChatAttachment[] | undefined
 ): Promise<ChatMessage[]> {
-  console.log('[vision] buildVisionMessages called, attachments:', attachments?.length || 0)
   if (!attachments || attachments.length === 0) return messages
 
   const imageAttachments = attachments.filter((a) => a.type === 'image')
-  console.log('[vision] image attachments:', imageAttachments.length)
   if (imageAttachments.length === 0) return messages
 
   // Find last user message and convert to vision format
@@ -96,15 +92,12 @@ async function buildVisionMessages(
   }
 
   for (const att of imageAttachments) {
-    console.log('[vision] Processing image:', att.url)
     const base64 = await getImageBase64(att.url)
     if (base64) {
-      console.log('[vision] Added base64 image, length:', base64.length)
       content.push({ type: 'image_url', image_url: { url: base64 } })
     }
   }
 
-  console.log('[vision] Final content parts:', content.length)
   return messages.map((m, i) => (i === lastUserIndex ? { ...m, content } : m))
 }
 
@@ -127,7 +120,6 @@ async function injectFileAttachments(
 
   for (const att of fileAttachments) {
     if (isPdfAttachment(att.name)) {
-      console.log('[pdf] Extracting text from PDF:', att.name, att.url)
       // Convert URL to local file path
       let filePath = att.url
       try {
@@ -449,7 +441,6 @@ export async function POST(request: NextRequest) {
       const content = body.content || injectedContent
       const stage = body.stage || 'proposal'
 
-      console.log('[paper_generation] topic length:', topic.length, 'content length:', content.length, 'stage:', stage, 'useHermes:', useHermes)
 
       // 提取图片附件并转为 base64（用于数据/图表阶段的视觉分析）
       let imageBase64List: string[] = []
@@ -460,7 +451,6 @@ export async function POST(request: NextRequest) {
           if (base64) imageBase64List.push(base64)
         }
         if (imageBase64List.length > 0) {
-          console.log(`[paper_generation] Attached ${imageBase64List.length} images for data analysis`)
         }
       }
 
@@ -534,7 +524,6 @@ export async function POST(request: NextRequest) {
           console.warn('[paper_generation] Image generation errors:', imageResult.errors)
         }
         if (imageResult.generatedCount > 0) {
-          console.log('[paper_generation] Generated', imageResult.generatedCount, 'images')
         }
       }
 

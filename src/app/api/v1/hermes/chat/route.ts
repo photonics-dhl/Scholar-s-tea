@@ -538,7 +538,6 @@ export async function POST(request: NextRequest) {
     })
 
     const userId = session?.user?.id || 'anonymous'
-    console.log(`[Hermes] uid=${userId} mode=${mode || 'default'} stream=${stream} vision=${isVisionRequest} msgs=${enrichedMessages.length}`)
 
     let response: Response | null = null
 
@@ -555,7 +554,6 @@ export async function POST(request: NextRequest) {
         )
         if (zaiRes.ok) {
           response = zaiRes
-          console.log('[Hermes] Using ZAI GLM-4.6V (native multimodal)')
         } else {
           const errText = await zaiRes.text()
           console.warn('[Hermes] ZAI GLM-4.6V failed:', zaiRes.status, errText)
@@ -570,7 +568,6 @@ export async function POST(request: NextRequest) {
           const zchatRes = await callZchatVision(enrichedMessages, 2048, stream)
           if (zchatRes.ok) {
             response = zchatRes
-            console.log('[Hermes] Using ZCHAT vision (gpt-5)')
           } else {
             const errText = await zchatRes.text()
             console.warn('[Hermes] ZCHAT vision failed:', zchatRes.status, errText)
@@ -584,7 +581,6 @@ export async function POST(request: NextRequest) {
       if (!response && imageUrl) {
         try {
           imageDescription = await callMinimaxVLM(userText || '请描述这张图片', imageUrl)
-          console.log('[Hermes] MiniMax VLM description succeeded')
         } catch (vlmErr) {
           console.warn('[Hermes] MiniMax VLM failed:', vlmErr)
         }
@@ -632,7 +628,6 @@ export async function POST(request: NextRequest) {
 
             if (gatewayRes.ok) {
               response = gatewayRes
-              console.log('[Hermes] Using MiniMax VLM → Hermes Gateway')
             } else {
               const errText = await gatewayRes.text()
               console.warn('[Hermes] Hermes Gateway failed after VLM:', gatewayRes.status, errText)
@@ -649,7 +644,6 @@ export async function POST(request: NextRequest) {
           const dsRes = await callDeepseek(enrichedMessages, 2048, stream)
           if (dsRes.ok) {
             response = dsRes
-            console.log('[Hermes] Using DeepSeek fallback')
           } else {
             const errText = await dsRes.text()
             console.error('[Hermes] DeepSeek fallback failed:', dsRes.status, errText)

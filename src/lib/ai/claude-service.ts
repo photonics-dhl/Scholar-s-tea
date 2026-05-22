@@ -294,7 +294,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
         const data = safeJsonParse(text)
         const content = data.choices?.[0]?.message?.content || ''
         if (content) {
-          console.log('[chatWithAI] Vision via ZAI GLM-4.6V succeeded')
           return { content: stripThinkBlocks(content) }
         }
       }
@@ -304,7 +303,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
       console.warn('[chatWithAI] ZAI vision error:', err)
     }
     // 2. fallback 到 ZCHAT
-    console.log('[chatWithAI] Vision fallback to ZCHAT')
     return chatWithZCHAT(messages, { systemPrompt })
   }
 
@@ -327,7 +325,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
   // 2. 回退 1: ZAI GLM-4.7（同家族备用）
   const fallbackGLM = await _callZAI(messages, systemPrompt, 4096, 0.7, ZAI_FALLBACK_MODEL)
   if (!fallbackGLM.error) {
-    console.log('[chatWithAI] Fallback to GLM-4.7 succeeded')
     return fallbackGLM
   }
   console.warn('[chatWithAI] GLM-4.7 failed:', fallbackGLM.error)
@@ -335,7 +332,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
   // 3. 回退 2: MiniMax-M2.7
   const fallback1 = await _callMiniMax(messages, systemPrompt)
   if (!fallback1.error) {
-    console.log('[chatWithAI] Fallback to MiniMax-M2.7 succeeded')
     return fallback1
   }
   console.warn('[chatWithAI] MiniMax failed:', fallback1.error)
@@ -348,7 +344,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
     temperature: 0.7,
   })
   if (!fallback2.error) {
-    console.log('[chatWithAI] Fallback to gpt-5 succeeded')
     return fallback2
   }
   console.warn('[chatWithAI] gpt-5 failed:', fallback2.error)
@@ -361,7 +356,6 @@ export async function chatWithAI(messages: ChatMessage[], systemPrompt?: string)
     temperature: 0.7,
   })
   if (!fallback3.error) {
-    console.log('[chatWithAI] Fallback to deepseek-v4-flash succeeded')
     return fallback3
   }
   console.error('[chatWithAI] All fallback models failed:', fallback3.error)
@@ -607,7 +601,6 @@ export async function generatePaper(
         venue: p.venue,
         url: p.url,
       }))
-      console.log(`[generatePaper] Retrieved ${retrievedPapers.length} external papers for "${params.topic}"`)
     } catch (err) {
       console.warn('[generatePaper] External search failed, falling back:', err)
     }
@@ -640,7 +633,6 @@ export async function generatePaper(
       // 优先使用基于 Semantic Scholar 的真实验证
       const { verifyAndReport } = await import('./citation-verifier')
       const report = await verifyAndReport(result.content, params.topic)
-      console.log(`[generatePaper] Citation verification: ${report.confirmedCount} confirmed, ${report.unverifiedCount} unverified, score ${report.credibilityScore}/100`)
 
       return {
         content: report.verifiedText,
@@ -1036,7 +1028,6 @@ export async function chatWithAIStream(
         stream: true,
       })
       if (zaiVisionRes.ok && zaiVisionRes.body) {
-        console.log('[chatWithAIStream] Vision via ZAI GLM-4.6V stream')
         let stream: ReadableStream
         if (typeof window === 'undefined' && typeof (zaiVisionRes.body as any).getReader !== 'function') {
           const { ReadableStream } = require('stream/web')

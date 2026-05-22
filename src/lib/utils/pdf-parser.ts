@@ -105,12 +105,9 @@ export async function extractTextFromPdf(
       ? filePath
       : join(process.cwd(), filePath)
 
-    console.log('[pdf-parser] Reading file:', resolvedPath)
     const buffer = await readFile(resolvedPath)
-    console.log('[pdf-parser] File size:', buffer.length)
 
     const { text, numpages } = await parsePdfBuffer(buffer)
-    console.log('[pdf-parser] Parsed pages:', numpages, 'text length:', text.length)
 
     const cleanText = text.replace(/\n{3,}/g, '\n\n').trim()
     const totalLength = cleanText.length

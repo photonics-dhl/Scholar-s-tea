@@ -98,7 +98,6 @@ export function useTeaPartySocket(roomId: string) {
       socketRef.current = socket;
 
       socket.on('connect', () => {
-        console.log('Socket connected');
         setIsConnected(true);
         setConnectionError(null);
         setIsJoined(false);
@@ -116,7 +115,6 @@ export function useTeaPartySocket(roomId: string) {
       });
 
       socket.on('disconnect', () => {
-        console.log('Socket disconnected');
         setIsConnected(false);
         setIsJoined(false);
       });

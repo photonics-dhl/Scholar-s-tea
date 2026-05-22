@@ -19,7 +19,6 @@ async function initProxy(): Promise<void> {
     try {
       const { ProxyAgent } = await import('undici');
       _dispatcher = new ProxyAgent(proxyUrl);
-      console.log('[Embedding] Proxy initialized (undici):', proxyUrl);
     } catch (e) {
       console.warn('[Embedding] Proxy init failed, using native fetch:', e);
     }
@@ -361,7 +360,6 @@ export async function syncPostToKnowledgeBase(postId: string): Promise<void> {
     if (result.error) {
       console.error('[syncPostToKB] Failed to sync post:', postId, result.error);
     } else {
-      console.log('[syncPostToKB] Synced post:', postId, 'doc:', result.id);
     }
   } catch (err) {
     console.error('[syncPostToKB] Failed to sync post:', postId, err);
@@ -409,7 +407,6 @@ export async function syncPublicationToKnowledgeBase(pubId: string): Promise<voi
     if (result.error) {
       console.error('[syncPubToKB] Failed to sync publication:', pubId, result.error);
     } else {
-      console.log('[syncPubToKB] Synced publication:', pubId, 'doc:', result.id);
     }
   } catch (err) {
     console.error('[syncPubToKB] Failed to sync publication:', pubId, err);

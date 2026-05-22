@@ -101,7 +101,6 @@ export async function retrieveRelatedPapers(
           })
         }
         source = 'mixed'
-        console.log(`[PaperEnhancement] External search returned ${papers.length} papers for "${topic}"`)
       }
     } catch (err) {
       console.warn('[PaperEnhancement] External search failed, falling back to local:', err)

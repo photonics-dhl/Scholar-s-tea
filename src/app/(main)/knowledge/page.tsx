@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Database, Search, BookOpen, ExternalLink, FileText, ArrowRight } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { Database, Search, BookOpen, ExternalLink, FileText, ArrowRight, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,6 +31,7 @@ interface KnowledgeResponse {
 }
 
 export default function KnowledgePage() {
+  const { data: session } = useSession();
   const [documents, setDocuments] = useState<KnowledgeDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -122,6 +124,18 @@ export default function KnowledgePage() {
       </section>
 
       <div className="container mx-auto py-10">
+        {/* Admin CTA */}
+        {session?.user?.role === 'ADMIN' && (
+          <div className="flex justify-end mb-4">
+            <Link href="/admin/knowledge">
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <Settings className="h-3.5 w-3.5" />
+                管理知识库
+              </Button>
+            </Link>
+          </div>
+        )}
+
         {/* Search */}
         <form onSubmit={handleSearch} className="flex gap-3 mb-8">
           <div className="relative flex-1">

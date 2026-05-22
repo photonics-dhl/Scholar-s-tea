@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles, Search } from 'lucide-react';
+import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles, Search, Settings, Database, Brain } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -172,6 +172,23 @@ export function MainNav() {
                     个人设置
                   </Link>
                 </DropdownMenuItem>
+                {session.user.role === 'ADMIN' && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/knowledge" className="cursor-pointer">
+                        <Database className="mr-2 h-4 w-4" />
+                        知识库管理
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/research-memory" className="cursor-pointer">
+                        <Brain className="mr-2 h-4 w-4" />
+                        研究记忆管理
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer text-destructive"

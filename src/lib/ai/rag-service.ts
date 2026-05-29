@@ -217,80 +217,67 @@ export async function searchKnowledgeBase(
       };
     }
 
-    // Hybrid search: keyword pre-filter + vector ranking
-    // First, narrow down candidates with keyword matching to avoid full table scan
-    const keywords = query.split(/\s+/).filter((w) => w.length > 1);
-    const keywordConditions =
-      keywords.length > 0
-        ? keywords.flatMap((k) => [
-            { title: { contains: k, mode: 'insensitive' as const } },
-            { content: { contains: k, mode: 'insensitive' as const } },
-          ])
-        : [];
+    // pgvector native cosine similarity search via <=> operator
+    // cosine_distance = 1 - cosine_similarity
+    const embeddingStr = '[' + embedding.join(',') + ']';
+    const distanceThreshold = 1 - threshold;
 
-    // Phase 1: keyword-filtered candidates (up to 300)
-    let candidateDocs = await prisma.knowledgeDocument.findMany({
-      where: {
-        ...whereClause,
-        ...(keywordConditions.length > 0 ? { OR: keywordConditions } : {}),
-      },
-      take: 300,
-      orderBy: { updatedAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        source: true,
-        discipline: true,
-        metadata: true,
-        embedding: true,
-      },
-    });
-
-    // Phase 2: if keyword filter is too strict (<50 docs), supplement with recent docs
-    if (candidateDocs.length < 50) {
-      const existingIds = new Set(candidateDocs.map((d) => d.id));
-      const supplementDocs = await prisma.knowledgeDocument.findMany({
-        where: {
-          ...whereClause,
-          id: { notIn: Array.from(existingIds) },
-        },
-        take: 300 - candidateDocs.length,
-        orderBy: { updatedAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          source: true,
-          discipline: true,
-          metadata: true,
-          embedding: true,
-        },
-      });
-      candidateDocs.push(...supplementDocs);
+    let rawResults: any[];
+    if (discipline && type) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, source, discipline, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "KnowledgeDocument"
+        WHERE embedding IS NOT NULL
+          AND discipline = ${discipline}
+          AND source = ${type}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else if (discipline) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, source, discipline, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "KnowledgeDocument"
+        WHERE embedding IS NOT NULL
+          AND discipline = ${discipline}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else if (type) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, source, discipline, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "KnowledgeDocument"
+        WHERE embedding IS NOT NULL
+          AND source = ${type}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, source, discipline, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "KnowledgeDocument"
+        WHERE embedding IS NOT NULL
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
     }
 
-    const validResults: SearchResult[] = [];
-
-    for (const doc of candidateDocs) {
-      const emb = typeof doc.embedding === 'string' ? JSON.parse(doc.embedding) : doc.embedding;
-      if (!emb || !Array.isArray(emb)) continue;
-
-      const similarity = cosineSimilarity(embedding, emb);
-      if (similarity >= threshold) {
-        validResults.push({
-          id: doc.id,
-          title: doc.title,
-          content: doc.content,
-          source: doc.source,
-          discipline: doc.discipline,
-          similarity,
-          metadata: doc.metadata as Record<string, unknown> | null,
-        });
-      }
-    }
-
-    validResults.sort((a, b) => b.similarity - a.similarity);
+    const validResults: SearchResult[] = (rawResults || []).map((doc: any) => ({
+      id: doc.id,
+      title: doc.title,
+      content: doc.content,
+      source: doc.source,
+      discipline: doc.discipline,
+      similarity: 1 - Number(doc.distance),
+      metadata: doc.metadata ? (typeof doc.metadata === 'string' ? JSON.parse(doc.metadata) : doc.metadata) : null,
+    }));
 
     // Fallback to keyword search if vector search yields no results
     if (validResults.length === 0) {
@@ -368,9 +355,18 @@ export async function addToKnowledgeBase(params: {
         discipline: params.discipline,
         authorId: params.authorId,
         metadata: params.metadata ? JSON.stringify(params.metadata) : null,
-        embedding: embedding.length > 0 ? JSON.stringify(embedding) : '[]',
       },
     });
+
+    // Update embedding via raw SQL (Unsupported type not accessible via Prisma ORM)
+    if (embedding.length > 0) {
+      const embeddingStr = '[' + embedding.join(',') + ']';
+      await prisma.$executeRaw`
+        UPDATE "KnowledgeDocument"
+        SET embedding = ${embeddingStr}::vector
+        WHERE id = ${doc.id}
+      `;
+    }
 
     return { id: doc.id };
   } catch (error) {
@@ -406,8 +402,6 @@ export async function upsertToKnowledgeBase(params: {
       console.warn('[upsertToKB] Embedding failed, saving without embedding:', error);
     }
 
-    const embeddingData = embedding.length > 0 ? JSON.stringify(embedding) : null;
-
     if (existing) {
       const doc = await prisma.knowledgeDocument.update({
         where: { id: existing.id },
@@ -417,9 +411,18 @@ export async function upsertToKnowledgeBase(params: {
           discipline: params.discipline,
           authorId: params.authorId,
           metadata: params.metadata ? JSON.stringify(params.metadata) : null,
-          embedding: embeddingData,
         },
       });
+
+      if (embedding.length > 0) {
+        const embeddingStr = '[' + embedding.join(',') + ']';
+        await prisma.$executeRaw`
+          UPDATE "KnowledgeDocument"
+          SET embedding = ${embeddingStr}::vector
+          WHERE id = ${doc.id}
+        `;
+      }
+
       return { id: doc.id };
     }
 
@@ -432,9 +435,17 @@ export async function upsertToKnowledgeBase(params: {
         discipline: params.discipline,
         authorId: params.authorId,
         metadata: params.metadata ? JSON.stringify(params.metadata) : null,
-        embedding: embeddingData,
       },
     });
+
+    if (embedding.length > 0) {
+      const embeddingStr = '[' + embedding.join(',') + ']';
+      await prisma.$executeRaw`
+        UPDATE "KnowledgeDocument"
+        SET embedding = ${embeddingStr}::vector
+        WHERE id = ${doc.id}
+      `;
+    }
 
     return { id: doc.id };
   } catch (error) {
@@ -564,9 +575,18 @@ export async function saveResearchMemory(params: {
         relatedPaper: params.relatedPaper,
         tags: params.tags || [],
         metadata: params.metadata ? JSON.stringify(params.metadata) : null,
-        embedding: embedding.length > 0 ? JSON.stringify(embedding) : '[]',
       },
     });
+
+    // Update embedding via raw SQL (Unsupported type not accessible via Prisma ORM)
+    if (embedding.length > 0) {
+      const embeddingStr = '[' + embedding.join(',') + ']';
+      await prisma.$executeRaw`
+        UPDATE "ResearchMemory"
+        SET embedding = ${embeddingStr}::vector
+        WHERE id = ${memory.id}
+      `;
+    }
 
     return { id: memory.id };
   } catch (error) {
@@ -640,77 +660,66 @@ export async function searchMemories(
       };
     }
 
-    // Hybrid search: keyword pre-filter + vector ranking
-    const keywords = query.split(/\s+/).filter((w) => w.length > 1);
-    const keywordConditions =
-      keywords.length > 0
-        ? keywords.flatMap((k) => [
-            { title: { contains: k, mode: 'insensitive' as const } },
-            { content: { contains: k, mode: 'insensitive' as const } },
-          ])
-        : [];
+    // pgvector native cosine similarity search via <=> operator
+    const embeddingStr = '[' + embedding.join(',') + ']';
+    const distanceThreshold = 1 - threshold;
 
-    let candidateMemories = await prisma.researchMemory.findMany({
-      where: {
-        ...whereClause,
-        ...(keywordConditions.length > 0 ? { OR: keywordConditions } : {}),
-      },
-      take: 300,
-      orderBy: { updatedAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        discipline: true,
-        type: true,
-        metadata: true,
-        embedding: true,
-      },
-    });
-
-    if (candidateMemories.length < 50) {
-      const existingIds = new Set(candidateMemories.map((m) => m.id));
-      const supplement = await prisma.researchMemory.findMany({
-        where: {
-          ...whereClause,
-          id: { notIn: Array.from(existingIds) },
-        },
-        take: 300 - candidateMemories.length,
-        orderBy: { updatedAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          discipline: true,
-          type: true,
-          metadata: true,
-          embedding: true,
-        },
-      });
-      candidateMemories.push(...supplement);
+    let rawResults: any[];
+    if (discipline && userId) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, discipline, type AS source, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "ResearchMemory"
+        WHERE embedding IS NOT NULL
+          AND discipline = ${discipline}
+          AND "userId" = ${userId}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else if (discipline) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, discipline, type AS source, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "ResearchMemory"
+        WHERE embedding IS NOT NULL
+          AND discipline = ${discipline}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else if (userId) {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, discipline, type AS source, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "ResearchMemory"
+        WHERE embedding IS NOT NULL
+          AND "userId" = ${userId}
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
+    } else {
+      rawResults = await prisma.$queryRaw`
+        SELECT id, title, content, discipline, type AS source, metadata,
+               (embedding <=> ${embeddingStr}::vector)::double precision AS distance
+        FROM "ResearchMemory"
+        WHERE embedding IS NOT NULL
+          AND embedding <=> ${embeddingStr}::vector <= ${distanceThreshold}
+        ORDER BY embedding <=> ${embeddingStr}::vector
+        LIMIT ${limit}
+      `;
     }
 
-    const validResults: SearchResult[] = [];
-
-    for (const mem of candidateMemories) {
-      const emb = typeof mem.embedding === 'string' ? JSON.parse(mem.embedding) : mem.embedding;
-      if (!emb || !Array.isArray(emb)) continue;
-
-      const similarity = cosineSimilarity(embedding, emb);
-      if (similarity >= threshold) {
-        validResults.push({
-          id: mem.id,
-          title: mem.title,
-          content: mem.content,
-          source: mem.type,
-          discipline: mem.discipline,
-          similarity,
-          metadata: mem.metadata as Record<string, unknown> | null,
-        });
-      }
-    }
-
-    validResults.sort((a, b) => b.similarity - a.similarity);
+    const validResults: SearchResult[] = (rawResults || []).map((mem: any) => ({
+      id: mem.id,
+      title: mem.title,
+      content: mem.content,
+      source: mem.source,
+      discipline: mem.discipline,
+      similarity: 1 - Number(mem.distance),
+      metadata: mem.metadata ? (typeof mem.metadata === 'string' ? JSON.parse(mem.metadata) : mem.metadata) : null,
+    }));
 
     if (validResults.length === 0) {
       const fbKeywords = query.split(/\s+/).filter((w) => w.length > 1);

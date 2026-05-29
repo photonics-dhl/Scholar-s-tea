@@ -22,7 +22,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return successResponse({
       ...doc,
       metadata: doc.metadata ? JSON.parse(doc.metadata) : null,
-      embedding: doc.embedding ? JSON.parse(doc.embedding) : null,
+      embedding: null,
     })
   } catch (error) {
     return apiErrors.internal(error, '获取知识文档失败')

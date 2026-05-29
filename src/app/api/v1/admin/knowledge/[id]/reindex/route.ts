@@ -38,12 +38,13 @@ export async function POST(_request: NextRequest, { params }: Params) {
       )
     }
 
-    const updated = await prisma.knowledgeDocument.update({
-      where: { id },
-      data: {
-        embedding: JSON.stringify(embeddingResult.embedding),
-      },
-    })
+    const embStr = '[' + embeddingResult.embedding.join(',') + ']'
+    await prisma.$executeRaw`
+      UPDATE "KnowledgeDocument"
+      SET embedding = ${embStr}::vector
+      WHERE id = ${id}
+    `
+    const updated = { id }
 
     return successResponse({
       id: updated.id,

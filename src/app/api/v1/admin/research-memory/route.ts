@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         relatedPaper: relatedPaper ? String(relatedPaper) : null,
         tags: Array.isArray(tags) ? tags.filter((t): t is string => typeof t === 'string') : [],
         metadata: metadata ? JSON.stringify(metadata) : null,
-        embedding: '[]',
+
       },
     })
 

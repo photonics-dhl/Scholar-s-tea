@@ -1,6 +1,3 @@
-// Scholar's Tea - Prisma Schema
-// Database: PostgreSQL 16+ with pgvector
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,40 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================
-// User & Auth
-// ============================================
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  avatar        String?
-  bio           String?
-  role          UserRole  @default(USER)
-  emailVerified DateTime?
-  passwordHash  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Academic profile (JSON stored)
-  academicProfile Json?  @db.Json
-
-  // Relations
-  accounts      Account[]
-  sessions      Session[]
-  groups        GroupMember[]
-  followedGroups ResearchGroup[] @relation("UserFollows")
-  posts         Post[]
-  comments      Comment[]
-  votes         Vote[]
-  teaPartyRooms TeaPartyRoomParticipant[]
-  hostedRooms   TeaPartyRoom[] @relation("RoomHost")
-  messages      Message[]
-  citations     CommunityCitation[] @relation("CitationUser")
-  verifiedCitations CommunityCitation[] @relation("CitationVerifier")
-  topTenVotes   TopTenVote[]
-  workshopSessions WorkshopSession[]
+  id                String                    @id @default(cuid())
+  email             String                    @unique
+  name              String?
+  avatar            String?
+  bio               String?
+  role              UserRole                  @default(USER)
+  emailVerified     DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  passwordHash      String?
+  academicProfile   Json?                     @db.Json
+  accounts          Account[]
+  comments          Comment[]
+  citations         CommunityCitation[]       @relation("CitationUser")
+  verifiedCitations CommunityCitation[]       @relation("CitationVerifier")
+  groups            GroupMember[]
+  messages          Message[]
+  posts             Post[]
+  sessions          Session[]
+  hostedRooms       TeaPartyRoom[]            @relation("RoomHost")
+  teaPartyRooms     TeaPartyRoomParticipant[]
+  topTenVotes       TopTenVote[]
+  votes             Vote[]
+  workshopSessions  WorkshopSession[]
+  followedGroups    ResearchGroup[]           @relation("UserFollows")
 }
 
 model Account {
@@ -52,15 +41,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -70,8 +58,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -82,197 +69,144 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-enum UserRole {
-  USER
-  GROUP_ADMIN
-  ADMIN
-}
-
-// ============================================
-// Institution (机构层级)
-// ============================================
-
 model Institution {
-  id        String   @id @default(cuid())
-  name      String   @unique // e.g., "浙江大学"
+  id        String          @id @default(cuid())
+  name      String          @unique
   logo      String?
   website   String?
-  createdAt DateTime @default(now())
-
-  colleges College[]
-  groups   ResearchGroup[]
+  createdAt DateTime        @default(now())
+  colleges  College[]
+  groups    ResearchGroup[]
 }
 
 model College {
-  id            String      @id @default(cuid())
-  name          String // e.g., "计算机科学与技术学院"
+  id            String          @id @default(cuid())
+  name          String
   institutionId String
-  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-
-  departments Department[]
-  groups      ResearchGroup[]
+  institution   Institution     @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  departments   Department[]
+  groups        ResearchGroup[]
 }
 
 model Department {
-  id        String   @id @default(cuid())
-  name      String // e.g., "计算机科学系"
+  id        String          @id @default(cuid())
+  name      String
   collegeId String
-  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
-
-  groups ResearchGroup[]
+  college   College         @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  groups    ResearchGroup[]
 }
-
-// ============================================
-// Research Group (课题组)
-// ============================================
 
 model ResearchGroup {
-  id          String    @id @default(cuid())
-  name        String // e.g., "人工智能实验室"
-  slug        String    @unique // URL friendly
-  logo        String?
-  banner      String?
-  description String?   @db.Text
-
-  // Institution relation
-  institutionId String
-  institution   Institution @relation(fields: [institutionId], references: [id])
-  collegeId     String?
-  college       College?    @relation(fields: [collegeId], references: [id])
-  departmentId  String?
-  department    Department? @relation(fields: [departmentId], references: [id])
-
-  // Scoring
-  score           Int      @default(0)
-  rank            Int?
-  verificationStatus VerificationStatus @default(PENDING)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  members        GroupMember[]
-  publications    Publication[]
-  news           News[]
-  patents        Patent[]
-  posts          Post[]
-  followers      User[]       @relation("UserFollows")
-  disciplines    GroupDiscipline[]
-  scoreHistory   ScoreHistory[]
-  citations      CommunityCitation[]
-}
-
-enum VerificationStatus {
-  PENDING
-  VERIFIED
-  REJECTED
+  id                 String              @id @default(cuid())
+  name               String
+  slug               String              @unique
+  logo               String?
+  banner             String?
+  description        String?
+  institutionId      String
+  collegeId          String?
+  departmentId       String?
+  score              Int                 @default(0)
+  rank               Int?
+  verificationStatus VerificationStatus  @default(PENDING)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  citations          CommunityCitation[]
+  disciplines        GroupDiscipline[]
+  members            GroupMember[]
+  news               News[]
+  patents            Patent[]
+  posts              Post[]
+  publications       Publication[]
+  college            College?            @relation(fields: [collegeId], references: [id])
+  department         Department?         @relation(fields: [departmentId], references: [id])
+  institution        Institution         @relation(fields: [institutionId], references: [id])
+  scoreHistory       ScoreHistory[]
+  followers          User[]              @relation("UserFollows")
 }
 
 model GroupMember {
-  id          String       @id @default(cuid())
-  userId      String
-  groupId     String
-  role        MemberRole  @default(MEMBER)
-  joinedAt    DateTime    @default(now())
-
-  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  group ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id       String        @id @default(cuid())
+  userId   String
+  groupId  String
+  role     MemberRole    @default(MEMBER)
+  joinedAt DateTime      @default(now())
+  group    ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
 }
 
-enum MemberRole {
-  LEADER
-  ADVISOR
-  MEMBER
-}
-
 model ScoreHistory {
-  id        String   @id @default(cuid())
-  groupId   String
-  score     Int
-  recordedAt DateTime @default(now())
-
-  group ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id         String        @id @default(cuid())
+  groupId    String
+  score      Int
+  recordedAt DateTime      @default(now())
+  group      ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
-
-// ============================================
-// Discipline (学科层级)
-// ============================================
 
 model Discipline {
-  id          String  @id @default(cuid())
-  name        String  @unique // e.g., "物理学"
-  slug        String  @unique
+  id          String            @id @default(cuid())
+  name        String            @unique
+  slug        String            @unique
   description String?
   parentId    String?
-  level       Int     @default(0) // 0=学科, 1=二级学科, 2=研究方向
-
-  parent   Discipline?  @relation("DisciplineTree", fields: [parentId], references: [id], onDelete: Restrict)
-  children Discipline[] @relation("DisciplineTree")
-
-  groups  GroupDiscipline[]
-  posts   Post[]
+  level       Int               @default(0)
+  parent      Discipline?       @relation("DisciplineTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children    Discipline[]      @relation("DisciplineTree")
+  groups      GroupDiscipline[]
+  posts       Post[]
 }
 
 model GroupDiscipline {
-  id        String @id @default(cuid())
-  groupId   String
+  id           String        @id @default(cuid())
+  groupId      String
   disciplineId String
-
-  group     ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  discipline Discipline    @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  discipline   Discipline    @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  group        ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, disciplineId])
 }
 
-// ============================================
-// Content: Post, Comment, Vote
-// ============================================
-
 model Post {
-  id          String    @id @default(cuid())
-  title       String
-  content     String    @db.Text
-  authorId    String
-  disciplineId String?
-  groupId     String?
-  isPinned    Boolean   @default(false)
-  isLocked    Boolean   @default(false)
-  viewCount   Int       @default(0)
-  topTenVotes Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  discipline Discipline? @relation(fields: [disciplineId], references: [id], onDelete: SetNull)
-  group      ResearchGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
-
-  comments Comment[]
-  votes    Vote[]
-  tags     PostTag[]
+  id                 String              @id @default(cuid())
+  title              String
+  content            String
+  authorId           String
+  disciplineId       String?
+  isPinned           Boolean             @default(false)
+  isLocked           Boolean             @default(false)
+  viewCount          Int                 @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  topTenVotes        Int                 @default(0)
+  groupId            String?
+  comments           Comment[]
+  citations          CommunityCitation[] @relation("PostCitations")
+  author             User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  discipline         Discipline?         @relation(fields: [disciplineId], references: [id])
+  group              ResearchGroup?      @relation(fields: [groupId], references: [id])
   linkedPublications PostPublication[]
-  citations CommunityCitation[] @relation("PostCitations")
-  topTenVoteRecords TopTenVote[]
+  tags               PostTag[]
+  topTenVoteRecords  TopTenVote[]
+  votes              Vote[]
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
+  id        String              @id @default(cuid())
+  content   String
   authorId  String
   postId    String
-  parentId  String? // for nested comments
-  isPinned  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  author User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parent Comment? @relation("CommentTree", fields: [parentId], references: [id], onDelete: Cascade)
-  children Comment[] @relation("CommentTree")
-
-  votes Vote[]
+  parentId  String?
+  isPinned  Boolean             @default(false)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  author    User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?            @relation("CommentTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Comment[]           @relation("CommentTree")
+  post      Post                @relation(fields: [postId], references: [id], onDelete: Cascade)
   citations CommunityCitation[] @relation("CommentCitations")
+  votes     Vote[]
 }
 
 model Vote {
@@ -280,151 +214,127 @@ model Vote {
   userId    String
   postId    String?
   commentId String?
-  value     Int      // 1=upvote, -1=downvote
+  value     Int
   createdAt DateTime @default(now())
-
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
   @@unique([userId, commentId])
 }
 
-// TOP10 Monthly Rankings
 model TopTenVote {
   id        String   @id @default(cuid())
   userId    String
   postId    String
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
 }
 
 model Tag {
-  id   String @id @default(cuid())
-  name String @unique
-
+  id    String    @id @default(cuid())
+  name  String    @unique
   posts PostTag[]
 }
 
 model PostTag {
   postId String
   tagId  String
-
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
 }
 
-// ============================================
-// Publication & Research Output
-// ============================================
-
 model Publication {
-  id          String   @id @default(cuid())
-  title       String
-  abstract    String?  @db.Text
-  authors     String[] // author names
-  year        Int?
-  doi         String?  @unique
-  url         String?
-  pdfUrl      String?
-
-  // Semantic Scholar data
-  semanticScholarId String?  @unique
-  citationCount      Int      @default(0)
-  externalIds        String?  // { arxiv: "...", pubmed: "..." }
-
-  // Group relation
-  groupId     String
-  group       ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  // AI summary
-  summary     String?  @db.Text
-  summaryUpdatedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  citedCitations Citation[] @relation("Cited")
-  citingCitations Citation[] @relation("Citing")
-  linkedPosts PostPublication[]
+  id                 String              @id @default(cuid())
+  title              String
+  abstract           String?
+  authors            String[]
+  year               Int?
+  doi                String?             @unique
+  url                String?
+  pdfUrl             String?
+  semanticScholarId  String?             @unique
+  citationCount      Int                 @default(0)
+  externalIds        String?
+  groupId            String
+  summary            String?
+  summaryUpdatedAt   DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  citedCitations     Citation[]          @relation("Cited")
+  citingCitations    Citation[]          @relation("Citing")
   communityCitations CommunityCitation[] @relation("PublicationCitations")
+  linkedPosts        PostPublication[]
+  group              ResearchGroup       @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model Citation {
-  id                String  @id @default(cuid())
-  citedPublicationId String
+  id                  String      @id @default(cuid())
+  citedPublicationId  String
   citingPublicationId String
-
-  citedPublication  Publication @relation("Cited", fields: [citedPublicationId], references: [id], onDelete: Cascade)
-  citingPublication Publication @relation("Citing", fields: [citingPublicationId], references: [id], onDelete: Cascade)
+  citedPublication    Publication @relation("Cited", fields: [citedPublicationId], references: [id], onDelete: Cascade)
+  citingPublication   Publication @relation("Citing", fields: [citingPublicationId], references: [id], onDelete: Cascade)
 
   @@unique([citedPublicationId, citingPublicationId])
 }
 
 model News {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
+  id         String        @id @default(cuid())
+  title      String
+  content    String   @db.Text
   coverImage String?
-  groupId   String
-  group     ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  groupId    String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  group      ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model Patent {
-  id        String   @id @default(cuid())
-  title     String
-  number    String?  // patent number
-  status    String?  // pending, granted, etc.
+  id         String        @id @default(cuid())
+  title      String
+  number     String?
+  status     String?
   filingDate DateTime?
-  groupId   String
-  group     ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  groupId    String
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  group      ResearchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model PostPublication {
   postId        String
   publicationId String
-
-  post        Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
-  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  post          Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
 
   @@id([postId, publicationId])
 }
 
-// ============================================
-// Community Citation (社区真实引用)
-// ============================================
-
 model CommunityCitation {
-  id            String   @id @default(cuid())
-  citingUserId   String
-  citingPostId  String?
+  id              String         @id @default(cuid())
+  citingUserId    String
+  citingPostId    String?
   citingCommentId String?
-  publicationId String
-  groupId       String
-  context       String?  @db.Text
-  status        CitationStatus @default(PENDING)
-  verifiedBy    String?
-  verifiedAt    DateTime?
-  rejectionNote String?
-  createdAt     DateTime @default(now())
-
-  citingUser   User        @relation("CitationUser", fields: [citingUserId], references: [id])
-  citingPost   Post?       @relation("PostCitations", fields: [citingPostId], references: [id], onDelete: SetNull)
-  citingComment Comment?   @relation("CommentCitations", fields: [citingCommentId], references: [id], onDelete: SetNull)
-  publication  Publication @relation("PublicationCitations", fields: [publicationId], references: [id])
-  group        ResearchGroup @relation(fields: [groupId], references: [id])
-  verifier     User?       @relation("CitationVerifier", fields: [verifiedBy], references: [id])
+  publicationId   String
+  groupId         String
+  context         String?
+  status          CitationStatus @default(PENDING)
+  verifiedBy      String?
+  verifiedAt      DateTime?
+  rejectionNote   String?
+  createdAt       DateTime       @default(now())
+  citingComment   Comment?       @relation("CommentCitations", fields: [citingCommentId], references: [id])
+  citingPost      Post?          @relation("PostCitations", fields: [citingPostId], references: [id])
+  citingUser      User           @relation("CitationUser", fields: [citingUserId], references: [id])
+  group           ResearchGroup  @relation(fields: [groupId], references: [id])
+  publication     Publication    @relation("PublicationCitations", fields: [publicationId], references: [id])
+  verifier        User?          @relation("CitationVerifier", fields: [verifiedBy], references: [id])
 
   @@index([publicationId])
   @@index([groupId])
@@ -432,149 +342,106 @@ model CommunityCitation {
   @@index([status])
 }
 
-enum CitationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-// ============================================
-// Tea Party (实时聊天室)
-// ============================================
-
 model TeaPartyRoom {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  isPublic    Boolean  @default(true)
-  hostId      String
-  maxParticipants Int   @default(50)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  host       User                      @relation("RoomHost", fields: [hostId], references: [id], onDelete: Cascade)
-  participants TeaPartyRoomParticipant[]
-  messages   Message[]
+  id              String                    @id @default(cuid())
+  name            String
+  description     String?
+  isPublic        Boolean                   @default(true)
+  hostId          String
+  maxParticipants Int                       @default(50)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  messages        Message[]
+  host            User                      @relation("RoomHost", fields: [hostId], references: [id], onDelete: Cascade)
+  participants    TeaPartyRoomParticipant[]
 }
 
 model TeaPartyRoomParticipant {
-  id        String   @id @default(cuid())
-  roomId    String
-  userId    String
-  joinedAt  DateTime @default(now())
-
-  room TeaPartyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       String       @id @default(cuid())
+  roomId   String
+  userId   String
+  joinedAt DateTime     @default(now())
+  room     TeaPartyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([roomId, userId])
 }
 
 model Message {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  type      MessageType @default(TEXT)
+  id        String       @id @default(cuid())
+  content   String
+  type      MessageType  @default(TEXT)
   roomId    String
   userId    String
-  createdAt DateTime @default(now())
-
-  room TeaPartyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  room      TeaPartyRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-enum MessageType {
-  TEXT
-  IMAGE
-  FILE
-  SYSTEM
-  STICKER
-}
-
-// ============================================
-// Top Questions
-// ============================================
 
 model TopQuestion {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   title     String
-  content   String?  @db.Text
-  month     String   // e.g., "2026-04"
+  content   String?
+  month     String
   status    QuestionStatus @default(ACTIVE)
-  voteCount Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  votes QuestionVote[]
-}
-
-enum QuestionStatus {
-  ACTIVE
-  CLOSED
-  SOLVED
+  voteCount Int            @default(0)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  votes     QuestionVote[]
 }
 
 model QuestionVote {
-  id        String @id @default(cuid())
+  id         String      @id @default(cuid())
   questionId String
-  userId    String
-  value     Int    // 1=upvote, -1=downvote
-
-  question TopQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId     String
+  value      Int
+  question   TopQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([questionId, userId])
 }
 
-// ============================================
-// Workshop (AI Chat Sessions)
-// ============================================
-
 model WorkshopSession {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   userId    String
-  title     String   @default("新对话")
-  mode      String   @default("general") // AgentMode: general, paper, grant, survey, research, peer_review, paper_generation, community_manager
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages WorkshopMessage[]
+  title     String            @default("新对话")
+  mode      String            @default("general")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  messages  WorkshopMessage[]
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([updatedAt])
 }
 
 model WorkshopMessage {
-  id        String   @id @default(cuid())
-  sessionId String
-  role      String   // user | assistant | system
-  content   String   @db.Text
-  citations String?  @db.Text // JSON: CitationVerifyResult[]
-  ragContext String? @db.Text // JSON: RAG source cards
-  attachments String? @db.Text // JSON: ChatAttachment[]
-  createdAt DateTime @default(now())
-
-  session WorkshopSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  sessionId   String
+  role        String
+  content     String
+  citations   String?
+  ragContext  String?
+  attachments String?
+  createdAt   DateTime        @default(now())
+  session     WorkshopSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
   @@index([createdAt])
 }
 
-// ============================================
-// RAG Knowledge Base
-// ============================================
-
 model KnowledgeDocument {
-  id          String   @id @default(cuid())
-  title       String
-  content     String   @db.Text
-  source      String?  //论文、帖子、新闻等
-  sourceId    String?  //关联的源记录ID
-  discipline  String?  //学科领域
-  authorId    String?
-  embedding   String?   // OpenAI text-embedding-3-small embeddings array (stored as JSON text)
-  metadata    String?   // 额外元数据 (stored as JSON text)
-  viewCount   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String                 @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  source     String?
+  sourceId   String?
+  discipline String?
+  authorId   String?
+  metadata   String?
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+  viewCount  Int                    @default(0)
+  embedding  Unsupported("vector")?
 
   @@index([discipline])
   @@index([source])
@@ -594,38 +461,38 @@ model KnowledgeBookmark {
 }
 
 model PersonalDocument {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  authors     String?  // JSON string: ["Author A", "Author B"]
-  year        Int?
-  journal     String?
-  doi         String?
-  url         String?
-  fileSize    Int?     // bytes
-  pageCount   Int?     // PDF pages
-  chunkCount  Int      @default(0)
-  metadata    String?  // JSON: keywords, abstract, sourceType, etc.
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  authors    String?
+  year       Int?
+  journal    String?
+  doi        String?
+  url        String?
+  fileSize   Int?
+  pageCount  Int?
+  chunkCount Int      @default(0)
+  metadata   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([userId])
 }
 
 model ResearchMemory {
-  id          String   @id @default(cuid())
-  type        MemoryType
-  title       String
-  content     String   @db.Text
-  summary     String?  @db.Text
-  embedding   String   // OpenAI text-embedding-3-small embeddings array (stored as JSON text)
-  discipline  String?
-  userId      String?
+  id           String                 @id @default(cuid())
+  type         MemoryType
+  title        String
+  content      String
+  summary      String?
+  discipline   String?
+  userId       String?
   relatedPaper String?
-  tags        String[]
-  metadata    String?   // 额外元数据 (stored as JSON text)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tags         String[]
+  metadata     String?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  embedding    Unsupported("vector")?
 
   @@index([type])
   @@index([discipline])
@@ -633,10 +500,48 @@ model ResearchMemory {
   @@index([updatedAt])
 }
 
+enum UserRole {
+  USER
+  GROUP_ADMIN
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum MemberRole {
+  LEADER
+  ADVISOR
+  MEMBER
+}
+
+enum CitationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+  STICKER
+}
+
+enum QuestionStatus {
+  ACTIVE
+  CLOSED
+  SOLVED
+}
+
 enum MemoryType {
-  IDEA           // 研究想法
-  PAPER_SUMMARY  // 论文摘要
-  DISCUSSION     // 讨论记录
-  QUESTION      // 问题记录
-  NOTES         // 笔记
+  IDEA
+  PAPER_SUMMARY
+  DISCUSSION
+  QUESTION
+  NOTES
 }

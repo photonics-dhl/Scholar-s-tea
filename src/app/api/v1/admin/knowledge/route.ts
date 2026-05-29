@@ -34,10 +34,19 @@ export async function POST(request: NextRequest) {
         sourceId: sourceId ? String(sourceId) : null,
         discipline: discipline ? String(discipline) : null,
         authorId: session.user.id,
-        embedding,
         metadata: metadata ? JSON.stringify(metadata) : null,
       },
     })
+
+    // Set embedding via raw SQL (Unsupported type)
+    if (embedding && embedding.length > 2) {
+      const embStr = embedding
+      await prisma.$executeRaw`
+        UPDATE "KnowledgeDocument"
+        SET embedding = ${embStr}::vector
+        WHERE id = ${doc.id}
+      `
+    }
 
     return successResponse({
       ...doc,

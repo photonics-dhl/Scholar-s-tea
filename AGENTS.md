@@ -62,7 +62,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 |-------|------|------|
 | API | Next.js API Routes | `src/app/api/v1/`, domain-subdirs |
 | Realtime | Node.js + Socket.io v4 | `server/`, port 3001, separate process |
-| Database | PostgreSQL 9.2.24 + pgvector | Production instance; schema targets PostgreSQL 16+ |
+| Database | PostgreSQL 16.4 + pgvector 0.7.4 | Source-compiled to `~/pgsql16`, data dir `~/pgdata16` |
 | ORM | Prisma | 5.14.x (root) / 5.22.x (server) |
 | Cache | Redis | Optional, used for sessions / queues |
 | Storage | MinIO | S3-compatible object storage |
@@ -70,7 +70,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 | AI (alt) | MiniMax API | `HERMES_MODEL=MiniMax-M2.7` via `MINIMAX_API_KEY` |
 | AI (vision) | ZCHAT API | Multimodal: `gpt-5`, `claude-sonnet-4-5`, etc. via `ZCHAT_API_KEY` |
 | AI (legacy) | Claude (Anthropic) | `CLAUDE_API_KEY` reserved; `claude-service.ts` wraps ZAI internally |
-| Process Manager | PM2 | `ecosystem.config.js` |
+| Process Manager | PM2 | `ecosystem.config.js` (3 processes) |
 
 ### Design System
 
@@ -240,6 +240,7 @@ npm run start   # node dist/index.js
 pm2 start ecosystem.config.js
 pm2 logs scholars-tea
 pm2 logs scholars-tea-socket
+pm2 logs scholars-tea-embedding
 ```
 
 ---
@@ -407,8 +408,11 @@ System Prompt 全局规定"数学公式必须使用 UTF-8 Unicode 符号，禁�
 
 ### RAG Storage
 
-- Embeddings are stored as JSON text in `KnowledgeDocument.embedding` and `ResearchMemory.embedding` (OpenAI `text-embedding-3-small` format).
-- pgvector is declared in the schema comment but the current embedding columns are plain `String?` / `String`; search is implemented via vector math in application code or Prisma raw queries.
+- Embeddings are stored as `vector(1024)` in `KnowledgeDocument.embedding` and `ResearchMemory.embedding` (pgvector native type, mapped as `Unsupported("vector")` in Prisma).
+- Search uses pgvector `<=>` cosine distance operator via `$queryRaw`. Distance threshold 0.5 corresponds to similarity ≥ 0.5.
+- **Critical**: `(embedding <=> vec)::double precision` must be used in `$queryRaw` because the `real` type deserializes to `null` in Node.js pg driver.
+- **Embedding generation**: `scripts/embedding-server.py` — local FastAPI service running BGE-M3 (lazy-load, ~1.8GB resident). OpenAI-compatible `/embeddings` endpoint on port 9997. Fallback to ZCHAT API if local server offline.
+- `generateEmbedding()` in `src/lib/ai/rag-service.ts` tries local first (`http://127.0.0.1:9997`), falls back to ZCHAT API on any error. Threshold for `searchKnowledgeBase` is 0.5 (BGE-M3 similarity distribution: 0.53–0.65 for top results).
 
 ---
 
@@ -476,6 +480,7 @@ pm2 restart ecosystem.config.js
 # or individually:
 pm2 restart scholars-tea
 pm2 restart scholars-tea-socket
+pm2 restart scholars-tea-embedding
 ```
 
 ### Hermes Gateway Restart
@@ -497,6 +502,9 @@ hermes gateway run > ~/hermes-home/logs/gateway.log 2>&1 &
 |-----|--------|------|--------------|
 | `scholars-tea` | `next start -p 3002` | 3002 | 1 GB |
 | `scholars-tea-socket` | `server/dist/index.js` | 3001 | 512 MB |
+| `scholars-tea-embedding` | `python3 scripts/embedding-server.py` | 9997 | 5 GB |
+
+Embedding process runs under the `ai_agent` conda environment with explicit `PATH` and `PYTHONPATH`. Lazy-loads BGE-M3 on first request (~5s).
 
 ### Required Environment Variables
 

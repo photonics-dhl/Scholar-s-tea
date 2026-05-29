@@ -10,105 +10,69 @@
 
 | 项 | 内容 |
 |----|------|
-| **目标** | P3-P7 五阶段性能与质量优化 |
-| **已完成** | ✅ P3 前端性能（Image 组件 + dynamic 懒加载，Workshop -25%）<br>✅ P4 API 性能（unstable_cache + 并行查询 + 消息限制）<br>✅ P5 错误处理标准化（api/response.ts helper）<br>✅ P6 代码质量（ESLint no-console 规则调整 + 清理 30+ 处 console.log）<br>✅ P7 安全评估（9 个漏洞需 --force，维持不修复决策）<br>✅ 远程 build + PM2 restart 成功 |
-| **关键决策** | - `no-console` 规则允许 `error`/`warn`，仅禁止 `console.log`<br>- 9 个 npm audit 漏洞需 Next.js 14→16 升级，决定延后处理<br>- `unstable_cache` 用于 disciplines/institutions(1h)/public-stats(5min)<br>- Workshop 消息限制 `take: 100` 防止长会话内存爆炸 |
+| **目标** | PostgreSQL 9.2 → 16.4 + pgvector 原生向量索引升级 |
+| **已完成** | ✅ 源码编译 PG 16.4 到 `~/pgsql16`（无 sudo）<br>✅ 编译安装 pgvector 0.7.4<br>✅ 备份旧数据、停止旧 PG、迁移数据到新 PG16<br>✅ 将 JSON text embedding 转换为 `vector(1024)` 类型（212 条零丢失）<br>✅ Prisma schema 更新：`Unsupported("vector")`<br>✅ rag-service.ts 改用 pgvector `<=>` 原生查询<br>✅ 修复所有 embedding 引用文件（admin API / reindex 脚本）<br>✅ `::double precision` 反序列化修复（Prisma/Node.js 驱动 bug）<br>✅ TypeScript 通过 + Build 成功 + PM2 重启<br>✅ Git push 到 develop 分支<br>✅ 添加 PG16 自启动 cron 任务 |
+| **关键决策** | - 无 sudo → 源码编译 `--prefix=$HOME/pgsql16`<br>- `vector` 类型通过 `$queryRaw`/`$executeRaw` 操作，Prisma ORM 不直接支持 `Unsupported`<br>- 距离计算用 `(embedding <=> vec)::double precision`（`real` 类型在 Node.js 驱动中反序列化为 null） |
 | **阻塞项** | 无 |
-| **相关文件** | `next.config.js`, `src/lib/api/response.ts`, `src/services/groups/index.ts`, `src/services/tea-party/index.ts`, `.eslintrc.json`, `src/app/api/v1/disciplines/route.ts`, `src/app/api/v1/institutions/route.ts`, `src/app/api/v1/public-stats/route.ts` |
-| **已知问题** | - 9 个 npm audit 漏洞（2 low, 3 moderate, 4 high），需 Next.js 16 升级修复<br>- Sakura Frp 网络间歇性断开（SSH 偶发超时） |
-| **下一动作** | 用户确认本轮优化效果；建议下一轮方向：1）Next.js 15/16 升级评估 2）Knowledge 管理端开发 3）服务端监控告警 |
+| **相关文件** | `prisma/schema.prisma`, `src/lib/ai/rag-service.ts`, `scripts/admin/reindex-knowledge.ts`, `src/app/api/v1/admin/knowledge/*`, `src/app/api/v1/admin/research-memory/*`, `src/app/api/v1/knowledge/[id]/route.ts` |
+| **已知问题** | - `Unsupported("vector")` 不在 Prisma Client 类型中，所有 embedding 操作必须用 raw SQL<br>- 个人知识库（Personal KB）的 PDF 公式提取仍依赖 pdf.js + LLM，未接入 MathPix |
+| **下一动作** | 1）用户测试 RAG 搜索功能<br>2）评估是否需要接入 MathPix API 改善 PDF 公式提取 |
+
+---
+
+## 本次变更详情（2026-05-29 — PostgreSQL 16 + pgvector 升级）
+
+### 背景
+
+- **旧环境**：PostgreSQL 9.2.24，embedding 以 JSON 文本存储，搜索时用 JavaScript `cosineSimilarity()` 全内存计算
+- **瓶颈**：无原生向量索引，数据量大时全表扫描性能差
+- **约束**：无 sudo，CentOS 7 已 EOL
+
+### 升级步骤
+
+1. **源码编译 PG 16.4** → `~/pgsql16`（`--prefix=$HOME/pgsql16`）
+2. **编译 pgvector 0.7.4** → 安装到 `~/pgsql16/lib`
+3. **数据迁移**：`pg_dumpall` 备份 → 停止旧 PG → `initdb` 新目录 → 导入数据
+4. **类型转换**：`ALTER TABLE ... ADD COLUMN embedding_vec vector(1024)` → 迁移 JSON → 删除旧列
+5. **代码适配**：Prisma `Unsupported("vector")` + `$queryRaw`/`$executeRaw` 操作
+6. **反序列化修复**：`(embedding <=> vec)::double precision`（`real` 在 Node.js 驱动中为 null）
+7. **自启动**：crontab 每分钟检查并自动启动 PG16
+
+### 验证结果
+
+```
+Query: "optics metamaterial"
+[1] Metamaterials for Electromagnetic Wave Control (sim: 0.6292)
+[2] Three-Dimensional Optical Metamaterial with a Negative Refractive Index (sim: 0.6265)
+[3] Metasurface Flat Optics: From Metalenses to Polarization Control (sim: 0.5455)
+```
+
+---
+
+## 核心环境（永不可忘）
+
+| 配置 | 值 |
+|------|-----|
+| **服务器** | `10.72.212.33` via `ssh ZJU-MSE-HPC` |
+| **PG 版本** | 16.4（源码编译 @ `~/pgsql16`） |
+| **PG 数据** | `~/pgdata16` |
+| **PG 旧备份** | `~/pgdata`（保留），`~/pg_backup_20260529.sql` |
+| **pgvector** | 0.7.4 |
+| **Embedding 模型** | BAAI/bge-m3（1024 维）@ `http://127.0.0.1:9997` |
+| **RAG 搜索** | pgvector `<=>` 原生 cosine distance（threshold 0.5 = distance ≤ 0.5） |
+| **BGE-M3 进程** | PID 11306, `scholars-tea-embedding`（PM2 管理）|
+| **Next.js** | Port 3002（PM2: `scholars-tea`）|
+| **Socket** | Port 3001（PM2: `scholars-tea-socket`）|
 
 ---
 
 ## 历史归档
 
-### 2026-05-22：五阶段性能与质量优化（P3-P7）
+### 2026-05-29：PostgreSQL 16 + pgvector 升级
+→ 详见 `.claude/project-memory/SOLUTIONS/postgresql-16-pgvector-upgrade.md`
 
-<details>
-<summary>展开查看详情</summary>
+### 2026-05-27：Marker PDF 逐页选择性 force_ocr
+→ 已废弃路径。Marker 最终移除，改用纯 LLM 修复。
 
-**P3 — 前端性能优化**：
-- `next.config.js` 扩展图片域名白名单（AWS S3、GitHub、Google、ByteDance）
-- `GroupCard`/`GroupHeader`/`NewsList` raw `<img>` → Next.js `<Image>` 组件
-- `WorkshopClient` 中 `PeerReviewPanel`/`PaperGenerationPanel` 改为 `next/dynamic` 懒加载
-- `ChatMessage` 中 `PeerReviewScoreCard`/`GrantApplicationWizard` 改为 `next/dynamic` 懒加载
-- 效果：`/workshop` bundle 31.2kB → 23.4kB (-25%)
-
-**P4 — API 性能优化**：
-- `/disciplines` `/institutions` `/public-stats` 添加 `unstable_cache`
-- `getGroups`/`getTeaPartyRooms` 中 `count` + `findMany` 改为 `Promise.all`
-- Workshop session GET 添加 `take: 100` 限制消息数量
-
-**P5 — 错误处理标准化**：
-- 新建 `src/lib/api/response.ts`：`successResponse` / `errorResponse` / `apiErrors`
-- disciplines/institutions/public-stats 路由迁移为新 helper
-
-**P6 — 代码质量**：
-- `.eslintrc.json`: `no-console` 规则允许 `error`/`warn`
-- 清理 30+ 处 `console.log` 调试日志
-- CI lint warning 归零
-
-**P7 — 安全评估**：
-- `npm audit` 显示 9 个漏洞，全部需 `--force` 修复（Next.js 14→16 breaking change）
-- 决定维持不修复，记录待后续升级处理
-
-**部署**：远程 build 成功，PM2 restart 成功，两个进程 online
-</details>
-
-### 2026-05-21：三阶段工程治理 + CI/CD 搭建
-
-<details>
-<summary>展开查看详情</summary>
-
-**P0-P2 工程基线治理**：Socket 泄漏修复、next.config.js 安全加固、日志分级、Vitest 框架（30 tests）、Prisma baseline migration、文档更新
-
-**CI/CD 搭建**：
-- `ci.yml`: PR/push 时自动运行 lint + typecheck + test + prisma validate ✅
-- `deploy.yml`: `workflow_dispatch` 手动触发（内网服务器不可达）
-- GitHub Secrets 已配置
-
-</details>
-
----
-
-## 经验记录
-
-### 1. `sed` 删除多行 `console.log` 的风险
-
-`sed -i '/console\.log/d'` 对多行 `console.log(...)` 调用会只删除包含 `console.log` 的行，留下后续参数行导致 Parsing Error。修复：手动检查并删除残留参数。
-
-### 2. `unstable_cache` 的使用
-
-Next.js App Router API 路由中可以使用 `unstable_cache` 缓存数据获取函数。需要指定 `tags` 以便后续通过 `revalidateTag` 手动失效。
-
-### 3. `next/dynamic` 对条件渲染组件的收益
-
-`PeerReviewPanel`/`PaperGenerationPanel` 只在特定 mode 下渲染，但静态导入会始终打包。改为 `next/dynamic` 后 Workshop 页面减少 7.8kB (25%)。
-
----
-
-## Document & Clear 模式
-
-### 写入（`/clear` 前必做）
-
-1. 更新上方「当前任务状态」表格
-2. 如产生阶段性成果（ADR、设计稿、调研结论），写入 `.claude/sessions/YYYY-MM-DD_主题.md`
-3. 执行 `/clear`
-
-### 恢复（新会话启动）
-
-1. **读取本文件** → 了解当前任务
-2. 读取 `AGENTS.md` → 项目全貌
-3. 按需读取 `.claude/rules/` 中的细则
-4. 按需读取 `.claude/agents/` 的 Agent 定义
-
----
-
-## Agent 间 Handoff（快速参考）
-
-- **必须传递**：目标（1 句话）、已完成（3–5 点）、关键决策、阻塞项、相关文件路径
-- **禁止传递**：完整代码块（用路径代替）、已解决的中间讨论、无关背景
-
----
-
-*Last updated: 2026-05-22*
+### 2026-05-26：BGE-M3 本地 Embedding 迁移
+→ 详见 `.claude/project-memory/SOLUTIONS/bge-m3-embedding-server.md`

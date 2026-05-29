@@ -572,11 +572,44 @@ model KnowledgeDocument {
   authorId    String?
   embedding   String?   // OpenAI text-embedding-3-small embeddings array (stored as JSON text)
   metadata    String?   // 额外元数据 (stored as JSON text)
+  viewCount   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([discipline])
   @@index([source])
+  @@index([updatedAt])
+  @@index([authorId])
+}
+
+model KnowledgeBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  docId     String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, docId])
+  @@index([userId])
+  @@index([docId])
+}
+
+model PersonalDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  authors     String?  // JSON string: ["Author A", "Author B"]
+  year        Int?
+  journal     String?
+  doi         String?
+  url         String?
+  fileSize    Int?     // bytes
+  pageCount   Int?     // PDF pages
+  chunkCount  Int      @default(0)
+  metadata    String?  // JSON: keywords, abstract, sourceType, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model ResearchMemory {
@@ -597,6 +630,7 @@ model ResearchMemory {
   @@index([type])
   @@index([discipline])
   @@index([userId])
+  @@index([updatedAt])
 }
 
 enum MemoryType {

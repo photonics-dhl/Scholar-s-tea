@@ -31,7 +31,7 @@ interface EmbeddingResult {
   error?: string;
 }
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   title: string;
   content: string;
@@ -41,11 +41,43 @@ interface SearchResult {
   metadata?: Record<string, unknown> | null;
 }
 
-const EMBEDDING_MODEL = 'text-embedding-3-small';
+const EMBEDDING_MODEL = 'BAAI/bge-m3';
+const LOCAL_EMBEDDING_URL = process.env.LOCAL_EMBEDDING_URL || 'http://127.0.0.1:9997';
 
-export async function generateEmbedding(text: string): Promise<EmbeddingResult> {
+async function generateEmbeddingViaLocal(text: string): Promise<EmbeddingResult> {
+  try {
+    const response = await fetch(`${LOCAL_EMBEDDING_URL}/v1/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: EMBEDDING_MODEL,
+        input: text.slice(0, 8000),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.warn('[Embedding] Local API error:', response.status, errorText.slice(0, 200));
+      return { embedding: [], error: `Local API error: ${response.status}` };
+    }
+
+    const data = await response.json();
+    let embedding: number[] = [];
+    if (Array.isArray(data.data) && data.data[0]?.embedding) {
+      embedding = data.data[0].embedding;
+    }
+    if (!Array.isArray(embedding) || embedding.length === 0) {
+      console.warn('[Embedding] Local empty embedding. Response keys:', Object.keys(data).join(','));
+    }
+    return { embedding: Array.isArray(embedding) ? embedding : [] };
+  } catch (error) {
+    console.warn('[Embedding] Local generation error:', error instanceof Error ? error.message : error);
+    return { embedding: [], error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+async function generateEmbeddingViaZChat(text: string): Promise<EmbeddingResult> {
   await initProxy();
-  // ZCHAT supports OpenAI-compatible embeddings API, prioritize it
   const apiKey = process.env.ZCHAT_API_KEY || process.env.ANTHROPIC_API_KEY || process.env.MINIMAX_API_KEY;
   const baseUrl = process.env.ZCHAT_BASE_URL || process.env.ANTHROPIC_BASE_URL || process.env.MINIMAX_BASE_URL;
 
@@ -61,7 +93,7 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: EMBEDDING_MODEL,
+        model: 'text-embedding-3-small',
         input: text.slice(0, 8000),
       }),
     };
@@ -72,12 +104,11 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[Embedding] API error:', response.status, errorText.slice(0, 200));
-      return { embedding: [], error: `Embedding API error: ${response.status}` };
+      console.error('[Embedding] ZChat API error:', response.status, errorText.slice(0, 200));
+      return { embedding: [], error: `ZChat API error: ${response.status}` };
     }
 
     const data = await response.json();
-    // Support multiple response formats: OpenAI {data:[{embedding}]}, ZCHAT {vectors:[...]}
     let embedding: number[] = [];
     if (Array.isArray(data.data) && data.data[0]?.embedding) {
       embedding = data.data[0].embedding;
@@ -86,14 +117,21 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
     } else if (Array.isArray(data.embedding)) {
       embedding = data.embedding;
     }
-    if (!Array.isArray(embedding) || embedding.length === 0) {
-      console.warn('[Embedding] Empty embedding returned. Response keys:', Object.keys(data).join(','));
-    }
     return { embedding: Array.isArray(embedding) ? embedding : [] };
   } catch (error) {
-    console.error('[Embedding] Generation error:', error instanceof Error ? error.message : error);
+    console.error('[Embedding] ZChat generation error:', error instanceof Error ? error.message : error);
     return { embedding: [], error: error instanceof Error ? error.message : 'Unknown error' };
   }
+}
+
+export async function generateEmbedding(text: string): Promise<EmbeddingResult> {
+  // Try local BGE-M3 first, fallback to ZCHAT API
+  const localResult = await generateEmbeddingViaLocal(text);
+  if (localResult.embedding.length > 0) {
+    return localResult;
+  }
+  console.warn('[Embedding] Local BGE-M3 failed, falling back to ZChat API:', localResult.error);
+  return generateEmbeddingViaZChat(text);
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
@@ -179,8 +217,25 @@ export async function searchKnowledgeBase(
       };
     }
 
-    const documents = await prisma.knowledgeDocument.findMany({
-      where: whereClause,
+    // Hybrid search: keyword pre-filter + vector ranking
+    // First, narrow down candidates with keyword matching to avoid full table scan
+    const keywords = query.split(/\s+/).filter((w) => w.length > 1);
+    const keywordConditions =
+      keywords.length > 0
+        ? keywords.flatMap((k) => [
+            { title: { contains: k, mode: 'insensitive' as const } },
+            { content: { contains: k, mode: 'insensitive' as const } },
+          ])
+        : [];
+
+    // Phase 1: keyword-filtered candidates (up to 300)
+    let candidateDocs = await prisma.knowledgeDocument.findMany({
+      where: {
+        ...whereClause,
+        ...(keywordConditions.length > 0 ? { OR: keywordConditions } : {}),
+      },
+      take: 300,
+      orderBy: { updatedAt: 'desc' },
       select: {
         id: true,
         title: true,
@@ -192,9 +247,32 @@ export async function searchKnowledgeBase(
       },
     });
 
+    // Phase 2: if keyword filter is too strict (<50 docs), supplement with recent docs
+    if (candidateDocs.length < 50) {
+      const existingIds = new Set(candidateDocs.map((d) => d.id));
+      const supplementDocs = await prisma.knowledgeDocument.findMany({
+        where: {
+          ...whereClause,
+          id: { notIn: Array.from(existingIds) },
+        },
+        take: 300 - candidateDocs.length,
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          source: true,
+          discipline: true,
+          metadata: true,
+          embedding: true,
+        },
+      });
+      candidateDocs.push(...supplementDocs);
+    }
+
     const validResults: SearchResult[] = [];
 
-    for (const doc of documents) {
+    for (const doc of candidateDocs) {
       const emb = typeof doc.embedding === 'string' ? JSON.parse(doc.embedding) : doc.embedding;
       if (!emb || !Array.isArray(emb)) continue;
 
@@ -213,6 +291,48 @@ export async function searchKnowledgeBase(
     }
 
     validResults.sort((a, b) => b.similarity - a.similarity);
+
+    // Fallback to keyword search if vector search yields no results
+    if (validResults.length === 0) {
+      const fbKeywords = query.split(/\s+/).filter((w) => w.length > 1);
+      const orConditions =
+        fbKeywords.length > 0
+          ? fbKeywords.flatMap((k) => [
+              { title: { contains: k, mode: 'insensitive' as const } },
+              { content: { contains: k, mode: 'insensitive' as const } },
+            ])
+          : [
+              { title: { contains: query, mode: 'insensitive' as const } },
+              { content: { contains: query, mode: 'insensitive' as const } },
+            ];
+      const docs = await prisma.knowledgeDocument.findMany({
+        where: {
+          ...whereClause,
+          OR: orConditions,
+        },
+        take: limit,
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          source: true,
+          discipline: true,
+          metadata: true,
+        },
+      });
+      return {
+        results: docs.map((doc) => ({
+          id: doc.id,
+          title: doc.title,
+          content: doc.content,
+          source: doc.source,
+          discipline: doc.discipline,
+          similarity: 0.5,
+          metadata: doc.metadata as Record<string, unknown> | null,
+        })),
+      };
+    }
 
     return { results: validResults.slice(0, limit) };
   } catch (error) {
@@ -464,7 +584,7 @@ export async function searchMemories(
     userId?: string;
   } = {}
 ): Promise<{ results: SearchResult[]; error?: string }> {
-  const { limit = 5, threshold = 0.5, discipline, userId } = options;
+  const { limit = 5, threshold = 0.3, discipline, userId } = options;
 
   try {
     const { embedding, error } = await generateEmbedding(query);
@@ -520,8 +640,23 @@ export async function searchMemories(
       };
     }
 
-    const memories = await prisma.researchMemory.findMany({
-      where: whereClause,
+    // Hybrid search: keyword pre-filter + vector ranking
+    const keywords = query.split(/\s+/).filter((w) => w.length > 1);
+    const keywordConditions =
+      keywords.length > 0
+        ? keywords.flatMap((k) => [
+            { title: { contains: k, mode: 'insensitive' as const } },
+            { content: { contains: k, mode: 'insensitive' as const } },
+          ])
+        : [];
+
+    let candidateMemories = await prisma.researchMemory.findMany({
+      where: {
+        ...whereClause,
+        ...(keywordConditions.length > 0 ? { OR: keywordConditions } : {}),
+      },
+      take: 300,
+      orderBy: { updatedAt: 'desc' },
       select: {
         id: true,
         title: true,
@@ -533,9 +668,31 @@ export async function searchMemories(
       },
     });
 
+    if (candidateMemories.length < 50) {
+      const existingIds = new Set(candidateMemories.map((m) => m.id));
+      const supplement = await prisma.researchMemory.findMany({
+        where: {
+          ...whereClause,
+          id: { notIn: Array.from(existingIds) },
+        },
+        take: 300 - candidateMemories.length,
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          discipline: true,
+          type: true,
+          metadata: true,
+          embedding: true,
+        },
+      });
+      candidateMemories.push(...supplement);
+    }
+
     const validResults: SearchResult[] = [];
 
-    for (const mem of memories) {
+    for (const mem of candidateMemories) {
       const emb = typeof mem.embedding === 'string' ? JSON.parse(mem.embedding) : mem.embedding;
       if (!emb || !Array.isArray(emb)) continue;
 
@@ -554,6 +711,47 @@ export async function searchMemories(
     }
 
     validResults.sort((a, b) => b.similarity - a.similarity);
+
+    if (validResults.length === 0) {
+      const fbKeywords = query.split(/\s+/).filter((w) => w.length > 1);
+      const orConditions =
+        fbKeywords.length > 0
+          ? fbKeywords.flatMap((k) => [
+              { title: { contains: k, mode: 'insensitive' as const } },
+              { content: { contains: k, mode: 'insensitive' as const } },
+            ])
+          : [
+              { title: { contains: query, mode: 'insensitive' as const } },
+              { content: { contains: query, mode: 'insensitive' as const } },
+            ];
+      const memories = await prisma.researchMemory.findMany({
+        where: {
+          ...whereClause,
+          OR: orConditions,
+        },
+        take: limit,
+        orderBy: { updatedAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          discipline: true,
+          type: true,
+          metadata: true,
+        },
+      });
+      return {
+        results: memories.map((mem) => ({
+          id: mem.id,
+          title: mem.title,
+          content: mem.content,
+          source: mem.type,
+          discipline: mem.discipline,
+          similarity: 0.5,
+          metadata: mem.metadata as Record<string, unknown> | null,
+        })),
+      };
+    }
 
     return { results: validResults.slice(0, limit) };
   } catch (error) {
@@ -707,9 +905,19 @@ export async function getContextForQuery(
     selected.push(s);
   }
 
-  const context = selected
-    .map((r) => `【${r.source || '知识'}】${r.title}\n${r.content.slice(0, 1000)}`)
-    .join('\n\n---\n\n');
+  if (selected.length === 0) {
+    return { context: '', sources: [] };
+  }
+
+  const context =
+    '以下是与用户问题相关的知识库内容。请在回答中引用来源时使用 [KB-N] 标记（如 [KB-1]、[KB-2]）。\n\n' +
+    selected
+      .map((r, i) => {
+        const num = i + 1;
+        const meta = [r.discipline, r.source].filter(Boolean).join(', ');
+        return `[KB-${num}] 《${r.title}》${meta ? `(${meta})` : ''} — relevance: ${(r.similarity || 0).toFixed(2)}\n${r.content.slice(0, 1000)}`;
+      })
+      .join('\n\n---\n\n');
 
   return { context, sources: selected };
 }

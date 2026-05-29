@@ -58,6 +58,9 @@ tests/logs/
 
 # Test artifacts (screenshots, debug outputs)
 tests/screenshots/
+/*.png
+tests/*.pdf
+scripts/temp/
 
 
 # Claude Code local settings (contain credentials)
@@ -75,7 +78,20 @@ settings.local.json
 # Git conflict backups
 *.orig
 
+# Python virtual environments
+venv/
+venv-*/
+.venv/
+
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
+
+# Temporary test outputs
+tests/marker-output/
+*.b64
+
+# Project memory (may contain sensitive context)
+.claude/project-memory/SOLUTIONS/
+.claude/HANDOFF.md

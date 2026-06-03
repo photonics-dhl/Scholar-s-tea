@@ -165,8 +165,8 @@ display:
   tool_progress_command: false
   tool_progress_overrides: {}
 fallback_providers:
-  - provider: minimax
-    model: MiniMax-M2.7
+  - provider: zai
+    model: glm-4.7
   - provider: deepseek
     model: deepseek-chat
     base_url: https://api.deepseek.com
@@ -270,11 +270,8 @@ skills:
 slack:
   channel_prompts: {}
 smart_model_routing:
-  cheap_model:
-    provider: kimi
-    model: moonshot-v1-8k
-    base_url: https://api.kimi.com/coding/v1
-  enabled: true
+  cheap_model: {}
+  enabled: false
   max_simple_chars: 160
   max_simple_words: 28
 streaming:

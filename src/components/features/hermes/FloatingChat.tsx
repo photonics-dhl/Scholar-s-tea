@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils/cn';
 import { useSession } from 'next-auth/react';
 import { useHermesChat, type HermesPersonality, compressImageToBase64 } from '@/hooks/useHermesChat';
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown';
+import { AttachmentActions } from './AttachmentActions';
 import { HermesAvatar, type HermesMood, type AvatarCommand } from './HermesAvatar';
 import { HermesRadialMenu, type RadialAction } from './HermesRadialMenu';
 
@@ -726,7 +727,10 @@ export function FloatingChat() {
                   />
                 )}
                 {message.role === 'assistant' ? (
-                  <SimpleMarkdown content={message.content} className="select-text" />
+                  <>
+                    <SimpleMarkdown content={message.content} className="select-text" />
+                    <AttachmentActions content={message.content} />
+                  </>
                 ) : (
                   <p className="whitespace-pre-wrap select-text">{message.content}</p>
                 )}

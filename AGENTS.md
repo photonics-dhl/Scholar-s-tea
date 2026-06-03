@@ -24,6 +24,7 @@
 | Tea Party | `/tea-party` | Socket.io real-time chat rooms |
 | AI Workshop | `/workshop` | ZAI GLM-5.1 academic assistant with RAG knowledge base |
 | Knowledge | `/knowledge` | RAG vector-store documents |
+| Personal KB | `/personal-kb` | User-uploaded PDF ingestion, chunking, embedding, and semantic search |
 | Profile / Settings | `/profile`, `/settings` | User profiles and preferences |
 
 Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), Discord (chat), Notion (editor).
@@ -74,7 +75,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 
 ### Design System
 
-- **Fonts**: Crimson Pro (serif headings), Source Serif 4 (body), Inter (UI), JetBrains Mono (code).
+- **Fonts**: Crimson Pro (serif headings), Source Serif 4 (body), Inter (UI), JetBrains Mono (code). Loaded via Google Fonts in `src/app/layout.tsx`.
 - **Dual-track color system** in Tailwind:
   - `journal-*` — Academic zone (teal primary `#1A5F5C`, gold accent `#D4A853`).
   - `tea-*` — Social zone (mint primary `#6AB894`, orange accent `#E8924A`).
@@ -99,6 +100,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   ├── top-questions/
 │   │   │   ├── workshop/
 │   │   │   ├── knowledge/
+│   │   │   ├── personal-kb/ # User PDF upload & semantic search
 │   │   │   ├── profile/
 │   │   │   └── settings/
 │   │   ├── api/v1/          # REST API routes (domain subdirs)
@@ -112,6 +114,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   ├── hermes/
 │   │   │   ├── institutions/
 │   │   │   ├── knowledge/
+│   │   │   ├── personal-kb/ # PDF ingestion, embedding, search endpoints
 │   │   │   ├── posts/
 │   │   │   ├── publications/
 │   │   │   ├── public-stats/
@@ -129,6 +132,7 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   │   ├── groups/
 │   │   │   ├── hermes/
 │   │   │   ├── home/
+│   │   │   ├── knowledge/
 │   │   │   ├── posts/
 │   │   │   ├── search/
 │   │   │   ├── tea-party/
@@ -140,7 +144,9 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   │   ├── db/prisma.ts     # Prisma singleton — ALL DB ops go here
 │   │   ├── auth/            # NextAuth config, providers, password utils
 │   │   ├── ai/              # ZAI wrapper, RAG service, prompts, citation detector
-│   │   │   ├── skills/      # AI skill engine (types, engine, index, paper-generation)
+│   │   │   ├── skills/      # AI skill engine (types, engine, paper-generation)
+│   │   ├── personal-kb/     # PDF extraction, chunking, embedding, storage for user KB
+│   │   ├── knowledge/       # Knowledge base category utilities
 │   │   ├── socket/          # Socket.io client utilities
 │   │   └── utils/           # cn(), sanitize, helpers
 │   ├── services/            # Client-side business logic
@@ -156,8 +162,8 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── dist/                # Compiled output (`tsc`)
 │   └── package.json
 ├── prisma/
-│   ├── schema.prisma        # 608 lines, ~30 models
-│   └── seed.ts
+│   ├── schema.prisma        # 547 lines, ~30 models
+│   └── seed.ts              # Seeds institutions, colleges, departments, etc.
 ├── scripts/
 │   ├── admin/               # make-admin.ts
 │   ├── build/               # build-start.sh, clean-rebuild.sh, fix-prisma.sh, simple-start.sh
@@ -165,9 +171,13 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 │   ├── deploy/              # Python/Shell deploy helpers
 │   ├── start/               # start-nextjs.sh, full-restart.sh, restart-next.sh
 │   ├── sync/                # Claude sync scripts (local/server bidirectional)
-│   ├── test/                # Ad-hoc diagnostic scripts (no formal test framework)
+│   ├── test/                # Ad-hoc diagnostic scripts (Playwright, API tests, etc.)
 │   └── auto-sync.sh         # Auto commit+push every 30 min to `develop`
 ├── tests/                   # Ad-hoc Playwright/manual test scripts + screenshots
+│   ├── e2e-*.mjs            # End-to-end test scripts
+│   ├── full-pipeline-test.js
+│   ├── marker-output/
+│   └── screenshots/
 ├── docs/
 │   ├── DEPLOYMENT.md        # Full deploy guide (Chinese)
 │   ├── SERVER_DEPLOYMENT.md # Server env, Singularity, Nginx, Feishu bot
@@ -180,10 +190,13 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 ├── public/
 │   ├── hermes/              # Hermes avatar assets
 │   ├── live2d/              # Live2D model assets
+│   ├── pdfjs/               # pdf.worker.min.mjs (copied at build time)
 │   └── uploads/             # User uploads
 ├── ecosystem.config.js      # PM2 config (Next.js port 3002, socket port 3001)
 ├── next.config.js           # reactStrictMode, image remotePatterns, webpack undici external
 ├── playwright.config.js     # Minimal Playwright config for ad-hoc tests/ scripts
+├── vitest.config.ts         # Vitest + React Testing Library + jsdom
+├── vitest.setup.ts          # Test setup
 ├── postcss.config.js        # tailwindcss + autoprefixer
 ├── tailwind.config.ts       # Design tokens, animations, fontFamily
 ├── package.json             # Root Next.js dependencies
@@ -206,11 +219,13 @@ Design inspirations: GitHub Organizations (groups), cc98/Reddit (discussions), D
 ```bash
 npm install
 npm run dev          # Port 3000
-npm run build        # Production build
+npm run build        # Production build (also copies pdfjs worker to public/pdfjs/)
 npm run start        # Port 3002 (PM2)
 npm run lint         # ESLint
 npm run typecheck    # tsc --noEmit
 npm run format       # Prettier: src/**/*.{ts,tsx,md}
+npm run test         # vitest run
+npm run test:watch   # vitest
 ```
 
 ### Database
@@ -274,6 +289,7 @@ pm2 logs scholars-tea-embedding
 - `strict: true` enforced.
 - Path alias `@/*` → `./src/*`.
 - `moduleResolution: bundler`.
+- `server/` is excluded from root `tsconfig.json` (has its own `server/tsconfig.json`).
 
 ### Tailwind / CSS
 
@@ -296,14 +312,29 @@ pm2 logs scholars-tea-embedding
 
 ## 6. Testing
 
-### Testing
+### Unit Tests
 
-- **Unit tests**: **Vitest** + **React Testing Library** 已配置（`vitest.config.ts`）。
-  - 运行: `npm run test`
-  - 现有覆盖: `latex-to-utf8`, `peer-review-prompts`, `grant-application-prompts`
-- **Ad-hoc scripts**: `tests/` 和 `scripts/test/` 保留手动诊断脚本（Playwright、API 测试等）。
-- **E2E**: 尚未配置正式框架。如需添加，使用 **Playwright**。
-- 生产部署不运行测试；CI/CD 尚未建立。
+- **Framework**: Vitest + React Testing Library + jsdom.
+- **Config**: `vitest.config.ts`.
+- **Run**: `npm run test`
+- **Test files**:
+  - `src/lib/ai/latex-to-utf8.test.ts`
+  - `src/lib/ai/peer-review-prompts.test.ts`
+  - `src/lib/ai/grant-application-prompts.test.ts`
+- **Include paths**: `src/**/*.test.{ts,tsx}`, `tests/unit/**/*.test.{ts,tsx}`
+
+### Ad-hoc / E2E Scripts
+
+- `tests/` and `scripts/test/` contain manual diagnostic scripts.
+- **Playwright**: Configured in `playwright.config.js` for ad-hoc scripts (not a formal CI E2E suite).
+- Examples: `tests/e2e-extract-pdf-test.mjs`, `scripts/test/zai-e2e-test.mjs`, `scripts/test/glm51-e2e-test.mjs`.
+
+### CI/CD
+
+- **GitHub Actions**:
+  - `.github/workflows/ci.yml` — Runs on PR/push to `develop`/`main`. Steps: `npm ci` → `npm run lint` → `npm run typecheck` → `npm test` → `npx prisma validate`.
+  - `.github/workflows/deploy.yml` — Manual dispatch (`workflow_dispatch`) with confirmation. SSHs into production server, builds socket server + Next.js, restarts PM2.
+- **Node version in CI**: 20.
 
 ---
 
@@ -312,11 +343,11 @@ pm2 logs scholars-tea-embedding
 ### Connection Patterns
 
 - **Next.js**: Prisma Client via `src/lib/db/prisma.ts` — global singleton prevents HMR connection exhaustion.
-- **Socket server**: Native `pg` Pool via `server/src/db.ts` — bypasses Prisma for realtime performance.
+- **Socket server**: Native `pg` Pool via `server/src/db.ts` — bypasses Prisma for realtime performance. Max 20 connections, 30s idle timeout.
 
 ### Core Models
 
-The schema (`prisma/schema.prisma`, 608 lines) includes:
+The schema (`prisma/schema.prisma`, 547 lines) includes:
 
 - **Auth**: `User`, `Account`, `Session`, `VerificationToken`
 - **Org hierarchy**: `Institution`, `College`, `Department`
@@ -326,6 +357,7 @@ The schema (`prisma/schema.prisma`, 608 lines) includes:
 - **Research output**: `Publication`, `Citation`, `News`, `Patent`, `PostPublication`, `CommunityCitation`
 - **Chat**: `TeaPartyRoom`, `TeaPartyRoomParticipant`, `Message`
 - **RAG**: `KnowledgeDocument`, `ResearchMemory`
+- **Personal KB**: `PersonalKbDocument`, `PersonalKbChunk`
 - **Admin**: `TopQuestion`, `QuestionVote`
 - **Workshop**: `WorkshopSession`, `WorkshopMessage`
 
@@ -346,7 +378,7 @@ npx prisma db seed
 - **Credentials provider**: email + password with bcrypt hashing (`src/lib/auth/password.ts`).
 - **Custom JWT/session callbacks** enrich the token/session with `id`, `name`, `bio`, `avatar`, `role`.
 - **RBAC roles**: `USER`, `ADMIN`, `GROUP_ADMIN`.
-- **Socket.io auth**: JWT verified via `socket.handshake.auth.token` in `server/src/middleware/auth.ts`.
+- **Socket.io auth**: JWT verified via `socket.handshake.auth.token` in `server/src/middleware/auth.ts`. Token expiry: 30 days.
 
 ---
 
@@ -404,11 +436,12 @@ System Prompt 全局规定"数学公式必须使用 UTF-8 Unicode 符号，禁�
 - `src/lib/ai/skills/engine.ts` — Skill 执行引擎（FastPath）。
 - `src/lib/ai/skills/paper-generation.ts` — Skill 注册与参数定义。
 - `src/lib/ai/agent-modes.ts` — Workshop 多 Agent 模式定义与行为配置。
+- `src/lib/personal-kb/` — 个人知识库：PDF 提取（`pdf-extractor.ts`）、文本分块（`chunker.ts`）、嵌入生成（`embedder.ts`）、存储与搜索（`storage.ts`, `search.ts`）。
 - `hermes-home/hermes-agent/skills/research/research-paper-writing/SKILL.md` — Hermes Gateway 侧 skill 定义（107+ skills 之一）。
 
 ### RAG Storage
 
-- Embeddings are stored as `vector(1024)` in `KnowledgeDocument.embedding` and `ResearchMemory.embedding` (pgvector native type, mapped as `Unsupported("vector")` in Prisma).
+- Embeddings are stored as `vector(1024)` in `KnowledgeDocument.embedding`, `ResearchMemory.embedding`, and `PersonalKbChunk.embedding` (pgvector native type, mapped as `Unsupported("vector")` in Prisma).
 - Search uses pgvector `<=>` cosine distance operator via `$queryRaw`. Distance threshold 0.5 corresponds to similarity ≥ 0.5.
 - **Critical**: `(embedding <=> vec)::double precision` must be used in `$queryRaw` because the `real` type deserializes to `null` in Node.js pg driver.
 - **Embedding generation**: `scripts/embedding-server.py` — local FastAPI service running BGE-M3 (lazy-load, ~1.8GB resident). OpenAI-compatible `/embeddings` endpoint on port 9997. Fallback to ZCHAT API if local server offline.
@@ -500,15 +533,52 @@ hermes gateway run > ~/hermes-home/logs/gateway.log 2>&1 &
 
 | App | Script | Port | Memory Limit |
 |-----|--------|------|--------------|
-| `scholars-tea` | `next start -p 3002` | 3002 | 1 GB |
+| `scholars-tea` | `next start -p 3002` | 3002 | 4 GB |
 | `scholars-tea-socket` | `server/dist/index.js` | 3001 | 512 MB |
 | `scholars-tea-embedding` | `python3 scripts/embedding-server.py` | 9997 | 5 GB |
 
 Embedding process runs under the `ai_agent` conda environment with explicit `PATH` and `PYTHONPATH`. Lazy-loads BGE-M3 on first request (~5s).
 
+### FRP Tunnel & Network Stability
+
+The server sits behind a **mandatory system-level socks5 proxy** (`127.0.0.1:7890`). All outbound traffic—including the Sakura Frp tunnel—must traverse this proxy. This creates an inherent instability: the proxy intermittently drops idle long-lived TCP connections.
+
+**frpc config** (`~/sakura-frp/frpc.ini`):
+```ini
+[common]
+user = <token>
+sakura_mode = true
+login_fail_exit = false
+server_addr = frp-fit.com
+server_port = 8088
+socks5_proxy = 127.0.0.1:7890
+# Stability optimizations (2026-05-30)
+heartbeat_interval = 15
+heartbeat_timeout = 45
+tcp_mux = true
+pool_count = 3
+log_level = warn
+```
+
+**When network instability is reported**, check in this order:
+1. `pm2 status` — ensure Next.js and socket server are online
+2. `curl -w '%{time_total}s' http://127.0.0.1:3002/` — if local < 0.05s, app is healthy
+3. `cat /tmp/frpc-run.log | grep '网络波动'` — check frpc disconnect frequency
+4. `ps aux | grep './frpc'` — ensure frpc is running; restart if needed:
+   ```bash
+   cd ~/sakura-frp && pkill -f 'frpc -f'
+   nohup ./frpc -f <token>:<tunnel_ids> --proxy socks5://127.0.0.1:7890 > /tmp/frpc-run.log 2>&1 &
+   ```
+
+**Known constraints**:
+- System Nginx (port 443, ParaCloud platform) cannot be modified (no sudo).
+- Direct outbound TCP to frp-fit.com:8088 fails without the socks5 proxy.
+- Cloudflare Tunnel is incompatible with this server's network config.
+
 ### Required Environment Variables
 
-> ⚠️ `.env.example` is **incomplete** — it does not list `ZAI_API_KEY`, but the application requires it at runtime (see `src/lib/ai/zai-service.ts`). Always verify `ecosystem.config.js` `forwardVars` array against actual code usage.
+> ⚠️ `.env.example` is **incomplete** — it does not list `ZAI_API_KEY`, but the application requires it at runtime (see `src/lib/ai/zai-service.ts`).  
+> ⚠️ `ecosystem.config.js` `forwardVars` array also **omits `ZAI_API_KEY`**. If you add this variable, you must update **both** `.env` and `ecosystem.config.js`.
 
 ```env
 DATABASE_URL="postgresql://..."
@@ -619,14 +689,15 @@ PID 10274  openclaw-gateway            ← Separate project (OpenClaw)
 
 ## 15. Limits & Notes
 
-- **Node.js**: 20 LTS required in production.
-- **PostgreSQL**: 9.2.24 (schema comments mention 16+ as a future goal).
+- **Node.js**: 20 LTS required in production (CI uses `node-version: '20'`).
+- **PostgreSQL**: Production runs 16.4 with pgvector 0.7.4.
 - **Socket server**: `server/src/modules`, `plugins`, `services` are currently empty — all logic lives in `handlers/` + `middleware/`.
-- **Tests**: Vitest + React Testing Library configured. 30 tests passing. Playwright config exists for ad-hoc manual scripts. No CI suite yet.
-- **CI/CD**: None. Rely on `scripts/auto-sync.sh` + manual PM2 restart.
+- **Tests**: Vitest + React Testing Library configured. 3 unit test files in `src/lib/ai/`. Playwright config exists for ad-hoc manual scripts. No formal E2E CI suite yet.
+- **CI/CD**: GitHub Actions `ci.yml` runs lint/typecheck/test/prisma-validate on PR/push. `deploy.yml` is manual SSH-based deploy.
 - **Hermes agent**: Not part of the Next.js build; it runs as a standalone Python/Node process using the config in `hermes-home/config.yaml`.
-- **ZAI_API_KEY**: Required at runtime but missing from `.env.example`; always check `ecosystem.config.js` `forwardVars` and actual code usage when adding new environment variables.
+- **ZAI_API_KEY**: Required at runtime but missing from `.env.example` and `ecosystem.config.js` `forwardVars`. Always verify both files when adding new environment variables.
+- **PDF.js worker**: The Next.js build script copies `node_modules/pdfjs-dist/build/pdf.worker.min.mjs` to `public/pdfjs/`. If pdfjs-dist is upgraded, verify this path still exists.
 
 ---
 
-> Updated: 2026-05-21
+> Updated: 2026-05-30

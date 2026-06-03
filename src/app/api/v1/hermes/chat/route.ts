@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { callZAIVision } from '@/lib/ai/zai-service'
+import { isPaperDownloadIntent, getDownloadTriggerHint } from '@/lib/ai/paper-download-intent'
 
 const HERMES_API_URL = process.env.HERMES_API_URL || 'http://127.0.0.1:8642/v1/chat/completions'
 const API_SERVER_KEY = process.env.API_SERVER_KEY || 'hk-e4f9a45f3106ee1396164e6dae60137f9f08c0805d75b137404097cc4bdbedac'
@@ -124,10 +125,23 @@ const TOOL_USAGE_PROMPT = `
 5. 持久记忆 — 已自动启用
    后端自动保存用户偏好和对话上下文，跨会话保持。无需显式调用 memory 工具。
 
+6. scansci-pdf — 学术论文 PDF 下载（通过 MCP）
+   场景：用户要求下载论文、提供 DOI/arXiv ID、搜索并下载文献
+   可用工具：mcp_scansci_pdf_smart_download（自动尝试所有源）、mcp_scansci_pdf_search（搜索）、mcp_scansci_pdf_batch_download（批量）
+   下载策略：fastest（默认）、oa_first（OA优先）、scihub_only、legal_only
+   下载完成后，必须在回复末尾添加标记：[ATTACHMENT:文件名.pdf]
+   示例：下载 DOI 10.1038/nature12345 → 调用 mcp_scansci_pdf_smart_download → 成功后在回复末尾写 "[ATTACHMENT:nature12345.pdf]"
+
+7. semantic-scholar / paper-search — 学术论文检索（通过 MCP）
+   场景：用户询问某作者的文章、某领域的论文、验证论文信息（标题、DOI、作者、年份）
+   可用工具：mcp_semantic_scholar_search_papers（Semantic Scholar 搜索论文）、mcp_semantic_scholar_search_authors（搜索作者）、mcp_paper_search_search_research（PaperPlain 跨库搜索）、mcp_paper_search_find_paper_by_title（按标题查找）
+   强制规则：当用户询问具体学术信息（如"某作者某年某期刊的文章"）时，必须先用搜索工具确认，禁止直接靠模型记忆回答。搜索到准确 DOI 后再调用下载工具。
+
 【调用规则】
 - 当用户问题明显需要搜索/浏览网页时，必须直接调用工具，不要先问"是否需要我搜索？"
 - 优先使用 skills_list 查找合适技能，再用 browser 深入分析具体页面
 - 如果工具调用失败或返回错误，向用户说明情况并提供替代建议
+- 学术查询强制规则：涉及具体论文、作者、年份、期刊的信息，必须先调用 semantic-scholar 或 paper-search 搜索验证，确认准确 DOI/标题后再回答。绝对禁止用"根据我的知识"、"据我所知"等基于模型记忆的回答方式。
 
 【安全限制】你没有 terminal 命令和文件系统操作权限（read_file / write_file / patch / search_files / terminal）。如果用户请求涉及系统命令或本地文件操作，请明确告知无法执行，并建议其他替代方案。
 
@@ -677,6 +691,21 @@ export async function POST(request: NextRequest) {
         role: m.role,
         content: typeof m.content === 'string' ? m.content : extractTextContent(m.content),
       }))
+
+      // 检测下载意图，追加触发提示
+      const lastUserMsg = [...textMessages].reverse().find((m) => m.role === 'user')
+      const lastUserText = lastUserMsg?.content || ''
+      const hasDownloadIntent = isPaperDownloadIntent(lastUserText)
+      if (hasDownloadIntent) {
+        const downloadHint = getDownloadTriggerHint(lastUserText, { platform: 'web' })
+        const lastIdx = textMessages.length - 1
+        if (textMessages[lastIdx]?.role === 'user') {
+          textMessages[lastIdx] = {
+            ...textMessages[lastIdx],
+            content: textMessages[lastIdx].content + downloadHint,
+          }
+        }
+      }
 
       const apiBody = {
         model: 'hermes-agent',

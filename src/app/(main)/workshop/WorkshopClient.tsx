@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
 import { Sparkles, PanelLeft, PanelLeftClose, Bot, Loader2, AlertCircle, RotateCcw } from 'lucide-react'
@@ -17,6 +17,11 @@ import { AgentModeSelector } from '@/components/features/workshop/AgentModeSelec
 import { ChatMessageItem } from '@/components/features/workshop/ChatMessage'
 import { ChatInput } from '@/components/features/workshop/ChatInput'
 import { WelcomeScreen } from '@/components/features/workshop/WelcomeScreen'
+import { DownloadDirectoryBanner } from '@/components/features/hermes/AttachmentActions'
+import { ResearchMemoryPanel } from '@/components/features/workshop/ResearchMemoryPanel'
+import { useDownloadDirectory } from '@/hooks/useDownloadDirectory'
+import { DownloadConfigPanel, useDownloadConfig } from '@/components/features/workshop/DownloadConfigPanel'
+import type { PaperCandidate } from '@/components/features/workshop/PaperCandidateList'
 
 const PeerReviewPanel = dynamic(
   () => import('@/components/features/workshop/PeerReviewPanel').then((m) => m.PeerReviewPanel),
@@ -45,6 +50,10 @@ export default function WorkshopClient() {
     error,
     streamingContent,
     dbAvailable,
+    personalKBEnabled,
+    setPersonalKBEnabled,
+    pkbStatus,
+    contextState,
     createSession,
     switchSession,
     deleteSession,
@@ -55,6 +64,20 @@ export default function WorkshopClient() {
   } = useChat(initialMode)
 
   const { capabilities: hermesCaps } = useHermesCapabilities()
+
+  // 文献下载模式的本地保存目录管理
+  const {
+    isSupported: dirSupported,
+    directoryHandle,
+    directoryName,
+    isSelecting,
+    savedCount,
+    selectDirectory,
+    clearDirectory,
+  } = useDownloadDirectory()
+
+  // 文献下载配置
+  const downloadConfig = useDownloadConfig()
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -102,6 +125,8 @@ export default function WorkshopClient() {
       community_manager: undefined,
       peer_review: 'peer_review',
       paper_generation: 'paper_generation',
+      knowledge_base: undefined,
+      paper_download: undefined,
     }
 
     const action = (options?.action as string) || actionMap[mode]
@@ -114,8 +139,39 @@ export default function WorkshopClient() {
         options?.structured !== undefined
           ? options.structured
           : action === 'peer_review' || action === 'grant',
+      // paper_download 模式传递下载配置
+      ...(mode === 'paper_download' && {
+        downloadConfig: {
+          batchMode: downloadConfig.batchMode,
+          strategy: downloadConfig.strategy,
+        },
+      }),
     })
   }
+
+  /** 处理用户从候选列表中选择后的批量下载 */
+  const handleCandidateDownload = useCallback(
+    (selected: PaperCandidate[]) => {
+      if (selected.length === 0) return
+
+      // 构造下载请求消息
+      const lines = selected.map(
+        (paper, i) =>
+          `${i + 1}. 《${paper.title}》${paper.doi ? `DOI: ${paper.doi}` : ''}`
+      )
+      const content = `请帮我下载以下 ${selected.length} 篇文献的 PDF：\n${lines.join('\n')}`
+
+      handleSend(content, {
+        action: 'paper_download',
+        // 批量下载时保持批量模式配置
+        downloadConfig: {
+          batchMode: true,
+          strategy: downloadConfig.strategy,
+        },
+      })
+    },
+    [downloadConfig.strategy, handleSend]
+  )
 
   return (
     <div className="flex h-[calc(100vh-4rem)] -mx-4 md:-mx-0">
@@ -199,13 +255,41 @@ export default function WorkshopClient() {
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto px-4 py-5 space-y-6 bg-dot-pattern"
+              className={cn(
+                'flex-1 overflow-y-auto px-4 py-5 bg-dot-pattern',
+                mode === 'paper_download' && messages.length === 0
+                  ? 'flex flex-col'
+                  : 'space-y-6'
+              )}
             >
+              {/* 文献下载模式：保存设置引导（始终显示在顶部） */}
+              {mode === 'paper_download' && (
+                <>
+                  <DownloadDirectoryBanner
+                    isSupported={dirSupported}
+                    directoryName={directoryName}
+                    isSelecting={isSelecting}
+                    savedCount={savedCount}
+                    onSelectDirectory={selectDirectory}
+                    onClearDirectory={clearDirectory}
+                  />
+                  <DownloadConfigPanel
+                    config={{ batchMode: downloadConfig.batchMode, strategy: downloadConfig.strategy }}
+                    onChange={(cfg) => {
+                      downloadConfig.setBatchMode(cfg.batchMode)
+                      downloadConfig.setStrategy(cfg.strategy)
+                    }}
+                  />
+                </>
+              )}
+
               {messages.length === 0 && !loading && (
-                <WelcomeScreen
-                  mode={activeMode}
-                  onQuickPrompt={handleSend}
-                />
+                <div className={cn(mode === 'paper_download' && 'flex-1 min-h-0')}>
+                  <WelcomeScreen
+                    mode={activeMode}
+                    onQuickPrompt={handleSend}
+                  />
+                </div>
               )}
 
               {messages.map((message, i) => (
@@ -224,6 +308,13 @@ export default function WorkshopClient() {
                     message.role === 'assistant'
                       ? streamingContent
                       : undefined
+                  }
+                  directoryHandle={directoryHandle}
+                  onCandidateDownload={
+                    mode === 'paper_download' ? handleCandidateDownload : undefined
+                  }
+                  onRequestDirectory={
+                    mode === 'paper_download' ? selectDirectory : undefined
                   }
                 />
               ))}
@@ -312,6 +403,9 @@ export default function WorkshopClient() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Research Memory Panel */}
+            <ResearchMemoryPanel />
+
             {/* Input */}
             <div className="border-t border-tea-primary/10 p-4 bg-background">
               {mode === 'peer_review' && messages.length === 0 && !loading ? (
@@ -324,6 +418,10 @@ export default function WorkshopClient() {
                   onStop={stopGeneration}
                   loading={loading}
                   placeholder={`${activeMode.label}模式：输入你的问题...`}
+                  personalKBEnabled={personalKBEnabled}
+                  onTogglePersonalKB={setPersonalKBEnabled}
+                  pkbStatus={pkbStatus}
+                  contextState={contextState}
                 />
               )}
             </div>

@@ -11,10 +11,13 @@ const httpServer = createServer();
 // Create Socket.io server
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:3002', 'http://localhost:3000', 'http://10.72.212.33:3002', 'http://10.72.212.33:3005', 'http://scholars-tea.428312321.xyz', 'https://scholars-tea.428312321.xyz'],
+    origin: ['http://localhost:3002', 'http://localhost:3000', 'http://10.72.212.33:3002', 'http://10.72.212.33:3005', 'http://scholars-tea.428312321.xyz', 'https://scholars-tea.428312321.xyz', 'http://socket.428312321.xyz', 'https://socket.428312321.xyz'],
     methods: ['GET', 'POST'],
     credentials: true,
   },
+  // Aggressive ping for frp HTTP tunnel stability (default 25s may exceed tunnel idle timeout)
+  pingInterval: 15000,
+  pingTimeout: 10000,
 });
 
 // Authenticate socket connections

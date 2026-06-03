@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Providers } from '@/components/providers/Providers';
+import { LanguageProvider } from '@/components/providers/LanguageProvider';
+import { MainNav } from '@/components/layout/MainNav';
 import { FloatingChat } from '@/components/features/hermes/FloatingChat';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import '@/styles/globals.css';
@@ -28,12 +30,15 @@ export default function RootLayout({
         <script src="/live2dcubismcore.min.js" defer />
       </head>
       <body className="font-sans antialiased">
-        <Providers>
-          {children}
-          <ErrorBoundary>
-            <FloatingChat />
-          </ErrorBoundary>
-        </Providers>
+        <LanguageProvider>
+          <Providers>
+            <MainNav />
+            {children}
+            <ErrorBoundary>
+              <FloatingChat />
+            </ErrorBoundary>
+          </Providers>
+        </LanguageProvider>
       </body>
     </html>
   );

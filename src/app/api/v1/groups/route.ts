@@ -23,6 +23,10 @@ export async function GET(request: NextRequest) {
       success: true,
       data: result.groups,
       meta: result.meta,
+    }, {
+      headers: {
+        'Cache-Control': 's-maxage=300, stale-while-revalidate=600',
+      },
     });
   } catch (error) {
     console.error('GET /api/v1/groups error:', error);

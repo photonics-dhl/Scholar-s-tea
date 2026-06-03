@@ -9,6 +9,8 @@ import {
   FileText,
   Image as ImageIcon,
   Trash2,
+  Library,
+  AlertTriangle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,6 +24,18 @@ interface ChatInputProps {
   disabled?: boolean
   placeholder?: string
   className?: string
+  personalKBEnabled?: boolean
+  onTogglePersonalKB?: (enabled: boolean) => void
+  pkbStatus?: {
+    lastSearchAt: number | null
+    resultCount: number
+    error: string | null
+  } | null
+  contextState?: {
+    totalTokens: number
+    isWarning: boolean
+    hiddenRounds: number
+  } | null
 }
 
 // Block dangerous file types
@@ -48,6 +62,10 @@ export function ChatInput({
   disabled,
   placeholder = '输入你的问题...',
   className,
+  personalKBEnabled,
+  onTogglePersonalKB,
+  pkbStatus,
+  contextState,
 }: ChatInputProps) {
   const [input, setInput] = useState('')
   const [attachments, setAttachments] = useState<ChatAttachment[]>([])
@@ -358,6 +376,42 @@ export function ChatInput({
             >
               <Paperclip className="h-4 w-4" />
             </Button>
+
+            {/* Personal Knowledge Base Toggle */}
+            {onTogglePersonalKB && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'h-8 px-2 text-xs gap-1',
+                  personalKBEnabled
+                    ? 'text-tea-primary bg-tea-primary/10 hover:bg-tea-primary/20'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                onClick={() => onTogglePersonalKB(!personalKBEnabled)}
+                disabled={disabled || loading || uploading}
+                title={personalKBEnabled ? '私人知识库已启用' : '点击启用私人知识库'}
+              >
+                <Library className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">知识库</span>
+                {personalKBEnabled && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-tea-primary" />
+                )}
+              </Button>
+            )}
+            {/* PKB status indicator */}
+            {personalKBEnabled && pkbStatus?.lastSearchAt && (
+              <span className="text-[10px] ml-1">
+                {pkbStatus.error ? (
+                  <span className="text-red-500" title={pkbStatus.error}>检索失败</span>
+                ) : pkbStatus.resultCount > 0 ? (
+                  <span className="text-tea-primary">引用 {pkbStatus.resultCount} 段</span>
+                ) : (
+                  <span className="text-muted-foreground">未匹配到内容</span>
+                )}
+              </span>
+            )}
 
             {uploading && (
               <div className="flex items-center gap-1.5 ml-1">

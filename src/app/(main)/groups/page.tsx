@@ -6,6 +6,7 @@ import { Search, Plus, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GroupCard } from '@/components/features/groups/GroupCard';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface Group {
   id: string;
@@ -37,6 +38,7 @@ interface GroupsResponse {
 }
 
 export default function GroupsPage() {
+  const { t } = useLanguage();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -91,18 +93,18 @@ export default function GroupsPage() {
                 <span className="text-sm font-medium text-journal-primary tracking-wide uppercase">Research Groups</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-foreground">
-                课题组
+                {t.groups.title}
               </h1>
               <p className="mt-4 text-lg text-muted-foreground font-source-serif leading-relaxed">
-                发现并加入优秀的研究团队
+                {t.groups.description}
                 <span className="mx-2 text-journal-gold">·</span>
-                共 <span className="font-semibold text-foreground">{total}</span> 个课题组
+                {t.groups.of} <span className="font-semibold text-foreground">{total}</span> {t.groups.title}
               </p>
             </div>
             <Link href="/groups/new" className="hidden sm:block">
               <Button variant="journal" size="lg">
                 <Plus className="mr-2 h-4 w-4" />
-                创建课题组
+                {t.groups.createGroup}
               </Button>
             </Link>
           </div>
@@ -116,14 +118,14 @@ export default function GroupsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="搜索课题组..."
+                placeholder={t.groups.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10 focus-visible:ring-journal-primary/30 focus-visible:border-journal-primary/50"
               />
             </div>
             <Button type="submit" variant="journal-outline">
-              搜索
+              {t.common.search}
             </Button>
           </form>
           <Button variant="outline" size="icon" className="border-journal-border/50 hover:border-journal-gold/50">
@@ -154,9 +156,9 @@ export default function GroupsPage() {
             <div className="h-16 w-16 rounded-2xl bg-journal-primary/10 flex items-center justify-center mb-4">
               <Search className="h-8 w-8 text-journal-primary/50" />
             </div>
-            <p className="text-muted-foreground font-source-serif text-lg">暂无课题组</p>
+            <p className="text-muted-foreground font-source-serif text-lg">{t.groups.empty}</p>
             <Link href="/groups/new" className="mt-4">
-              <Button variant="journal">创建第一个课题组</Button>
+              <Button variant="journal">{t.groups.createGroup}</Button>
             </Link>
           </div>
         ) : (
@@ -180,10 +182,10 @@ export default function GroupsPage() {
                   disabled={page === 1}
                   className="border-journal-border/50"
                 >
-                  上一页
+                  {t.common.back}
                 </Button>
                 <span className="text-sm text-muted-foreground px-3">
-                  第 <span className="font-medium text-foreground">{page}</span> / {totalPages} 页
+                  <span className="font-medium text-foreground">{page}</span> / {totalPages}
                 </span>
                 <Button
                   variant="outline"
@@ -195,7 +197,7 @@ export default function GroupsPage() {
                   disabled={page === totalPages}
                   className="border-journal-border/50"
                 >
-                  下一页
+                  {t.common.next}
                 </Button>
               </div>
             )}

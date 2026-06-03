@@ -13,6 +13,8 @@ import {
   Shield,
   Gavel,
   PenTool,
+  Library,
+  Download,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -25,6 +27,8 @@ export type AgentMode =
   | 'community_manager'
   | 'peer_review'
   | 'paper_generation'
+  | 'knowledge_base'
+  | 'paper_download'
 
 export interface AgentModeConfig {
   id: AgentMode
@@ -61,6 +65,12 @@ const basePrompt = `你是 Scholar's Tea 学者茶话会的学术 AI 助手，�
 3. 适当引用相关理论或方法
 4. 用清晰的结构组织回答（分点、分段）
 5. 鼓励批判性思考，提醒用户验证信息
+
+知识库引用规范：
+- 如果用户消息中包含【用户个人知识库相关内容】，你必须基于这些提供的文献段落进行回答
+- 回答时应明确引用知识库中的具体信息，格式如"根据您上传的《文献名》..."
+- 知识库内容与您的训练数据冲突时，优先以知识库内容为准
+- 如果知识库内容不足以回答用户问题，应诚实说明并基于训练数据补充
 
 输出格式规范：
 - 使用 Markdown 表格呈现对比数据（| 列1 | 列2 |）
@@ -484,6 +494,113 @@ export const agentModes: Record<AgentMode, AgentModeConfig> = {
         icon: FileText,
         label: '正文写作',
         text: '请帮我撰写论文的「引言」部分，主题是「大语言模型在科学发现中的应用」，要求：阐述研究背景、指出当前挑战、说明本文贡献。',
+      },
+    ],
+  },
+  knowledge_base: {
+    id: 'knowledge_base',
+    label: '知识库助手',
+    description: '基于社区知识库回答学术问题，标注引用来源',
+    icon: Library,
+    color: 'text-journal-primary',
+    bgColor: 'bg-journal-primary/10',
+    borderColor: 'border-journal-primary/20',
+    systemPrompt: `${basePrompt}
+
+你当前是 Scholar's Tea 知识库的专属学术助手。你的回答必须严格基于知识库中检索到的内容。
+
+核心规则：
+1. 回答问题时，必须引用知识库中的相关文档，使用 [KB-N] 标记（如 [KB-1]、[KB-2]）标注来源。
+2. 如果检索到的内容不足以回答用户问题，请明确说明"知识库中暂无足够相关信息"，并基于你的通用学术知识给出初步建议，但仍需提醒用户核实。
+3. 对比多个知识库文档中的观点时，明确指出异同，并分别标注来源。
+4. 优先引用高相关性（relevance 高）的文档内容。
+5. 回答结构清晰，必要时先总结知识库中的共识观点，再补充细节。`,
+    welcome: {
+      title: '知识库学术助手',
+      subtitle: '基于社区知识库，为你提供有据可查的学术回答',
+      features: [
+        '检索知识库中的相关文档并引用来源',
+        '对比不同文献的观点和方法',
+        '基于知识库内容回答专业学术问题',
+        '发现知识库中的研究趋势和热点',
+      ],
+    },
+    quickPrompts: [
+      {
+        icon: BookOpen,
+        label: 'KB 综述',
+        text: '请基于知识库中的内容，总结「光学超表面」领域的最新研究进展和关键方法，并标注每个观点的来源文档。',
+      },
+      {
+        icon: Lightbulb,
+        label: '观点对比',
+        text: '知识库中关于「大语言模型在科研中的应用」有哪些不同观点？请对比分析并标注各自的来源。',
+      },
+      {
+        icon: FileText,
+        label: '方法梳理',
+        text: '请梳理知识库中提到的「数值模拟」相关方法，包括各方法的优势、适用场景和典型文献来源。',
+      },
+    ],
+  },
+
+  paper_download: {
+    id: 'paper_download',
+    label: '文献下载',
+    description: '搜索并下载学术论文 PDF，支持 DOI/arXiv/标题',
+    icon: Download,
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    systemPrompt: `${basePrompt}
+
+你当前是「文献下载助手」，专精于帮助用户获取学术论文 PDF。
+
+你拥有 scansci-pdf 工具（通过 MCP 集成），支持以下能力：
+- mcp_scansci_pdf_smart_download：智能下载，自动尝试 13+ 数据源
+- mcp_scansci_pdf_search：通过 OpenAlex 搜索论文
+- mcp_scansci_pdf_batch_download：批量下载多篇论文
+
+【下载策略】
+- fastest（默认）：并行竞赛，谁快用谁
+- oa_first：优先开放获取，合规下载
+- scihub_only：仅 Sci-Hub/LibGen
+- legal_only：仅合法来源
+
+【工作流程】
+1. 用户提供 DOI / arXiv ID / 论文标题 → 直接调用 smart_download
+2. 用户提供关键词 → 先 search，展示结果让用户确认，再下载
+3. 批量 DOI → 调用 batch_download
+
+【输出规范】
+- 下载成功后，在回复末尾添加 [ATTACHMENT:文件名.pdf]
+- 如果下载失败，说明原因并建议替代方案（换策略、换数据源等）
+- 尊重版权，优先使用合法开放获取渠道`,
+    welcome: {
+      title: '文献下载助手',
+      subtitle: '搜索并下载学术论文，支持 DOI、arXiv、标题等多种方式',
+      features: [
+        '通过 DOI 或 arXiv ID 直接下载 PDF',
+        '关键词搜索后选择性下载',
+        '批量下载多篇文献',
+        '自动尝试 13+ 数据源，提高成功率',
+      ],
+    },
+    quickPrompts: [
+      {
+        icon: Download,
+        label: 'DOI 下载',
+        text: '帮我下载 DOI 10.1038/s41586-021-03819-2',
+      },
+      {
+        icon: BookOpen,
+        label: '搜索下载',
+        text: '搜索「量子纠错」领域近 3 年的高被引论文，帮我下载前 5 篇',
+      },
+      {
+        icon: FileText,
+        label: 'arXiv 下载',
+        text: '下载 arXiv 2305.11148',
       },
     ],
   },

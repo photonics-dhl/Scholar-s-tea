@@ -164,7 +164,8 @@ export async function searchKnowledgeBase(
 
   try {
     const { embedding, error } = await generateEmbedding(query);
-    const hasEmbedding = !error && embedding.length > 0;
+    // BGE-M3 produces 1024-dim embeddings; reject mismatched dimensions to avoid pgvector crash
+    const hasEmbedding = !error && embedding.length === 1024;
 
     const whereClause: Prisma.KnowledgeDocumentWhereInput = {};
     if (discipline) {
@@ -608,7 +609,8 @@ export async function searchMemories(
 
   try {
     const { embedding, error } = await generateEmbedding(query);
-    const hasEmbedding = !error && embedding.length > 0;
+    // BGE-M3 produces 1024-dim embeddings; reject mismatched dimensions to avoid pgvector crash
+    const hasEmbedding = !error && embedding.length === 1024;
 
     const whereClause: Prisma.ResearchMemoryWhereInput = {};
     if (discipline) {

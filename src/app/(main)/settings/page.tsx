@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, User, Mail, Bell, Shield, Save, Loader2, GraduationCap, BookOpen, FlaskConical } from 'lucide-react'
+import { Settings, User, Mail, Bell, Shield, Save, Loader2, GraduationCap, BookOpen, FlaskConical, Library, Database, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -52,7 +52,34 @@ export default function SettingsPage() {
       publicProfile: true,
       showEmail: false,
     },
+    knowledgeBase: {
+      provider: 'api' as 'api' | 'local',
+      apiKey: '',
+      baseUrl: 'https://api.z.ai/api/coding/paas/v4',
+      model: 'text-embedding-3-small',
+      localModel: 'Xenova/all-MiniLM-L6-v2',
+    },
   })
+
+  // Load embedding config from IndexedDB on mount
+  useEffect(() => {
+    import('@/lib/personal-kb/storage').then(({ getEmbeddingConfig }) => {
+      getEmbeddingConfig().then((config) => {
+        if (config) {
+          setFormData((prev) => ({
+            ...prev,
+            knowledgeBase: {
+              provider: config.provider,
+              apiKey: config.provider === 'api' ? config.apiKey : '',
+              baseUrl: config.provider === 'api' ? config.baseUrl : prev.knowledgeBase.baseUrl,
+              model: config.provider === 'api' ? config.model : prev.knowledgeBase.model,
+              localModel: config.provider === 'local' ? config.model : prev.knowledgeBase.localModel,
+            },
+          }))
+        }
+      })
+    })
+  }, [])
 
   // Fetch full profile on mount
   useEffect(() => {
@@ -86,6 +113,37 @@ export default function SettingsPage() {
       }))
     }
   }, [session])
+
+  const handleSaveKBConfig = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { saveEmbeddingConfig } = await import('@/lib/personal-kb/storage')
+      const { setApiEmbeddingConfig } = await import('@/lib/personal-kb/embedder')
+      const kb = formData.knowledgeBase
+      if (kb.provider === 'api') {
+        const config = {
+          provider: 'api' as const,
+          apiKey: kb.apiKey,
+          baseUrl: kb.baseUrl,
+          model: kb.model,
+        }
+        await saveEmbeddingConfig(config)
+        setApiEmbeddingConfig(config)
+      } else {
+        await saveEmbeddingConfig({
+          provider: 'local',
+          model: kb.localModel,
+        })
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '保存失败')
+    } finally {
+      setLoading(false)
+    }
+  }, [formData.knowledgeBase])
 
   if (status === 'loading' || fetchingProfile) {
     return (
@@ -149,7 +207,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 max-w-lg">
+        <TabsList className="grid w-full grid-cols-5 max-w-lg">
           <TabsTrigger value="profile">
             <User className="h-4 w-4 mr-2" />
             个人资料
@@ -165,6 +223,10 @@ export default function SettingsPage() {
           <TabsTrigger value="privacy">
             <Shield className="h-4 w-4 mr-2" />
             隐私
+          </TabsTrigger>
+          <TabsTrigger value="knowledge">
+            <Library className="h-4 w-4 mr-2" />
+            知识库
           </TabsTrigger>
         </TabsList>
 
@@ -458,6 +520,166 @@ export default function SettingsPage() {
                     }))
                   }
                 />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Knowledge Base Tab */}
+        <TabsContent value="knowledge">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Library className="h-5 w-5 text-primary" />
+                私人知识库配置
+              </CardTitle>
+              <CardDescription>配置向量嵌入模型，用于私人知识库的语义检索</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Provider Selection */}
+              <div className="space-y-3">
+                <Label>嵌入模型来源</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        knowledgeBase: { ...prev.knowledgeBase, provider: 'api' },
+                      }))
+                    }
+                    className={cn(
+                      'p-3 rounded-lg border text-left transition-colors',
+                      formData.knowledgeBase.provider === 'api'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-input hover:bg-muted/50'
+                    )}
+                  >
+                    <p className="text-sm font-medium">API 模式（推荐）</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      调用 OpenAI-compatible API，速度快、质量高
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        knowledgeBase: { ...prev.knowledgeBase, provider: 'local' },
+                      }))
+                    }
+                    className={cn(
+                      'p-3 rounded-lg border text-left transition-colors',
+                      formData.knowledgeBase.provider === 'local'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-input hover:bg-muted/50'
+                    )}
+                  >
+                    <p className="text-sm font-medium">本地模式（实验性）</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      浏览器内运行 ONNX 模型，隐私更好但首次加载慢
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {formData.knowledgeBase.provider === 'api' ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-baseUrl">API Base URL</Label>
+                    <Input
+                      id="kb-baseUrl"
+                      value={formData.knowledgeBase.baseUrl}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          knowledgeBase: { ...prev.knowledgeBase, baseUrl: e.target.value },
+                        }))
+                      }
+                      placeholder="https://api.openai.com/v1"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      支持 OpenAI-compatible API，如 ZAI、SiliconFlow、OpenAI 等
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-apiKey">API Key</Label>
+                    <Input
+                      id="kb-apiKey"
+                      type="password"
+                      value={formData.knowledgeBase.apiKey}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          knowledgeBase: { ...prev.knowledgeBase, apiKey: e.target.value },
+                        }))
+                      }
+                      placeholder="sk-..."
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      仅存储在本地浏览器中，不会上传到服务器
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="kb-model">模型名称</Label>
+                    <Input
+                      id="kb-model"
+                      value={formData.knowledgeBase.model}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          knowledgeBase: { ...prev.knowledgeBase, model: e.target.value },
+                        }))
+                      }
+                      placeholder="text-embedding-3-small"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="kb-localModel">本地模型</Label>
+                  <select
+                    id="kb-localModel"
+                    value={formData.knowledgeBase.localModel}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        knowledgeBase: { ...prev.knowledgeBase, localModel: e.target.value },
+                      }))
+                    }
+                    className="w-full px-3 py-2 text-sm rounded-md border border-input bg-background"
+                  >
+                    <option value="Xenova/all-MiniLM-L6-v2">
+                      all-MiniLM-L6-v2（~80MB，384-dim，推荐）
+                    </option>
+                    <option value="Xenova/all-MiniLM-L12-v2">
+                      all-MiniLM-L12-v2（~120MB，384-dim）
+                    </option>
+                  </select>
+                  <div className="flex items-start gap-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>
+                      首次使用本地模型时需下载约 80MB 模型文件，请确保网络稳定。模型缓存后后续加载秒开。
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  <Database className="h-4 w-4 inline mr-1" />
+                  配置仅保存在当前浏览器中
+                </div>
+                <Button onClick={handleSaveKBConfig} disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4 mr-1.5" />
+                  )}
+                  保存配置
+                </Button>
               </div>
             </CardContent>
           </Card>

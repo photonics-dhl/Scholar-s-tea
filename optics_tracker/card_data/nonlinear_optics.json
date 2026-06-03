@@ -2,81 +2,81 @@
   "domain_name": "非线性光学",
   "papers": [
     {
-      "title": "Combining non-parametric quantum states and MERA tensor networks for ground-state optimization",
-      "abstract": "Hybrid tensor networks offer a promising route to enhance the expressivity of classical tensor network methods by incorporating quantum states prepared on a quantum computer. Existing approaches are limited by the variational optimization of the quantum component of the tensor network. In this work, we introduce an alternative strategy that combines a non-parametric quantum state prepared through quantum annealing and a classical isometric tensor network. The latter is variationally optimized while the former is used as a fixed, boundary tensor resource in the form of classical shadows. We demonstrate the feasibility of this approach through extensive numerical simulations on the transverse-field Ising model, showing that the optimization procedure remains robust under statistical and hardware noise. Moreover, our results indicate that our newly proposed setup improves the accuracy of the obtained ground state approximation compared to the original quantum simulation, without increasing the depth of the applied quantum circuits. Therefore, this setup offers a practical route to scale variational quantum algorithms towards the quantum utility scale.",
-      "arxiv_id": "2605.21447v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21447v1",
+      "title": "Layer-Resolved Nonlinear Optics in Finite-Thickness Two-Dimensional Systems",
+      "abstract": "Nonlinear optical (NLO) responses in two-dimensional quantum-confined systems are typically described within bulk-based frameworks as macroscopic spatial averages. In finite-thickness van der Waals multilayers directly relevant to nanoscale devices, this picture substantially breaks down. Here, we establish a general symmetry-based framework for classifying second-order NLO responses in multilayers. We reveal a layer-resolved organization into skin, weak-skin, and hidden effects governed by local symmetry and stacking order. First-principles calculations for both nonmagnetic and spin-polarized systems confirm our predictions, demonstrating that stacking alone suffices to dramatically reshape both the spatial pattern and magnitude of the NLO response, a phenomenon not explainable within standard bulk theory. Our results establish stacking geometry as an effective knob for engineering surface-selective NLO responses in layered materials.",
+      "arxiv_id": "2606.02354v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02354v1",
       "authors": [
-        "Julian Schuhmacher",
-        "Alberto Baiardi",
-        "Francesco Tacchino"
+        "Liangting Ye",
+        "Chengzhi Wu",
+        "Zeyu Jiang"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出结合非参量量子态与MERA张量网络的混合方法优化基态近似精度",
-        "research思路": "解决现有混合张量网络中量子分量变分优化的局限性",
-        "experiment": "用量子退火制备非参量量子态，结合经典等距张量网络进行变分优化",
-        "innovation": "将量子态作为固定边界资源，避免量子参数优化，提高鲁棒性",
-        "related_work": "量子张量网络、MERA、变分量子特征求解器相关工作",
-        "impact": "为量子-经典混合计算提供新范式，增强基态近似精度和噪声鲁棒性"
+        "summary": "建立了基于对称性的多层二维系统二阶非线性光学响应分类框架，揭示层分辨效应",
+        "research思路": "解决有限厚度二维系统中传统体材料平均方法失效的问题，建立层分辨理论",
+        "experiment": "结合对称性分析与第一性原理计算，验证非磁和自旋极化系统预测",
+        "innovation": "发现堆叠几何可重塑非线性光学响应空间模式和强度，突破体理论限制",
+        "related_work": "二维材料非线性光学、范德华异质结构设计、对称性分析在材料中的应用",
+        "impact": "为层状材料表面选择性非线性光学响应设计提供新思路，推动纳米光子学发展"
       },
       "domain_trend": {
-        "trend": "量子计算与经典计算深度融合，突破基态近似、预言机优化和过程合成瓶颈",
+        "trend": "二维材料非线性光学与薄膜集成量子光源正引领纳米光子学革命",
         "key_topics": [
-          "量子-经典混合计算",
-          "量子资源优化",
-          "量子强化学习"
+          "层状材料非线性光学响应",
+          "薄膜铌酸锂量子光源",
+          "量子态生成与调控"
         ],
-        "development_direction": "非线性光学领域正加速与量子计算融合，通过非参量量子态、资源优化模型和强化学习算法，推动量子计算实用化进程，解决噪声鲁棒性和可扩展性等关键挑战。"
+        "development_direction": "非线性光学与量子信息技术的深度融合，推动新型光子器件与量子计算平台发展，从基础研究向实用化应用快速推进"
       }
     },
     {
-      "title": "Modeling and Resource Optimization for Quantum Oracles",
-      "abstract": "Quantum computing has demonstrated its significant advantage over supercomputing for specific applications and shown promising prospect, such as machine learning, cryptography, finance, etc.. Quantum oracles are very common in many quantum algorithms and oracle resource consumption directly affects algorithm performance. However, existing oracle designs often exhibit high resource overhead and limited compatibility. Moreover, structured description tools and complexity analysis methods are lacked. In this work, we introduces a Hierarchical Recursive Synthesis-Evaluation (HRSE) model, enabling formal description and precise quantum gate complexity analysis of oracles. Based on this model, we propose an Adaptive Space-depth Trade-off (ASDT) algorithm for generating oracle structures under a fixed qubit constraint. We provide a theoretical proof showing that the ASDT algorithm achieves the optimal gate count for a given number of qubits. Experimental results show that the ASDT algorithm reduces the average quantum circuit depth by 53.99% compared with the W-cycle approach, with the number of variables being 10, 15, and 20, respectively.",
-      "arxiv_id": "2605.21380v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21380v1",
+      "title": "Quantum light source with lithium tantalate for scalable photonic quantum circuits",
+      "abstract": "Thin-film lithium tantalate (TFLT) has emerged as a promising integrated photonic platform owing to its low photorefractive noise, high optical damage threshold, and reduced birefringence, attracting increasing interest for scalable photonic technologies. Here, to the best of our knowledge, we demonstrate the first quantum light source with TFLT via spontaneous four-wave mixing, bridging the gap between the rapidly advancing classical TFLT ecosystem and integrated quantum photonics. The fabricated microring exhibits a free spectral range of 350~GHz and an optical quality factor of $10^6$, enabling efficient cavity-enhanced nonlinear interactions. Correlated photon pairs are generated across the telecom band from 1510 to 1570~nm, with a photon pair generation rate of 24 $\\mathrm{MHz/mW^{2}}$ at a wavelength of 1535.04 nm. The source delivers strongly antibunched heralded single photons with $g^{(2)}_{H}(0)=0.071\\pm0.004$ at a heralding rate of 170 kHz, while the unheralded statistics yield $g^{(2)}(0)=1.93 \\pm 0.05$, indicating near-single-temporal-mode emission. Energy-time entanglement is further confirmed by a raw two-photon interference visibility of $92.55\\pm0.94\\%$, well above the Bell-inequality violation threshold. These results establish TFLT as a manufacturing-compatible platform for scalable photonic quantum circuits, paving the way for the monolithic co-integration of classical and quantum photonic functionalities.",
+      "arxiv_id": "2606.01657v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.01657v1",
       "authors": [
-        "Zhihang Li",
-        "Bo Zhao",
-        "Chuanbing Han"
+        "Yun-Ru Fan",
+        "Bo-Wen Chen",
+        "Dan Xu"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出HRSE模型和ASDT算法，优化量子预言机资源消耗与性能",
-        "research思路": "解决量子预言机高资源开销、兼容性差和缺乏结构化描述工具问题",
-        "experiment": "构建HRSE模型形式化描述预言机，提出ASDT算法固定量子比特约束优化结构",
-        "innovation": "首次实现预言机量子门复杂度精确分析，证明ASDT在固定量子比特下最优",
-        "related_work": "量子算法优化、量子电路综合、量子复杂度理论相关研究",
-        "impact": "为量子算法设计提供理论工具，推动量子计算实用化进程"
+        "summary": "首次在薄膜铌酸锂平台上实现量子光源，为可扩展光子量子电路提供新方案。",
+        "research思路": "解决薄膜铌酸锂平台在量子光子学中的应用缺失问题，实现经典与量子技术结合。",
+        "experiment": "利用自发四波混频在微环谐振腔中产生光子对，通过高品质因子腔增强非线性效应。",
+        "innovation": "首次将薄膜铌酸锂用于量子光源，实现低噪声、高效率的关联光子对产生。",
+        "related_work": "铌酸锂薄膜经典光子器件、其他材料平台的集成量子光源研究。",
+        "impact": "推动薄膜铌酸锂在量子光子学中的应用，为大规模光量子计算奠定基础。"
       }
     },
     {
-      "title": "Enhanced Reinforcement Learning-based Process Synthesis via Quantum Computing",
-      "abstract": "In this work, we present quantum reinforcement learning (RL) as a solution strategy for process synthesis problems. Building on our prior work, we develop a generalized framework that formally poses process synthesis as a Markov decision process and introduces quantum-enhanced RL algorithms to solve it with improved scalability. Earlier implementations of quantum-based RL for process synthesis were limited by qubit requirements, which scaled poorly with problem complexity. This work overcomes this challenge by introducing state encoding algorithms to decouple qubit requirements from problem size. A classical RL-based solution strategy is used as a baseline to benchmark the quantum algorithms under identical training conditions. All algorithms are evaluated across a flowsheet synthesis problem of increasing unit counts to analyze their performance and scalability. Results show that all approaches are capable of identifying the optimal flowsheet designs in small design spaces. For moderate-scale unit counts, quantum approaches demonstrate competitive performance on a per-episode basis and improved efficiency on a per-parameter basis versus the classical RL benchmark. This work provides a foundation for future quantum computing applications within process systems engineering, establishes a controlled benchmark for comparing classical and quantum algorithms, and shows that the proposed quantum variants remain competitive for the process synthesis problem examined in this work.",
-      "arxiv_id": "2605.21213v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21213v1",
+      "title": "Iterative $C_Z$-gate-based protocol for squeezed Schrödinger cat state engineering",
+      "abstract": "Squeezed optical Schrödinger cat states constitute a key resource for both fundamental tests of quantum theory and up-to-date quantum technologies. We propose a measurement-assisted gate for the generation and manipulation of the cat states. In this scheme, an ancilla in the non-Gaussian small-amplitude (in general, squeezed) Schrödinger cat state and the target oscillator initially prepared in a squeezed vacuum (or coherent) state are subjected to a quantum nondemolition (QND) entangling operation followed by projective homodyne measurement. The proposed gate enables generation of high-fidelity squeezed Schrödinger cat states with controllable size and squeezing with tunable fidelity/success-probability trade-off. We also introduce an iterative, homodyne-conditioned $C_Z$-based protocol for cat-state amplification. The parameter regimes required to achieve the desired fidelity and the success probability are analyzed. The approach is well suited for applications in measurement-based quantum computing and hybrid quantum networks where non-Gaussian resources enhance computational and communication capabilities.",
+      "arxiv_id": "2606.02201v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02201v1",
       "authors": [
-        "Austin Braniff",
-        "Fengqi You",
-        "Yuhe Tian"
+        "Roman Goncharov",
+        "N. G. Veselkova",
+        "Alexei D. Kiselev"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出量子强化学习框架解决过程合成问题，克服量子比特需求随问题规模增长的瓶颈。",
-        "research思路": "解决量子强化学习在过程合成中量子比特需求随问题复杂度指数增长的 scalability 问题。",
-        "experiment": "将过程合成建模为马尔可夫决策过程，引入状态编码算法解耦量子比特与问题规模，对比经典与量子算法。",
-        "innovation": "通过状态编码算法突破量子比特需求与问题规模的耦合关系，提升量子强化学习的可扩展性。",
-        "related_work": "基于经典强化学习的过程合成方法、早期量子强化学习在过程合成中的应用、量子计算优化算法。",
-        "impact": "为量子计算在过程合成中的实用化奠定基础，推动量子强化学习在复杂工程问题中的应用。"
+        "summary": "提出一种基于测量辅助的迭代CZ门协议，用于生成高保真度可调谐挤压薛定谔猫态",
+        "research思路": "解决光学量子技术中挤压薛定谔猫态的高质量生成与操控问题",
+        "experiment": "采用量子非破坏性纠缠门和投影零差测量，结合迭代优化方法",
+        "innovation": "实现了可控大小和挤压参数的猫态生成，可调节保真度与成功概率",
+        "related_work": "量子非破坏性测量、压缩态光学、量子纠错与量子计算领域相关工作",
+        "impact": "为量子技术提供关键资源生成方法，推动量子信息处理与量子精密测量发展"
       }
     }
   ]

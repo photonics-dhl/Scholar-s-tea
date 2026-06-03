@@ -41,6 +41,10 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / pageSize),
       },
+    }, {
+      headers: {
+        "Cache-Control": "s-maxage=300, stale-while-revalidate=600",
+      },
     });
   } catch (error) {
     console.error('GET /api/v1/publications error:', error);

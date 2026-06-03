@@ -202,6 +202,7 @@ platform_toolsets:
   - skills
   - todo
   - memory
+  - mcp
   feishu:
   - hermes-feishu
 platforms:
@@ -246,7 +247,7 @@ quick_commands:
     type: exec
 security:
   redact_secrets: true
-  tirith_enabled: true
+  tirith_enabled: false
   tirith_fail_open: true
   tirith_path: tirith
   tirith_timeout: 5

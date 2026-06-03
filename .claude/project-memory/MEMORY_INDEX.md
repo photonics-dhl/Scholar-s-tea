@@ -1,7 +1,7 @@
 # Project Memory Index
 
 > 本项目记忆索引，记录 Scholar's Tea 项目的错误、解决方案与部署配置。
-> 最后更新: 2026-05-29
+> 最后更新: 2026-06-01
 > Marker PDF 部署记录: 2026-05-21
 
 ---
@@ -19,6 +19,8 @@
 │   └── postgresql-16-pgvector-upgrade.md  # PostgreSQL 16 + pgvector 无 sudo 升级 (2026-05-29)
 ├── token-optimization-deployment.md    # Token 优化策略部署记录 (2026-05-06)
 ├── marker-pdf-deployment.md            # Marker PDF 后端服务部署 (2026-05-21)
+├── embedding-server-500-fix.md         # BGE-M3 500 错误修复 (2026-05-31)
+├── archiver-v8-downgrade.md            # archiver v8→v6 降级修复 (2026-05-31)
 └── MEMORY_INDEX.md                     # 本索引文件
 ```
 
@@ -59,7 +61,7 @@
 - **Fallback**: Marker 失败时自动回退到 pdf.js 初提取结果
 - **详细文档**: `SOLUTIONS/marker-pdf-deployment.md`
 
-### BGE-M3 本地 Embedding 服务（2026-05-26）
+### BGE-M3 本地 Embedding 服务（2026-05-31 更新）
 - **服务**: `scripts/embedding-server.py`（FastAPI, port 9997）
 - **模型**: BAAI/bge-m3, 1024 维，normalized output
 - **环境**: `ai_agent` conda @ `/data/home/zju321/miniconda3/envs/ai_agent/`
@@ -71,12 +73,18 @@
   - 全量重索引: `npx tsx scripts/admin/reindex-knowledge.ts --all`
 - **PM2 包路径陷阱**: conda 包 vs `~/.local` 冲突 → 显式 `PATH`/`PYTHONPATH` + `sys.path.insert(0, ...)`
 - **Fallback**: 本地服务离线时自动回退 ZCHAT API
+- **⚠️ 已知问题（已修复）**: 空文本/特殊字符导致 `TypeError: TextEncodeInput must be Union[TextInputSequence, Tuple[InputSequence, InputSequence]]` → 增加输入过滤 + try-except 逐个回退
+- **详细修复**: `SOLUTIONS/embedding-server-500-fix.md`
 
 ### 错误记录
 | 文件 | 问题类型 | 状态 |
 |------|---------|------|
 | `ERRORS/lark-sdk-ws-start.md` | 飞书 SDK WebSocket | 已记录 |
 | `ERRORS/ssh-user-mismatch.md` | SSH 用户配置 | 已记录 |
+| `ERRORS/archiver-v8-esm-broken.md` | archiver v8 ESM 默认导出缺失 | 已修复 |
+| `ERRORS/embedding-server-500.md` | BGE-M3 空文本 500 错误 | 已修复 |
+| `ERRORS/nextjs-crash-vector-dimension.md` | Next.js 循环崩溃：pgvector 维度不匹配 | 已修复 |
+| `ERRORS/archiver-webpack-externalize.md` | archiver webpack externalize + import 不兼容 | 已修复 |
 
 ### 解决方案
 | 文件 | 主题 | 状态 |
@@ -84,6 +92,11 @@
 | `SOLUTIONS/server-node-env.md` | Node.js 环境 | 已记录 |
 | `SOLUTIONS/marker-pdf-deployment.md` | Marker PDF 后端服务 | 已记录 |
 | `SOLUTIONS/bge-m3-embedding-server.md` | BGE-M3 Embedding 服务 | 已记录 |
+| `SOLUTIONS/embedding-server-500-fix.md` | BGE-M3 500 错误修复 | 已记录 |
+| `SOLUTIONS/archiver-v8-downgrade.md` | archiver v8→v6 降级 | 已记录 |
+| `SOLUTIONS/research-memory-browser-migration.md` | ResearchMemory 浏览器端迁移 | 已记录 |
+| `SOLUTIONS/vector-dimension-defense.md` | Embedding 维度防御性校验 | 已记录 |
+| `SOLUTIONS/archiver-webpack-externalize.md` | archiver webpack externalize 兼容导入 | 已记录 |
 
 ---
 
@@ -92,4 +105,10 @@
 - [x] MCP 精简: 已从 17 个降至 12 个（移除 context7, paper-search, mermaid, postgres, time）
 - [x] entroly Python engine → WASM engine 替代
 - [x] BGE-M3 本地 Embedding 迁移完成（2026-05-26）
+- [x] ResearchMemory 浏览器端迁移（2026-05-31）
+- [x] BGE-M3 500 错误修复（2026-05-31）
+- [x] archiver v8→v6 降级修复 ZIP 下载（2026-05-31）
+- [x] 文献下载双平台路由修复（2026-05-31）
+- [x] 登录失败紧急修复（2026-06-01）
+- [ ] BGE-M3 偶发 fetch failed 根因排查
 - [ ] 建立 token 消耗新基线 (monitor.ps1)

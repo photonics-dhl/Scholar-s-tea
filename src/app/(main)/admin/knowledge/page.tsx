@@ -15,6 +15,8 @@ import {
   FileText,
   Tag,
   X,
+  Link2,
+  BookOpen,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,6 +39,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import UrlImportDialog from '@/components/features/knowledge/UrlImportDialog'
+import SearchImportDialog from '@/components/features/knowledge/SearchImportDialog'
+import {
+  KNOWLEDGE_DISCIPLINES,
+  KNOWLEDGE_TAG_CATEGORIES,
+  getDisciplineLabel,
+  getSourceLabel,
+} from '@/lib/knowledge/categories'
 
 interface KnowledgeDoc {
   id: string
@@ -51,6 +61,7 @@ interface DocForm {
   content: string
   source: string
   discipline: string
+  tags: string[]
 }
 
 export default function AdminKnowledgePage() {
@@ -66,10 +77,13 @@ export default function AdminKnowledgePage() {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState<DocForm>({ title: '', content: '', source: '', discipline: '' })
+  const [form, setForm] = useState<DocForm>({ title: '', content: '', source: '', discipline: '', tags: [] })
   const [submitting, setSubmitting] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [reindexingId, setReindexingId] = useState<string | null>(null)
+
+  const [urlImportOpen, setUrlImportOpen] = useState(false)
+  const [searchImportOpen, setSearchImportOpen] = useState(false)
 
   // Auth check
   useEffect(() => {
@@ -117,7 +131,7 @@ export default function AdminKnowledgePage() {
 
   const openCreate = () => {
     setEditingId(null)
-    setForm({ title: '', content: '', source: '', discipline: '' })
+    setForm({ title: '', content: '', source: '', discipline: '', tags: [] })
     setDialogOpen(true)
   }
 
@@ -128,17 +142,20 @@ export default function AdminKnowledgePage() {
       content: '', // Will fetch full content
       source: doc.source || '',
       discipline: doc.discipline || '',
+      tags: [],
     })
     // Fetch full document for editing
     fetch(`/api/v1/knowledge/${doc.id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
+          const meta = data.data.metadata ? JSON.parse(data.data.metadata) : null
           setForm({
             title: data.data.title,
             content: data.data.content,
             source: data.data.source || '',
             discipline: data.data.discipline || '',
+            tags: Array.isArray(meta?.tags) ? meta.tags : [],
           })
         }
       })
@@ -164,6 +181,7 @@ export default function AdminKnowledgePage() {
           content: form.content,
           source: form.source || null,
           discipline: form.discipline || null,
+          metadata: form.tags.length > 0 ? JSON.stringify({ tags: form.tags }) : null,
         }),
       })
 
@@ -210,12 +228,15 @@ export default function AdminKnowledgePage() {
     }
   }
 
-  const getSourceLabel = (source: string | null) => {
-    const labels: Record<string, string> = {
-      paper: '论文', post: '帖子', news: '新闻',
-      publication: '论文', wiki: '百科', manual: '手册',
-    }
-    return labels[source || ''] || source || '文档'
+  // Tags toggle handler
+  const toggleTag = (tag: string) => {
+    setForm((prev) => {
+      const exists = prev.tags.includes(tag)
+      return {
+        ...prev,
+        tags: exists ? prev.tags.filter((t) => t !== tag) : [...prev.tags, tag],
+      }
+    })
   }
 
   if (status === 'loading') {
@@ -244,10 +265,20 @@ export default function AdminKnowledgePage() {
             共 {total} 篇知识文档
           </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          新建文档
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setUrlImportOpen(true)}>
+            <Link2 className="h-4 w-4 mr-1.5" />
+            URL 导入
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setSearchImportOpen(true)}>
+            <BookOpen className="h-4 w-4 mr-1.5" />
+            搜索导入
+          </Button>
+          <Button size="sm" onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-1.5" />
+            新建
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -307,7 +338,7 @@ export default function AdminKnowledgePage() {
                         {doc.discipline ? (
                           <Badge variant="outline" className="text-[10px]">
                             <Tag className="h-3 w-3 mr-1" />
-                            {doc.discipline}
+                            {getDisciplineLabel(doc.discipline) || doc.discipline}
                           </Badge>
                         ) : (
                           <span className="text-muted-foreground text-xs">—</span>
@@ -433,13 +464,22 @@ export default function AdminKnowledgePage() {
               </div>
               <div>
                 <Label htmlFor="discipline">学科</Label>
-                <Input
-                  id="discipline"
-                  value={form.discipline}
-                  onChange={(e) => setForm({ ...form, discipline: e.target.value })}
-                  placeholder="如: physics, cs"
-                  className="mt-1.5"
-                />
+                <Select
+                  value={form.discipline || ' '}
+                  onValueChange={(v) => setForm({ ...form, discipline: v === ' ' ? '' : v })}
+                >
+                  <SelectTrigger id="discipline" className="mt-1.5">
+                    <SelectValue placeholder="选择学科" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value=" ">未选择</SelectItem>
+                    {KNOWLEDGE_DISCIPLINES.map((d) => (
+                      <SelectItem key={d.value} value={d.value}>
+                        {d.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div>
@@ -452,6 +492,54 @@ export default function AdminKnowledgePage() {
                 className="mt-1.5 min-h-[200px]"
                 required
               />
+            </div>
+            {/* Tags selection */}
+            <div>
+              <Label>标签</Label>
+              <div className="mt-2 space-y-3">
+                {KNOWLEDGE_TAG_CATEGORIES.map((cat) => (
+                  <div key={cat.category}>
+                    <span className="text-xs text-muted-foreground font-medium">
+                      {cat.category}
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {cat.tags.map((tag) => {
+                        const selected = form.tags.includes(tag)
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => toggleTag(tag)}
+                            className={`px-2 py-0.5 rounded-full text-xs border transition-all duration-150 ${
+                              selected
+                                ? 'bg-journal-primary/10 text-journal-primary border-journal-primary/30'
+                                : 'bg-background text-muted-foreground border-journal-border/40 hover:border-journal-primary/30'
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {form.tags.length > 0 && (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs text-muted-foreground">已选：</span>
+                  {form.tags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="text-[10px] cursor-pointer gap-1"
+                      onClick={() => toggleTag(tag)}
+                    >
+                      {tag}
+                      <X className="h-2.5 w-2.5" />
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
@@ -466,6 +554,17 @@ export default function AdminKnowledgePage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <UrlImportDialog
+        open={urlImportOpen}
+        onOpenChange={setUrlImportOpen}
+        onSuccess={() => fetchDocs(search, page)}
+      />
+      <SearchImportDialog
+        open={searchImportOpen}
+        onOpenChange={setSearchImportOpen}
+        onSuccess={() => fetchDocs(search, page)}
+      />
     </div>
   )
 }

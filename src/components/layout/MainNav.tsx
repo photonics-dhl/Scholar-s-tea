@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles, Search, Settings, Database, Brain } from 'lucide-react';
+import { GraduationCap, Users, MessageCircle, Trophy, Menu, X, LogOut, Sparkles, Search, Database, Brain, Globe } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -16,30 +16,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-const navItems = [
-  { href: '/disciplines', label: '学科', icon: GraduationCap, zone: 'scholarly' as const },
-  { href: '/groups', label: '课题组', icon: Users, zone: 'scholarly' as const },
-  { href: '/workshop', label: 'AI Workshop', icon: Sparkles, zone: 'social' as const },
-  { href: '/tea-party', label: '茶话会', icon: MessageCircle, zone: 'social' as const },
-  { href: '/top-questions', label: 'TOP10', icon: Trophy, zone: 'scholarly' as const },
-];
-
-function getZone(pathname: string): 'scholarly' | 'social' | 'neutral' {
-  if (pathname.startsWith('/disciplines') || pathname.startsWith('/groups') || pathname.startsWith('/top-questions')) {
-    return 'scholarly';
-  }
-  if (pathname.startsWith('/tea-party') || pathname.startsWith('/workshop')) {
-    return 'social';
-  }
-  return 'neutral';
-}
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 export function MainNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { lang, t, toggleLang } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const navItems = [
+    { href: '/disciplines', label: t.nav.disciplines, icon: GraduationCap, zone: 'scholarly' as const },
+    { href: '/groups', label: t.nav.groups, icon: Users, zone: 'scholarly' as const },
+    { href: '/workshop', label: t.nav.workshop, icon: Sparkles, zone: 'social' as const },
+    { href: '/tea-party', label: t.nav.teaParty, icon: MessageCircle, zone: 'social' as const },
+    { href: '/top-questions', label: t.nav.top10, icon: Trophy, zone: 'scholarly' as const },
+  ];
+
   const currentZone = getZone(pathname);
 
   // Global search shortcut: /
@@ -136,14 +129,26 @@ export function MainNav() {
           onClick={() => setSearchOpen(true)}
         >
           <Search className="h-4 w-4" />
-          <span className="text-sm">搜索</span>
+          <span className="text-sm">{t.nav.search}</span>
           <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
             /
           </kbd>
         </Button>
 
-        {/* User Menu */}
+        {/* Right side: Language + User */}
         <div className="flex items-center gap-2">
+          {/* Language Switcher */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2"
+            onClick={toggleLang}
+            title={t.common.switchLang}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            <span className="font-medium">{lang === 'zh' ? '中' : 'En'}</span>
+          </Button>
+
           {session?.user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -169,7 +174,7 @@ export function MainNav() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
-                    个人设置
+                    {t.nav.profile}
                   </Link>
                 </DropdownMenuItem>
                 {session.user.role === 'ADMIN' && (
@@ -178,13 +183,13 @@ export function MainNav() {
                     <DropdownMenuItem asChild>
                       <Link href="/admin/knowledge" className="cursor-pointer">
                         <Database className="mr-2 h-4 w-4" />
-                        知识库管理
+                        {t.nav.knowledgeBase}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/admin/research-memory" className="cursor-pointer">
                         <Brain className="mr-2 h-4 w-4" />
-                        研究记忆管理
+                        {t.nav.researchMemory}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -195,13 +200,13 @@ export function MainNav() {
                   onClick={() => signOut()}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  退出登录
+                  {t.nav.logout}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Button asChild size="sm" variant="default">
-              <Link href="/signin">登录</Link>
+              <Link href="/signin">{t.nav.login}</Link>
             </Button>
           )}
 
@@ -247,6 +252,17 @@ export function MainNav() {
                 </Link>
               );
             })}
+            {/* Mobile Language Switcher */}
+            <button
+              onClick={() => {
+                toggleLang();
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-accent w-full"
+            >
+              <Globe className="h-4 w-4" />
+              {t.common.switchLang}: {lang === 'zh' ? t.common.langZh : t.common.langEn}
+            </button>
           </nav>
         </div>
       )}
@@ -254,4 +270,14 @@ export function MainNav() {
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
+}
+
+function getZone(pathname: string): 'scholarly' | 'social' | 'neutral' {
+  if (pathname.startsWith('/disciplines') || pathname.startsWith('/groups') || pathname.startsWith('/top-questions')) {
+    return 'scholarly';
+  }
+  if (pathname.startsWith('/tea-party') || pathname.startsWith('/workshop')) {
+    return 'social';
+  }
+  return 'neutral';
 }

@@ -13,11 +13,13 @@ import {
   Settings,
   ArrowRight,
   GraduationCap,
+  Library,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils/cn'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 interface StatCardProps {
   icon: React.ReactNode
@@ -59,10 +61,12 @@ interface UserStats {
 }
 
 export default function ProfilePage() {
+  const { t } = useLanguage()
   const { data: session, status } = useSession()
   const router = useRouter()
   const [stats, setStats] = useState<UserStats>({ posts: 0, comments: 0, groups: 0 })
   const [statsLoading, setStatsLoading] = useState(true)
+  const [kbCount, setKbCount] = useState(0)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -83,6 +87,24 @@ export default function ProfilePage() {
         .finally(() => setStatsLoading(false))
     }
   }, [status])
+
+  useEffect(() => {
+    fetch('/api/v1/personal-kb')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          setKbCount(data.data.length)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const statItems = [
+    { icon: <BookOpen className="h-5 w-5" />, label: t.profile.stats.posts, value: statsLoading ? '...' : stats.posts, href: '/disciplines' },
+    { icon: <MessageSquare className="h-5 w-5" />, label: t.profile.stats.comments, value: statsLoading ? '...' : stats.comments, href: '/disciplines' },
+    { icon: <Users className="h-5 w-5" />, label: t.profile.stats.groups, value: statsLoading ? '...' : stats.groups, href: '/groups' },
+    { icon: <Library className="h-5 w-5" />, label: t.profile.stats.knowledgeBase, value: kbCount, href: '/personal-kb' },
+  ]
 
   if (status === 'loading') {
     return (
@@ -131,12 +153,6 @@ export default function ProfilePage() {
     academicProfile.bioDetail
   )
 
-  const statItems = [
-    { icon: <BookOpen className="h-5 w-5" />, label: '我的帖子', value: statsLoading ? '...' : stats.posts, href: '/disciplines' },
-    { icon: <MessageSquare className="h-5 w-5" />, label: '我的评论', value: statsLoading ? '...' : stats.comments, href: '/disciplines' },
-    { icon: <Users className="h-5 w-5" />, label: '加入的课题组', value: statsLoading ? '...' : stats.groups, href: '/groups' },
-  ]
-
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -146,14 +162,14 @@ export default function ProfilePage() {
           <CardContent className="px-6 pb-6 -mt-12">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
               <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-                <AvatarImage src={user.image || undefined} alt={user.name || '用户'} />
+                <AvatarImage src={user.image || undefined} alt={user.name || 'User'} />
                 <AvatarFallback className="text-2xl bg-journal-primary/15 text-journal-primary">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <h1 className="text-2xl font-bold text-foreground">
-                  {user.name || '未设置昵称'}
+                  {user.name || 'User'}
                 </h1>
                 <div className="flex items-center gap-2 mt-1 text-muted-foreground">
                   <Mail className="h-4 w-4" />
@@ -166,7 +182,7 @@ export default function ProfilePage() {
               <Button variant="outline" className="border-journal-border/30" asChild>
                 <Link href="/settings">
                   <Settings className="h-4 w-4 mr-2" />
-                  设置
+                  {t.settings.title}
                 </Link>
               </Button>
             </div>
@@ -174,7 +190,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {statItems.map((stat) => (
             <StatCard key={stat.label} {...stat} />
           ))}
@@ -186,26 +202,26 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle className="text-lg font-medium flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-journal-primary" />
-                学术画像
+                {t.settings.tabs.profile}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {academicProfile?.institution && (
                   <div>
-                    <p className="text-xs text-muted-foreground">所在机构</p>
+                    <p className="text-xs text-muted-foreground">Institution</p>
                     <p className="text-sm font-medium">{academicProfile.institution}</p>
                   </div>
                 )}
                 {academicProfile?.position && (
                   <div>
-                    <p className="text-xs text-muted-foreground">职位/身份</p>
+                    <p className="text-xs text-muted-foreground">Position</p>
                     <p className="text-sm font-medium">{academicProfile.position}</p>
                   </div>
                 )}
                 {academicProfile?.educationLevel && (
                   <div>
-                    <p className="text-xs text-muted-foreground">最高学历</p>
+                    <p className="text-xs text-muted-foreground">Education</p>
                     <p className="text-sm font-medium">{academicProfile.educationLevel}</p>
                   </div>
                 )}
@@ -213,7 +229,7 @@ export default function ProfilePage() {
 
               {academicProfile?.researchField && academicProfile.researchField.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1.5">研究领域</p>
+                  <p className="text-xs text-muted-foreground mb-1.5">Research Fields</p>
                   <div className="flex flex-wrap gap-1.5">
                     {academicProfile.researchField.map((field) => (
                       <span
@@ -229,7 +245,7 @@ export default function ProfilePage() {
 
               {academicProfile?.interests && academicProfile.interests.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1.5">感兴趣的方向</p>
+                  <p className="text-xs text-muted-foreground mb-1.5">Interests</p>
                   <div className="flex flex-wrap gap-1.5">
                     {academicProfile.interests.map((interest) => (
                       <span
@@ -245,7 +261,7 @@ export default function ProfilePage() {
 
               {academicProfile?.skills && academicProfile.skills.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1.5">专业技能</p>
+                  <p className="text-xs text-muted-foreground mb-1.5">Skills</p>
                   <div className="flex flex-wrap gap-1.5">
                     {academicProfile.skills.map((skill) => (
                       <span
@@ -261,7 +277,7 @@ export default function ProfilePage() {
 
               {academicProfile?.bioDetail && (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">详细学术简介</p>
+                  <p className="text-xs text-muted-foreground mb-1">Bio</p>
                   <p className="text-sm text-foreground whitespace-pre-wrap">{academicProfile.bioDetail}</p>
                 </div>
               )}
@@ -279,10 +295,10 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {[
-              { label: '浏览学科社区', href: '/disciplines', desc: '探索不同学科领域的讨论' },
-              { label: '发现课题组', href: '/groups', desc: '找到适合你的研究团队' },
-              { label: 'AI Workshop', href: '/workshop', desc: '与 AI 助手讨论学术问题' },
-              { label: '茶话会', href: '/tea-party', desc: '加入实时学术交流' },
+              { label: t.nav.disciplines, href: '/disciplines', desc: t.disciplines.description },
+              { label: t.nav.groups, href: '/groups', desc: t.groups.description },
+              { label: t.nav.workshop, href: '/workshop', desc: t.workshop.title },
+              { label: t.nav.teaParty, href: '/tea-party', desc: t.teaParty.description },
             ].map((item) => (
               <Link
                 key={item.label}

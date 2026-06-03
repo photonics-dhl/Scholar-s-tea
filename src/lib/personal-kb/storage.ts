@@ -6,11 +6,12 @@
 import type { LocalDocument, DocumentChunk, EmbeddingConfig } from './types'
 
 const DB_NAME = 'scholars-tea-personal-kb'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 const STORES = {
   documents: 'documents',
   settings: 'settings',
+  memories: 'memories',
 } as const
 
 let _db: IDBDatabase | null = null
@@ -29,12 +30,17 @@ function openDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result
+      const oldVersion = (event as IDBVersionChangeEvent).oldVersion
 
       if (!db.objectStoreNames.contains(STORES.documents)) {
         db.createObjectStore(STORES.documents, { keyPath: 'docId' })
       }
       if (!db.objectStoreNames.contains(STORES.settings)) {
         db.createObjectStore(STORES.settings, { keyPath: 'key' })
+      }
+      // v2: 新增研究记忆 store（供 research-memory 模块使用）
+      if (oldVersion < 2 && !db.objectStoreNames.contains(STORES.memories)) {
+        db.createObjectStore(STORES.memories, { keyPath: 'id' })
       }
     }
   })

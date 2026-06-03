@@ -2,79 +2,81 @@
   "domain_name": "硅基光子学与量子光学",
   "papers": [
     {
-      "title": "Essentially singular limits of Jacobi operators and applications to higher-order squeezing",
-      "abstract": "We study a family of Jacobi operators in which the diagonal entries are multiplied by a coupling parameter $λ\\geq0$. Under suitable conditions, the operator is self-adjoint for every $λ>0$, while the formal limit at $λ=0$ is a symmetric Jacobi operator admitting a one-parameter family of self-adjoint extensions. A central ingredient of our analysis is the derivation of uniform bounds for square-summable generalized eigenvectors in the small-$λ$ regime, which combines discrete WKB methods with Airy-function asymptotics. Using these estimates, we analyze the limiting behavior $λ\\to0$ in the strong resolvent sense, proving that for every sequence $λ_j\\to0$ one can extract a subsequence along which the corresponding Jacobi operators converge to some self-adjoint extension of the limiting operator; conversely, every such extension can be obtained in this way. We call this behavior an essentially singular limit, by analogy with essential singularities in complex analysis.   As an application, we study higher-order squeezing operators arising in quantum optics. Using the connection with Jacobi operators, we show that when the relative strength of the free-field term tends to zero, different self-adjoint extensions of the squeezing operator are selected along different sequences. In particular, this limit does not single out a physically distinguished self-adjoint extension, but instead identifies a distinguished subclass of extensions compatible with the underlying symmetry.",
-      "arxiv_id": "2605.21355v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21355v1",
+      "title": "Drift-free characterization of electro-optic tuning efficiency in lithium niobate photonic nanocavities",
+      "abstract": "Lithium niobate photonic crystal nanobeam cavity (PCNBC) represents a premier platform for integrated electro-optics, offering deep sub-wavelength mode confinement, enhanced light-matter interactions, and ultralow power consumption. However, accurate characterization of the electro-optic (EO) tuning efficiency in such high-Q devices is fundamentally impeded by DC drift, a time-dependent spectral instability arising from charge redistribution, surface screening, or buffer layer relaxation under sustained electric fields. Here, we report the systematic analysis of DC drift dynamics in lithium niobate nanocavities and demonstrate that conventional quasi-static DC voltage scanning yields highly unreliable characterization data. To circumvent this limitation, we introduce a drift-free, dynamic measurement methodology that employs high-frequency triangular-wave voltage sweeps to effectively decouple the instantaneous electronic Pockels response from slow charge-relaxation processes. Validated across 35 devices with varying electrode geometries, our method delivers reproducible tuning efficiency of 4.3-4.5 pm/V with a low coefficient of variation of 1.1%, showing excellent quantitative agreement with three-dimensional finite-element simulations. This robust, drift-free measurement technique establishes a rigorous standard for the characterization and optimization of resonant cavity electro-optics, accelerating the development of high-performance thin-film lithium niobate photonic integrated circuits.",
+      "arxiv_id": "2606.02216v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02216v1",
       "authors": [
-        "Felix Fischer",
-        "Daniel Burgarth",
-        "Davide Lonigro"
+        "Erqi Zhang",
+        "Danyang Yao",
+        "Xu Ran"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "研究Jacobi算子在耦合参数趋于零时的本质奇异极限行为及其在高阶压缩中的应用。",
-        "research思路": "解决耦合参数趋于零时Jacobi算子的自伴延拓问题及强预解收敛性。",
-        "experiment": "结合离散WKB方法和Airy函数渐近分析，导出平方可积广义特征向量的一致界。",
-        "innovation": "提出",
-        "related_work": "包括谱理论中Jacobi算子研究、算子极限理论及量子光学中的高阶压缩现象。",
-        "impact": "为算子极限理论提供新视角，在量子光学和谱分析领域具有潜在应用价值。"
+        "summary": "提出动态测量方法解决铌酸锂纳米腔电光调谐效率表征中的直流漂移问题",
+        "research思路": "解决高Q铌酸锂纳米腔中由电荷弛豫引起的直流漂移导致的表征不准问题",
+        "experiment": "采用高频三角波电压扫描方法分离瞬时Pockels效应与慢速电荷弛豫过程",
+        "innovation": "首次系统分析直流漂移动力学并开发无漂移动态测量技术",
+        "related_work": "铌酸锂光子晶体腔、集成电光调制器、低功耗光电器件表征等领域研究",
+        "impact": "为高精度电光器件表征提供可靠方法，推动集成光电子学发展"
       },
       "domain_trend": {
-        "trend": "硅基量子光子学融合机器学习，实现单光子精准操控与新型量子计算范式",
+        "trend": "硅基光量子集成系统正突破存储、调谐与辐射噪声控制三大技术瓶颈",
         "key_topics": [
-          "量子光学基础理论",
-          "量子机器学习与控制",
-          "单光子探测与操控"
+          "电光调谐效率表征技术",
+          "非易失性光电子阻变存储器",
+          "量子比特辐射噪声控制"
         ],
-        "development_direction": "从基础量子光学理论创新到跨领域应用拓展，硅基光子学作为平台正融合量子计算、机器学习和精密测量技术，推动量子信息处理与量子传感的实用化进程。"
+        "development_direction": "硅基光子学与量子光学正朝着高精度表征、低功耗存储与高稳定量子计算方向快速发展，通过解决电光调谐、光子存储与量子噪声控制等关键技术挑战，推动全可编程自适应光子系统的实现"
       }
     },
     {
-      "title": "Software Between Quantum and Machine Learning -- And Down to Pulses",
-      "abstract": "Contemporary quantum computing platforms remain, in essence, programmable physical systems whose control is typically mediated through unitary gate abstractions. While such abstractions provide a uniform interface, they obscure important aspects of the underlying hardware and may limit the exploitation of its full capabilities. Direct operation at the control-pulse level offers a more expressive and physically faithful paradigm, enabling, for instance, the implementation of tailored error-mitigation and optimisation strategies. However, this increased expressivity comes at the cost of greater quantum software development complexity, necessitating structured and accessible tooling.   We present a software framework, integrated within the QML-Essentials package, that extends quantum machine learning (QML) methodologies to encompass pulse-level modelling. By embedding quantum optimal control techniques within a QML setting, our approach enables the seamless combination of gate-based and pulse-level representations. The framework provides a comprehensive suite of modelling and analytical capabilities. In particular, we introduce composable ansatz constructions based on interchangeable building blocks, and support for end-to-end optimisation of pulse parameters. Motivated by the central role of quantum Fourier models, we further incorporate a range of Fourier-analytic diagnostics, complemented by extended measures of entanglement. All performance-critical components are implemented in a high-performance environment using JAX and supported by a dedicated quantum simulator. Taken together, the framework facilitates reproducible and systematic investigations, while bridging the conceptual and practical divide between abstract circuit models and hardware-aware optimisation. It provides a robust foundation for future developments at the intersection of QML and quantum control.",
-      "arxiv_id": "2605.21286v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21286v1",
+      "title": "Emerging Non-Volatile Opto-electronic Resistive Memories for Next-Generation Photonic Integrated Circuits",
+      "abstract": "Photonic integrated circuits have emerged as a powerful platform for high speed communication, sensing, and information processing due to their large bandwidth, low latency, and inherent parallelism. However, the absence of efficient, scalable, and non-volatile memory elements remains a fundamental limitation for realizing fully programmable and adaptive photonic systems. Conventional electronic memories introduce significant energy overhead, latency, and architectural inefficiencies due to repeated optical electrical conversions. Non volatile opto electronic resistive memories or OERMs have recently emerged as a promising solution to address these challenges by integrating memory functionality directly within the photonic domain. These devices combine resistive switching mechanisms with optical readout, enabling persistent state retention, multilevel programmability, and energy efficient operation. In this review, we provide a comprehensive overview of OERMs, spanning from fundamental physical mechanisms to system level applications. We first discuss the underlying resistive switching phenomena, including filamentary conduction, interface type switching, phase change transitions, and ionic migration, with particular emphasis on their interaction with confined optical modes. We then examine key material platforms such as metal oxides, transparent conducting oxides, phase change materials, and emerging two-dimensional systems, highlighting their performance trade-offs. Furthermore, we analyse device architectures and benchmark their performance in terms of switching energy, speed, endurance, and optical modulation efficiency. The integration of OERMs into programmable photonic circuits, neuromorphic systems, and in-memory optical computing architectures is critically discussed. Finally, we outline the major challenges and future research directions toward scalable, reliable",
+      "arxiv_id": "2606.01463v1",
+      "published": "2026-05-31",
+      "url": "http://arxiv.org/abs/2606.01463v1",
       "authors": [
-        "Maja Franz",
-        "Melvin Strobl",
-        "Jonathan Hunz"
+        "Santosh Kumar",
+        "Mukesh Kumar",
+        "Eunso Shin"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出将量子机器学习扩展到脉冲级建模的软件框架，突破量子门抽象限制。",
-        "research思路": "解决量子计算中门级抽象掩盖硬件能力、限制性能优化的问题。",
-        "experiment": "在QML-Essentials包中集成量子最优控制技术，实现门与脉冲级混合建模。",
-        "innovation": "首次将量子机器学习与脉冲级控制结合，提供更物理真实的量子计算范式。",
-        "related_work": "量子最优控制、量子错误缓解、量子计算编译与优化领域研究。",
-        "impact": "为量子计算提供底层硬件优化新路径，推动量子软件工具发展。"
+        "summary": "全面综述非易失性光电子阻变存储器(OERMs)技术，为下一代光子集成电路提供存储解决方案",
+        "research思路": "解决光子集成电路中缺乏高效可扩展非易失性存储元件的关键技术瓶颈",
+        "experiment": "结合电阻开关机制与光学读出技术，实现持久状态保持和多级可编程性",
+        "innovation": "将存储功能直接集成在光子域，减少光电转换损耗，提升能效与系统性能",
+        "related_work": "传统电子存储器、光子晶体存储器、相变光存储器及全光存储技术",
+        "impact": "推动全可编程自适应光子系统发展，为高速通信与信息处理开辟新路径"
       }
     },
     {
-      "title": "Velocity-Controlled Directional Readout of Single Photons",
-      "abstract": "Photodetection is usually treated in the frame in which the detector is at rest relative to the optical apparatus. We show that uniform motion of an electric Glauber detector changes the single-click POVM realized on two counterpropagating single-photon modes. Motion Doppler-shifts the alternatives in the detector frame; finite bandwidth then converts propagation direction into a detection bias without decohering the photon. For a Lorentzian response near one Doppler branch, the readout crosses from phase-sensitive to direction-sensitive with a quality-factor-enhanced onset. Finite-time integration adds Doppler-beat visibility loss, separating passive covariance from measurement change.",
-      "arxiv_id": "2605.21206v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21206v1",
+      "title": "Accelerating Surface Radiation Content to Investigate the Impact of Radon Progeny on Superconducting Qubits",
+      "abstract": "Ionizing radiation in the form of $α$, $β$, $γ$, and additional high-energy particles can induce decoherence via phonon and quasiparticle poisoning in superconducting qubits. Recent studies have explored this effect using cosmic rays or controlled radioactive sources held in the proximity of a qubit package, and have concluded that reductions in such ``external'' environmental radiation may benefit stable operation of qubit devices. However, the effect of long-lived, unstable daughters of $^{222}$Rn that ``plate out'' directly on device and packaging surfaces has not been as extensively explored. This plate-out process, well-known to the dark matter direct detection field, occurs throughout the fabrication and testing lifecycle of a device and (separately) its packaging, and produces a local source of $α$-decays which can remain active for decades. As this scales with chip area, understanding and managing this source of ionizing radiation is relevant for successfully scaling quantum computing architectures to larger numbers of qubits in a radiation-robust way. We present a setup capable of accelerating and enhancing radon daughter plateout by a factor of $7\\times10^4$ over ambient, in order to study, \\textit{in situ}, the impact of these events on superconducting qubits. We also provide outlook on the potential impact of this source of ionizing radiation on current and future qubit arrays.",
+      "arxiv_id": "2606.00473v1",
+      "published": "2026-05-30",
+      "url": "http://arxiv.org/abs/2606.00473v1",
       "authors": [
-        "Mohamed Hatifi"
+        "Sagar S. Poudel",
+        "Dylan J. Temples",
+        "Ryan Linehan"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "探测器运动改变了单光子探测的POVM，实现速度控制的方向读出",
-        "research思路": "解决运动探测器如何改变单光子探测特性及方向分辨问题",
-        "experiment": "分析运动Glauber探测器对两反向传播单光子模式的响应",
-        "innovation": "发现运动可将传播方向转化为检测偏置且不退相干",
-        "related_work": "静止探测器POVM理论、量子光学中的多普勒效应研究",
-        "impact": "为量子通信和量子计量中的方向敏感探测提供新方法"
+        "summary": "研究氡子体表面沉积对超导量子比特的辐射影响机制",
+        "research思路": "解决氡子体表面沉积导致的量子比特退相干问题",
+        "experiment": "加速表面辐射含量测试方法，结合辐射源与量子器件",
+        "innovation": "首次系统研究表面氡子体沉积对量子比特的长期影响",
+        "related_work": "宇宙线辐射影响研究、暗物质探测中的板结现象研究",
+        "impact": "为大规模量子计算中的辐射噪声控制提供新思路"
       }
     }
   ]

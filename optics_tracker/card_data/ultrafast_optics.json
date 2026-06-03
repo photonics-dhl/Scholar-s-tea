@@ -2,83 +2,81 @@
   "domain_name": "超快光学",
   "papers": [
     {
-      "title": "A strategy for high-quality EBSD surface processing in femtosecond laser machining",
-      "abstract": "",
-      "doi": "10.1016/j.optlastec.2026.115535",
-      "url": "https://doi.org/10.1016/j.optlastec.2026.115535",
+      "title": "Sub-cycle field-driven dynamical Berry phase in solids",
+      "abstract": "In quantum mechanics, a wavepacket acquires a geometric phase, known as the Berry phase, as it evolves along a closed trajectory in parameter space. In condensed matter systems, the Berry phase underlies a broad range of phenomena, including the anomalous Hall effect, orbital magnetism, and electric polarization. However, in centrosymmetric materials possessing time-reversal (TR) symmetry, its manifestation is suppressed and effectively vanishes. When a system is driven by a strong terahertz (THz) field, it can be coherently driven far from equilibrium, transiently reshaping its symmetry on sub-picosecond timescales. This capability opens new avenues for quantum control with potential applications in information processing and sensing. Here, we experimentally demonstrate that a strong THz field can transiently break inversion symmetry in MgO, inducing a dynamical complex Berry phase, thereby manipulating the topological properties of the material. Applying high-harmonic generation (HHG) spectroscopy, we directly resolve the Berry phase, accessing both its real and imaginary components. The first is associated with coherent intraband dynamics while the second with quantum tunneling through a potential barrier. This observation enables the reconstruction of the time-dependent evolution of the Berry phase within the cycle of the THz field. The coherent manipulation of solids with strong fields, combined with attosecond-resolved HHG spectroscopy, represents a fundamental step toward unveiling and controlling geometric quantum phenomena in condensed matter systems.",
+      "arxiv_id": "2606.02238v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02238v1",
       "authors": [
-        "Hongyan Guo",
-        "Zhaojiang Xue",
-        "Yifei Hao",
-        "Xin Tan",
-        "Wentao Wu"
+        "Lior Faeyrman",
+        "Jianing Zhang",
+        "Misha Ivanov"
       ],
       "citations": 0,
-      "venue": "Optics &amp; Laser Technology",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "提出飞秒激光加工中高质量EBSD表面处理策略，提升材料表征精度。",
-        "research思路": "解决飞秒激光加工后表面损伤导致的EBSD分析质量问题。",
-        "experiment": "优化飞秒激光参数与后处理工艺，结合EBSD表征验证效果。",
-        "innovation": "首次系统建立飞秒激光加工与EBSD表面质量的关联模型。",
-        "related_work": "包括激光抛光、电解抛光及低能离子束表面处理技术。",
-        "impact": "为材料微观结构表征提供新方法，推动先进制造与材料科学发展。"
+        "summary": "实验证明强THz场可瞬时打破MgO反演对称性，诱导动态Berry相，调控材料拓扑性质。",
+        "research思路": "解决中心对称材料中Berry相被抑制的问题，通过强场驱动实现瞬时对称破缺。",
+        "experiment": "采用强THz场驱动MgO，结合高次谐波产生技术观测动态Berry相效应。",
+        "innovation": "首次在中心对称材料中实现强场诱导的动态Berry相，突破传统对称性限制。",
+        "related_work": "包括异常霍尔效应、轨道磁性、电极化相关的Berry相研究，以及强场调控拓扑物态工作。",
+        "impact": "为超快量子调控提供新途径，推动拓扑材料在信息处理和传感中的应用。"
       },
       "domain_trend": {
-        "trend": "超快光学正引领材料表征与调制革新，通过飞秒激光加工与拓扑声子学突破技术边界。",
+        "trend": "超快光学驱动量子态与拓扑结构动态调控，开启材料新功能革命",
         "key_topics": [
-          "飞秒激光表面处理",
-          "ENZ材料超快调制",
-          "拓扑声子学"
+          "动态Berry相调控",
+          "手性磁结构超快动力学",
+          "声学光栅增强散射"
         ],
-        "development_direction": "超快光学正向多学科深度融合方向发展，飞秒激光技术与材料表征、纳米光子学、拓扑物理等领域交叉创新，推动超快调制精度提升、新型功能材料开发及先进制造技术突破。未来趋势将聚焦于更高精度、更快响应的光学器件设计，以及基于超快现象的新应用开发，特别是在量子计算和信息处理领域的应用。"
+        "development_direction": "超快光学正向多维度、跨领域融合发展，通过超快激光与材料量子态、磁结构、声子动力学的相互作用，实现材料性质的动态调控与功能增强，为量子信息、磁存储和声子学器件提供新原理与新方法。"
       }
     },
     {
-      "title": "Intraband and Interband Competition Drives Ultrafast Modulations of Indium Tin Oxide",
-      "abstract": "Transparent conducting oxides near their epsilon-near-zero frequency exhibit near-unity ultrafast modulations of the refractive index which have enabled the field of time-varying metamaterials, yet the underlying carrier dynamics at high driving fluences remain poorly understood. Here, we report ultrafast modulations in the reflectivity and transmissivity of indium tin oxide, and a non-monotonic oscillatory behavior. This is especially evident in the time evolution of the complex Fresnel coefficients retrieved directly from pump-probe spectrograms using a optical gating technique, GRUMPY FROG. The dynamics of the retrieved plasma frequency and damping coefficient are well captured by an extended two-temperature model incorporating a competing nonlinear interband process: at high fluences, Auger-type scattering of hot conduction electrons promotes valence band carriers, increasing the plasma frequency while accelerating hot-electron cooling and raising the damping coefficient. These results clarify the origin of anomalous high-fluence dynamics in indium tin oxide and identify a fluence-tuneable modulation dynamic with direct implications for ultrafast refractive index engineering in time-varying photonic devices and optical switching",
-      "arxiv_id": "2605.21432v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21432v1",
+      "title": "Ultrafast internal dynamics of chiral domain walls probed by time-resolved XRMS",
+      "abstract": "We measure picosecond dynamics of labyrinthine stripe domains with chiral Néel-type domain walls using time-resolved x-ray resonant magnetic scattering (XRMS). At the stripe-domain wavevector, the helicity-summed signal shows ultrafast demagnetization, recovery, and a weak oscillatory contribution that we identify as a signature of laser-launched coherent surface phonons. In contrast, the dichroic signal, which is sensitive to the in-plane magnetization inside the Néel walls, shows a strong oscillatory response whose frequency decreases with increasing pump fluence. We attribute this softening to pump-induced changes in the effective anisotropy and saturation magnetization, which modify the restoring field of an internal domain-wall mode. Time-resolved XRMS thus isolates wall-specific dynamics and provides access to internal domain-wall motion in disordered stripe textures on picosecond time scales.",
+      "arxiv_id": "2606.02154v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02154v1",
       "authors": [
-        "Anthony C Harwood",
-        "Sean Z J Lim",
-        "T V Raziman"
+        "Dmitriy Ksenzov",
+        "Flavio Capotondi",
+        "Nicolas Jaouen"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "揭示了ITO在ENZ频率下超快调制过程中带内与带间过程的竞争机制，发现Auger散射在高光强下促进价带载流子，导致等离子体频率增加和阻尼系数上升的非单调振荡行为。",
-        "research思路": "针对高驱动光强下ITO载流子动力学机理不明的难题，通过直接测量复菲涅耳系数的时间演化，区分带内Drude响应与非线性带间过程，建立扩展双温模型描述Auger型散射导致的竞争效应。",
-        "experiment": "采用GRUMPY FROG光学门控技术从泵浦-探针光谱图中实时检索复菲涅耳系数，测量反射率和透射率的超快演化时域波形，获取等离子体频率和阻尼系数的时间分辨动力学数据。",
-        "innovation": "提出可同时捕获等离子体频率和阻尼系数动态演化的扩展双温模型；首次直接测量复菲涅耳系数的时域演化；揭示高光强下Auger型散射作为竞争性带间过程对等离子体动力学的调控机制。",
-        "related_work": "M. Z. Alam等关于ENZ材料超快调制的基础工作；时间域超材料先驱研究（如H. Lakhotia、K. Fan等）；氧化物透明导电电极的超快光学响应研究；热电子弛豫动力学的双温模型理论。",
-        "impact": "为时变超材料提供了对高光强下载流子动力学的基本理解，有助于优化ENZ材料实现更大调制幅度和更快响应速度，推动超快光开关、光调制器和时域光子器件的发展。"
+        "summary": "利用飞秒时间分辨XRMS技术首次观测到手性奈尔畴壁的皮秒级内部动力学模式。",
+        "research思路": "解决手性磁畴壁超快动力学难以直接探测的问题，揭示其内部振荡模式机制。",
+        "experiment": "采用时间分辨X射线共振磁散射(XRMS)技术，测量迷宫状条纹域的螺旋度和二色信号。",
+        "innovation": "首次在皮秒尺度分离出畴壁特有动力学，发现泵浦诱导的有效各向异性软化现象。",
+        "related_work": "包括时间分辨磁光克尔效应研究畴壁运动、X射线光电子显微术观察静态畴壁结构等。",
+        "impact": "为超快磁学和非易失性存储器设计提供新视角，推动手性磁结构动力学研究发展。"
       }
     },
     {
-      "title": "Topological phononics",
-      "abstract": "Topological phononics extends the foundational concepts of topological condensed matter physics to the realm of lattice vibrations and classical mechanical waves, unlocking robust, defect-immune states and phenomena beyond the reach of conventional phononic engineering. This review provides a unified, systematic framework for understanding topological phonons across natural and artificial systems, spanning solid-state materials, acoustic/mechanical metamaterials, and non-Hermitian platforms. We cover the core theoretical principles -- from Berry curvature and symmetry-protected topological invariants to bulk-boundary correspondence -- alongside experimental advances in probing topological phonon states via inelastic scattering and momentum-resolved techniques for solid-state phonons as well as pump-probe measurements in acoustic/mechanical metamaterials. Key topics include Weyl/Dirac/nodal-line phonons in crystalline solids, symmetry-engineered topological phases in metamaterials, non-Hermitian effects (exceptional points, skin effect), and emergent directions such as Floquet engineering, synthetic dimensions, and real-space topological textures (skyrmions, merons). We also highlight technological applications in robust waveguides, on-chip surface-acoustic-wave devices, and acoustofluidics, while outlining future challenges and opportunities in quantum phononics, nonlinear topological phenomena, and interdisciplinary integration with photonics and electronics. This review serves as a comprehensive guide across physics, materials science, and engineering, bridging fundamental theory with cutting-edge experiments and innovations in topological phononics.",
-      "arxiv_id": "2605.20900v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20900v1",
+      "title": "Bragg-enhanced time-domain Brillouin scattering from a propagating acoustic grating",
+      "abstract": "Generation and detection of coherent phonons in semiconductors by femtosecond optical pulses is a powerful tool for high-frequency acoustic control of their electronic properties. Here, we demonstrate a propagating one-dimensional acoustic grating in bulk semiconductors using above-band-gap excitation by a train of laser pulses with high repetition rate of 1 GHz. This approach enables shaping of the coherent acoustic phonon spectrum and leads to a significant enhancement of Brillouin light scattering at selected probe wavelengths in pump-probe configuration. We demonstrate this effect at a cryogenic temperature of 5 K in prototypical semiconductor systems, namely bulk crystalline GaAs and (Cd,Zn)Te, which serve as benchmark materials for the proposed method. The spectral dependence of the time-domain Brillouin light scattering amplitude exhibits resonant peaks at discrete probe wavelengths arising from Bragg reflection of the probe light by the propagating acoustic grating. A 10-30-fold resonant enhancement of the signal amplitude is observed for GaAs and (Cd,Zn)Te, determined by the finite spectral width of the probe pulse. With further spectral narrowing, enhancements of the order ~ 100-150 are expected, set by the number N of strain pulses in the acoustic grating within the sample and ultimately limited by the material parameters and sample thickness.",
+      "arxiv_id": "2606.02012v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02012v1",
       "authors": [
-        "Zeguo Chen",
-        "Tiantian Zhang",
-        "Xulong Wang"
+        "O. S. Ken",
+        "D. O. Horiachyi",
+        "V. L. Korenev"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "拓扑声子学将凝聚态拓扑概念推广到晶格振动和机械波领域，实现稳健无缺陷的状态和现象。",
-        "research思路": "解决传统声子工程中难以实现的鲁棒性和缺陷免疫问题，拓展拓扑物理应用范围。",
-        "experiment": "结合非弹性散射、动量分辨技术测量固体中拓扑声子，声学超材料采用泵浦探测方法。",
-        "innovation": "首次建立统一框架理解自然和人工系统中拓扑声子，涵盖非厄米平台和对称工程。",
-        "related_work": "拓扑光子学、拓扑绝缘体、声学/力学超材料设计、非厄米物理相关研究。",
-        "impact": "为声子调控提供新范式，推动量子计算、声波器件和材料科学交叉领域发展。"
+        "summary": "提出利用GHz激光脉冲序列在体半导体中产生传播声学光栅，增强布里渊散射信号。",
+        "research思路": "解决高频声子控制电子性质的问题，通过特定声子谱整形实现选择性布里渊散射增强。",
+        "experiment": "采用1GHz激光脉冲序列在5K低温下激发GaAs和(Cd,Zn)Te，探测其布里渊散射增强效应。",
+        "innovation": "首次利用传播声学光栅实现布拉格增强的时间域布里渊散射，信号提升10-30倍。",
+        "related_work": "超快声子动力学研究、光声相互作用、半导体中相干声子产生与检测相关工作。",
+        "impact": "为高频声子调控电子性质提供新方法，对声子学器件和量子声学有重要推动作用。"
       }
     }
   ]

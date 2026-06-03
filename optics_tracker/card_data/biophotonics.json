@@ -2,81 +2,81 @@
   "domain_name": "生物与医学光子学",
   "papers": [
     {
-      "title": "Near-Field Vibrational Energy Transfer for Mid-Infrared Upconversion in Plasmonic Nanogaps",
-      "abstract": "Förster energy transfer underpins modern photonics, yet establishing an analogous vibrational pathway in the mid-infrared (MIR) remains highly challenging, as sub-picosecond intramolecular vibrational redistribution (IVR) suppresses intermolecular coupling. Here we demonstrate vibrational donor--acceptor transfer in the MIR and subsequent upconversion to visible luminescence enabled by sub-2 nm plasmonic nanogaps. The extreme lateral field confinement in metal--molecule--metal ring cavities defined by self-assembled molecular spacers couples efficiently to in-plane molecular dipoles. Continuous-wave MIR excitation selectively populates $-\\mathrm{C}\\equiv\\mathrm{N}$ vibrational donors, and plasmon-enhanced near-field coupling transfers this energy to nearby electronic acceptors, generating anti-Stokes visible emission under low power densities. Upconversion efficiencies exceeding $0.3\\%$ are observed, limited by competition between the plasmon-mediated transfer rate and IVR. These results show that extreme plasmonic confinement can redirect molecular vibrational relaxation pathways, opening a route toward vibrational nanophotonics, intermolecular interactions for bioimaging, and room-temperature MIR detection based on molecular degrees of freedom.",
-      "arxiv_id": "2605.19498v1",
-      "published": "2026-05-19",
-      "url": "http://arxiv.org/abs/2605.19498v1",
+      "title": "Reflector-Free, Highly Confined Love-Like SAWs Enabled by a Phononic Metasurface for Real-Time Monitoring of Cell Dynamics",
+      "abstract": "Surface acoustic wave (SAW) devices are widely used in sensing and biosensing but generally suffer from strong attenuation in liquid environments. Conventional approaches rely on reflectors to reduce these losses, yet these components remain difficult to optimize: limited device miniaturization, and increase fabrication complexity. Here, we introduce an innovative design strategy that integrates a phononic metasurface with tailored electromechanical properties of the substrate to generate a type of shear-horizontal (SH) surface resonance modes that exhibit strong lateral confinement and zero radiation into both the substrate bulk and the free surface, eliminating the need for reflectors. This approach enables highly tailorable surface acoustic resonances with distinctive enhanced dynamic strain-energy confinement leading to significantly higher quality factors than conventional SAW devices, particularly in water-loaded conditions. We show the fabrication and experimental validation of the proposed phononic metasurface-based SAW resonator and showcase its biosensing capabilities through real-time monitoring of cellular death.",
+      "arxiv_id": "2604.24436v1",
+      "published": "2026-04-27",
+      "url": "http://arxiv.org/abs/2604.24436v1",
       "authors": [
-        "Avisekh Pal",
-        "Anju Sajan",
-        "Christopher Sumner"
+        "Jessica Monaldi",
+        "Mourad Oudich",
+        "Francis Kosior"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实现了等离子体纳米间隙中近场振动能量传递和中红外上转换",
-        "research思路": "解决中红外振动能量传递受分子内振动再分布抑制的问题",
-        "experiment": "利用自组装分子间隔物定义亚2nm金属-分子-金属环形腔",
-        "innovation": "首次在中红外波段实现振动供体-受体传递并上转换至可见光",
-        "related_work": "Förster能量转移、等离子体增强光谱、分子振动耦合",
-        "impact": "为高效中红外探测和转换器件设计提供新思路"
+        "summary": "通过声子超表面设计实现无反射器、高度局域化的类乐夫声表面波，用于液体环境实时细胞监测",
+        "research思路": "解决传统SAW器件在液体环境中衰减严重和依赖反射器的问题",
+        "experiment": "结合声子超表面设计与基底压电性能优化，制造并实验验证器件性能",
+        "innovation": "实现零辐射泄漏的剪切水平表面共振模式，消除反射器需求并提高品质因数",
+        "related_work": "传统SAW反射器设计、声子晶体波导、微流控SAW生物传感器",
+        "impact": "为液体环境生物传感提供新平台，推动实时细胞动力学监测技术发展"
       },
       "domain_trend": {
-        "trend": "纳米光子学驱动的生物传感技术正实现从分子到疾病的精确探测新突破",
+        "trend": "超构材料与分子光力学驱动生物传感与成像技术革命",
         "key_topics": [
-          "中红外能量转换",
-          "无标记光学传感平台",
-          "单分子检测技术"
+          "声子超表面生物传感",
+          "低阈值声子激光器",
+          "表面功能化优化"
         ],
-        "development_direction": "生物与医学光子学正朝着更高效、更灵敏的传感与检测技术发展，重点聚焦于纳米光子结构创新、多平台性能优化以及单分子水平检测技术突破，同时积极推进与材料科学、纳米技术和临床诊断的跨领域融合应用"
+        "development_direction": "生物与医学光子学正朝着高灵敏度、实时监测、无标记检测的方向发展，特别注重超构材料设计、光-声-分子多场耦合机制以及表面工程优化，以实现更精准的生物医学诊断与成像应用。"
       }
     },
     {
-      "title": "Comparative performance of three optical biosensing platforms for SARS-CoV-2 antibodies detection in human serum",
-      "abstract": "This study presents a rigorous comparative analysis of two label-free optical biosensing platforms, Bloch surface wave (BSW) and microring resonator (MRR), for the detection of SARS-CoV-2 antibodies in human serum. To ensure direct comparability, a new BSW readout system was established alongside an existing MRR platform, allowing assays to be conducted under nearly identical experimental conditions. Both sensors were functionalized with various SARS-CoV-2 Spike and Nucleocapsid protein variants to capture specific host antibodies. The results demonstrate that both platforms provide rapid, quantitative, and sensitive detection of anti-Spike and anti-Nucleocapsid antibodies without the need for secondary labels. Furthermore, the platforms show excellent agreement with longitudinal serology benchmarks and high repeatability across different biochip batches. This work establishes both BSW and MRR technologies as powerful, low-cost candidates for next-generation clinical diagnostics and serological surveillance.",
-      "arxiv_id": "2604.08225v1",
-      "published": "2026-04-09",
-      "url": "http://arxiv.org/abs/2604.08225v1",
+      "title": "Molecular-optomechanical phonon laser",
+      "abstract": "Molecular cavity optomechanics (COM) leverages ultrastrong interactions between confined optical fields and high-frequency molecular vibration, providing a unique platform for exploring high-frequency phonon dynamics. In this work, we theoretically propose the use of a hybrid molecular COM system for realizing an ultra-low-threshold mid-infrared (MIR) phonon laser. Despite an optical quality factor of only $Q_a=100$, an ultra-low threshold power of $\\mathrm{P}_{\\mathrm{th}} = 17.5~\\mathrm{nW}$ is achieved, enabled by giant single-photon optomechanical coupling and molecular collective effect. Moreover, the mechanical gain and threshold power can be further tuned by adjusting the distance between mirrors of the Fabry-Pérot cavity. Our findings establish the first direct connection between molecular COM and MIR phonon lasers, with potential applications in MIR acoustics and biomedical imaging.",
+      "arxiv_id": "2604.23998v1",
+      "published": "2026-04-27",
+      "url": "http://arxiv.org/abs/2604.23998v1",
+      "authors": [
+        "Bin Yin",
+        "Jie Wang",
+        "Qian Zhang"
+      ],
+      "citations": 0,
+      "venue": "arXiv",
+      "source": "arxiv",
+      "analysis": {
+        "summary": "提出分子腔光力学系统实现超低阈值中红外声子激光器",
+        "research思路": "解决传统声子激光器阈值高、中红外波段难以实现的问题",
+        "experiment": "采用法布里-珀罗腔与分子振动耦合的理论模型设计",
+        "innovation": "在低品质因子条件下实现纳瓦级超低阈值声子激射",
+        "related_work": "腔光力学、分子振动光谱学、中红外激光器研究",
+        "impact": "为中红外声学和生物医学成像提供新器件平台"
+      }
+    },
+    {
+      "title": "Comparative Silane Surface Functionalization Strategies for Enhanced Bloch Surface Wave Biosensing of Anti-SARS-CoV-2 Antibodies",
+      "abstract": "Surface functionalization plays a decisive role in the performance of biosensors, as it governs the efficiency and stability of biomolecule immobilization at the sensor interface and, consequently, the overall performance of the biosensing platforms. In this work, we present a comparative study of three organosilane chemistries - APTES, APDMS, and CPTES - applied to a SiO2 terminated 1D photonic crystal able to sustain Bloch surface waves and designed to operate as optical biosensors in both label free and fluorescence enhanced modes. Each chemistry was evaluated through a standardized label-free protocol based on the interaction between immobilized SARS CoV 2 spike protein and its corresponding antibodies, enabling quantitative assessment of binding efficiency, nonspecific adsorption, and signal repeatability. CPTES exhibited the most favorable balance between specific signals, reduced variability, and low nonspecific adsorption. The three chemistries were subsequently tested in fluorescence mode for the detection of anti SARS CoV 2 IgG antibodies in human serum, demonstrating the suitability of BSW enhanced fluorescence for rapid serological analysis. Overall, the study identifies CPTES as the most robust and reproducible functionalization strategy among the three investigated for BSW biosensing and highlights the potential of the platform for fast, sensitive detection of clinically relevant antibodies.",
+      "arxiv_id": "2604.22444v1",
+      "published": "2026-04-24",
+      "url": "http://arxiv.org/abs/2604.22444v1",
       "authors": [
         "Agostino Occhicone",
         "Alberto Sinibaldi",
-        "Peter Munzert"
+        "Paola Di Matteo"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "比较BSW和MRR两种无标记光学传感平台检测人血清中SARS-CoV-2抗体的性能",
-        "research思路": "解决如何直接、快速、灵敏地检测血清中新冠病毒抗体的问题",
-        "experiment": "建立新BSW系统并与现有MRR平台对比，使用Spike和Nucleocapsid蛋白功能化",
-        "innovation": "首次在相同实验条件下直接比较BSW和MRR平台性能",
-        "related_work": "ELISA、表面等离子体共振(SPR)等传统抗体检测技术",
-        "impact": "为下一代低成本、高灵敏度临床诊断技术提供重要参考"
-      }
-    },
-    {
-      "title": "Digital nanophotonic biosensing empowered by silicon Mie voids",
-      "abstract": "Optical biosensors are indispensable in medical and environmental diagnostics, yet existing approaches are fundamentally limited in their sensitivity due to ensemble-averaged measurements. Digital biosensing has emerged as a promising solution for resolving individual binding events, thereby providing signals at very low analyte concentrations down to the single-molecule level. Here, we present a novel concept for digital optical biosensing empowered by dielectric Mie voids, combining nanoparticle-based contrast enhancement and deep learning for ultrasensitive biomarker detection. The resonantly trapped light in the air cavities of the periodic Mie void arrays ensures strong overlap between the near-fields and the single gold nanoparticles that are captured on the surface in the presence of the protein biomarker. Remarkably, this strong interaction creates high-contrast digital signals for the precise counting of single nanoparticles located both within and outside the voids, yielding efficient use of the entire sensor area for high sensitivity. We employ deep-ultraviolet (DUV) lithography for the scalable and low-cost production of Mie voids in silicon wafers and automated image analysis with a convolutional neural network for robust nanoparticle counting. As a proof of our concept, we demonstrate the detection of an important disease biomarker, interleukin-6 (IL-6), from small sample volumes at concentrations as low as 1.84 pg/ml, within the physiological range of healthy individuals. Owing to its scalability, precision, and adaptability, our digital nanophotonic biosensing approach based on silicon Mie voids establishes a versatile route for applications ranging from bioanalytics to health and environmental monitoring.",
-      "arxiv_id": "2604.01182v1",
-      "published": "2026-04-01",
-      "url": "http://arxiv.org/abs/2604.01182v1",
-      "authors": [
-        "Daniil Riabov",
-        "Abtin Saateh",
-        "Wenhong Yang"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "提出基于硅Mie空腔的数字纳米光学生物传感器，实现单分子水平的生物标志物检测。",
-        "research思路": "解决传统光学生物传感器灵敏度受限于系综平均测量的问题，实现单分子检测。",
-        "experiment": "结合介电Mie空腔阵列、纳米粒子对比增强和深度学习技术进行生物标志物检测。",
-        "innovation": "首次将Mie空腔结构用于数字生物传感，实现空腔内外单纳米粒子高对比度计数。",
-        "related_work": "数字ELISA、单分子荧光、等离子体纳米孔传感等单分子检测技术。",
-        "impact": "为超灵敏生物标志物检测提供新平台，推动医疗诊断和环境监测领域发展。"
+        "summary": "系统比较了三种硅烷化学方法（APTES、APDMS、CPTES）在Bloch表面波生物传感器上的功能化效果，CPTES表现出最佳的信号强度与特异性结合平衡。",
+        "research思路": "针对表面功能化决定生物传感器性能的关键问题，通过标准化无标记检测协议，系统评估不同硅烷化学对SARS-CoV-2蛋白-抗体相互作用的影响。",
+        "experiment": "采用SiO2终端1D光子晶体激发Bloch表面波，使用SARS-CoV-2刺突蛋白-抗体作为模型结合对，通过无标记和荧光增强双模式评估结合效率与特异性。",
+        "innovation": "首次在同一传感平台上系统比较三种有机硅烷化学在Bloch表面波生物传感器中的性能差异，建立表面功能化优化方法论。",
+        "related_work": "涉及Bloch表面波传感器技术、硅烷表面修饰化学、COVID-19生物传感检测等相关研究领域的重要进展。",
+        "impact": "为光学生物传感器表面工程提供关键参考，推动高灵敏度、高特异性诊断平台的发展，尤其在传染病检测领域具有应用潜力。"
       }
     }
   ]

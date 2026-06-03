@@ -2,81 +2,80 @@
   "domain_name": "超材料与纳米光学",
   "papers": [
     {
-      "title": "Towards compact high-frequency nonreciprocal devices using nanoplasma-switched time-varying metasurfaces",
-      "abstract": "Time-modulated systems have received growing interest in recent years. They allow us to tailor effects, such as frequency conversion, single-direction propagation, etc. For the microwave band, semiconductor elements, such as varactors, are usually used as time-modulated elements but their modulation frequency has been limited to the few-gigahertz range. Recent advances in nanoplasma switches, i.e., two-state electronic switches based on a gas discharge in a nanometer-scale gap, provide a new potential for developing time-modulated systems with high operating frequencies. Here, we develop an analytical framework based on the time-Floquet method for the design of nonreciprocal time-modulated devices based on two-state time-modulated elements, for instance, nanoplasma-based switches. A practical example of a microwave isolator operating at 100~GHz frequency is developed and studied both analytically and using full-wave simulations. A potential realization in a parallel-plate waveguide is also simulated numerically.",
-      "arxiv_id": "2605.20836v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20836v1",
+      "title": "Multilayer Babinet metamaterial to initiate nonreciprocal topological phenomena and generalized Faraday rotation",
+      "abstract": "Multilayers of Babinet complementary periodic structures constructed with miniarrays of spherical plasmonic nanoresonators were optimized to ensure Generalized Faraday Rotation. Nonreciprocal rotation and asymmetric transmission were achieved in spectrally overlapping regions due to the reach physics involving (i) symmetry breaking via coupled localized modes, (ii) Brillouin zone-folding stemmed from constituent sub-lattices forming in-plane twisted coupled loops, (iii) interlayer coupling between Babinet complementary patterns. The nanophotonical phenomena include (i) quasi-BIC resonances, (ii) hierarchically coupled localized and propagating modes that results in time-periodic Floquet modulation, (iii) initialization of synthetic potentials tuneable independently via intra and inter-layer parameters. The unique bianisotropic composites result in a synthetic vector gauge and emulated magnetic field manifesting itself in tilted-precessing magnetic dipoles and the accompanying modulation being time-periodic, inherently ensures a synthetic dimension. The asymmetric transmission is enhanced in the classical sense along quantized flat bands, and in mixed and forward bases inside finite wavelength-and-tilting intervals overlapping with nonreciprocal polarization rotation. The transmitted pulse re-shaping proves beating of nearby resonant modes, the loss can be compensated with active ad-layers thereby resulting in Faraday isolator capability. The multilayers synthetize topological phenomena in high-dimensional synthetic parameter spaces.",
+      "arxiv_id": "2606.02571v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02571v1",
       "authors": [
-        "Mikhail Sidorenko",
-        "Jin Zhang",
-        "Xuchen Wang"
+        "Balázs Bánhelyi",
+        "Miklós Waldhauser",
+        "Virág Szünstein"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出基于纳米等离子体开关的时间调制超表面设计方法，实现高频非互易器件",
-        "research思路": "解决传统半导体调制器频率限制问题，开发高频时间调制系统",
-        "experiment": "采用时间Floquet分析方法，设计100GHz微波隔离器并进行全波仿真验证",
-        "innovation": "首次将纳米等离子体开关应用于时间调制超表面，突破GHz频率限制",
-        "related_work": "包括微波半导体调制器、Floquet理论应用、等离子体开关技术等",
-        "impact": "为高频非互易器件设计提供新途径，推动太赫兹通信和成像技术发展"
+        "summary": "设计多层巴比涅超材料，实现非互易拓扑现象和广义法拉第旋转。",
+        "research思路": "解决光学系统中非互易性和拓扑现象的激发与调控问题。",
+        "experiment": "优化球形等离激元纳米谐振器微阵列的多层巴比涅互补周期结构。",
+        "innovation": "通过层间耦合和对称破缺实现光谱重叠区域的非互易旋转和不对称传输。",
+        "related_work": "包括等离激元超材料、拓扑光子学和Floquet工程等领域研究。",
+        "impact": "为设计新型光学器件和调控电磁波提供新思路，推动拓扑光子学发展。"
       },
       "domain_trend": {
-        "trend": "超材料与纳米光子学正突破传统光学限制，推动高频非互易器件与混合谐振技术革命",
+        "trend": "拓扑光子学与非厄米系统融合驱动超材料与纳米光学新突破",
         "key_topics": [
-          "时间调制超表面",
-          "混合谐振器设计",
-          "纳米等离子体结构优化"
+          "非互易拓扑超材料",
+          "非厄米光学微腔拓扑结构",
+          "多波束调制超表面设计"
         ],
-        "development_direction": "超材料与纳米光学正向多功能、高频化和跨应用领域方向发展，重点突破传统光学限制，通过混合谐振理论、新型纳米结构和时间调制技术，实现在通信、传感、生物医学和量子技术等领域的革命性应用"
+        "development_direction": "领域正从单纯材料设计向多功能、可调控、跨学科融合方向发展，特别是拓扑光子学与非厄米系统的结合，以及在通信、量子信息等领域的应用拓展。光学与凝聚态物理、材料科学、量子信息科学的交叉研究将成为未来发展重点，推动新型光学器件和量子技术的实现。"
       }
     },
     {
-      "title": "Engineering Hybrid Resonances in Nanophotonics",
-      "abstract": "Hybridization of resonances is known to overcome inherent limitations of individual systems, enabling advanced functionalities and applications. Here we discuss hybrid plasmonic-Mie resonators that emerged recently as a promising direction in advancing nanophotonic structures by synergistically combining the strong near-field enhancement of plasmonic components with the low-loss, multipolar resonances of dielectric Mie elements. We review the recent progress in the field, encompassing the fundamental physical principles, structural design strategies, material platforms, computational optimization approaches, and representative device implementations. Our discussion starts by evaluating the complementary characteristics of plasmonic and Mie resonances followed by a description of the coupling between these resonances in order to boost light-matter interactions. Afterward, we explore the performance of efficient hybrid resonators for different application areas. Apart from the conventional metal-dielectric systems, we consider the recent class of epsilon-near-zero (ENZ) materials, which can provide unique advantages in terms of field localization, phase engineering, and energy flow management in the vicinity of zero-permittivity conditions, offering more flexibility in designing hybrid nano-optical devices. Lastly, we point out potential research avenues aiming to improve functional and efficient nanophotonic devices, especially those involving emerging topological material systems, such as Sb2Te3, Bi2Te3, Bi2Se3, combining plasmonic amplification, dielectric confinement, and spin-dependent optical behavior.",
-      "arxiv_id": "2605.20605v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20605v1",
+      "title": "Skyrmions in scalar fields of non-Hermitian optical microcavities: spontaneous formation, nonlinear control, and optical forces",
+      "abstract": "Topological textures of light offer powerful routes for structuring optical fields, controlling wave transport, and manipulating matter. Skyrmions, long studied as topological solitons in vector fields, have recently been extended to scalar wave systems, including acoustics, hydrodynamics, and plasmonics. However, their realization in two-dimensional scalar wave propagation with nonlinearities and in quantum fluids remains uncharted. Here, we establish such a Skyrmion framework for scalar fields in optical microcavities. With focus on exciton-polaritons, we show that nonresonant excitation without imposed phase can spontaneously generate isolated Skyrmions and self-organized Skyrmion lattices in a polariton condensate. We trace this mechanism to gain- and loss-induced phase curvature together with outward polariton flow. We further demonstrate that polariton nonlinearities provide all-optical control of these textures, enabling switching of the Skyrmion number and reconfiguration of Skyrmion moiré lattices through resonant and nonresonant excitation schemes. These results establish nonlinear non-Hermitian resonators as a versatile platform for the spontaneous generation and active control of scalar topological light fields.",
+      "arxiv_id": "2606.02265v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02265v1",
       "authors": [
-        "Shutao Zhang",
-        "Cheng-Feng Pan",
-        "Yandong Fan"
+        "Jan Wingenbach",
+        "Roman Lebs",
+        "Xuekai Ma"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "结合等离子体与米氏共振优势，设计高效纳米光子混合谐振器，突破单一系统局限。",
-        "research思路": "解决等离子体高损耗和米氏共振场强不足的问题，通过混合共振增强光物质相互作用。",
-        "experiment": "采用结构设计策略、材料平台选择及计算优化方法，实现混合谐振器的性能提升。",
-        "innovation": "首次系统提出等离子体-米氏混合谐振器理论框架，并验证其在多个应用场景的优势。",
-        "related_work": "包括纯等离子体纳米结构、全介质米氏谐振器及表面等离激元-光子晶体混合系统研究。",
-        "impact": "为纳米光子器件设计提供新范式，推动传感、非线性光学及量子技术等领域发展。"
+        "summary": "在非厄米光学微腔中实现标量场斯格明子的自发形成、非线性控制及光学力研究",
+        "research思路": "探索二维标量波系统中斯格明子的实现及其非线性控制机制",
+        "experiment": "利用激子极化子非共振激发，在极化子凝聚体中自发产生孤立斯格明子和自组织晶格",
+        "innovation": "首次在光学微腔中标量场中实现斯格明子，并展示非线性光学调控",
+        "related_work": "声学、流体力学和等离激元中斯格明子研究，量子流体拓扑结构",
+        "impact": "为拓扑光学结构研究开辟新方向，推动光场调控和物质操纵技术发展"
       }
     },
     {
-      "title": "Gold Bipyramids as a Promising Alternative to Gold Nanorods for Analytical and Biomedical Applications",
-      "abstract": "Pentagonal gold bipyramids with dimensions of 75x25 nm and a longitudinal plasmon resonance (PR) at 753 nm are synthesized. For comparison, gold nanorods with a diameter of 20 nm, lengths ranging from 95 to 50 nm, and longitudinal PR from 945 to 644 nm were synthesized by chemical etching. The samples were characterized by UV-vis spectroscopy and transmission electron microscopy (TEM). It is shown that the absorption spectral quality factor of the bipyramids is significantly higher than that of the nanorods. To compare the nanoparticles as platforms for surface-enhanced Raman scattering (SERS), their surface was functionalized with thiolated nitrobenzene molecules (NBT). It is demonstrated that the SERS enhancement factor for the bipyramids is approximately three times higher than that for the nanorods. The red shift of the bipyramids' PR after functionalization with NBT molecules is also about three times greater than for nanorods with the same PR. This agrees with the theoretical estimate of the bipyramids' PR shift being more sensitive to variations in the refractive index of the external medium or the dielectric shell thickness than that of gold nanospheres and nanorods. The high efficiency of the bipyramids as thermosensitizers for converting laser radiation into heat in photothermal therapy is experimentally and theoretically demonstrated. Effective photothermal killing of E. coli was shown upon irradiation with a laser at the plasmon resonance wavelength using nanobipyramids or nanorods.",
-      "arxiv_id": "2605.20582v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20582v1",
+      "title": "Plane-Wave Excitation of Multi-Beam Modulated Metasurface Antennas",
+      "abstract": "This paper explores the design of multibeam metasurface (MTS) antennas excited by multi-directional plane-wave launchers. First, we solve the fundamental yet open problem of a plane surface wave (SW) that propagates obliquely to the modulation direction of a sinusoidally modulated MTS. Closed-form expressions are provided to accurately predict the beam pointing angles for any propagation direction of the illuminating plane SW and for any Floquet harmonic. Then, the proposed formulation is used to design a highly directive multibeam MTS antenna at K-band with linear polarization. The designed antenna combines an MTS and a pillbox quasi-optical beamformer arranged in a very compact space. A pillbox is a double-layer structure that embeds a reflector coupled to multiple primary feeds in the lower layer. The beams launched by the primary feeds are thus transformed into plane waves with different directions in the upper layer. Printing a modulated MTS in the upper layer results in a low-profile, multibeam antenna suitable for PCB fabrication. Experimental results validate the proposed formulation. The fabricated MTS antenna exhibits a maximum directivity of 30.5 dB and a 17.5% fractional -3 dB directivity bandwidth over the 19.7-21.7 GHz band. By switching feeds and modifying the operating frequency, the scanning range is [$3^o$,$35^o$] in elevation and [$-76^o$,$+76^o$] in azimuth. Additionally, different antenna designs are included that demonstrate the validity and generality of the derived formulation. The proposed multibeam concept can be exploited in satellite communications and 5G/6G networks.",
+      "arxiv_id": "2606.02222v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02222v1",
       "authors": [
-        "Andrey M. Burov",
-        "Sergey V. Zarkov",
-        "Arina V. Drozd"
+        "Jorge Ruiz-García",
+        "Marco Faenzi",
+        "Adham Mahmoud"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "证明金双锥体比金纳米棒在SERS应用中具有三倍增强效果",
-        "research思路": "解决金纳米棒作为SERS基底效果不足的问题",
-        "experiment": "合成金双锥体和纳米棒，比较其光谱质量和SERS增强效果",
-        "innovation": "首次系统比较金双锥体与金纳米棒的光学性能和应用潜力",
-        "related_work": "金纳米结构的光学性质、SERS增强机理、表面功能化研究",
-        "impact": "为生物医学和光学分析提供更高效的纳米材料选择"
+        "summary": "提出多波束调制超表面天线设计新方法，解决平面波斜入射问题",
+        "research思路": "解决调制超表面天线中平面波斜入射传播的基础理论问题",
+        "experiment": "结合调制超表面与 pillbox 准光学波束成形器，设计 K 波段天线",
+        "related_work": "超表面天线设计、准光学波束成形、Floquet 调制理论",
+        "impact": "为多波束天线设计提供新理论框架，推动紧凑型通信系统发展"
       }
     }
   ]

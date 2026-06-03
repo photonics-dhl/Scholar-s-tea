@@ -35,6 +35,10 @@ export async function GET(request: NextRequest) {
         total: result.total,
         totalPages: result.totalPages,
       },
+    }, {
+      headers: {
+        "Cache-Control": "s-maxage=60, stale-while-revalidate=300",
+      },
     });
   } catch (error) {
     console.error('GET /api/v1/posts error:', error);

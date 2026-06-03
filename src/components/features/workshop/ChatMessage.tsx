@@ -7,8 +7,10 @@ import { StreamText } from './StreamText'
 import { CitationCard } from './CitationCard'
 import { SimpleMarkdown } from '@/components/ui/SimpleMarkdown'
 import { ImageLightbox } from '@/components/features/tea-party/ImageLightbox'
+import { AttachmentActions } from '@/components/features/hermes/AttachmentActions'
 import type { ChatMessage } from '@/hooks/useChat'
 import dynamic from 'next/dynamic'
+import { PaperCandidateList, extractPaperCandidates, type PaperCandidate } from './PaperCandidateList'
 
 const PeerReviewScoreCard = dynamic(
   () => import('./PeerReviewScoreCard').then((m) => m.PeerReviewScoreCard),
@@ -24,6 +26,41 @@ interface ChatMessageProps {
   isStreaming?: boolean
   streamingContent?: string
   index?: number
+  /** 自动保存目录句柄（File System Access API） */
+  directoryHandle?: FileSystemDirectoryHandle | null
+  /** 候选文献下载回调（paper_download 批量模式） */
+  onCandidateDownload?: (selected: PaperCandidate[]) => void
+  /** 请求选择保存目录 */
+  onRequestDirectory?: () => void
+}
+
+/**
+ * 过滤 Hermes Gateway 回复中的飞书相关内容
+ * 保留论文信息、DOI、文件大小等有用信息，仅在前端展示层过滤
+ */
+function filterFeishuContent(content: string): string {
+  if (!content) return content
+  return content
+    .split('\n')
+    .map((line) =>
+      line
+        // 移除/替换飞书相关短语
+        .replace(/现在发送到飞书[：:]\s*/gi, '')
+        .replace(/下载成功[!！]\s*现在发送到飞书[：:]\s*/gi, '下载成功！')
+        .replace(/下载并已发送到飞书[^✅]*✅/gi, '下载成功 ✅')
+        .replace(/发送到飞书\s*/gi, '')
+        .replace(/飞书\s*[Hh]ome\s*群\s*/gi, '')
+        .replace(/飞书群\s*/gi, '')
+        .replace(/PDF 已发到飞书群/gi, 'PDF 已保存到服务器')
+        .replace(/已发到飞书群/gi, '已保存到服务器')
+        .replace(/已发送到飞书/gi, '已保存到服务器')
+        .replace(/发送到飞书\s*/gi, '')
+        .replace(/飞书\s*/gi, ' ')
+        .trim()
+    )
+    .filter((line) => line.length > 0)
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
 }
 
 /**
@@ -58,6 +95,9 @@ export function ChatMessageItem({
   isStreaming,
   streamingContent,
   index = 0,
+  directoryHandle,
+  onCandidateDownload,
+  onRequestDirectory,
 }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const isAssistant = message.role === 'assistant'
@@ -71,9 +111,20 @@ export function ChatMessageItem({
     ? extractThinkBlocks(message.content)
     : { cleanContent: message.content, thinkContent: '' }
 
-  const displayContent = showStream
+  const rawDisplayContent = showStream
     ? extractThinkBlocks(streamingContent).cleanContent
     : cleanContent
+
+  // 对 AI 消息过滤飞书相关内容（仅展示层过滤，不修改原始消息）
+  const filteredContent = isAssistant && !showStream
+    ? filterFeishuContent(rawDisplayContent)
+    : rawDisplayContent
+
+  // 从 AI 回复中提取候选文献列表（批量下载模式）
+  const { candidates, cleanContent: displayContent } =
+    isAssistant && !showStream && onCandidateDownload
+      ? extractPaperCandidates(filteredContent)
+      : { candidates: [], cleanContent: filteredContent }
 
   const handleCopy = async () => {
     try {
@@ -173,6 +224,24 @@ export function ChatMessageItem({
               {isAssistant ? (
                 <div className="relative select-text">
                   <SimpleMarkdown content={displayContent} className="select-text" />
+                  {/* 候选文献选择列表（批量下载模式，仅完整消息后显示） */}
+                  {!showStream && candidates.length > 0 && onCandidateDownload && (
+                    <div className="mt-3">
+                      <PaperCandidateList
+                        candidates={candidates}
+                        directoryHandle={directoryHandle}
+                        onRequestDirectory={onRequestDirectory}
+                        onDownload={onCandidateDownload}
+                      />
+                    </div>
+                  )}
+                  {!showStream && (
+                    <AttachmentActions
+                      content={displayContent}
+                      directoryHandle={directoryHandle}
+                      autoSave={!!directoryHandle}
+                    />
+                  )}
                   {showStream && (
                     <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-middle" />
                   )}

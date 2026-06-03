@@ -91,7 +91,10 @@ function parseMarkdown(text: string): string {
     }
   )
 
-  // ===== 步骤2: 提取折叠区块 details/summary（用占位符保护）=====
+  // ===== 步骤2: 移除附件标记 [ATTACHMENT:filename.pdf]（由上层组件单独渲染）=====
+  html = html.replace(/\[ATTACHMENT:[^\]]+\]\s*/g, '')
+
+  // ===== 步骤3: 提取折叠区块 details/summary（用占位符保护）=====
   const detailsBlocks: Array<{ placeholder: string; html: string }> = []
   html = html.replace(
     /<details\b[^>]*>([\s\S]*?)<\/details>/gi,

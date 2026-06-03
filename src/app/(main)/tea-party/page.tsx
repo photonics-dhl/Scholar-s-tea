@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RoomCard } from '@/components/features/tea-party/RoomCard';
 import { CreateRoomDialog } from '@/components/features/tea-party/CreateRoomDialog';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface Room {
   id: string;
@@ -37,6 +38,7 @@ interface RoomsResponse {
 }
 
 export default function TeaPartyPage() {
+  const { t } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -98,17 +100,17 @@ export default function TeaPartyPage() {
                 <span className="text-sm font-medium text-tea-primary tracking-wide uppercase">Live Chat</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-                茶话会
+                {t.teaParty.title}
               </h1>
               <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                加入实时聊天室，与研究者交流思想
+                {t.teaParty.description}
                 <span className="mx-2 text-tea-accent">·</span>
-                共 <span className="font-semibold text-tea-primary">{total}</span> 个房间
+                <span className="font-semibold text-tea-primary">{total}</span> {t.teaParty.title}
               </p>
             </div>
             <Button onClick={() => setShowCreate(true)} className="hidden sm:inline-flex bg-tea-primary hover:bg-tea-primary/90 text-tea-primary-foreground">
               <Plus className="size-4 mr-2" />
-              创建房间
+              {t.teaParty.createRoom}
             </Button>
           </div>
         </div>
@@ -121,14 +123,14 @@ export default function TeaPartyPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="搜索房间..."
+              placeholder={t.teaParty.searchPlaceholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 focus-visible:ring-tea-primary/30 focus-visible:border-tea-primary/50"
             />
           </div>
           <Button type="submit" variant="tea-outline">
-            搜索
+            {t.common.search}
           </Button>
           <Button
             onClick={() => setShowCreate(true)}
@@ -142,7 +144,7 @@ export default function TeaPartyPage() {
         {/* Stats */}
         <div className="flex items-center gap-2 mb-6 text-sm text-muted-foreground">
           <MessageSquare className="size-4 text-tea-primary" />
-          <span>共 <span className="font-medium text-foreground">{total}</span> 个房间</span>
+          <span><span className="font-medium text-foreground">{total}</span> {t.teaParty.title}</span>
         </div>
 
         {/* Room List */}
@@ -160,16 +162,16 @@ export default function TeaPartyPage() {
             <div className="h-16 w-16 rounded-2xl bg-tea-primary/10 flex items-center justify-center mx-auto mb-4">
               <Coffee className="size-8 text-tea-primary/50" />
             </div>
-            <h3 className="text-xl font-medium mb-2">暂无房间</h3>
+            <h3 className="text-xl font-medium mb-2">{t.teaParty.empty}</h3>
             <p className="text-muted-foreground mb-6">
-              成为第一个创建茶话会房间的人
+              {t.teaParty.description}
             </p>
             <Button
               onClick={() => setShowCreate(true)}
               className="bg-tea-primary hover:bg-tea-primary/90 text-tea-primary-foreground"
             >
               <Plus className="size-4 mr-2" />
-              创建房间
+              {t.teaParty.createRoom}
             </Button>
           </div>
         ) : (
@@ -194,7 +196,7 @@ export default function TeaPartyPage() {
                   }}
                   className="border-journal-border/50"
                 >
-                  上一页
+                  {t.common.back}
                 </Button>
                 <span className="px-4 py-2 text-sm text-muted-foreground">
                   <span className="font-medium text-foreground">{page}</span> / {totalPages}
@@ -208,7 +210,7 @@ export default function TeaPartyPage() {
                   }}
                   className="border-journal-border/50"
                 >
-                  下一页
+                  {t.common.next}
                 </Button>
               </div>
             )}

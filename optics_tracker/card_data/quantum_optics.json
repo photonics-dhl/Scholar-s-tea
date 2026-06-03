@@ -2,76 +2,79 @@
   "domain_name": "光通信与光纤传感",
   "papers": [
     {
-      "title": "Reconfigurable generation of high-power structured light via nonlinear beam shaping",
-      "abstract": "High-power structured light has a wide range of applications, from material processing and high-capacity optical communications to programmable electron beams, plasmas, and nuclear states. On-demand generation of structured light and adaptive control of beam profiles are essential for many practical applications, but are difficult to achieve at high power. Here, we demonstrate reconfigurable generation of structured light from a high-power multimode-fiber laser amplifier through full-field control of a low-power seed. An efficient nonlinear beam shaping scheme based on a local linear approximation of the complex nonlinear input--output relation is developed and realized in situ. Diverse structured beams such as Gaussian, Bessel, vector and orbital angular momentum beams are directly generated from the fiber amplifier at powers exceeding 500 W. Our scheme enables real-time programmability of structured light and is readily scalable to even higher power levels. This work provides a general framework for controlling high-dimensional nonlinear systems without accurate knowledge or tractable model.",
-      "arxiv_id": "2605.19996v1",
-      "published": "2026-05-19",
-      "url": "http://arxiv.org/abs/2605.19996v1",
+      "title": "Manifold partitioning induced sequential optical reasoning and decision framework for photonic computing",
+      "abstract": "Real-world data are intrinsically embedded in highly entangled manifolds, making the extraction of separable representations a central challenge for artificial intelligent (AI) systems. While optical neural networks (ONNs) offer ultrafast and energy-efficient data processing, their capacity is constrained by limited physical depth. Here, we introduce a sequential optical reasoning and decision (SORD) framework, an architecture that performs time-sequenced hierarchical inference by decomposing global tasks into coarse-to-fine steps via geometry-guided data partitioning. At each step, SORD executes small reasoning via dynamic operator selection, effectively reducing the overall task complexity without scaling up physical architecture. Experimentally, SORD enables a single-layer diffractive ONN to achieve otherwise intractable 100-class optical fiber speckle classification with 94% accuracy and a system energy efficiency of 23.3 TOPS/W. This high-fidelity recognition is further examined in a human-machine interface, featuring real-time interactive all-optical sensing. Overall, our work establishes a scalable and hardware-efficient approach to expanding the effective expressivity of compact photonic AI systems, and may advance their deployment in applications requiring real-time sensing, inference, and control.",
+      "arxiv_id": "2606.01616v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.01616v1",
       "authors": [
-        "KyeoReh Lee",
-        "Baichuan Huang",
-        "Peyman Ahmadi"
+        "Zhihao Li",
+        "Jing Pan",
+        "Wei Yan"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实现高功率光纤放大器中结构化光的可重构生成，通过非线性波束整形突破功率限制。",
-        "research思路": "解决高功率结构化光按需生成与自适应控制的难题，克服传统方法在高功率下的局限性。",
-        "experiment": "采用基于局部线性近似的高效非线性波束整形方案，通过低功率种子源全场控制实现。",
-        "innovation": "首次在高功率(>500W)光纤放大器中直接生成多种结构化光束，并实现实时可编程控制。",
-        "related_work": "包括空间光调制器波束整形、数字微镜器件控制、以及低功率结构化光生成技术。",
-        "impact": "为高功率结构化光应用开辟新途径，推动材料加工、光通信等领域的技术革新。"
+        "summary": "提出SORD框架，通过流形分解实现单层光子计算的高精度多类分类",
+        "research思路": "解决光神经网络物理深度限制导致的复杂任务处理能力不足问题",
+        "experiment": "采用几何引导的数据划分和动态算子选择实现分层推理",
+        "innovation": "将全局任务分解为粗到细步骤，突破单层ONN处理复杂任务瓶颈",
+        "related_work": "光神经网络、流形学习、动态计算选择、光子计算架构优化",
+        "impact": "为光计算在边缘AI应用提供新范式，显著提升能效比和处理能力"
       },
       "domain_trend": {
-        "trend": "光通信与光纤传感正迈向高功率可重构、量子级集成与全功能感知网络新时代",
+        "trend": "光子计算与量子通信深度融合，驱动高速低功耗光网络革命",
         "key_topics": [
-          "高功率结构化光生成",
-          "量子级电光机械集成",
-          "全光纤传感系统"
+          "光子计算边缘AI",
+          "连续变量量子通信",
+          "高密钥率量子网络"
         ],
-        "development_direction": "光通信与光纤传感领域正从单一功能向多功能、高功率、量子级精度的智能集成系统发展，通过突破传统功率限制、实现量子级操作兼容性以及将普通光纤转变为多功能感知网络，为材料加工、量子通信、智能城市等领域提供革命性解决方案"
+        "development_direction": "从单点突破到系统级创新，光通信与光纤传感正向高效能、大规模、实用化网络架构演进，光子计算与量子技术融合将重塑信息处理与传输范式"
       }
     },
     {
-      "title": "Release-free electro-optomechanical crystal modulator",
-      "abstract": "Electro-optic modulation is central to classical optical communications and emerging quantum technologies. High-confinement optomechanical crystal modulators enable microwave-optical transduction through strong optomechanical interactions and offer a promising interface between superconducting qubits and optical fibers. However, their performance is limited by thermal noise from optical absorption. Release-free optomechanical crystals provide improved thermal anchoring but have not yet been integrated into a microwave-optical transducer. Here, we demonstrate a release-free electro-optomechanical transducer combining strong optomechanical interactions in silicon with the efficient piezoelectricity of lithium niobate via micro-transfer printing. We observe electro- and optomechanical coupling rates compatible with quantum-level operation when co-integrated with a superconducting microwave circuit. This advance moves release-free electro-optomechanical devices toward practical microwave-optical interfaces.",
-      "arxiv_id": "2605.05190v2",
-      "published": "2026-05-06",
-      "url": "http://arxiv.org/abs/2605.05190v2",
+      "title": "Quantum communications in continuous variable systems",
+      "abstract": "Nowadays, quantum communications provide a vast field of research in rapid expansion, with a huge potential impact on the future developments of quantum technologies. In particular, continuous variable systems, employing coherent-state encoding and quadrature measurements, represent a suitable platform, due to their compatibility with both the modulation and detection systems currently employed in standard fiber-optical communications. In this work, we address some relevant aspects of the field, and provide innovative results being also experimentally oriented. In particular, we focus on two relevant paradigms: quantum decision theory and continuous variable quantum key distribution (CVQKD). In the former case, we address the problem of coherent-state discrimination and design new hybrid receivers for binary phase-shift keying discrimination, obtaining a quantum advantage over conventional detection schemes, being also robust against typical experimental imperfections. In the latter scenario, we proceed in two different directions. On the one hand, we design new CVQKD protocols employing discrete modulation of coherent states, being a feasible solution compatible with the state of the art in optical communications technologies. On the other hand, we address the more fundamental problem of performing channel losses mitigation to enhance existing protocols, and investigate the role of optical amplifiers for the task. Finally, we make a first step towards a fully non-Gaussian CVQKD scheme by proposing, for the first time, the adoption of an optimized state-discrimination receiver, commonly adopted for quantum decision theory, within the context of CVQKD, obtaining a genuine quantum enhancement over conventional protocols.",
+      "arxiv_id": "2605.19602v1",
+      "published": "2026-05-19",
+      "url": "http://arxiv.org/abs/2605.19602v1",
       "authors": [
-        "Paul Burger",
-        "Joey Frey",
-        "Johan Kolvik"
+        "Michele N. Notarnicola"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "实现了无需释放的硅-铌酸锂电光机械晶体调制器，实现微波-光量子转换",
-        "research思路": "解决传统光机械晶体调制器因热噪声限制性能的问题，改善热锚定",
-        "experiment": "通过微转移打印技术将硅与铌酸锂结合，集成超导微波电路",
-        "innovation": "首次将释放自由结构与微波-光转换器集成，实现量子级操作兼容性",
-        "related_work": "高限制光机械晶体调制器、超导量子比特-光纤界面研究",
-        "impact": "为量子技术提供实用微波-光转换接口，推动量子通信与计算发展"
+        "summary": "研究连续变量量子通信中的量子决策理论和CVQKD，设计新型接收器实现量子优势",
+        "research思路": "解决连续变量系统中的量子态区分问题和量子密钥分发安全通信问题",
+        "experiment": "设计混合接收器进行二进制相移键调制区分，验证其抗实验不完美性能力",
+        "innovation": "提出新型混合接收器超越传统检测方案，实现量子优势并具备鲁棒性",
+        "related_work": "离散变量QKD、连续变量量子态优化、量子纠错码和量子中继器研究",
+        "impact": "推动量子通信实用化，为未来量子网络和量子互联网发展奠定基础"
       }
     },
     {
-      "title": "Turning Fiber into a Sensing System: The Magic of Fiber Optics ...",
-      "abstract": "This is the power of fiber optic sensing, a technology that transforms ordinary optical fibers into the digital world's sensory network. In",
-      "source": "tavily",
-      "url": "https://www.comsoc.org/publications/ctn/turning-fiber-sensing-system-magic-fiber-optics-sensing",
-      "authors": [],
+      "title": "High-key-rate Fully-Passive Quantum Access Network with Thermal Source",
+      "abstract": "To accommodate classical communication systems with progressively increasing transmission rates, quantum access networks (QAN) have undergone systematic and protocol-level optimizations in recent years, where quantum passive optical network (QPON) architectures are gaining significant attention due to their simple structure. It is challenging for the previous QAN based on active protocols or Stokes operator coding protocols to achieve high-speed linear modulation with high extinction ratio and stability under practical conditions. In this work, we propose and experimentally demonstrate a downstream fully passive quantum access network protocol using passive state preparation (PSP) with free-space and single-mode fiber hybrid channels, and the final key generation rate is up to a record-breaking 19.48 Mbps per quantum network unit. The proposed PSP-QPON scheme extends the scope of PSP-CVQKD from point-to-point to point-to-multi-point networks, which enables high-key-rate, high-stability, and low-resource-consumption implementation. Moreover, the network channel in this experiment is fully compatible with access networks in classical optical communications, which allows integration with existing optical infrastructure without the need for additional modifications, providing a promising solution for local area network quantum access network at home or a mobile terminal.",
+      "arxiv_id": "2604.27327v1",
+      "published": "2026-04-30",
+      "url": "http://arxiv.org/abs/2604.27327v1",
+      "authors": [
+        "H. W. Yin",
+        "B. D. Zhu",
+        "H. Peng"
+      ],
       "citations": 0,
-      "venue": "Web",
-      "arxiv_id": "",
+      "venue": "arXiv",
+      "source": "arxiv",
       "analysis": {
-        "summary": "将普通光纤转变为数字世界感知网络的光纤传感技术",
-        "research思路": "解决如何利用光纤作为分布式传感系统实现实时监测的问题",
-        "experiment": "采用光纤光学原理和信号处理技术构建分布式传感网络",
-        "innovation": "实现了将普通光纤转变为高灵敏度、多功能的传感系统",
-        "related_work": "分布式光纤传感、光纤布拉格光栅、光纤陀螺仪等领域研究",
-        "impact": "为基础设施监测、智能城市等领域提供了新型感知解决方案"
+        "summary": "提出高密钥率全被动量子接入网络协议，实现19.48Mbps/单元的突破性密钥生成速率",
+        "research思路": "解决现有量子接入网络难以实现高速线性调制、高消光比和稳定性的问题",
+        "experiment": "采用被动态制备技术，结合自由空间和单模光纤混合信道进行实验验证",
+        "innovation": "将PSP-CVQKD从点对点扩展到点对多点网络，实现高速率高稳定性",
+        "related_work": "主动协议量子接入网络、Stokes算子编码协议、点对点PSP-CVQKD系统",
+        "impact": "为高速量子通信网络提供新架构，推动量子接入网络实用化进程"
       }
     }
   ]

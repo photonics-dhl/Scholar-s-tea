@@ -90,9 +90,21 @@ export function useTeaPartySocket(roomId: string) {
       socket = io(SOCKET_URL, {
         auth: { token },
         transports: ['polling'],
+        upgrade: false, // frp HTTP tunnel does not support WebSocket upgrade
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: 10,
         reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5, // spread reconnection attempts to avoid thundering herd
+        timeout: 20000,
+        // Polling-specific: increase timeout for slow frp tunnels
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              'X-Client-Version': '1.0',
+            },
+          },
+        },
       });
 
       socketRef.current = socket;

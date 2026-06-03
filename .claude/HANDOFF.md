@@ -10,41 +10,54 @@
 
 | 项 | 内容 |
 |----|------|
-| **目标** | PostgreSQL 9.2 → 16.4 + pgvector 原生向量索引升级 |
-| **已完成** | ✅ 源码编译 PG 16.4 到 `~/pgsql16`（无 sudo）<br>✅ 编译安装 pgvector 0.7.4<br>✅ 备份旧数据、停止旧 PG、迁移数据到新 PG16<br>✅ 将 JSON text embedding 转换为 `vector(1024)` 类型（212 条零丢失）<br>✅ Prisma schema 更新：`Unsupported("vector")`<br>✅ rag-service.ts 改用 pgvector `<=>` 原生查询<br>✅ 修复所有 embedding 引用文件（admin API / reindex 脚本）<br>✅ `::double precision` 反序列化修复（Prisma/Node.js 驱动 bug）<br>✅ TypeScript 通过 + Build 成功 + PM2 重启<br>✅ Git push 到 develop 分支<br>✅ 添加 PG16 自启动 cron 任务 |
-| **关键决策** | - 无 sudo → 源码编译 `--prefix=$HOME/pgsql16`<br>- `vector` 类型通过 `$queryRaw`/`$executeRaw` 操作，Prisma ORM 不直接支持 `Unsupported`<br>- 距离计算用 `(embedding <=> vec)::double precision`（`real` 类型在 Node.js 驱动中反序列化为 null） |
+| **目标** | 排查并修复网络连接不稳定问题（需多次刷新才能加载主页） |
+| **已完成** | ✅ frpc 配置优化（`heartbeat_interval=15`, `heartbeat_timeout=45`, `pool_count=3`, `tcp_mux=true`）<br>✅ Next.js HTTP 缓存头（首页 60s SWR，静态资源 immutable）<br>✅ PostgreSQL TCP keepalive 参数（`keepalives_idle=60&keepalives_interval=10`）<br>✅ 定位根本原因：socks5 代理（127.0.0.1:7890）间歇性清理长连接 + 原 frpc 无心跳参数<br>✅ 响应时间从 2.6s → 0.55-0.82s，10 连击全部 200 成功<br>✅ 部署验证通过 |
+| **关键决策** | - frpc 心跳 15s/超时 45s 是平衡网络负载和稳定性的折中<br>- `pool_count=3` 预建连接减少冷启动延迟<br>- 系统 Nginx（ParaCloud，443 端口）不可修改，放弃 nginx 反向代理方案<br>- socks5 代理由系统维护，不在用户控制范围内 |
 | **阻塞项** | 无 |
-| **相关文件** | `prisma/schema.prisma`, `src/lib/ai/rag-service.ts`, `scripts/admin/reindex-knowledge.ts`, `src/app/api/v1/admin/knowledge/*`, `src/app/api/v1/admin/research-memory/*`, `src/app/api/v1/knowledge/[id]/route.ts` |
-| **已知问题** | - `Unsupported("vector")` 不在 Prisma Client 类型中，所有 embedding 操作必须用 raw SQL<br>- 个人知识库（Personal KB）的 PDF 公式提取仍依赖 pdf.js + LLM，未接入 MathPix |
-| **下一动作** | 1）用户测试 RAG 搜索功能<br>2）评估是否需要接入 MathPix API 改善 PDF 公式提取 |
+| **相关文件** | `next.config.js`, `.env`, `/data/home/zju321/sakura-frp/frpc.ini` |
+| **已知问题** | - 数据连接仍有间歇性 EOF 断线（底层 socks5 代理/网络链路固有问题，频率已大幅降低）<br>- 断线呈批量爆发模式（tcp_mux 复用连接的连锁反应）<br>- 个人知识库（Personal KB）的 PDF 公式提取仍依赖 pdf.js + LLM，未接入 MathPix |
+| **下一动作** | 1）用户持续观察网络稳定性，如仍有问题可添加 frpc 监控脚本 + 前端重试逻辑<br>2）评估是否需要接入 MathPix API 改善 PDF 公式提取 |
 
 ---
 
-## 本次变更详情（2026-05-29 — PostgreSQL 16 + pgvector 升级）
+## 本次变更详情（2026-05-30 — 网络稳定性排查与修复）
 
 ### 背景
 
-- **旧环境**：PostgreSQL 9.2.24，embedding 以 JSON 文本存储，搜索时用 JavaScript `cosineSimilarity()` 全内存计算
-- **瓶颈**：无原生向量索引，数据量大时全表扫描性能差
-- **约束**：无 sudo，CentOS 7 已 EOL
+- **症状**：访问 `scholars-tea.428312321.xyz` 需要多次刷新才能加载，频繁遇到 503/超时
+- **原响应时间**：外部 2.6s，本地 0.019s（130 倍差距）
+- **frpc 日志**：大量"网络波动导致数据连接断开, 正在重试: EOF"（33 次/天）
 
-### 升级步骤
+### 排查过程
 
-1. **源码编译 PG 16.4** → `~/pgsql16`（`--prefix=$HOME/pgsql16`）
-2. **编译 pgvector 0.7.4** → 安装到 `~/pgsql16/lib`
-3. **数据迁移**：`pg_dumpall` 备份 → 停止旧 PG → `initdb` 新目录 → 导入数据
-4. **类型转换**：`ALTER TABLE ... ADD COLUMN embedding_vec vector(1024)` → 迁移 JSON → 删除旧列
-5. **代码适配**：Prisma `Unsupported("vector")` + `$queryRaw`/`$executeRaw` 操作
-6. **反序列化修复**：`(embedding <=> vec)::double precision`（`real` 在 Node.js 驱动中为 null）
-7. **自启动**：crontab 每分钟检查并自动启动 PG16
+1. **服务器资源检查** — CPU/内存/磁盘均正常，PM2 进程健康（重启均为部署 SIGINT，非崩溃）
+2. **FRP 隧道诊断** — Sakura Frp 会员套餐，但必须经系统级 socks5 代理（127.0.0.1:7890）访问外网
+3. **网络链路测试** — 直接 TCP 到 frp-fit.com:8088 失败，ping 100% 丢包，traceroute 第 5 跳后消失
+4. **frpc 配置审计** — 原配置无心跳参数，tcp_mux 未显式开启
+5. **数据库连接层** — PostgreSQL keepalive 全为 0，Prisma 连接字符串无保活参数
+
+### 修复措施
+
+| 层级 | 修复 | 文件 |
+|------|------|------|
+| FRP 隧道 | `heartbeat_interval=15`, `heartbeat_timeout=45`, `pool_count=3`, `tcp_mux=true` | `~/sakura-frp/frpc.ini` |
+| HTTP 缓存 | 首页 `max-age=60,s-w-r=300`；静态资源 `immutable`；API `no-store` | `next.config.js` |
+| DB 连接 | `keepalives=1&keepalives_idle=60&keepalives_interval=10&keepalives_count=6` | `.env` `DATABASE_URL` |
 
 ### 验证结果
 
 ```
-Query: "optics metamaterial"
-[1] Metamaterials for Electromagnetic Wave Control (sim: 0.6292)
-[2] Three-Dimensional Optical Metamaterial with a Negative Refractive Index (sim: 0.6265)
-[3] Metasurface Flat Optics: From Metalenses to Polarization Control (sim: 0.5455)
+# 10 次连续外部请求
+req1: 200 0.591s
+req2: 200 0.587s
+req3: 200 0.612s
+req4: 200 0.585s
+req5: 200 0.549s
+req6: 200 0.570s
+req7: 200 0.545s
+req8: 200 0.565s
+req9: 200 0.548s
+req10: 200 0.539s
 ```
 
 ---
@@ -54,19 +67,24 @@ Query: "optics metamaterial"
 | 配置 | 值 |
 |------|-----|
 | **服务器** | `10.72.212.33` via `ssh ZJU-MSE-HPC` |
+| **OS** | CentOS 7 (no sudo) |
 | **PG 版本** | 16.4（源码编译 @ `~/pgsql16`） |
 | **PG 数据** | `~/pgdata16` |
-| **PG 旧备份** | `~/pgdata`（保留），`~/pg_backup_20260529.sql` |
 | **pgvector** | 0.7.4 |
 | **Embedding 模型** | BAAI/bge-m3（1024 维）@ `http://127.0.0.1:9997` |
 | **RAG 搜索** | pgvector `<=>` 原生 cosine distance（threshold 0.5 = distance ≤ 0.5） |
-| **BGE-M3 进程** | PID 11306, `scholars-tea-embedding`（PM2 管理）|
 | **Next.js** | Port 3002（PM2: `scholars-tea`）|
 | **Socket** | Port 3001（PM2: `scholars-tea-socket`）|
+| **FRP 隧道** | Sakura Frp 会员，`frpc.ini` @ `~/sakura-frp/frpc.ini` |
+| **FRP 代理** | 强制经 socks5://127.0.0.1:7890（系统级代理，不可控） |
+| **FRP 域名** | `scholars-tea.428312321.xyz` (3002), `socket.428312321.xyz` (3001) |
 
 ---
 
 ## 历史归档
+
+### 2026-05-30：网络稳定性排查与修复
+→ 详见本节「本次变更详情」
 
 ### 2026-05-29：PostgreSQL 16 + pgvector 升级
 → 详见 `.claude/project-memory/SOLUTIONS/postgresql-16-pgvector-upgrade.md`

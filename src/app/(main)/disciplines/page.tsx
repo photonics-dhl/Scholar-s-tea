@@ -6,6 +6,7 @@ import { ChevronRight, BookOpen, Users, MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface Discipline {
   id: string;
@@ -21,6 +22,7 @@ interface Discipline {
 }
 
 function DisciplineCard({ discipline, animationDelay = 0 }: { discipline: Discipline; animationDelay?: number }) {
+  const { t } = useLanguage();
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden animate-fade-in-up border-journal-border/60 hover:border-journal-gold/50" style={{ animationDelay: `${animationDelay}ms` }}>
       <CardContent className="p-0">
@@ -57,12 +59,12 @@ function DisciplineCard({ discipline, animationDelay = 0 }: { discipline: Discip
           <div className="flex items-center gap-1.5">
             <Users className="h-4 w-4 text-journal-primary/70" />
             <span className="font-medium text-foreground">{discipline._count.groups}</span>
-            <span>课题组</span>
+            <span>{t.disciplines.groups}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <MessageSquare className="h-4 w-4 text-journal-gold/70" />
             <span className="font-medium text-foreground">{discipline._count.posts}</span>
-            <span>帖子</span>
+            <span>{t.disciplines.posts}</span>
           </div>
         </div>
 
@@ -78,7 +80,7 @@ function DisciplineCard({ discipline, animationDelay = 0 }: { discipline: Discip
                 >
                   <span className="truncate max-w-[120px]">{child.name}</span>
                   <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-journal-primary/10 text-journal-primary border-0">
-                    {child._count.groups}组
+                    {child._count.groups}{t.disciplines.groupUnit}
                   </Badge>
                 </Link>
               ))}
@@ -107,6 +109,7 @@ function DisciplinePageSkeleton() {
 }
 
 export default function DisciplinesPage() {
+  const { t } = useLanguage();
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -137,14 +140,10 @@ export default function DisciplinesPage() {
               <span className="text-sm font-medium text-journal-primary tracking-wide uppercase">Academic Community</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-foreground">
-              学科社区
+              {t.disciplines.title}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground font-source-serif leading-relaxed max-w-2xl">
-              探索不同学科领域，与学者们交流思想
-              <span className="mx-2 text-journal-gold">·</span>
-              共{' '}
-              <span className="font-semibold text-foreground">{disciplines.length}</span>{' '}
-              个一级学科
+              {t.disciplines.description}
             </p>
           </div>
         </div>
@@ -161,10 +160,7 @@ export default function DisciplinesPage() {
         ) : (
           <Card className="p-16 text-center border-journal-border/40">
             <BookOpen className="h-14 w-14 mx-auto text-journal-primary/30 mb-4" />
-            <h3 className="mt-4 font-serif font-medium text-xl">暂无学科</h3>
-            <p className="mt-2 text-sm text-muted-foreground font-source-serif">
-              敬请期待，即将上线
-            </p>
+            <h3 className="mt-4 font-serif font-medium text-xl">{t.disciplines.empty}</h3>
           </Card>
         )}
       </div>

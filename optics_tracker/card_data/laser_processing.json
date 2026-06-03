@@ -2,83 +2,30 @@
   "domain_name": "激光加工与制造",
   "papers": [
     {
-      "title": "A strategy for high-quality EBSD surface processing in femtosecond laser machining",
-      "abstract": "",
-      "doi": "10.1016/j.optlastec.2026.115535",
-      "url": "https://doi.org/10.1016/j.optlastec.2026.115535",
-      "authors": [
-        "Hongyan Guo",
-        "Zhaojiang Xue",
-        "Yifei Hao",
-        "Xin Tan",
-        "Wentao Wu"
-      ],
+      "title": "F2-Laser Microfabrication for Photonics and Biophotonics",
+      "abstract": "... F2-Laser Microfabrication for Photonics and Biophotonics' published in 'Excimer Laser Technology ... Springer Nature. © 2026 Springer Nature.",
+      "source": "tavily",
+      "url": "https://link.springer.com/chapter/10.1007/3-540-26667-4_18",
+      "authors": [],
       "citations": 0,
-      "venue": "Optics &amp; Laser Technology",
-      "published": 2026,
-      "source": "crossref",
+      "venue": "Web",
+      "arxiv_id": "",
       "analysis": {
-        "summary": "提出飞秒激光加工中高质量EBSD表面处理策略，提升材料表征精度。",
-        "research思路": "解决飞秒激光加工后表面损伤导致的EBSD分析质量问题。",
-        "experiment": "优化飞秒激光参数与后处理工艺，结合EBSD表征验证效果。",
-        "innovation": "首次系统建立飞秒激光加工与EBSD表面质量的关联模型。",
-        "related_work": "包括激光抛光、电解抛光及低能离子束表面处理技术。",
-        "impact": "为材料微观结构表征提供新方法，推动先进制造与材料科学发展。"
+        "summary": "F2激光微加工在光子学和生物光子学领域的创新应用与技术突破。",
+        "research思路": "探索F2激光微加工技术在高精度光子学和生物光子学器件制造中的应用潜力。",
+        "experiment": "采用F2激光(157nm)微加工技术，结合材料特性研究，制造光子学和生物光子学结构。",
+        "innovation": "利用F2激光短波长特性实现更高精度微加工，拓展生物材料兼容性。",
+        "related_work": "准分子激光微加工、飞秒激光直写技术、纳米压印技术在光子学中的应用。",
+        "impact": "为光子学和生物光子学器件制造提供新方法，推动微型化和集成化发展。"
       },
       "domain_trend": {
-        "trend": "超快光学正引领材料表征与调制革新，通过飞秒激光加工与拓扑声子学突破技术边界。",
+        "trend": "超短波长激光微加工正引领光子与生物光子器件精准制造革命",
         "key_topics": [
-          "飞秒激光表面处理",
-          "ENZ材料超快调制",
-          "拓扑声子学"
+          "短波长激光微加工",
+          "光子学器件制造",
+          "生物材料兼容性"
         ],
-        "development_direction": "超快光学正向多学科深度融合方向发展，飞秒激光技术与材料表征、纳米光子学、拓扑物理等领域交叉创新，推动超快调制精度提升、新型功能材料开发及先进制造技术突破。未来趋势将聚焦于更高精度、更快响应的光学器件设计，以及基于超快现象的新应用开发，特别是在量子计算和信息处理领域的应用。"
-      }
-    },
-    {
-      "title": "HotLoop Optimization of Petawatt Laser Focal Spot via a Twin-Focus Scheme",
-      "abstract": "Achieving diffraction-limited focusing of high-power laser pulses to generate ultra-high intensities is crucial for developing compact laser-driven particle accelerators and exploring strong-field quantum electrodynamics. However, accurately diagnosing and optimizing the focal spots of petawatt (PW) laser pulses remains a significant challenge. In this work, we present an experimental methodology utilizing a twin-focus scheme to precisely characterize the intensity distribution and wavefront of focused PW femtosecond laser pulses, and employ it to elucidate their power-dependent evolution. Furthermore, we optimized the focal spots at full power via our in-situ wavefront correction method termed ``HotLoop', achieving a Strehl ratio of 0.80 for 1 PW laser pulses. Consequently, the cutoff proton energies in laser proton acceleration experiments were significantly enhanced. The success of this approach underscores the necessity of in-situ high-energy wavefront correction for ultra-high intensity laser-matter interactions.",
-      "arxiv_id": "2605.20647v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20647v1",
-      "authors": [
-        "Qingfan Wu",
-        "Ying Gao",
-        "Minjian Wu"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "提出HotLoop波前校正方法优化拍瓦激光焦斑，显著提升质子加速截止能量",
-        "research思路": "解决高功率激光聚焦诊断与优化难题，实现全功率下近衍射极限聚焦",
-        "experiment": "采用双焦方案精确表征强度分布与波前，结合原位HotLoop校正技术",
-        "innovation": "首次实现1 PW激光0.80斯特列尔比，突破传统离线校正局限",
-        "related_work": "波前传感技术、自适应光学、激光质子加速、强场QED实验",
-        "impact": "为紧凑型激光加速器和强场QED研究提供关键技术支撑"
-      }
-    },
-    {
-      "title": "Breakdown of spallation in multi-pulse ultrafast laser ablation",
-      "abstract": "Ultrashort-pulse laser ablation of metals near damage threshold is governed by homogeneous spallation, in which tensile unloading releases a nanometre-thin liquid film whose optical signatures are temporally evolving concentric Newton rings in pump--probe experiments. This well-established picture rests almost exclusively on single-pulse results obtained on ideally flat surfaces, yet application-oriented processing invariably operates in a multi-pulse regime in which each pulse irradiates a surface progressively modified by preceding pulses. Whether homogeneous spallation persists under these conditions has remained an open question. Here we resolve this question using time-resolved pump-probe interferometry applied pulse by pulse to austenitic stainless steel. We show that homogeneous spallation dominates the first pulse, while its contribution is strongly reduced for the second pulse. By the third pulse, Newton rings vanish and sustained surface bulging collapses, with the optical transients fully saturating into a phase-explosion-like signature by the fourth pulse. Fourier-domain coherence analysis rules out roughness-induced decoherence as an optical artefact. Four independent observables, spanning time-resolved and final-state measurements, converge on the same transition after three to four pulses. Spallation-layer formation, widely invoked to explain ultrashort-pulse ablation of metals, is thus a single-pulse phenomenon rather than a multi-pulse ablation mechanism.",
-      "arxiv_id": "2604.13858v1",
-      "published": "2026-04-15",
-      "url": "http://arxiv.org/abs/2604.13858v1",
-      "authors": [
-        "David Redka",
-        "Julian Vollmann",
-        "Nicolas Thomae"
-      ],
-      "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "analysis": {
-        "summary": "揭示多脉冲超快激光烧蚀中均质层裂失效机制，解决传统单脉冲模型的局限性",
-        "research思路": "探究多脉冲激光烧蚀中均质层裂是否持续存在，填补单脉冲与实际应用的认知鸿沟",
-        "experiment": "采用逐脉冲时间分辨泵浦-探针干涉术，实时监测奥氏体不锈钢多脉冲烧蚀动态",
-        "innovation": "首次量化多脉冲下层裂贡献递减规律，发现三脉冲后牛顿环完全消失",
-        "related_work": "单脉冲烧蚀的均质层裂理论、表面改性累积效应研究、超快激光干涉诊断技术",
-        "impact": "为多脉冲激光加工提供关键物理机制指导，推动超快激光应用从理想向实际转化"
+        "development_direction": "向更高精度、更强生物兼容性、更深层次集成化的激光微加工技术发展，促进光子学与生物光子学领域的微型化和多功能集成"
       }
     }
   ]

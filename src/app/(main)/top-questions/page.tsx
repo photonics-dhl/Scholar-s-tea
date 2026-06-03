@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Trophy, Calendar, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface TopQuestion {
   id: string;
@@ -33,6 +34,7 @@ interface TopQuestionsResponse {
 }
 
 export default function TopQuestionsPage() {
+  const { lang, t } = useLanguage();
   const [questions, setQuestions] = useState<TopQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(2026);
@@ -64,6 +66,9 @@ export default function TopQuestionsPage() {
     return 'bg-journal-primary/10 text-journal-primary';
   };
 
+  const yearLabel = (y: number) => lang === 'zh' ? `${y}${t.topQuestions.year}` : `${y}`;
+  const monthLabel = (m: number) => lang === 'zh' ? `${m}${t.topQuestions.month}` : `${m}`;
+
   return (
     <div>
       {/* Scholarly Page Header */}
@@ -76,10 +81,10 @@ export default function TopQuestionsPage() {
               <span className="text-sm font-medium text-journal-primary tracking-wide uppercase">Community Ranking</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight text-foreground">
-              TOP10 问题
+              {t.topQuestions.title}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground font-source-serif leading-relaxed">
-              每月最受欢迎的研究讨论，看看社区最热门的话题
+              {t.topQuestions.description}
             </p>
           </div>
         </div>
@@ -95,8 +100,8 @@ export default function TopQuestionsPage() {
               onChange={(e) => setYear(Number(e.target.value))}
               className="bg-transparent text-sm font-medium outline-none"
             >
-              <option value={2026}>2026年</option>
-              <option value={2025}>2025年</option>
+              <option value={2026}>{yearLabel(2026)}</option>
+              <option value={2025}>{yearLabel(2025)}</option>
             </select>
             <select
               value={month}
@@ -104,12 +109,12 @@ export default function TopQuestionsPage() {
               className="bg-transparent text-sm font-medium outline-none"
             >
               {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}月</option>
+                <option key={i + 1} value={i + 1}>{monthLabel(i + 1)}</option>
               ))}
             </select>
           </div>
           <span className="text-sm text-muted-foreground">
-            {year}年{month}月 TOP10
+            {lang === 'zh' ? `${year}年${month}月 TOP10` : `TOP10 - ${monthLabel(month)} ${yearLabel(year)}`}
           </span>
         </div>
 
@@ -125,10 +130,7 @@ export default function TopQuestionsPage() {
             <div className="h-16 w-16 rounded-2xl bg-journal-gold/10 flex items-center justify-center mx-auto mb-4">
               <Trophy className="h-8 w-8 text-journal-gold/50" />
             </div>
-            <h3 className="font-serif font-medium text-xl mb-2">暂无排名数据</h3>
-            <p className="text-muted-foreground font-source-serif">
-              {year}年{month}月还没有帖子获得投票
-            </p>
+            <h3 className="font-serif font-medium text-xl mb-2">{t.topQuestions.empty}</h3>
           </Card>
         ) : (
           <div className="space-y-3">
@@ -147,8 +149,8 @@ export default function TopQuestionsPage() {
                       {question.title}
                     </h3>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <span>{question.author?.name || '匿名用户'}</span>
-                      <span>{question.createdAt ? new Date(question.createdAt).toLocaleDateString('zh-CN') : '-'}</span>
+                      <span>{question.author?.name || 'Anonymous'}</span>
+                      <span>{question.createdAt ? new Date(question.createdAt).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US') : '-'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm font-medium text-journal-gold">

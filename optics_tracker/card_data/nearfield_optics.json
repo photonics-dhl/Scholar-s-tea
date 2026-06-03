@@ -2,79 +2,81 @@
   "domain_name": "近场光学",
   "papers": [
     {
-      "title": "Low-Divergence Quasi-Gaussian Emission at Watt-Level Power from a Large-Diameter Ring-Aperture VCSEL",
-      "abstract": "The far-field emission of large-area vertical-cavity surface-emitting lasers (VCSELs) is commonly associated with multimode, high-divergence beam profiles, limiting applicability in high-brightness free-space systems. We investigate angular emission characteristics of a 1 mm-diameter ring-aperture watt-class VCSEL and establish a theoretical framework capturing the formation of its far-field radiation patterns. Modeling the near field as an azimuthally modulated ring distribution and evaluating the far field within the Fresnel approximation, we demonstrate that a quasi-Gaussian far-field profile emerges from combined lower-order azimuthal modes, even in a highly multimode cavity.   Experimentally, we observe a current-driven transition of the far-field distribution from a high-divergence ring at low injection levels to a narrow central beam at elevated currents. At high drive currents, the emission approaches a near-Gaussian profile with a full width at half maximum of 8°, while maintaining watt-class output power. Angle-resolved spectroscopy associates the central emission with longer-wavelength, lower-order modes, whereas the outer ring originates from shorter-wavelength, higher-order contributions. Combined with electroluminescence measurements and wavelength-dependent photon lifetime analysis, these results demonstrate that spectral and angular emission are determined by the interplay between wavelength-dependent material gain and angle-dependent cavity losses. This approach establishes a general framework for controlling beam divergence and modal content in large-area VCSELs, enabling high-power operation with near-Gaussian, low-divergence beam profiles.",
-      "arxiv_id": "2605.21110v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.21110v1",
+      "title": "Denoising‐Assisted Rapid Multiphoton Imaging for Analysing Traumatic Penumbra Microenvironment in Rat Brain",
+      "abstract": "ABSTRACT\n                  Accurate identification of the traumatic penumbra (TP) is essential for understanding secondary injury after traumatic brain injury. However, conventional imaging cannot capture microenvironmental alterations at subcellular resolution. In this study, denoising‐assisted multiphoton microscopy (MPM) was used to investigate the microstructural features of the TP in rat brain tissue. Image processing and quantitative analysis were performed to characterize normal tissue, penumbra, and core regions. To accelerate high‐quality imaging, we proposed a Dual‐Branch Collaborative Network (DBCNet) to restore low‐noise images from single‐scan data using multi‐scan references. The results show that MPM reveals key pathological features such as intracellular edema, vasogenic ed",
+      "doi": "10.1002/jbio.70303",
+      "url": "https://doi.org/10.1002/jbio.70303",
       "authors": [
-        "Marta Więckowska",
-        "Luke Graham",
-        "James Guenter"
+        "Pan Guo",
+        "Le Chen",
+        "Shanghai Jiang",
+        "Li Ai",
+        "Shenghui Shi"
       ],
       "citations": 0,
-      "venue": "arXiv",
-      "source": "arxiv",
-      "domain_trend": {
-        "trend": "突破量子极限：近场光学在量子噪声控制与精密测量领域展现革命性突破",
-        "key_topics": [
-          "量子通道膨胀理论",
-          "Kerr非线性相位精密测量",
-          "光子减法量子传感"
-        ],
-        "development_direction": "近场光学领域正从基础理论研究向高精度量子传感应用转变，量子噪声控制与量子精密测量成为主导研究方向，融合非线性光学与量子信息处理技术将推动下一代量子传感器件的创新发展"
+      "venue": "Journal of Biophotonics",
+      "published": 2026,
+      "source": "crossref",
+      "analysis": {
+        "summary": "开发了DBCNet去噪网络辅助多光子显微镜，实现了对大鼠脑创伤半暗带微环境的快速、高质量成像分析，识别出细胞内外水肿等病理特征。",
+        "research思路": "针对创伤性脑损伤中半暗带准确识别的难题，采用多光子显微技术捕获亚细胞分辨率的微环境变化，结合深度学习去噪实现低剂量快速成像。",
+        "experiment": "使用去噪辅助MPM对大鼠脑组织成像，通过DBCNet从单扫描数据恢复高质量图像，定量分析正常组织、半暗带和核心区域的微结构差异。",
+        "innovation": "提出Dual-Branch Collaborative Network创新架构，利用多扫描参考信息增强单扫描图像质量，实现成像速度与质量的平衡，这是该领域首次将协作式去噪引入快速多光子成像。",
+        "related_work": "该领域重要工作包括：传统多光子显微成像技术、图像去噪深度学习（如U-Net、RED-Net）、创伤性脑损伤半暗带动物模型研究、以及其他脑组织显微成像方法如CLARITY和light-sheet microscopy。",
+        "impact": "该研究为创伤性脑损伤的早期诊断和治疗策略开发提供了重要的技术支撑，推动了多光子显微成像在神经科学研究中的临床转化应用。"
       },
-      "analysis": {
-        "summary": "展示大直径环形孔径VCSEL可实现瓦级低发散准高斯光束输出。",
-        "research思路": "解决大面积VCSEL多模高发散光束限制自由空间应用的问题。",
-        "experiment": "研究1mm环形孔径瓦级VCSEL角度特性，建立理论框架分析远场辐射。",
-        "innovation": "证明多模腔中通过低阶方位角模组合可产生准高斯远场分布。",
-        "related_work": "传统大面积VCSEL多模发射、光束整形技术、高亮度自由空间系统。",
-        "impact": "为高亮度自由空间应用提供新型VCSEL光源，推动VCSEL在新领域应用。"
+      "domain_trend": {
+        "trend": "近场光学融合AI与量子技术，推动神经成像与量子器件革命性突破",
+        "key_topics": [
+          "AI辅助光学成像",
+          "量子光学器件",
+          "多光子显微技术"
+        ],
+        "development_direction": "近场光学领域正向着智能化、量子化和跨学科融合方向发展，通过人工智能算法提升成像质量与效率，结合量子材料开发新型光子器件，并深入应用于神经科学、量子通信等领域，形成了从基础研究到应用开发的完整创新链条"
       }
     },
     {
-      "title": "Symmetric dilations of Pauli channels and semigroups",
-      "abstract": "We explore the symmetry properties of Stinespring dilations of single-qubit Pauli channels, addressing both the generic case and the specific examples of phase damping and depolarizing channels. For each scenario, we derive the representation of the Pauli group acting on the Hilbert space of the environment. We then focus on dilations that are continuous in time and driven by a time-independent Hamiltonian, and on collision models that generate a Pauli dynamical semigroup in the limit of fast collisions. First, we complement some recent general results on these types of dilations (M. Cattaneo, Phys. Rev. A 111, 022209 (2025)) with some additions and clarifications, including the case of covariant channels with strongly conserved quantities. Next, we show that the covariance property of Pauli channels impose strong constraints on both the dilation Hamiltonian and the initial state of the environment, and demonstrate how these constraints can be exploited to explicitly construct the time-dependent dilations in all considered cases. Our results are relevant for the quantum simulation of Pauli channels via unitary dilations and of Pauli semigroups via collision models, both in the laboratory and on quantum computers.",
-      "arxiv_id": "2605.20907v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20907v1",
+      "title": "Optimized Point Addition Circuits for Elliptic Curve Discrete Logarithms",
+      "abstract": "Shor's algorithm represents the main threat of quantum computers to cryptography. In order to precisely understand its feasibility, many authors have worked towards reducing its costs, either at the logical level (assuming a fault-tolerant architecture), or at the physical level (taking into account the constraints of envisioned hardware). In particular, recent works by Chevignard et al. (CRYPTO 2024) and Gidney (arXiv 2025) used improved arithmetic to significantly reduce the qubit cost of factoring RSA public keys.   Even more recently, Babbush et al. (arXiv 2026) improved the cost of computing elliptic curve discrete logarithms, with a reduction of a factor 2 to 3 in gate count and qubit count compared to a previous work by Litinski (arXiv 2023). Their result relies on optimized point addition circuits on elliptic curves over prime fields. However they did not reveal their logical quantum circuits, relying instead on a zero-knowledge proof.   In this paper, we detail a quantum logical circuit architecture which gives similar results as Babbush et al., with a slightly higher number of qubits (around 1.5% increase) and a slightly smaller Toffoli gate count (between 6.5% and 10% reduction) for the curve secp256k1. We also give gate counts for a generic variant of the circuit, which is valid for any prime field.",
+      "arxiv_id": "2606.02235v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.02235v1",
       "authors": [
-        "Marco Cattaneo"
+        "André Schrottenloher"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "研究Pauli通道的对称性膨胀性质及其在时间连续膨胀和碰撞模型中的应用",
-        "research思路": "解决单量子比特Pauli通道的Stinespring膨胀对称性表征问题",
-        "experiment": "理论推导Pauli群在环境希尔伯特空间的表示，分析膨胀哈密顿量和环境初态约束",
-        "innovation": "揭示Pauli通道协变性对膨胀哈密顿量和环境初态的强约束条件",
-        "related_work": "M. Cattaneo关于膨胀类型的一般性结果及协变通道研究",
-        "impact": "为量子通道膨胀理论提供新工具，促进量子噪声控制和量子信息处理发展"
+        "summary": "详细实现椭圆曲线离散对数优化点加法量子逻辑电路，降低Shor算法资源消耗",
+        "research思路": "解决量子计算对椭圆曲线密码的威胁问题，优化点加法电路以降低资源成本",
+        "experiment": "通过量子逻辑电路设计，实现椭圆曲线点加法操作，并与已有工作对比性能",
+        "innovation": "首次公开Babbush等人未公开的优化点加法量子电路细节，提供具体实现方案",
+        "related_work": "Babbush等人(arXiv 2026)、Litinski(arXiv 2023)、Chevignard等人(CRYPTO 2024)和Gidney(arXiv 2025)",
+        "impact": "推动量子计算攻击椭圆曲线密码的资源评估，促进后量子密码安全标准发展"
       }
     },
     {
-      "title": "Enhancing Phase Estimation in a Hybrid Interferometer via Kerr Nonlinearity and Photon Subtraction",
-      "abstract": "We propose a high-precision phase estimation scheme in a hybrid interferometer by synergistically combining a Kerr nonlinear phase shifter and multi-photon subtraction operations. Using a coherent state and a vacuum state as input resources, we systematically evaluate the phase sensitivity via homodyne detection and analyze the quantum Fisher information as well as the quantum Cramér-Rao bound under both ideal and lossy conditions. Our results show that the joint integration of Kerr nonlinearity and multi-photon subtraction yields remarkable advantages over either technique used alone. The proposed scheme enables the phase sensitivity to surpass the standard quantum limit, exceed the conventional Heisenberg scaling ($1/N$), and approach the super-Heisenberg scaling ($1/N^{2}$)-a direct consequence of Kerr nonlinearity. More precisely, the super-Heisenberg scaling $\\propto $ $1/N^{2}$ is the ultimate precision limit permitted by the $k=2$ Kerr nonlinearity and does not violate the fundamental Heisenberg limit for linear phase accumulation. Even under moderate internal photon loss, the system maintains high precision and exhibits enhanced robustness to decoherence. The Kerr nonlinearity introduces an intensity-dependent phase shift proportional to the squared photon number, while multi-photon subtraction tailors non-Gaussian states to strengthen phase information extraction. Compared with existing schemes based on hybrid interferometers or SU(1,1) interferometers, our architecture achieves superior precision and stronger loss resilience. All components are experimentally accessible with current quantum optical technologies. This work provides a promising route for practical high-precision quantum metrology and quantum sensing.",
-      "arxiv_id": "2605.20893v1",
-      "published": "2026-05-20",
-      "url": "http://arxiv.org/abs/2605.20893v1",
+      "title": "In-situ Silicon Doped hBN by High-Temperature Molecular Beam Epitaxy Enables Single Photon Emission",
+      "abstract": "Hexagonal boron nitride (hBN) has emerged as a leading host for optically active quantum defects. Yet introduction of specific impurity species other than carbon remains unexplored. Here, we demonstrate an in-situ silicon doping of hBN grown by high-temperature molecular beam epitaxy (HT-MBE). By systematically varying the growth temperature from 900 to 1390 °C under a constant silicon flux, we establish an optimal window for Si incorporation to host a diverse range of emitters from 430-750 nm at room temperature. By transferring silicon-doped hBN film on SiO$_2$ substrate, we verified that single photon emitter activity was sustained in the hBN, demonstrating compatibility with device integration. The plausible origins of the observed optical transitions were discussed, and several potential candidates were proposed. Our results demonstrate a step toward a comprehensive understanding of in-situ doping of hBN and its utilization for quantum photonic applications.",
+      "arxiv_id": "2606.01727v1",
+      "published": "2026-06-01",
+      "url": "http://arxiv.org/abs/2606.01727v1",
       "authors": [
-        "Lifen Guo",
-        "Qingqian Kang",
-        "Zekun Zhao"
+        "Jiyun Kim",
+        "Nika Teran",
+        "Juliette Plo"
       ],
       "citations": 0,
       "venue": "arXiv",
       "source": "arxiv",
       "analysis": {
-        "summary": "提出结合Kerr非线性与光子减法的混合干涉仪，实现相位精度突破标准量子极限",
-        "research思路": "解决相位估计精度受限问题，突破标准量子极限并逼近超海森堡标度",
-        "experiment": "采用相干态+真空态输入，结合Kerr非线性相移器和多光子减法操作",
-        "innovation": "首次联合利用Kerr非线性和光子减法，实现超海森堡标度(1/N²)的相位精度",
-        "related_work": "包括量子干涉仪、非线性光学相位估计、光子减法技术等方向研究",
-        "impact": "为量子精密测量提供新范式，推动高精度相位传感技术发展"
+        "summary": "首次实现高温分子束外延生长硅掺杂六方氮化硼，并证实其单光子发射特性",
+        "research思路": "解决hBN中非碳杂质掺杂难题，拓展量子缺陷发光范围",
+        "experiment": "采用HT-MBE技术在900-1390°C温度下进行原位硅掺杂hBN生长",
+        "innovation": "首次实现硅掺杂hBN，获得430-750nm宽带单光子发射并验证器件兼容性",
+        "related_work": "碳掺杂hBN量子缺陷研究、其他二维材料掺杂技术",
+        "impact": "为hBN量子缺陷工程提供新途径，推动量子光子学器件发展"
       }
     }
   ]

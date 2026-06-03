@@ -1,72 +1,98 @@
-# Scholar's Tea — Session Boot
+# CLAUDE.md
 
-> 完整规范 → `AGENTS.md` | 当前任务 → `.claude/HANDOFF.md` | 细则 → `.claude/rules/`
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
----
+## Project
 
-## 🔴 会话启动协议（新会话必读 — 必须执行）
+**Scholar's Tea** — full-stack academic community platform. Next.js 14 App Router + PostgreSQL 16 + pgvector + Socket.io + ZAI GLM-5.1 AI.
 
-**本文件是项目入口指令。每次新会话启动时，必须先完成以下步骤，再执行用户请求：**
+Detailed docs: `AGENTS.md` | Current task state: `.claude/HANDOFF.md` | Rules: `.claude/rules/`
 
-1. **读取 `.claude/HANDOFF.md`** → 恢复当前任务状态（目标、已完成、阻塞项、下一动作）
-2. **读取 `AGENTS.md`** → 获取项目全貌（技术栈、结构、规范）
-3. **读取 `.claude/rules/clear-protocol.md`** → 了解 /clear 前 checklist
-4. 按需读取 `.claude/rules/` 中的细则（commands.md、routes.md、api.md 等）
+## Commands
 
-**禁止跳过以上步骤直接响应用户。** 如果你已经读取了这些文件，在回复中简要说明当前任务状态即可。
+```bash
+# Dev
+npm run dev              # Next.js dev server, port 3000
+npm run build            # Production build (copies pdfjs worker)
+npm run start            # Production, port 3002
 
----
+# Quality gates — run before committing
+npm run lint             # ESLint
+npm run typecheck        # tsc --noEmit
 
-## 🔴 /clear 前强制协议（SessionEnd — 必须执行）
+# Tests
+npm run test             # vitest run
+npm run test:watch       # vitest --watch
 
-**禁止直接 `/clear` 或退出会话。** 必须先完成以下检查清单：
+# Database
+npx prisma migrate dev --name <name>   # Dev migration
+npx prisma migrate deploy              # Production migration
+npx prisma generate                    # Regenerate client after schema change
+npm run db:seed                        # Seed data
 
-1. **更新 `.claude/HANDOFF.md`** → 填写「当前任务状态」表格（目标、已完成、关键决策、阻塞项、相关文件、下一动作）
-2. **归档阶段性成果** → 如有 ADR、设计结论、调研结果，写入 `.claude/sessions/YYYY-MM-DD_主题.md`
-3. **更新项目知识** → 如有新踩坑/约束，追加到 `.claude/rules/` 或本文件
-4. **确认完成** → 明确告知用户已更新 HANDOFF.md，获得用户许可后才能执行 `/clear`
+# Socket server (separate process)
+cd server && npm run dev               # tsx watch, port 3001
+cd server && npm run build             # tsc → dist/
 
-完整 checklist → `.claude/rules/clear-protocol.md`
+# Production (on server via SSH)
+pm2 restart ecosystem.config.js        # Restart all 3 processes
+```
 
----
+## Architecture
 
-## Boot Checklist
+```
+src/app/(auth)/         → Login, register
+src/app/(main)/         → All page routes (groups, disciplines, tea-party, workshop, knowledge, profile, settings)
+src/app/api/v1/         → REST API routes, domain subdirs (ai/, groups/, posts/, knowledge/, hermes/, etc.)
+src/components/ui/      → shadcn base — NO business logic allowed
+src/components/features/→ Business components (editor, groups, hermes, workshop, tea-party, etc.)
+src/lib/db/prisma.ts    → Prisma singleton — ALL Next.js DB ops must use this
+src/lib/ai/             → ZAI wrapper, RAG service, paper generation, citation tools
+src/lib/ai/skills/      → AI skill engine (types, engine, registration)
+src/lib/personal-kb/    → PDF extraction, chunking, embedding, storage
+src/lib/auth/           → NextAuth config, providers, password utils
+server/src/             → Standalone Socket.io server (port 3001)
+server/src/db.ts        → Native pg Pool (bypasses Prisma for realtime perf)
+prisma/schema.prisma    → ~30 models (547 lines)
+```
 
-1. 轮数>20 / 时长>30min / Input>5M → 先执行上方 `/clear 协议`，再 `/compact` 或 `/clear`
-2. 禁止 `Read` >200 行；先 `Grep` 或 `Agent`
-3. 禁止修改 `CLAUDE.md`、`.claudeignore`、`settings.json`
-4. MCP 精简：当前 9 个，禁止新增不替换
-5. API key 仅通过 env 获取
+### Critical patterns
 
-## 恢复上下文
+- **Dual DB access**: Next.js uses Prisma (`src/lib/db/prisma.ts`); Socket server uses raw `pg` (`server/src/db.ts`). Changes to schema must work with both.
+- **AI naming gotcha**: `claude-service.ts` is a **legacy filename** — it wraps ZAI GLM-5.1, not Anthropic Claude. New code should import from `zai-service.ts`.
+- **pgvector queries**: Embeddings are `Unsupported("vector")` in Prisma. Raw SQL uses `(embedding <=> vec)::double precision` — the `::double precision` cast is mandatory (pg `real` type deserializes to `null` in Node.js).
+- **Embedding pipeline**: Local BGE-M3 (port 9997) → fallback to ZCHAT API. `generateEmbedding()` in `rag-service.ts` handles this.
+- **Paper generation dual-path**: Hermes Path (default) vs FastPath (fallback). Hermes path requires explicit `PAPER_GENERATION_SYSTEM_PROMPT` injection as system message.
+- **Build step copies pdfjs worker**: `npm run build` runs `cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdfjs/`. If pdfjs-dist is upgraded, verify this path.
 
-| 需要 | 读取 |
-|------|------|
-| 当前任务状态 | `.claude/HANDOFF.md` |
-| 命令速查 | `.claude/rules/commands.md` |
-| 路由/API 速查 | `.claude/rules/routes.md` |
-| API 设计规范 | `.claude/rules/api.md` |
-| 测试规范 | `.claude/rules/testing.md` |
-| 记忆规则 | `.claude/rules/memory.md` |
-| /clear 协议 | `.claude/rules/clear-protocol.md` |
-| 历史会话 | `.claude/sessions/` |
-| Agent 定义 | `.claude/agents/` |
+### Deploy model
 
-## 验证 Gates
+Local Windows (`z:\321\DHL\Scholar's_Tea`) is a **RaiDrive SFTP mount** of remote server (`/data/home/zju321/321/DHL/Scholar's_Tea`). Local edits write through immediately. **Build and restart must happen on server** via `ssh ZJU-MSE-HPC`. No local build needed.
 
-| 类型 | 命令 |
-|------|------|
-| API / 前端 | `npm run lint && npm run typecheck` |
-| DB | `npx prisma validate` |
+PM2 runs 3 processes: Next.js (3002), Socket.io (3001), Embedding server (9997).
 
-## 记忆写入
+### Design system
 
-| 类型 | 位置 |
-|------|------|
-| 工具 Bug / workaround | `memory` 工具 |
-| 跨项目 SOP | `.claude/skills/` |
-| 项目事实 / 踩坑 | `.claude/rules/` 或本文件 |
+Tailwind semantic tokens only — `journal-*` (academic teal/gold), `tea-*` (social mint/orange), `convo-*` (dialog blue/blush). No hardcoded hex in JSX.
 
----
+### Code style
 
-*Last updated: 2026-05-14*
+- Prettier: `semi: false`, `singleQuote: true`, `trailingComma: es5`, `printWidth: 100`
+- ESLint: `no-console: warn`
+- Path alias: `@/*` → `./src/*`
+- Conventional Commits: `feat(scope):`, `fix(scope):`, `refactor(scope):`
+- TypeScript strict mode
+
+## Session protocol
+
+1. **Boot**: Read `.claude/HANDOFF.md` → report current task state to user
+2. **Before /clear**: Update HANDOFF.md task table + archive to `.claude/sessions/`. Get user confirmation first.
+3. **Token discipline**: Read ≤100 lines at a time. Grep/Glob before Read. Parallel independent calls.
+
+## Verification
+
+| Type | Command |
+|------|---------|
+| API / Frontend | `npm run lint && npm run typecheck` |
+| Database | `npx prisma validate` |
+| Socket server | `cd server && npm run build` |

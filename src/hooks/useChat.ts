@@ -2,6 +2,9 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { AgentMode } from '@/lib/ai/agent-modes'
+import { searchPersonalKB } from '@/lib/personal-kb/search'
+import { applySlidingWindow, getContextState } from '@/lib/personal-kb/context-manager'
+import { searchResearchMemories } from '@/lib/research-memory/search'
 
 export interface ChatAttachment {
   type: 'image' | 'file'
@@ -26,6 +29,8 @@ export interface ChatMessage {
     id: string
     title: string
     source?: string
+    discipline?: string | null
+    similarity: number
   }>
   /** 引用验证结果（仅 Hermes 增强模式生成） */
   citations?: CitationStatus
@@ -218,6 +223,24 @@ export function useChat(initialMode: AgentMode = 'general') {
   const abortRef = useRef<AbortController | null>(null)
   const [initialized, setInitialized] = useState(false)
   const [dbAvailable, setDbAvailable] = useState(false)
+  const PKB_ENABLED_KEY = 'scholars-tea-pkb-enabled'
+  const [personalKBEnabled, setPersonalKBEnabled] = useState(() => {
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem(PKB_ENABLED_KEY) === 'true'
+    } catch {
+      return false
+    }
+  })
+  const [pkbStatus, setPkbStatus] = useState<{
+    lastSearchAt: number | null
+    resultCount: number
+    error: string | null
+  }>({ lastSearchAt: null, resultCount: 0, error: null })
+  const [contextState, setContextState] = useState<{
+    totalTokens: number
+    isWarning: boolean
+    hiddenRounds: number
+  } | null>(null)
 
   // Load sessions: try DB first, fallback to localStorage
   useEffect(() => {
@@ -251,6 +274,32 @@ export function useChat(initialMode: AgentMode = 'general') {
       cancelled = true
     }
   }, [initialized])
+
+  // Persist PKB toggle state
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(PKB_ENABLED_KEY, String(personalKBEnabled))
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [personalKBEnabled, PKB_ENABLED_KEY])
+
+  // Pre-load embedding config into memory on mount (fixes refresh loss)
+  useEffect(() => {
+    import('@/lib/personal-kb/storage').then(({ getEmbeddingConfig }) => {
+      getEmbeddingConfig().then((config) => {
+        if (config) {
+          import('@/lib/personal-kb/embedder').then(({ setApiEmbeddingConfig }) => {
+            if (config.provider === 'api') {
+              setApiEmbeddingConfig(config as unknown as import('@/lib/personal-kb/types').ApiEmbeddingConfig)
+            }
+          })
+        }
+      })
+    })
+  }, [])
 
   const currentSession = sessions.find((s) => s.id === currentSessionId) || null
 
@@ -385,12 +434,64 @@ export function useChat(initialMode: AgentMode = 'general') {
         activeSessionId = await createSession(mode)
       }
 
+      // ===== 私人知识库检索 =====
+      let pkbContext = ''
+      let pkbSources: Array<{ id: string; title: string; similarity: number }> = []
+      if (personalKBEnabled) {
+        try {
+          const results = await searchPersonalKB(content.trim(), { limit: 10, threshold: 0.5 })
+          if (results.length > 0) {
+            pkbSources = results.map((r) => ({
+              id: r.chunk.id,
+              title: r.docMeta.title || '未命名文献',
+              similarity: r.similarity,
+            }))
+            pkbContext =
+              '\n\n【用户个人知识库相关内容】\n' +
+              results
+                .map(
+                  (r, i) =>
+                    `[PKB-${i + 1}] 《${r.docMeta.title || '未命名文献'}》 — 相关段落：\n${r.chunk.text.slice(0, 800)}`
+                )
+                .join('\n\n')
+          }
+          setPkbStatus({ lastSearchAt: Date.now(), resultCount: results.length, error: null })
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : String(err)
+          console.warn('[useChat] Personal KB search failed:', err)
+          setPkbStatus({ lastSearchAt: Date.now(), resultCount: 0, error: errMsg })
+          // 非阻塞：继续聊天，但用户可以通过 pkbStatus 看到错误
+        }
+      } else {
+        setPkbStatus({ lastSearchAt: null, resultCount: 0, error: null })
+      }
+
+      // ===== 研究记忆搜索（浏览器端） =====
+      let memoryContext = ''
+      try {
+        const memoryResults = await searchResearchMemories(content.trim(), { limit: 3, threshold: 0.5 })
+        if (memoryResults.length > 0) {
+          memoryContext =
+            '\n\n【用户研究笔记】\n' +
+            memoryResults
+              .map(
+                (r, i) =>
+                  `[MEMORY-${i + 1}] 《${r.memory.title}》(${r.memory.type}) — relevance: ${r.similarity.toFixed(2)}\n${r.memory.content.slice(0, 600)}`
+              )
+              .join('\n\n')
+        }
+      } catch (err) {
+        // 非阻塞：embedder 未配置或失败时静默跳过
+        console.warn('[useChat] Research memory search skipped:', err)
+      }
+
       const userMessage: ChatMessage = {
         id: generateId(),
         role: 'user',
-        content: content.trim(),
+        content: content.trim() + pkbContext + memoryContext,
         timestamp: Date.now(),
         attachments,
+        ragContext: pkbSources.length > 0 ? pkbSources : undefined,
       }
 
       const updatedMessages = [...messages, userMessage]
@@ -419,8 +520,15 @@ export function useChat(initialMode: AgentMode = 'general') {
       const doFetch = async (attempt = 1): Promise<Response> => {
         abortRef.current = new AbortController()
 
+        // ===== 上下文管理：滑动窗口 =====
+        const { visible: windowedMessages } = applySlidingWindow(updatedMessages)
+
+        // 更新上下文状态显示
+        const ctxState = getContextState(windowedMessages)
+        setContextState(ctxState)
+
         // Build API messages
-        const apiMessages = updatedMessages.map((m) => ({
+        const apiMessages = windowedMessages.map((m) => ({
           role: m.role,
           content: m.content,
         }))
@@ -579,7 +687,7 @@ export function useChat(initialMode: AgentMode = 'general') {
         abortRef.current = null
       }
     },
-    [messages, loading, currentSessionId, mode, createSession, sessions]
+    [messages, loading, currentSessionId, mode, createSession, sessions, personalKBEnabled]
   )
 
   const stopGeneration = useCallback(() => {
@@ -618,6 +726,10 @@ export function useChat(initialMode: AgentMode = 'general') {
     error,
     streamingContent,
     dbAvailable,
+    personalKBEnabled,
+    setPersonalKBEnabled,
+    pkbStatus,
+    contextState,
     createSession,
     switchSession,
     deleteSession,

@@ -18,13 +18,15 @@ import {
   analyzePaperWithHermes,
 } from '@/lib/ai/claude-service'
 import type { ChatMessage, VisionContent } from '@/lib/ai/claude-service'
-import { getContextForQuery } from '@/lib/ai/rag-service'
+import { callHermesGatewayStream } from '@/lib/ai/hermes-gateway-adapter'
+import { getContextForQuery, type SearchResult } from '@/lib/ai/rag-service'
 import { agentModes, type AgentMode } from '@/lib/ai/agent-modes'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { guardDepth } from '@/lib/utils/loop-guard'
 import { extractTextFromPdf, isPdfAttachment } from '@/lib/utils/pdf-parser'
 import { processImageMarkers } from '@/lib/ai/zai-service'
+import { isPaperDownloadIntent, getDownloadTriggerHint } from '@/lib/ai/paper-download-intent'
 
 interface ChatAttachment {
   type: 'image' | 'file'
@@ -543,6 +545,79 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // paper_download 模式：直接路由到 Hermes Gateway
+    if (mode === 'paper_download') {
+      if (!messages || messages.length === 0) {
+        return NextResponse.json(
+          { success: false, data: null, error: { code: 'INVALID_REQUEST', message: '消息不能为空' } },
+          { status: 400 }
+        )
+      }
+
+      // 注入前端下载配置
+      const downloadConfig = body.downloadConfig as { batchMode?: boolean; strategy?: string } | undefined
+
+      // 注入下载触发提示，强化 Gateway 调用 scansci-pdf 的意愿
+      const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user')
+      const lastUserText =
+        lastUserMsg && typeof lastUserMsg.content === 'string'
+          ? lastUserMsg.content
+          : ''
+      const downloadHint = lastUserText
+        ? getDownloadTriggerHint(lastUserText, { ...downloadConfig, platform: 'web' })
+        : ''
+      let configHint = ''
+      if (downloadConfig) {
+        const strategyMap: Record<string, string> = {
+          fastest: '自动（并行竞赛）',
+          oa_first: 'OA优先',
+          scihub_only: 'Sci-Hub',
+          legal_only: '仅合法来源',
+        }
+        configHint = `\n\n【下载配置】模式: ${downloadConfig.batchMode ? '批量下载' : '单篇下载'} | 策略: ${strategyMap[downloadConfig.strategy || 'fastest'] || downloadConfig.strategy}。请严格按此配置执行。`
+      }
+
+      const hintedMessages = downloadHint || configHint
+        ? messages.map((m) =>
+            m === lastUserMsg ? { ...m, content: m.content + downloadHint + configHint } : m
+          )
+        : messages
+
+      // 注入强制搜索验证的 system prompt（叠加在 Gateway 核心 prompt 之上）
+      const searchEnforcementPrompt = `【强制执行】本对话涉及学术论文查询/下载。你必须遵循以下规则：
+1. 绝对禁止基于模型记忆直接回答论文标题、作者、DOI 等信息。
+2. 必须先调用 mcp_semantic_scholar_search_papers 或 mcp_paper_search_search_research 搜索验证。
+3. 只有在获得搜索结果后，才能基于搜索到的真实信息回答用户。
+4. 如果搜索失败，明确告知用户"搜索服务暂时不可用"，而不是给出可能错误的答案。`
+
+      const enrichedMessages = [
+        { role: 'system' as const, content: searchEnforcementPrompt },
+        ...hintedMessages,
+      ]
+
+      const hermesResult = await callHermesGatewayStream(enrichedMessages as ChatMessage[], {
+        personality: 'technical',
+        timeout: 180_000,
+        maxTokens: 4096,
+        temperature: 0.7,
+      })
+
+      if ('error' in hermesResult) {
+        return NextResponse.json(
+          { success: false, data: null, error: { code: 'AI_ERROR', message: hermesResult.error } },
+          { status: 500 }
+        )
+      }
+
+      return new Response(hermesResult, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      })
+    }
+
     // Default: chat
     if (!messages || messages.length === 0) {
       return NextResponse.json(
@@ -557,7 +632,7 @@ export async function POST(request: NextRequest) {
 
     // Enhance with RAG context if enabled
     let enhancedMessages = messages
-    let ragSources: Array<{ id: string; title: string; source?: string | null }> | null = null
+    let ragSources: SearchResult[] | null = null
 
     if (useRag && messages.length > 0) {
       const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')
@@ -585,6 +660,76 @@ export async function POST(request: NextRequest) {
 
     // Convert image attachments to vision format
     const visionMessages = await buildVisionMessages(messagesWithFiles, attachments)
+
+    // 论文下载意图 → 路由到 Hermes Gateway（scansci-pdf MCP）
+    const lastUserMsg = [...visionMessages].reverse().find((m) => m.role === 'user')
+    const lastUserText =
+      lastUserMsg && typeof lastUserMsg.content === 'string'
+        ? lastUserMsg.content
+        : lastUserMsg
+          ? (lastUserMsg.content as Array<{ type: string; text?: string }>)
+              .filter((c) => c.type === 'text')
+              .map((c) => c.text)
+              .join('')
+          : ''
+    const shouldUseHermesForDownload = isPaperDownloadIntent(lastUserText)
+
+    if (shouldUseHermesForDownload && useStream) {
+      // 注入前端下载配置（如果存在）
+      const downloadConfig = body.downloadConfig as { batchMode?: boolean; strategy?: string } | undefined
+
+      // 注入下载触发提示，强化 Gateway 调用 scansci-pdf 的意愿
+      const downloadHint = lastUserText ? getDownloadTriggerHint(lastUserText, { ...downloadConfig, platform: 'web' }) : ''
+      let configHint = ''
+      if (downloadConfig) {
+        const strategyMap: Record<string, string> = {
+          fastest: '自动（并行竞赛）',
+          oa_first: 'OA优先',
+          scihub_only: 'Sci-Hub',
+          legal_only: '仅合法来源',
+        }
+        configHint = `\n\n【下载配置】模式: ${downloadConfig.batchMode ? '批量下载' : '单篇下载'} | 策略: ${strategyMap[downloadConfig.strategy || 'fastest'] || downloadConfig.strategy}。请严格按此配置执行。`
+      }
+
+      const hintedMessages = downloadHint || configHint
+        ? visionMessages.map((m) =>
+            m === lastUserMsg ? { ...m, content: m.content + downloadHint + configHint } : m
+          )
+        : visionMessages
+
+      // 注入强制搜索验证的 system prompt（叠加在 Gateway 核心 prompt 之上）
+      const searchEnforcementPrompt = `【强制执行】本对话涉及学术论文查询/下载。你必须遵循以下规则：
+1. 绝对禁止基于模型记忆直接回答论文标题、作者、DOI 等信息。
+2. 必须先调用 mcp_semantic_scholar_search_papers 或 mcp_paper_search_search_research 搜索验证。
+3. 只有在获得搜索结果后，才能基于搜索到的真实信息回答用户。
+4. 如果搜索失败，明确告知用户"搜索服务暂时不可用"，而不是给出可能错误的答案。`
+
+      const enrichedMessages = [
+        { role: 'system' as const, content: searchEnforcementPrompt },
+        ...hintedMessages,
+      ]
+
+      const hermesResult = await callHermesGatewayStream(enrichedMessages as ChatMessage[], {
+        personality: 'technical',
+        timeout: 180_000,
+        maxTokens: 4096,
+        temperature: 0.7,
+      })
+
+      if ('error' in hermesResult) {
+        console.warn('[Workshop] Hermes download routing failed:', hermesResult.error)
+        // Fallback to normal ZAI flow below
+      } else {
+        // Hermes SSE 透传给前端
+        return new Response(hermesResult, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            Connection: 'keep-alive',
+          },
+        })
+      }
+    }
 
     // Streaming response
     if (useStream) {
@@ -683,7 +828,7 @@ export async function POST(request: NextRequest) {
         content: result.content,
         ragContext: ragSources,
       },
-      meta: null,
+      meta: { ragSourceCount: ragSources?.length ?? 0 },
     })
   } catch (error) {
     console.error('POST /api/v1/ai/chat error:', error)

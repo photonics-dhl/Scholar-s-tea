@@ -72,15 +72,54 @@ export async function callZAI(
     body.thinking = true
   }
 
-  return _fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-    agent: _agent,
-  } as any)
+  const maxRetries = 3
+  let lastError: any
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await _fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(body),
+        agent: _agent,
+      } as any)
+
+      // 429 rate limit -> exponential backoff retry
+      if (response.status === 429) {
+        const delay = Math.min(1000 * 2 ** attempt, 8000)
+        console.warn(
+          `[ZAI] Rate limited, retrying in ${delay}ms... (${attempt + 1}/${maxRetries})`
+        )
+        await new Promise((r) => setTimeout(r, delay))
+        continue
+      }
+
+      return response
+    } catch (error) {
+      lastError = error
+      const isRetryable =
+        error instanceof Error &&
+        (error.message.includes('ECONNRESET') ||
+          error.message.includes('ETIMEDOUT') ||
+          error.message.includes('socket hang up') ||
+          error.message.includes('disconnected before secure TLS') ||
+          error.message.includes('Network request failed'))
+
+      if (!isRetryable || attempt === maxRetries - 1) break
+
+      const delay = Math.min(1000 * 2 ** attempt, 8000)
+      console.warn(
+        `[ZAI] Network error, retrying in ${delay}ms... (${attempt + 1}/${maxRetries})`
+      )
+      await new Promise((r) => setTimeout(r, delay))
+    }
+  }
+
+  if (lastError) throw lastError
+  throw new Error('ZAI 调用失败，已重试多次')
 }
 
 /** 调用 ZAI 视觉模型 GLM-4.6V（原生支持 image_url） */

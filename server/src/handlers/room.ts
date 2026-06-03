@@ -151,8 +151,11 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
     });
 
     // Disconnect — clean up all participant records for this socket
+    // Capture user info at connection time to avoid undefined on disconnect
+    const connectedUser = socket.data.user;
+
     socket.on('disconnect', async () => {
-      const userId = socket.data.user?.id;
+      const userId = connectedUser?.id;
       if (!userId) return;
 
       if (process.env.LOG_LEVEL === 'debug') {
@@ -180,7 +183,7 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
             `INSERT INTO "Message" ("id", "roomId", "userId", "content", "type", "createdAt")
              VALUES ($1, $2, $3, $4, $5, NOW())
              RETURNING *`,
-            [randomUUID(), roomId, userId, `${socket.data.user?.name || '用户'} 离开了房间`, 'SYSTEM']
+            [randomUUID(), roomId, userId, `${connectedUser?.name || '用户'} 离开了房间`, 'SYSTEM']
           );
 
           // Broadcast system message
@@ -189,7 +192,7 @@ export function registerRoomHandlers(io: Server, query: QueryFunction) {
               ...systemMsgResult.rows[0],
               user: {
                 id: userId,
-                name: socket.data.user?.name,
+                name: connectedUser?.name,
                 avatar: null,
               },
             },

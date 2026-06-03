@@ -165,8 +165,8 @@ display:
   tool_progress_command: false
   tool_progress_overrides: {}
 fallback_providers:
-  - provider: zai
-    model: glm-4.7
+  - provider: minimax
+    model: MiniMax-M2.7
   - provider: deepseek
     model: deepseek-chat
     base_url: https://api.deepseek.com

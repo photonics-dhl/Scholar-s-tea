@@ -10,87 +10,87 @@
 
 | 项 | 内容 |
 |----|------|
-| **目标** | 排查并修复网络连接不稳定问题（需多次刷新才能加载主页） |
-| **已完成** | ✅ frpc 配置优化（`heartbeat_interval=15`, `heartbeat_timeout=45`, `pool_count=3`, `tcp_mux=true`）<br>✅ Next.js HTTP 缓存头（首页 60s SWR，静态资源 immutable）<br>✅ PostgreSQL TCP keepalive 参数（`keepalives_idle=60&keepalives_interval=10`）<br>✅ 定位根本原因：socks5 代理（127.0.0.1:7890）间歇性清理长连接 + 原 frpc 无心跳参数<br>✅ 响应时间从 2.6s → 0.55-0.82s，10 连击全部 200 成功<br>✅ 部署验证通过 |
-| **关键决策** | - frpc 心跳 15s/超时 45s 是平衡网络负载和稳定性的折中<br>- `pool_count=3` 预建连接减少冷启动延迟<br>- 系统 Nginx（ParaCloud，443 端口）不可修改，放弃 nginx 反向代理方案<br>- socks5 代理由系统维护，不在用户控制范围内 |
+| **目标** | 项目健康度审计 + 零风险优化 + Hermes 配置关系梳理，为后续功能开发做准备 |
+| **已完成** | ✅ 项目全量技术债审计（架构/代码质量/基础设施/CI）<br>✅ .env.example 同步实际代码（移除 7 死变量，补充 12 未记录变量）<br>✅ 删除 server/src 空 directory（modules/plugins/services）<br>✅ CI 添加 npm run build 门禁<br>✅ Hermes 实例关系彻底理清<br>✅ Hermes config fallback 链修正（GLM-5.1 → MiniMax-M2.7 → DeepSeek）<br>✅ smart_model_routing 关闭（Kimi 不可用）<br>✅ 4 个科研技能复制到项目 hermes-home<br>✅ 所有变更已推送到 GitHub develop（2e65c68） |
+| **关键决策** | - **Hermes 实例关系**：运行时只有全局 `~/.hermes/` 一个实例，项目 `hermes-home/` 是版本控制的参考副本，不被任何运行时进程读取<br>- **fallback 链**：GLM-5.1 → MiniMax-M2.7 → DeepSeek（用户确认）<br>- **smart_model_routing**：关闭，Kimi moonshot-v1-8k 不可用，GLM-5.1 并发数足够<br>- **技术债优先级**：仅执行零风险项（文档同步/空目录/CI），高风险项（API 样板重构/大文件拆分/as any 修复）暂不执行 |
 | **阻塞项** | 无 |
-| **相关文件** | `next.config.js`, `.env`, `/data/home/zju321/sakura-frp/frpc.ini` |
-| **已知问题** | - 数据连接仍有间歇性 EOF 断线（底层 socks5 代理/网络链路固有问题，频率已大幅降低）<br>- 断线呈批量爆发模式（tcp_mux 复用连接的连锁反应）<br>- 个人知识库（Personal KB）的 PDF 公式提取仍依赖 pdf.js + LLM，未接入 MathPix |
-| **下一动作** | 1）用户持续观察网络稳定性，如仍有问题可添加 frpc 监控脚本 + 前端重试逻辑<br>2）评估是否需要接入 MathPix API 改善 PDF 公式提取 |
+| **相关文件** | `.env.example`, `.github/workflows/ci.yml`, `hermes-home/config.yaml`, `~/.hermes/config.yaml`, `server/src/`（已清理空目录） |
+| **已知问题** | - Prisma 缺失索引（Message/Post/Comment/Vote 等高频查询无索引，随数据量增长将变慢）<br>- ~40 处 `as any` 类型断言（auth.ts 模块扩展是根因，修复一处可消除 8+ 处）<br>- API 路由 51 处重复认证样板（已有 `lib/api/response.ts` 但仅 11 文件使用）<br>- 脚本目录 44 个根级文件含大量 one-shot 临时脚本待归档<br>- `API_SERVER_KEY` 在源码中有硬编码 fallback（用户暂不改） |
+| **下一动作** | 进入功能开发阶段。等待用户指定具体功能需求。 |
 
 ---
 
-## 本次变更详情（2026-05-30 — 网络稳定性排查与修复）
+## 核心架构认知（永不可忘）
 
-### 背景
-
-- **症状**：访问 `scholars-tea.428312321.xyz` 需要多次刷新才能加载，频繁遇到 503/超时
-- **原响应时间**：外部 2.6s，本地 0.019s（130 倍差距）
-- **frpc 日志**：大量"网络波动导致数据连接断开, 正在重试: EOF"（33 次/天）
-
-### 排查过程
-
-1. **服务器资源检查** — CPU/内存/磁盘均正常，PM2 进程健康（重启均为部署 SIGINT，非崩溃）
-2. **FRP 隧道诊断** — Sakura Frp 会员套餐，但必须经系统级 socks5 代理（127.0.0.1:7890）访问外网
-3. **网络链路测试** — 直接 TCP 到 frp-fit.com:8088 失败，ping 100% 丢包，traceroute 第 5 跳后消失
-4. **frpc 配置审计** — 原配置无心跳参数，tcp_mux 未显式开启
-5. **数据库连接层** — PostgreSQL keepalive 全为 0，Prisma 连接字符串无保活参数
-
-### 修复措施
-
-| 层级 | 修复 | 文件 |
-|------|------|------|
-| FRP 隧道 | `heartbeat_interval=15`, `heartbeat_timeout=45`, `pool_count=3`, `tcp_mux=true` | `~/sakura-frp/frpc.ini` |
-| HTTP 缓存 | 首页 `max-age=60,s-w-r=300`；静态资源 `immutable`；API `no-store` | `next.config.js` |
-| DB 连接 | `keepalives=1&keepalives_idle=60&keepalives_interval=10&keepalives_count=6` | `.env` `DATABASE_URL` |
-
-### 验证结果
+### Hermes 实例关系（2026-06-03 确认）
 
 ```
-# 10 次连续外部请求
-req1: 200 0.591s
-req2: 200 0.587s
-req3: 200 0.612s
-req4: 200 0.585s
-req5: 200 0.549s
-req6: 200 0.570s
-req7: 200 0.545s
-req8: 200 0.565s
-req9: 200 0.548s
-req10: 200 0.539s
+~/.hermes/                          ← 唯一活跃实例
+├── config.yaml                     ← Gateway + Next.js 共同读取的配置
+├── skills/research/                ← 15 个科研技能（含 scansci-pdf）
+├── hermes-agent/                   ← Gateway Python 源码（PYTHONPATH 指向此处）
+└── .env                            ← Gateway 环境变量
+
+~/scholars/hermes-home/             ← 项目仓库中的备份/参考副本
+├── config.yaml                     ← 与全局保持同步，运行时不读取
+└── hermes-agent/                   ← 开发/备份副本
 ```
 
----
+- Gateway 启动：`HERMES_HOME=/data/home/zju321/.hermes`（见 `tests/scripts/restart_hermes.sh`）
+- Next.js capabilities 路由：`process.env.HERMES_HOME || homedir()/.hermes`（默认指向全局）
+- `ecosystem.config.js` 的 `forwardVars` 不含 `HERMES_HOME`（未覆盖）
+- **项目 hermes-home/ 中的技能和配置不影响运行中的 Gateway**
 
-## 核心环境（永不可忘）
+### AI 调用链路
+
+```
+Workshop / FloatingChat (前端)
+    ↓
+Next.js API Routes (3002)
+    ├── 纯文本 → Hermes Gateway (8642) → GLM-5.1 (ZAI)
+    │                                   fallback: MiniMax-M2.7 → DeepSeek
+    ├── 图片 → GLM-4.6V → ZCHAT → MiniMax VLM → DeepSeek (四级 fallback)
+    └── 论文生成 → Hermes Gateway (含 PAPER_GENERATION_SYSTEM_PROMPT 显式注入)
+```
+
+### 环境配置
 
 | 配置 | 值 |
 |------|-----|
 | **服务器** | `10.72.212.33` via `ssh ZJU-MSE-HPC` |
 | **OS** | CentOS 7 (no sudo) |
 | **PG 版本** | 16.4（源码编译 @ `~/pgsql16`） |
-| **PG 数据** | `~/pgdata16` |
 | **pgvector** | 0.7.4 |
 | **Embedding 模型** | BAAI/bge-m3（1024 维）@ `http://127.0.0.1:9997` |
-| **RAG 搜索** | pgvector `<=>` 原生 cosine distance（threshold 0.5 = distance ≤ 0.5） |
+| **RAG 搜索** | pgvector `<=>` cosine distance（threshold 0.5） |
 | **Next.js** | Port 3002（PM2: `scholars-tea`）|
 | **Socket** | Port 3001（PM2: `scholars-tea-socket`）|
-| **FRP 隧道** | Sakura Frp 会员，`frpc.ini` @ `~/sakura-frp/frpc.ini` |
-| **FRP 代理** | 强制经 socks5://127.0.0.1:7890（系统级代理，不可控） |
+| **FRP 隧道** | Sakura Frp 会员，经 socks5://127.0.0.1:7890 |
 | **FRP 域名** | `scholars-tea.428312321.xyz` (3002), `socket.428312321.xyz` (3001) |
+| **本地路径** | `z:\321\DHL\Scholar's_Tea` = RaiDrive SFTP mount of `/data/home/zju321/321/DHL/Scholar's_Tea` |
+
+---
+
+## 技术债清单（待后续评估执行）
+
+| 优先级 | 项目 | 工作量 | 风险 |
+|--------|------|--------|------|
+| 🔴 P0 | Prisma 添加缺失索引 | 2h | 低 |
+| 🔴 P1 | API 路由抽象 auth+error 样板 | 4h | 中 |
+| 🟡 P2 | 修复 auth.ts 类型 → 消除 ~8 处 as any | 2h | 中 |
+| 🟡 P2 | 清理 scripts/ 归档临时文件 | 1h | 低 |
+| 🟢 P3 | CI deploy 添加健康检查+回滚 | 2h | 低 |
+| 🟢 P3 | 拆分 >700 行大文件 | 8h | 高 |
 
 ---
 
 ## 历史归档
 
+### 2026-06-03：技术债审计 + Hermes 关系梳理 + 零风险优化
+→ 详见本节
+
 ### 2026-05-30：网络稳定性排查与修复
-→ 详见本节「本次变更详情」
+→ frpc 心跳优化 + HTTP 缓存头 + PG keepalive
 
 ### 2026-05-29：PostgreSQL 16 + pgvector 升级
 → 详见 `.claude/project-memory/SOLUTIONS/postgresql-16-pgvector-upgrade.md`
-
-### 2026-05-27：Marker PDF 逐页选择性 force_ocr
-→ 已废弃路径。Marker 最终移除，改用纯 LLM 修复。
-
-### 2026-05-26：BGE-M3 本地 Embedding 迁移
-→ 详见 `.claude/project-memory/SOLUTIONS/bge-m3-embedding-server.md`
